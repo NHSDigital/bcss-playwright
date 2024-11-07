@@ -12,7 +12,11 @@ RUN mkdir -p /tests/
 COPY ./tests/ ./tests/
 RUN mkdir -p /utils/
 COPY ./utils/ ./utils/
+RUN mkdir -p /pages/
+COPY ./pages ./pages
 COPY ./pytest.ini ./pytest.ini
 COPY ./run_tests.sh ./run_tests.sh
+COPY ./.env ./.env
 
 RUN chmod +x ./run_tests.sh
+CMD bash run_tests.sh

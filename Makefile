@@ -7,11 +7,19 @@ include scripts/init.mk
 
 # Example CI/CD targets are: dependencies, build, publish, deploy, clean, etc.
 
+test: # run tests in a local podman container
+	if podman inspect -f '{{.Name}}' playwright > /dev/null; then
+		podman rm playwright --force
+	fi
+		podman build -t bcss-playwright:latest .
+		podman run --name playwright bcss-playwright:latest
+		podman logs -f playwright
+		
 dependencies: # Install dependencies needed to build and test the project @Pipeline
 	# TODO: Implement installation of your project dependencies
 
 build: # Build the project artefact @Pipeline
-	# TODO: Implement the artefact build step
+	podman build -t bcss-playwright:latest .
 
 publish: # Publish the project artefact @Pipeline
 	# TODO: Implement the artefact publishing step

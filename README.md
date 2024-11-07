@@ -6,7 +6,7 @@ This project is designed to provide a blueprint to allow for development teams t
 
 NOTE: This project is currently under initial development so isn't finalised, but should work if you want to experiment with Playwright Python.
 
-> **NOTE: When considering this project, please be advised that currently Playwright is a "proposed" tool within the [NHS England Tech Radar](https://radar.engineering.england.nhs.uk/).  Whilst we are taking steps to get Playwright moved to the "mainstream" section of the radar, as it has not yet been formally adopted it is possible that Playwright may not be fully endorsed by NHS England as a standard tool going forward, and using this framework for an NHS England project is currently at your own risk.**
+> **NOTE: When considering this project, please be advised that currently Playwright is a "proposed" tool within the [NHS England Tech Radar](https://radar.engineering.england.nhs.uk/). Whilst we are taking steps to get Playwright moved to the "mainstream" section of the radar, as it has not yet been formally adopted it is possible that Playwright may not be fully endorsed by NHS England as a standard tool going forward, and using this framework for an NHS England project is currently at your own risk.**
 
 ## Table of Contents
 
@@ -34,18 +34,26 @@ To utilise the blueprint code, you will need to have the following installed:
 - [Python](https://www.python.org/downloads/) 3.12 or greater
 
 Whilst not required to get started, you may also want to [configure a Python virtual environment for your project](https://docs.python.org/3/library/venv.html) before proceeding with
-the configuration.  If you are using an IDE such as Visual Studio Code or PyCharm, you will normally be prompted to do this automatically.
+the configuration. If you are using an IDE such as Visual Studio Code or PyCharm, you will normally be prompted to do this automatically.
 
 ### Configuration
 
-To get started using Playwright and with the examples provided, use the following commands:
+There is a makefile which has common commands to interface with the repository, to check if the tests are working you can run the command `make test`
 
-```shell
+The first time you run this it will create a container using buildah and podman, it will then install the prerequisites onto it and copy over the code before executing `pytest` to run all the tests. This is the reccomended way to run the tests
+
+If you prefer to run the tests locally you can do so by first assuming the python virtual environment, vscode should pick it up automatically in the `venv` directory but if you are using the terminal on linux or mac you can run `source venv/bin/activate` If you are using windows it may work the same for you or you may need to lookup how to assume a python virtual environment.
+
+Once that is done you can run the following commands to install the prerequisites:
+
+```bash
 pip install -r requirements.txt
 playwright install --with-deps
 ```
 
-This will install all the necessary packages for executing Playwright tests, and install Playwright ready for use by the framework.  You can test the configuration
+> **Note** I found that trying to run this on fedora let to some errors, only Ubuntu seems to be supported which is why I have setup a container using ubuntu to support other environments
+
+This will install all the necessary packages for executing Playwright tests, and install Playwright ready for use by the framework. You can test the configuration
 has worked by running our example tests, which can be done using the following command (this will run all tests with tracing reports turned on, and in headed mode
 so you can see the browser execution):
 
