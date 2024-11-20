@@ -6,7 +6,7 @@ WORKDIR /test
 COPY ./requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 RUN playwright install --with-deps
-RUN playwright install chrome
+RUN playwright install chrome --with-deps
 
 RUN mkdir -p /tests/
 COPY ./tests/ ./tests/
