@@ -28,11 +28,9 @@ class ScreeningPractitionerAppointments:
                 "link", name="Patients that Require Colonoscopy Assessment Appointments"
             )
         )
-        self.patients_that_require_colonoscopy_assessment_appointments_bowl_scope = (
-            self.page.get_by_role(
-                "link",
-                name="Bowel Scope",
-            )
+        self.patients_that_require_colonoscopy_assessment_appointments_bowl_scope = self.page.get_by_role(
+            "link",
+            name="Patients that Require Colonoscopy Assessment Appointments - Bowel Scope",
         )
         self.patients_that_require_surveillance_appointments = self.page.get_by_role(
             "link", name="Patients that Require Surveillance Appointments"

@@ -21,45 +21,47 @@ NOTE: This project is currently under initial development so isn't finalised, bu
 
 ## Setup
 
-You can clone this whole repository using the code below:
-
-```shell
-git clone https://github.com/nhs-england-tools/playwright-python-blueprint.git
-```
+You can clone this whole repository by clicking on the green `Code` button at near the top of the screen, then select either ssh or https, depending on if you have your ssh key setup
 
 ### Prerequisites
 
-To utilise the blueprint code, you will need to have the following installed:
+#### Python3
 
-- [Python](https://www.python.org/downloads/) 3.12 or greater
+To utilise the test for the BCSS app you will first of all require python3. The installation method changes based on operating systems but can usually be installed from a software store.
 
-Whilst not required to get started, you may also want to [configure a Python virtual environment for your project](https://docs.python.org/3/library/venv.html) before proceeding with
-the configuration. If you are using an IDE such as Visual Studio Code or PyCharm, you will normally be prompted to do this automatically.
+#### Virtual Environment
+
+To avoid conflicts with the rest of the operating system it is reccomended to create a python virtual environment, this isolates any packages installed and makes your life easier. To do that run the following command:
+
+`python -m venv .venv`
+
+This will create a bunch of files under a directory called `.venv` if you are using Visual Studios Code then it should automatically detect this environment and use it, but you may need to restart VSCode to pick up this new virtual environment
+
+#### Python Packages
+
+There are a bunch of packages that are required to run the tests in this repository, they have been tracked in the `requirements.txt` file. To install them run this command:
+
+```bash
+pip install -r requirements.txt
+```
+
+This will then install all of the dependancies.
+
+#### Playwright
+
+Once all the pre-requisites have been installed then you can install playwright with the following command:
+
+```bash
+playwright install --with-deps
+```
+
+This will take a while and will install playwright and its browsers which allow it to run the tests.
 
 ### Configuration
 
 There is a makefile which has common commands to interface with the repository, to check if the tests are working you can run the command `make test`
 
-The first time you run this it will create a container using buildah and podman, it will then install the prerequisites onto it and copy over the code before executing `pytest` to run all the tests. This is the reccomended way to run the tests
-
-If you prefer to run the tests locally you can do so by first assuming the python virtual environment, vscode should pick it up automatically in the `venv` directory but if you are using the terminal on linux or mac you can run `source venv/bin/activate` If you are using windows it may work the same for you or you may need to lookup how to assume a python virtual environment.
-
-Once that is done you can run the following commands to install the prerequisites:
-
-```bash
-pip install -r requirements.txt
-playwright install --with-deps
-```
-
-> **Note** I found that trying to run this on fedora let to some errors, only Ubuntu seems to be supported which is why I have setup a container using ubuntu to support other environments
-
-This will install all the necessary packages for executing Playwright tests, and install Playwright ready for use by the framework. You can test the configuration
-has worked by running our example tests, which can be done using the following command (this will run all tests with tracing reports turned on, and in headed mode
-so you can see the browser execution):
-
-```shell
-pytest --tracing on --headed
-```
+There is also a dockerised version which will create a container using podman and run it there, if you dont have a compatible OS or you dont want to install the dependancies directly, however you will need to install podman and podman-build, you can run that with `podman-test`
 
 ## Getting Started
 
@@ -67,20 +69,14 @@ pytest --tracing on --headed
 
 Once you've confirmed your installation is working, please take a look at the following guides on getting started with Playwright Python.
 
-1. [Understanding Playwright Python](./docs/getting-started/1_Understanding_Playwright_Python.md)
-2. [Blueprint File Breakdown](./docs/getting-started/2_Blueprint_File_Breakdown.md)
-
-We've also created a [Quick Reference Guide](./docs/getting-started/Quick_Reference_Guide.md) for common commands and actions you may regularly perform using this blueprint.
-
-For additional reading and guidance on writing tests, we also recommend reviewing the [Playwright Python documentation](https://playwright.dev/python/docs/writing-tests).
+- [Quick Reference Guide](./docs/getting-started/Quick_Reference_Guide.md) for common commands and actions you may regularly perform using this blueprint.
+- [Playwright Python documentation](https://playwright.dev/python/docs/writing-tests) guidance on writing tests.
 
 ## Contacts
 
-If you have any queries regarding this blueprint, please contact [dave.harding1@nhs.net](mailto:dave.harding1@nhs.net).
+If you have any queries regarding these tests, please contact [dave.harding1@nhs.net](mailto:dave.harding1@nhs.net). or [andrew.cleveland1@nhs.net](mailto:andrew.cleveland1@nhs.net)
 
 ## Licence
-
-> The [LICENCE.md](./LICENCE.md) file will need to be updated with the correct year and owner
 
 Unless stated otherwise, the codebase is released under the MIT License. This covers both the codebase and any sample code in the documentation.
 

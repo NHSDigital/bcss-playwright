@@ -80,3 +80,10 @@ def test_homepage_user_guide(page: Page) -> None:
         user_guide = popup_info.value
         # user_guide.screenshot(path="test-results/help_screen.png")
         expect(user_guide.get_by_text("Bowel Cancer Screening System"))
+
+
+def test_logout(page: Page) -> None:
+    homepage = BcssHomePage(page)
+    homepage.click_logout()
+    page.screenshot(path="test-results/logout_screen.png")
+    expect(page.get_by_role("link", name="Log in"))

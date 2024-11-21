@@ -7,7 +7,10 @@ include scripts/init.mk
 
 # Example CI/CD targets are: dependencies, build, publish, deploy, clean, etc.
 
-test: # run tests in a local podman container
+test:
+	./run_tests.sh
+
+podman-test: # run tests in a local podman container
 	if podman inspect -f '{{.Name}}' playwright > /dev/null; then
 		podman rm playwright --force
 	fi

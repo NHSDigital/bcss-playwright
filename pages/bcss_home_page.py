@@ -53,3 +53,6 @@ class BcssHomePage:
 
     def click_screening_pracitioners_appointments(self):
         self.screening_pracitioners_appointments.click()
+
+    def click_logout(self):
+        self.log_out.click()
