@@ -4,4 +4,5 @@ pytest-json-report>=1.5.0
 pytest-timeout>=2.3.1
 python-dotenv>=1.0.1
 pytest-retry>=1.6.3
+pytest-xdist>=3.6.1
 PyMuPDF>=1.24.13
