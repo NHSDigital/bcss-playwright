@@ -59,6 +59,19 @@ This will take a while and will install playwright and its browsers which allow 
 
 ### Configuration
 
+To use these tests you will need to supply some environmental variables, the easiest way to do that is to create a file called `.env` in the root directory
+
+inside that file you will need to provide the following information:
+
+```bash
+PYTEST_BASE_URL="https://example.com/"
+
+BCSS_USERNAME="MyUser"
+BCSS_PASSWORD="ChangeMe"
+```
+
+Once those details have been filled in then 
+
 There is a makefile which has common commands to interface with the repository, to check if the tests are working you can run the command `make test`
 
 There is also a dockerised version which will create a container using podman and run it there, if you dont have a compatible OS or you dont want to install the dependancies directly, however you will need to install podman and podman-build, you can run that with `podman-test`

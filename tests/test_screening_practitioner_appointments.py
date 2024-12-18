@@ -29,7 +29,8 @@ def get_to_screen(page: Page):
         page.get_by_role("link", name="Screening Practitioner Appointments")
     ).to_be_visible()
     homepage.click_screening_pracitioners_appointments()
-    expect(page.get_by_role("link", name="View appointments")).to_be_visible()
+    expect(page.get_by_text("Screening Practitioner Appointments")).to_be_visible()
+    page.screenshot(path="test-results/screening/main_screen.png")
 
 
 def test_view_appointments(page: Page) -> None:
@@ -42,16 +43,20 @@ def test_view_appointments(page: Page) -> None:
     expect(page.get_by_text("Screening Practitioner Day View")).to_be_visible()
     table_locator = page.locator("table#displayRS tbody tr")
     row_count = table_locator.count()
+    page.screenshot(path="test-results/screening/view_appointments.png")
     assert row_count > 0
 
 
 def test_patients_that_require_colonoscopy_assessment_appointments(page: Page) -> None:
     get_to_screen(page)
-    screening_pracitioners_appointments = ScreeningPractitionerAppointments(page)
-    screening_pracitioners_appointments.click_patients_that_require_colonoscopy_assessment_appointments()
+    page.locator("#menuOp2").click()
+    page.screenshot(path="test-results/screening/patients_requiring_appointments.png")
     expect(
         page.get_by_text("Patients that Require Colonoscopy Assessment Appointments")
     ).to_be_visible()
+
+    page.screenshot(path="test-results/screening/patients_requiring_appointments.png")
     table_locator = page.locator("table#booking tbody tr")
     child_count = table_locator.count()
+
     assert child_count > 0

@@ -23,10 +23,10 @@ def test_homepage_sub_menu(page: Page) -> None:
 
     # Check the show and hide sub menu works
     homepage.click_sub_menu_link()
-    page.screenshot(path="test-results/sub_menu_screen.png")
+    page.screenshot(path="test-results/homepage/sub_menu_screen.png")
     expect(page.get_by_role("link", name="Organisation Parameters")).to_be_visible()
     homepage.click_hide_sub_menu_link()
-    page.screenshot(path="test-results/menu_screen.png")
+    page.screenshot(path="test-results/homepage/menu_screen.png")
     expect(page.get_by_role("cell", name="Alerts", exact=True)).to_be_visible()
 
 
@@ -35,7 +35,7 @@ def test_homepage_select_org(page: Page) -> None:
 
     # check the select org link works
     homepage.click_select_org_link()
-    page.screenshot(path="test-results/select_org_screen.png")
+    page.screenshot(path="test-results/homepage/select_org_screen.png")
     expect(page.locator("form[action*='/changeorg']")).to_contain_text(
         "Choose an Organisation"
     )
@@ -53,7 +53,7 @@ def test_homepage_release_notes(page: Page) -> None:
 
     # Click release notes link
     homepage.click_release_notes_link()
-    page.screenshot(path="test-results/release_notes_screen.png")
+    page.screenshot(path="test-results/homepage/release_notes_screen.png")
     expect(page.locator("#page-title")).to_contain_text("Release Notes")
 
 
@@ -64,7 +64,7 @@ def test_homepage_help(page: Page) -> None:
     with page.expect_popup() as popup_info:
         homepage.click_help_link()
         help_page = popup_info.value
-        help_page.screenshot(path="test-results/help_screen.png")
+        help_page.screenshot(path="test-results/homepage/help_screen.png")
         expect(
             help_page.get_by_text("Bowel Cancer Screening System Help")
         ).to_be_visible
@@ -76,14 +76,12 @@ def test_homepage_user_guide(page: Page) -> None:
     # check the user guide works
     with page.expect_popup() as popup_info:
         homepage.click_user_guide_link()
-        # homepage.screenshot(path="test-results/help_screen.png")
         user_guide = popup_info.value
-        # user_guide.screenshot(path="test-results/help_screen.png")
         expect(user_guide.get_by_text("Bowel Cancer Screening System"))
 
 
 def test_logout(page: Page) -> None:
     homepage = BcssHomePage(page)
     homepage.click_logout()
-    page.screenshot(path="test-results/logout_screen.png")
+    page.screenshot(path="test-results/homepage/logout_screen.png")
     expect(page.get_by_role("link", name="Log in"))

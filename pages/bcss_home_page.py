@@ -26,6 +26,7 @@ class BcssHomePage:
         self.screening_pracitioners_appointments = self.page.get_by_role(
             "link", name="Screening Practitioner Appointments"
         )
+        self.contacts_list = self.page.get_by_role("link", name="Contacts List")
 
     def click_sub_menu_link(self):
         self.sub_menu_link.click()
@@ -53,6 +54,9 @@ class BcssHomePage:
 
     def click_screening_pracitioners_appointments(self):
         self.screening_pracitioners_appointments.click()
+
+    def click_contacts_list(self):
+        self.contacts_list.click()
 
     def click_logout(self):
         self.log_out.click()
