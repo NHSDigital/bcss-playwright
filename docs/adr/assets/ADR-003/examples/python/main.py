@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-import jwt
+import jwt  # type: ignore
 import os
-import requests
+import requests  # type: ignore
 import time
 
 
@@ -13,7 +13,9 @@ def main():
     gh_org = os.environ.get("GITHUB_ORG")
 
     if not gh_app_id or not gh_app_pk_file or not gh_org:
-        raise ValueError("Environment variables GITHUB_APP_ID, GITHUB_APP_PK_FILE and GITHUB_ORG must be passed to this program.")
+        raise ValueError(
+            "Environment variables GITHUB_APP_ID, GITHUB_APP_PK_FILE and GITHUB_ORG must be passed to this program."
+        )
 
     jwt_token = get_jwt_token(gh_app_id, gh_app_pk_file)
     installation_id = get_installation_id(jwt_token, gh_org)
