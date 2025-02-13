@@ -1,0 +1,21 @@
+[tool.black]
+line-length = 120
+
+[tool.ruff]
+line-length = 120
+
+target-version = "py312"
+
+lint.select = [
+    "E",  # pycodestyle
+    "W",  # pycodestyle
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C90",  # mccabe cyclomatic complexity
+    "G",  # flake8-logging-format
+]
+lint.ignore = []
+exclude = [
+    "docs/adr/assets"
+]

@@ -1,9 +1,12 @@
 from os import environ
-from playwright.sync_api import Page, expect
-from pages.login import BcssLoginPage
+
 from dotenv import load_dotenv
+from playwright.sync_api import Page, expect
+
+from pages.login import BcssLoginPage
 
 load_dotenv()
+
 
 def test_successful_login_to_bcss(page: Page) -> None:
     username = environ.get("BCSS_USERNAME")

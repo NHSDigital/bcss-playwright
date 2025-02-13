@@ -23,10 +23,8 @@ class ScreeningPractitionerAppointments:
 
         # Main Menu
         self.view_appointments = self.page.get_by_role("link", name="View appointments")
-        self.patients_that_require_colonoscopy_assessment_appointments = (
-            self.page.get_by_role(
-                "link", name="Patients that Require Colonoscopy Assessment Appointments"
-            )
+        self.patients_that_require_colonoscopy_assessment_appointments = self.page.get_by_role(
+            "link", name="Patients that Require Colonoscopy Assessment Appointments"
         )
         self.patients_that_require_colonoscopy_assessment_appointments_bowl_scope = self.page.get_by_role(
             "link",
@@ -35,55 +33,53 @@ class ScreeningPractitionerAppointments:
         self.patients_that_require_surveillance_appointments = self.page.get_by_role(
             "link", name="Patients that Require Surveillance Appointments"
         )
-        self.patients_that_require_post_investigation_appointments = (
-            self.page.get_by_role(
-                "link", name="Patients that Require Post-Investigation Appointments"
-            )
+        self.patients_that_require_post_investigation_appointments = self.page.get_by_role(
+            "link", name="Patients that Require Post-Investigation Appointments"
         )
         self.set_availability = self.page.get_by_role("link", name="Set Availability")
 
     # Top menu interactions
-    def click_sub_menu_link(self):
+    def click_sub_menu_link(self) -> None:
         self.sub_menu_link.click()
 
-    def click_hide_sub_menu_link(self):
+    def click_hide_sub_menu_link(self) -> None:
         self.hide_sub_menu_link.click()
 
-    def click_select_org_link(self):
+    def click_select_org_link(self) -> None:
         self.select_org_link.click()
 
-    def click_back_button(self):
+    def click_back_button(self) -> None:
         self.back_button.click()
 
-    def click_release_notes_link(self):
+    def click_release_notes_link(self) -> None:
         self.release_notes_link.click()
 
-    def click_refresh_alerts_link(self):
+    def click_refresh_alerts_link(self) -> None:
         self.refresh_alerts_link.click()
 
-    def click_user_guide_link(self):
+    def click_user_guide_link(self) -> None:
         self.user_guide_link.click()
 
-    def click_help_link(self):
+    def click_help_link(self) -> None:
         self.help_link.click()
 
     # Main Menu interactions
-    def click_view_appointments(self):
+    def click_view_appointments(self) -> None:
         self.view_appointments.click()
 
-    def click_patients_that_require_colonoscopy_assessment_appointments(self):
+    def click_patients_that_require_colonoscopy_assessment_appointments(self) -> None:
         self.patients_that_require_colonoscopy_assessment_appointments.click()
 
     def click_patients_that_require_colonoscopy_assessment_appointments_bowl_scope(
         self,
-    ):
+    ) -> None:
         self.patients_that_require_colonoscopy_assessment_appointments_bowl_scope.click()
 
-    def click_patients_that_require_surveillance_appointments(self):
+    def click_patients_that_require_surveillance_appointments(self) -> None:
         self.patients_that_require_surveillance_appointments.click()
 
-    def click_patients_that_require_post_investigation_appointments(self):
+    def click_patients_that_require_post_investigation_appointments(self) -> None:
         self.patients_that_require_post_investigation_appointments.click()
 
-    def click_set_availability(self):
+    def click_set_availability(self) -> None:
         self.set_availability.click()

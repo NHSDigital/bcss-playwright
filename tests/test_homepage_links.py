@@ -1,16 +1,18 @@
 from os import environ
+
 import pytest
-from playwright.sync_api import Page, expect
-from pages.login import BcssLoginPage
-from pages.bcss_home_page import BcssHomePage
 from dotenv import load_dotenv
+from playwright.sync_api import Page, expect
+
+from pages.bcss_home_page import BcssHomePage
+from pages.login import BcssLoginPage
 
 load_dotenv()
 expect.set_options(timeout=30_000)
 
 
 @pytest.fixture(scope="function", autouse=True)
-def before_each(page: Page):
+def before_each(page: Page) -> None:
     # This will run before every other job and log in to the homepage.
     username = environ.get("BCSS_USERNAME")
     password = environ.get("BCSS_PASSWORD")
@@ -36,9 +38,7 @@ def test_homepage_select_org(page: Page) -> None:
     # check the select org link works
     homepage.click_select_org_link()
     page.screenshot(path="test-results/homepage/select_org_screen.png")
-    expect(page.locator("form[action*='/changeorg']")).to_contain_text(
-        "Choose an Organisation"
-    )
+    expect(page.locator("form[action*='/changeorg']")).to_contain_text("Choose an Organisation")
     # Check there is at least one entry in the organisation list
     table_locator = page.locator("table#organisations tr")
     row_count = table_locator.count()
@@ -65,9 +65,8 @@ def test_homepage_help(page: Page) -> None:
         homepage.click_help_link()
         help_page = popup_info.value
         help_page.screenshot(path="test-results/homepage/help_screen.png")
-        expect(
-            help_page.get_by_text("Bowel Cancer Screening System Help")
-        ).to_be_visible
+        help_page_element = help_page.get_by_text("Bowel Cancer Screening System Help")
+        expect(help_page_element).to_be_visible()
 
 
 def test_homepage_user_guide(page: Page) -> None:

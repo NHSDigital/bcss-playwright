@@ -13,7 +13,7 @@ from playwright.sync_api import Page, expect
 
 @pytest.mark.example
 def test_basic_example(page: Page) -> None:
-    '''
+    """
     This test demonstrates how to quickly get started using Playwright Python.
 
     This example starts with @pytest.mark.example, which indicates this test has been tagged
@@ -27,7 +27,7 @@ def test_basic_example(page: Page) -> None:
     1) Navigates to this repository
     2) Asserts that the README contents rendered by GitHub contains the text "Playwright Python Blueprint"
     3) Asserts that the main section of the page contains the topic label "playwright-python"
-    '''
+    """
 
     # Navigate to page
     page.goto("https://github.com/nhs-england-tools/playwright-python-blueprint")
