@@ -54,7 +54,7 @@ def test_view_an_invitation_plan(page: Page) -> None:
     page.get_by_role("link", name="BCS009").click()
 
     # Select an invitation plan
-    page.get_by_role("row", name="07 May 2024 16:43:57").get_by_role("link").click()
+    page.get_by_role("row").nth(1).get_by_role("link").click()
 
     # Verify invitation page is displayed
     expect(page.locator("#page-title")).to_contain_text("View a plan")
