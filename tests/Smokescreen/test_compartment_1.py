@@ -27,12 +27,23 @@ def test_example(page: Page) -> None:
     page.get_by_placeholder("Enter note").fill("test data")
     page.locator("#saveNote").get_by_role("button", name="Save").click()
 
-    # Generate Invitations
+     # Generate Invitations
     page.get_by_role("link", name="Main Menu").click()
     page.get_by_role("link", name="Call and Recall").click()
     page.get_by_role("link", name="Generate Invitations").click()
     page.get_by_role("button", name="Generate Invitations").click()
-    #TODO Add loop for below steps
+    # #TODO Add loop for below steps
     expect(page.locator("#displayRS")).to_contain_text("Queued")
     page.get_by_role("button", name="Refresh").click()
     expect(page.locator("#displayRS")).to_contain_text("Completed")
+
+
+    #Print the batch of Pre-Invitation Letters
+    page.get_by_role("link", name="Communications Production").click()
+    page.get_by_role("link", name="Active Batch List").click()
+    page.locator("#eventCodeFilter").click()
+    page.locator("#eventCodeFilter").fill("S1")
+    page.locator("#eventCodeFilter").press("Enter")
+    page.get_by_role("link", name="8843").click()
+    page.get_by_text("Open In-Queue Processing Prepared Type : Original Priority : High Deadline : 17").click()
+    
