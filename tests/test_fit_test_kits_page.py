@@ -7,6 +7,10 @@ from pages.login_page import BcssLoginPage
 
 @pytest.fixture(scope="function", autouse=True)
 def before_each(page: Page):
+    """
+    Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the
+    fit test kits page
+    """
     # Log in to BCSS
     BcssLoginPage(page).login_as_user_bcss401()
 
@@ -16,6 +20,10 @@ def before_each(page: Page):
 
 @pytest.mark.smoke
 def test_fit_test_kits_page_navigation(page: Page) -> None:
+    """
+    Confirms all menu items are displayed on the fit test kits page, and that the relevant pages
+    are loaded when the links are clicked
+    """
     # Verify FIT rollout summary page opens as expected
     page.get_by_role("link", name="FIT Rollout Summary").click()
     expect(page.locator("body")).to_contain_text("FIT Rollout Summary")

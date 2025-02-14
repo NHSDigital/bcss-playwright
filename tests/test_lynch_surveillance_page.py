@@ -7,6 +7,10 @@ from pages.login_page import BcssLoginPage
 
 @pytest.fixture(scope="function", autouse=True)
 def before_each(page: Page):
+    """
+    Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the
+    lynch surveillance page
+    """
     # Log in to BCSS
     BcssLoginPage(page).login_as_user_bcss401()
 
@@ -16,6 +20,10 @@ def before_each(page: Page):
 
 @pytest.mark.smoke
 def test_lynch_surveillance_page_navigation(page: Page) -> None:
+    """
+    Confirms that the 'set lynch invitation rates' link is visible and clickable, and navigates to the
+    expected page when clicked
+    """
     # 'Set lynch invitation rates' page loads as expected
     page.get_by_role("link", name="Set Lynch Invitation Rates").click()
     expect(page.locator("#page-title")).to_contain_text("Set Lynch Surveillance Invitation Rates")

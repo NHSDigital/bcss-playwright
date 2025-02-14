@@ -7,6 +7,9 @@ from pages.login_page import BcssLoginPage
 
 @pytest.fixture(scope="function", autouse=True)
 def before_each(page: Page):
+    """
+    Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the call and recall page
+    """
     # Log in to BCSS
     BcssLoginPage(page).login_as_user_bcss401()
 
@@ -16,6 +19,9 @@ def before_each(page: Page):
 
 @pytest.mark.smoke
 def test_call_and_recall_page_navigation(page: Page) -> None:
+    """
+    Confirms that the Call and Recall menu displays all menu options and confirms they load the correct pages
+    """
     # Planning and monitoring page loads as expected
     page.get_by_role("link", name="Planning and Monitoring").click()
     expect(page.locator("#page-title")).to_contain_text("Invitations Monitoring - Screening Centre")
@@ -47,6 +53,9 @@ def test_call_and_recall_page_navigation(page: Page) -> None:
 
 
 def test_view_an_invitation_plan(page: Page) -> None:
+    """
+    Confirms that an invitation plan can be viewed via a screening centre from the planning ad monitoring page
+    """
     # Go to planning and monitoring page
     page.get_by_role("link", name="Planning and Monitoring").click()
 

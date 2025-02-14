@@ -7,12 +7,19 @@ from utils.date_time_utils import DateTimeUtils
 
 @pytest.fixture(scope="function", autouse=True)
 def before_each(page: Page):
+    """
+    Before every test is executed, this fixture logs in to BCSS as a test user and results in the home page
+    being displayed
+    """
     # Log in to BCSS
     BcssLoginPage(page).login_as_user_bcss401()
 
 
 @pytest.mark.smoke
 def test_home_page_links_navigation(page: Page) -> None:
+    """
+    Confirms that homepage links are visible and clickable, and the expected pages open when clicking the links
+    """
     homepage = BcssHomePage(page)
 
     # Click 'show sub menu' link

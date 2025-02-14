@@ -7,6 +7,10 @@ from pages.login_page import BcssLoginPage
 
 @pytest.fixture(scope="function", autouse=True)
 def before_each(page: Page):
+    """
+    Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the
+    organisations page
+    """
     # Log in to BCSS
     BcssLoginPage(page).login_as_user_bcss401()
 
@@ -16,6 +20,10 @@ def before_each(page: Page):
 
 @pytest.mark.smoke
 def test_organisations_page_navigation(page: Page) -> None:
+    """
+    Confirms all menu items are displayed on the organisations page, and that the relevant pages
+    are loaded when the links are clicked
+    """
     # Screening centre parameters page loads as expected
     page.get_by_role("link", name="Screening Centre Parameters").click()
     expect(page.locator("#ntshPageTitle")).to_contain_text("Screening Centre Parameters")
@@ -45,6 +53,9 @@ def test_organisations_page_navigation(page: Page) -> None:
 
 
 def test_view_an_organisations_system_parameters(page: Page) -> None:
+    """
+    Confirms that an organisation's system parameters can be accessed and viewed
+    """
     # Go to screening centre parameters page
     page.get_by_role("link", name="Screening Centre Parameters").click()
 

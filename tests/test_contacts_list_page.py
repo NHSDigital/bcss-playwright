@@ -7,6 +7,9 @@ from pages.login_page import BcssLoginPage
 
 @pytest.fixture(scope="function", autouse=True)
 def before_each(page: Page):
+    """
+    Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the contacts list page
+    """
     # Log in to BCSS
     BcssLoginPage(page).login_as_user_bcss401()
 
@@ -16,6 +19,10 @@ def before_each(page: Page):
 
 @pytest.mark.smoke
 def test_contacts_list_page_navigation(page: Page) -> None:
+    """
+    Confirms all menu items are displayed on the contacts list page, and that the relevant pages
+    are loaded when the links are clicked
+    """
     # View contacts page loads as expected
     page.get_by_role("link", name="View Contacts").click()
     expect(page.locator("#ntshPageTitle")).to_contain_text("View Contacts")

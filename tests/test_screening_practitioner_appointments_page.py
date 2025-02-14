@@ -7,6 +7,10 @@ from pages.login_page import BcssLoginPage
 
 @pytest.fixture(scope="function", autouse=True)
 def before_each(page: Page):
+    """
+    Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the
+    screening_practitioner_appointments page
+    """
     # Log in to BCSS
     BcssLoginPage(page).login_as_user_bcss401()
 
@@ -16,6 +20,10 @@ def before_each(page: Page):
 
 @pytest.mark.smoke
 def test_screening_practitioner_appointments_page_navigation(page: Page) -> None:
+    """
+    Confirms screening_practitioner_appointments page loads and the expected links are visible
+    and clickable (where the user has required permissions).
+    """
     # Verify View appointments page opens as expected
     page.get_by_role("link", name="View appointments").click()
     expect(page.locator("#ntshPageTitle")).to_contain_text("Appointment Calendar")
