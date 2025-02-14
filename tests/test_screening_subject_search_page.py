@@ -9,6 +9,10 @@ from pages.screening_subject_search_page import ScreeningStatusSearchOptions, La
 
 @pytest.fixture(scope="function", autouse=True)
 def before_each(page: Page):
+    """
+    Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the
+    screening_subject_search page
+    """
     # Log in to BCSS
     BcssLoginPage(page).login_as_user_bcss401()
 
@@ -18,6 +22,9 @@ def before_each(page: Page):
 
 @pytest.mark.smoke
 def test_search_screening_subject_by_nhs_number(page: Page) -> None:
+    """
+    Confirms a screening subject can be searched for, using their nhs number
+    """
     # Clear filters (if any filters have persisted the NHS number field is inactive)
     page.get_by_role("button", name="Clear Filters").click()
 
@@ -35,6 +42,9 @@ def test_search_screening_subject_by_nhs_number(page: Page) -> None:
 
 
 def test_search_screening_subject_by_surname(page: Page) -> None:
+    """
+    Confirms a screening subject can be searched for, using their surname
+    """
     # Enter a surname
     page.locator("#A_C_Surname").fill("Absurd")
 
@@ -49,6 +59,9 @@ def test_search_screening_subject_by_surname(page: Page) -> None:
 
 
 def test_search_screening_subject_by_forename(page: Page) -> None:
+    """
+    Confirms a screening subject can be searched for, using their forename
+    """
     # Enter a forename
     page.get_by_label("Forename").fill("Pentagram")
 
@@ -63,6 +76,9 @@ def test_search_screening_subject_by_forename(page: Page) -> None:
 
 
 def test_search_screening_subject_by_dob(page: Page) -> None:
+    """
+    Confirms a screening subject can be searched for, using their date of birth
+    """
     # Enter a date in the dob field
     page.locator("#A_C_DOB_From").fill("11/01/1934")
 
@@ -77,6 +93,9 @@ def test_search_screening_subject_by_dob(page: Page) -> None:
 
 
 def test_search_screening_subject_by_postcode(page: Page) -> None:
+    """
+    Confirms a screening subject can be searched for, using their postcode
+    """
     # Enter a postcode
     page.locator("#A_C_Postcode").fill("*")
 
@@ -91,6 +110,9 @@ def test_search_screening_subject_by_postcode(page: Page) -> None:
 
 
 def test_search_screening_subject_by_episode_closed_date(page: Page) -> None:
+    """
+    Confirms a screening subject can be searched for, using their episode closed date
+    """
     # Enter an "episode closed date"
     page.get_by_label("Episode Closed Date").fill("22/09/2020")
 
@@ -108,6 +130,9 @@ def test_search_screening_subject_by_episode_closed_date(page: Page) -> None:
 
 
 def test_search_criteria_clear_filters_button(page: Page) -> None:
+    """
+    Confirms the 'clear filters' button on the search page works as expected
+    """
     # Enter number in NHS field and verify value
     page.get_by_label("NHS Number").fill("34344554353")
     expect(page.get_by_label("NHS Number")).to_have_value("34344554353")
@@ -119,6 +144,9 @@ def test_search_criteria_clear_filters_button(page: Page) -> None:
 
 # Tests searching via the "Screening Status" drop down list
 def test_search_screening_subject_by_status_call(page: Page) -> None:
+    """
+    Confirms screening subjects can be searched for, using the screening status (call)
+    """
     # Select status from dropdown
     ScreeningStatusSearchOptions(page).select_status_call()
 
@@ -133,6 +161,9 @@ def test_search_screening_subject_by_status_call(page: Page) -> None:
 
 
 def test_search_screening_subject_by_status_inactive(page: Page) -> None:
+    """
+    Confirms screening subjects can be searched for, using the screening status (inactive)
+    """
     # Select status from dropdown
     ScreeningStatusSearchOptions(page).select_status_inactive()
 
@@ -147,6 +178,9 @@ def test_search_screening_subject_by_status_inactive(page: Page) -> None:
 
 
 def test_search_screening_subject_by_status_opt_in(page: Page) -> None:
+    """
+    Confirms screening subjects can be searched for, using the screening status (opt-in)
+    """
     # Select status from dropdown
     ScreeningStatusSearchOptions(page).select_status_opt_in()
 
@@ -161,6 +195,9 @@ def test_search_screening_subject_by_status_opt_in(page: Page) -> None:
 
 
 def test_search_screening_subject_by_status_recall(page: Page) -> None:
+    """
+    Confirms screening subjects can be searched for, using the screening status (recall)
+    """
     # Select status from dropdown
     ScreeningStatusSearchOptions(page).select_status_recall()
 
@@ -175,6 +212,9 @@ def test_search_screening_subject_by_status_recall(page: Page) -> None:
 
 
 def test_search_screening_subject_by_status_self_referral(page: Page) -> None:
+    """
+    Confirms screening subjects can be searched for, using the screening status (self-referral)
+    """
     # Select status from dropdown
     ScreeningStatusSearchOptions(page).select_status_self_referral()
 
@@ -189,6 +229,9 @@ def test_search_screening_subject_by_status_self_referral(page: Page) -> None:
 
 
 def test_search_screening_subject_by_status_surveillance(page: Page) -> None:
+    """
+    Confirms screening subjects can be searched for, using the screening status (surveillance)
+    """
     # Select status from dropdown
     ScreeningStatusSearchOptions(page).select_status_surveillance()
 
@@ -203,6 +246,9 @@ def test_search_screening_subject_by_status_surveillance(page: Page) -> None:
 
 
 def test_search_screening_subject_by_status_seeking_further_data(page: Page) -> None:
+    """
+    Confirms screening subjects can be searched for, using the screening status (seeking further data)
+    """
     # Select status from dropdown
     ScreeningStatusSearchOptions(page).select_status_seeking_further_data()
 
@@ -217,6 +263,9 @@ def test_search_screening_subject_by_status_seeking_further_data(page: Page) -> 
 
 
 def test_search_screening_subject_by_status_ceased(page: Page) -> None:
+    """
+    Confirms screening subjects can be searched for, using the screening status (ceased)
+    """
     # Select status from dropdown
     ScreeningStatusSearchOptions(page).select_status_ceased()
 
@@ -231,6 +280,9 @@ def test_search_screening_subject_by_status_ceased(page: Page) -> None:
 
 
 def test_search_screening_subject_by_status_bowel_scope(page: Page) -> None:
+    """
+    Confirms screening subjects can be searched for, using the screening status (bowel scope)
+    """
     # Select status from dropdown
     ScreeningStatusSearchOptions(page).select_status_bowel_scope()
 
@@ -245,6 +297,9 @@ def test_search_screening_subject_by_status_bowel_scope(page: Page) -> None:
 
 
 def test_search_screening_subject_by_status_lynch_surveillance(page: Page) -> None:
+    """
+    Confirms screening subjects can be searched for, using the screening status (lynch surveillance)
+    """
     # Select status from dropdown
     ScreeningStatusSearchOptions(page).select_status_lynch_surveillance()
 
@@ -259,6 +314,9 @@ def test_search_screening_subject_by_status_lynch_surveillance(page: Page) -> No
 
 
 def test_search_screening_subject_by_status_lynch_self_referral(page: Page) -> None:
+    """
+    Confirms screening subjects can be searched for, using the screening status (lynch self-referral)
+    """
     # Select status from dropdown
     ScreeningStatusSearchOptions(page).select_status_lynch_self_referral()
 
@@ -274,6 +332,9 @@ def test_search_screening_subject_by_status_lynch_self_referral(page: Page) -> N
 
 # Tests searching via the "Latest Episode Status" drop down list
 def test_search_screening_subject_by_latest_episode_status_open_paused(page: Page) -> None:
+    """
+    Confirms screening subjects can be searched for, using the latest episode status (open-paused)
+    """
     # Select status from dropdown
     LatestEpisodeStatusSearchOptions(page).select_status_open_paused()
 
@@ -288,6 +349,9 @@ def test_search_screening_subject_by_latest_episode_status_open_paused(page: Pag
 
 
 def test_search_screening_subject_by_latest_episode_status_closed(page: Page) -> None:
+    """
+    Confirms screening subjects can be searched for, using the latest episode status (closed)
+    """
     # Select status from dropdown
     LatestEpisodeStatusSearchOptions(page).select_status_closed()
 
@@ -302,6 +366,9 @@ def test_search_screening_subject_by_latest_episode_status_closed(page: Page) ->
 
 
 def test_search_screening_subject_by_latest_episode_status_no_episode(page: Page) -> None:
+    """
+    Confirms screening subjects can be searched for, using the latest episode status (no episode)
+    """
     # Select status from dropdown
     LatestEpisodeStatusSearchOptions(page).select_status_no_episode()
 
@@ -317,6 +384,9 @@ def test_search_screening_subject_by_latest_episode_status_no_episode(page: Page
 
 # Tests searching via the "Search Area" drop down list
 def test_search_screening_subject_by_home_hub(page: Page) -> None:
+    """
+    Confirms screening subjects can be searched for, using the search area (home hub)
+    """
     # Select screening status "recall" (searching by search area requires another search option to be selected)
     ScreeningStatusSearchOptions(page).select_status_recall()
 
@@ -331,6 +401,9 @@ def test_search_screening_subject_by_home_hub(page: Page) -> None:
 
 
 def test_search_screening_subject_by_gp_practice(page: Page) -> None:
+    """
+    Confirms screening subjects can be searched for, using the search area (gp practice)
+    """
     # Select screening status "call" (searching by search area requires another search option to be selected)
     ScreeningStatusSearchOptions(page).select_status_call()
 
@@ -351,6 +424,9 @@ def test_search_screening_subject_by_gp_practice(page: Page) -> None:
 
 
 def test_search_screening_subject_by_ccg(page: Page) -> None:
+    """
+    Confirms screening subjects can be searched for, using the search area (ccg)
+    """
     # Select screening status "call" (searching by search area requires another search option to be selected)
     ScreeningStatusSearchOptions(page).select_status_call()
 
@@ -371,6 +447,9 @@ def test_search_screening_subject_by_ccg(page: Page) -> None:
 
 
 def test_search_screening_subject_by_screening_centre(page: Page) -> None:
+    """
+    Confirms screening subjects can be searched for, using the search area (screening centre)
+    """
     # Select screening status "call" (searching by search area requires another search option to be selected)
     ScreeningStatusSearchOptions(page).select_status_call()
 
@@ -388,6 +467,9 @@ def test_search_screening_subject_by_screening_centre(page: Page) -> None:
 
 
 def test_search_screening_subject_by_whole_database(page: Page) -> None:
+    """
+    Confirms screening subjects can be searched for, using the search area (whole database)
+    """
     # Select screening status "recall" (searching by search area requires another search option to be selected)
     ScreeningStatusSearchOptions(page).select_status_recall()
 

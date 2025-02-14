@@ -7,6 +7,9 @@ from pages.login_page import BcssLoginPage
 
 @pytest.fixture(scope="function", autouse=True)
 def before_each(page: Page):
+    """
+    Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the download page
+    """
     # Log in to BCSS
     BcssLoginPage(page).login_as_user_bcss401()
 
@@ -16,6 +19,11 @@ def before_each(page: Page):
 
 @pytest.mark.smoke
 def test_download_facility_page_navigation(page: Page) -> None:
+    """
+    Confirms all menu items are displayed on the downloads page, and that the relevant pages
+    are loaded when the links are clicked. Also confirms that the warning header messages are displayed
+    on the relevant pages
+    """
     # Individual download request and retrieval page loads as expected
     page.get_by_role("link", name="Individual Download Request").click()
     expect(page.locator("#ntshPageTitle")).to_contain_text("Individual Download Request and Retrieval")

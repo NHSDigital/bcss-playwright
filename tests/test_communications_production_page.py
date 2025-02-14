@@ -6,14 +6,23 @@ from pages.bcss_home_page import MainMenu
 
 @pytest.fixture(scope="function", autouse=True)
 def before_each(page: Page):
+    """
+    Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the communications
+    production page
+    """
     # Log in to BCSS
     BcssLoginPage(page).login_as_user_bcss401()
 
     # Go to communications production page
     MainMenu(page).go_to_communications_production_page()
 
+
 @pytest.mark.smoke
 def test_communications_production_page_navigation(page: Page) -> None:
+    """
+    Confirms all menu items are displayed on the communications production page, and that the relevant pages
+    are loaded when the links are clicked
+    """
     # Active batch list page loads as expected
     page.get_by_role("link", name="Active Batch List").click()
     expect(page.locator("#page-title")).to_contain_text("Active Batch List")

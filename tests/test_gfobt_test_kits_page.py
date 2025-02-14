@@ -7,6 +7,10 @@ from pages.login_page import BcssLoginPage
 
 @pytest.fixture(scope="function", autouse=True)
 def before_each(page: Page):
+    """
+    Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the
+    gfob test kits page
+    """
     # Log in to BCSS
     BcssLoginPage(page).login_as_user_bcss401()
 
@@ -16,6 +20,10 @@ def before_each(page: Page):
 
 @pytest.mark.smoke
 def test_gfob_test_kit_page_navigation(page: Page) -> None:
+    """
+    Confirms all menu items are displayed on the gfob test kits page, and that the relevant pages
+    are loaded when the links are clicked
+    """
     # Test kit logging page opens as expected
     page.get_by_role("link", name="Test Kit Logging").click()
     expect(page.locator("#ntshPageTitle")).to_contain_text("Test Kit Logging")
@@ -41,6 +49,9 @@ def test_gfob_test_kit_page_navigation(page: Page) -> None:
 
 
 def test_create_a_qc_kit(page: Page) -> None:
+    """
+    Confirms that a qc test kit can be created and that each of the dropdowns has an option set available for selection
+    """
     # Navigate to create QC kit page
     page.get_by_role("link", name="Create QC Kit").click()
 

@@ -8,6 +8,10 @@ from pages.login_page import BcssLoginPage
 
 @pytest.fixture(scope="function", autouse=True)
 def before_each(page: Page):
+    """
+    Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the
+    reports page
+    """
     # Log in to BCSS
     BcssLoginPage(page).login_as_user_bcss401()
 
@@ -17,6 +21,10 @@ def before_each(page: Page):
 
 @pytest.mark.smoke
 def test_reports_page_navigation(page: Page) -> None:
+    """
+    Confirms all menu items are displayed on the reports page, and that the relevant pages
+    are loaded when the links are clicked
+    """
     # Bureau reports link is visible
     expect(page.get_by_text("Bureau Reports")).to_be_visible()
 
@@ -55,6 +63,10 @@ def test_reports_page_navigation(page: Page) -> None:
 
 # Failsafe Reports
 def test_failsafe_reports_date_report_last_requested(page: Page) -> None:
+    """
+    Confirms 'date_report_last_requested' page loads, 'generate report' and 'refresh' buttons work as expected
+    and the timestamp updates to current date and time when refreshed
+    """
     # Go to failsafe reports page
     reports_page.go_to_failsafe_reports_page(page)
 
@@ -80,6 +92,10 @@ def test_failsafe_reports_date_report_last_requested(page: Page) -> None:
 
 
 def test_failsafe_reports_screening_subjects_with_inactive_open_episode(page: Page) -> None:
+    """
+    Confirms 'screening_subjects_with_inactive_open_episode' page loads, 'generate report' button works as expected
+    and that a screening subject record can be opened
+    """
     # Go to failsafe reports page
     reports_page.go_to_failsafe_reports_page(page)
 
@@ -100,6 +116,12 @@ def test_failsafe_reports_screening_subjects_with_inactive_open_episode(page: Pa
 
 
 def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(page: Page) -> None:
+    """
+    Confirms 'subjects_ceased_due_to_date_of_birth_changes' page loads,
+    the datepicker and 'generate report' button works as expected
+    the timestamp updates to current date and time when refreshed and
+    a screening subject record can be opened
+    """
     # Go to failsafe reports page
     reports_page.go_to_failsafe_reports_page(page)
 
@@ -126,6 +148,13 @@ def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(page: Pag
 
 
 def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundaries(page: Page) -> None:
+    """
+    Confirms 'allocate_sc_for_patient_movements_within_hub_boundaries' page loads,
+    the 'generate report' button works as expected
+    the timestamp updates to current date and time when refreshed
+    a screening subject record can be opened and
+    a different SC can be allocated to a patient record
+    """
     # Go to failsafe reports page
     reports_page.go_to_failsafe_reports_page(page)
 
@@ -159,6 +188,11 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
 
 
 def test_failsafe_reports_allocate_sc_for_patient_movements_into_your_hub(page: Page) -> None:
+    """
+    Confirms 'allocate_sc_for_patient_movements_into_your_hub' page loads,
+    the 'generate report' and 'refresh' buttons work as expected and
+    the timestamp updates to current date and time when refreshed
+    """
     # Go to failsafe reports page
     reports_page.go_to_failsafe_reports_page(page)
 
@@ -184,6 +218,13 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_into_your_hub(page: 
 
 
 def test_failsafe_reports_identify_and_link_new_gp(page: Page) -> None:
+    """
+    Confirms 'identify_and_link_new_gp' page loads,
+    the 'generate report' and 'refresh' buttons work as expected
+    the timestamp updates to current date and time when refreshed
+    a screening subject record can be opened and the Link GP practice to Screening Centre page
+    can be opened from here
+    """
     # Go to failsafe reports page
     reports_page.go_to_failsafe_reports_page(page)
 
@@ -216,6 +257,13 @@ def test_failsafe_reports_identify_and_link_new_gp(page: Page) -> None:
 
 # Operational Reports
 def test_operational_reports_appointment_attendance_not_updated(page: Page) -> None:
+    """
+    Confirms 'appointment_attendance_not_updated' page loads,
+    a SC can be selected from the dropdown
+    the 'generate report' button works as expected
+    the timestamp updates to current date and time when refreshed and
+    an appointment record can be opened from here
+    """
     # Go to operational reports page
     reports_page.go_to_operational_reports_page(page)
 
@@ -243,6 +291,11 @@ def test_operational_reports_appointment_attendance_not_updated(page: Page) -> N
 
 
 def test_operational_reports_fobt_kits_logged_but_not_read(page: Page) -> None:
+    """
+    Confirms 'fobt_kits_logged_but_not_read' page loads,
+    the 'refresh' button works as expected and
+    the timestamp updates to current date and time when refreshed
+    """
     # Go to operational reports page
     reports_page.go_to_operational_reports_page(page)
 
@@ -261,6 +314,11 @@ def test_operational_reports_fobt_kits_logged_but_not_read(page: Page) -> None:
 
 
 def test_operational_reports_demographic_update_inconsistent_with_manual_update(page: Page) -> None:
+    """
+    Confirms 'demographic_update_inconsistent_with_manual_update' page loads,
+    the 'refresh' button works as expected and
+    the timestamp updates to current date and time when refreshed
+    """
     # Go to operational reports page
     reports_page.go_to_operational_reports_page(page)
 
@@ -272,6 +330,12 @@ def test_operational_reports_demographic_update_inconsistent_with_manual_update(
 
 
 def test_operational_reports_screening_practitioner_6_weeks_availability_not_set_up(page: Page) -> None:
+    """
+    Confirms 'screening_practitioner_6_weeks_availability_not_set_up_report' page loads,
+    a SC can be selected
+    the 'generate report' and 'refresh' buttons work as expected and
+    the timestamp updates to current date and time when refreshed
+    """
     # Go to operational reports page
     reports_page.go_to_operational_reports_page(page)
 
@@ -300,6 +364,12 @@ def test_operational_reports_screening_practitioner_6_weeks_availability_not_set
 
 
 def test_operational_reports_screening_practitioner_appointments(page: Page) -> None:
+    """
+    Confirms 'screening_practitioner_appointments' page loads,
+    a SC and Screening Practitioner can be selected
+    the 'generate report' button works as expected and
+    the timestamp updates to current date and time when refreshed
+    """
     # Go to operational reports page
     reports_page.go_to_operational_reports_page(page)
 
