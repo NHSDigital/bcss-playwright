@@ -20,7 +20,7 @@ def test_example(page: Page) -> None:
     # Create plan
     page.get_by_role("link", name="Call and Recall").click()
     page.get_by_role("link", name="Planning and Monitoring").click()
-    page.get_by_role("link", name="BCS009").click()
+    page.get_by_role("link", name="BCS001").click()
     page.get_by_role("button", name="Create a Plan").click()
     page.get_by_role("link", name="Set all").click()
     page.get_by_placeholder("Enter weekly invitation rate").fill("1")
@@ -135,6 +135,7 @@ def active_batch_processing(page: Page, batch_type: str, batch_description: str,
     page.get_by_role("button", name="Confirm Printed").click()
 
     page.get_by_role("link", name="Back").click()
+    page.get_by_role("link", name="Back").click()
     page.get_by_role("link", name="Archived Batch List").click()
     page.locator("#batchIdFilter").click()
     page.locator("#batchIdFilter").fill(link_text)
@@ -184,7 +185,7 @@ def active_batch_processing_csv(page: Page, batch_type: str, batch_description: 
     # Start waiting for the pdf download
     with page.expect_download() as download_info:
         # Perform the action that initiates download
-        page.locator("[id=\"\\32 8336\"]").get_by_role("button", name="Retrieve").click() # Needs to be changed, locator ID is dynamic and changes each run
+        page.get_by_role("button", name="Retrieve").nth(0).click()
     download_pdf = download_info.value
     # Wait for the download process to complete and save the downloaded file in a temp folder
     download_pdf.save_as(f"/temp/{download_pdf.suggested_filename}")
@@ -204,22 +205,23 @@ def active_batch_processing_csv(page: Page, batch_type: str, batch_description: 
                     break
 
     page.on("dialog", lambda dialog: dialog.accept())
-    expect(page.locator("[id=\"\\32 8336\"]").get_by_role("button", name="Confirm Printed")).to_be_visible() # Needs to be changed, locator ID is dynamic and changes each run
-
+    expect(page.get_by_role("button", name="Confirm Printed").nth(0)).to_be_visible()
+    page.get_by_role("button", name="Confirm Printed").nth(0).click()
     # Start waiting for the csv download
     with page.expect_download() as download_info:
         # Perform the action that initiates download
-        page.locator("[id=\"\\32 8337\"]").get_by_role("button", name="Retrieve").click() # Needs to be changed, locator ID is dynamic and changes each run
+        page.get_by_role("button", name="Retrieve").nth(1).click()
     download_csv = download_info.value
     # Wait for the download process to complete and save the downloaded file in a temp folder
     download_csv.save_as(f"/temp/{download_csv.suggested_filename}")
 
     page.on("dialog", lambda dialog: dialog.accept())
-    expect(page.locator("[id=\"\\32 8337\"]").get_by_role("button", name="Confirm Printed")).to_be_visible() # Needs to be changed, locator ID is dynamic and changes each run
-
+    expect(page.get_by_role("button", name="Confirm Printed").nth(0)).to_be_visible()
+    page.get_by_role("button", name="Confirm Printed").nth(0).click()
     # Storing the downloaded csv into a pandas dataframe
     csv_df = pd.read_csv(download_csv.suggested_filename)
 
+    page.get_by_role("link", name="Back").click()
     page.get_by_role("link", name="Back").click()
     page.get_by_role("link", name="Archived Batch List").click()
     page.locator("#batchIdFilter").click()
