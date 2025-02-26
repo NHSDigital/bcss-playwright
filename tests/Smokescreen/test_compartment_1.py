@@ -96,6 +96,7 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
             link = row.locator("a").first
             link_text = link.inner_text()  # Get the link text dynamically
             link.click()
+            break
         else:
             pytest.fail(f"No {batch_type} batch found")
 
@@ -119,7 +120,7 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
         download_file = download_info.value
         file = download_file.suggested_filename
         # Wait for the download process to complete and save the downloaded file in a temp folder
-        download_file.save_as(f"/temp/{file}")
+        download_file.save_as(file)
         page.wait_for_timeout(1000)
         if file.endswith(".pdf"):
             nhs_no = pdf_Reader(file)
@@ -146,7 +147,7 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
     subject_search_by_nhs_no(page, nhs_no, latest_event_status)
 
 def pdf_Reader(file: str):
-    reader = PdfReader(f"/temp/{file}")
+    reader = PdfReader(file)
 
     # For loop looping through all pages of the file to find the NHS Number
     for pages in reader.pages:
@@ -162,7 +163,7 @@ def pdf_Reader(file: str):
     return nhs_no
 
 def csv_Reader(file: str):
-    csv_df = pd.read_csv(f"/temp/{file}")
+    csv_df = pd.read_csv(file)
     return csv_df
 
 def subject_search_by_nhs_no(page: Page, nhs_no: str, latest_event_status: str):
