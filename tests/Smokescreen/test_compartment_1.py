@@ -180,4 +180,4 @@ def main_menu_available(page: str):
     is_main_menu_available = page.get_by_role("link", name="Main Menu").is_visible()
 
     if is_main_menu_available:
-         page.get_by_role("link", name="Main Menu").click()
+        page.get_by_role("link", name="Main Menu").click()

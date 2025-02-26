@@ -46,7 +46,7 @@ def test_home_page_links_navigation(page: Page) -> None:
     homepage.click_refresh_alerts_link()
     # Verify that the 'last updated' timestamp matches the current date and time
     (expect(page.locator("form[name=\"refreshCockpit\"]")).to_contain_text
-     ("Refresh alerts (last updated :" + DateTimeUtils.current_datetime()))
+    ("Refresh alerts (last updated :" + DateTimeUtils.current_datetime()))
 
     # Click the user guide link
     with page.expect_popup() as page1_info:
