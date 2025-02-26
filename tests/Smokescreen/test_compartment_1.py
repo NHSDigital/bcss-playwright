@@ -1,8 +1,6 @@
-import re
 import pytest
 from pypdf import PdfReader
 from playwright.sync_api import Page, expect
-import oracledb
 import pandas as pd
 import sys
 sys.path.append("../utils")
@@ -33,7 +31,7 @@ def test_example(page: Page) -> None:
     page.locator("#saveNote").get_by_role("button", name="Save").click()
 
     # Generate Invitations
-    page.get_by_role("link", name="Main Menu").click()
+    main_menu_available(page)
     page.get_by_role("link", name="Call and Recall").click()
     page.get_by_role("link", name="Generate Invitations").click()
     page.get_by_role("button", name="Generate Invitations").click()
@@ -65,23 +63,23 @@ def test_example(page: Page) -> None:
     expect(page.locator("#displayRS")).to_contain_text("Completed")
 
     # Print the batch of Pre-Invitation Letters
-    active_batch_processing(page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent")
-    active_batch_processing(page, "S1", "Pre-invitation (FIT) (digital leaflet)", "S9 - Pre-invitation Sent")
+    batch_processing(page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent")
+    batch_processing(page, "S1", "Pre-invitation (FIT) (digital leaflet)", "S9 - Pre-invitation Sent") # Sometimes it is "S10 - Invitation & Test Kit Sent"
 
     database_connection_exec("bcss_timed_events")
 
     # Print the batch of Invitation & Test Kit Letters
-    active_batch_processing_csv(page, "S9", "Invitation & Test Kit (FIT)", "S10 - Invitation & Test Kit Sent")
+    batch_processing(page, "S9", "Invitation & Test Kit (FIT)", "S10 - Invitation & Test Kit Sent")
 
     # Print a set of reminder letters
-    active_batch_processing(page, "S10", "Test Kit Reminder", "	S19 - Reminder of Initial Test Sent")
+    batch_processing(page, "S10", "Test Kit Reminder", "S19 - Reminder of Initial Test Sent")
 
     # Log out
     page.get_by_role("link", name="Log-out").click()
     expect(page.get_by_role("heading", name="You have logged out")).to_be_visible()
 
-def active_batch_processing(page: Page, batch_type: str, batch_description: str, latest_event_status: str) -> None:
-    page.get_by_role("link", name="Main Menu").click()
+def batch_processing(page: Page, batch_type: str, batch_description: str, latest_event_status: str):
+    main_menu_available(page)
     page.get_by_role("link", name="Communications Production").click()
     page.get_by_role("link", name="Active Batch List").click()
     page.locator("#eventCodeFilter").click()
@@ -98,26 +96,57 @@ def active_batch_processing(page: Page, batch_type: str, batch_description: str,
             link = row.locator("a").first
             link_text = link.inner_text()  # Get the link text dynamically
             link.click()
+        else:
+            pytest.fail(f"No {batch_type} batch found")
 
     # Checks to see if batch is already prepared
     page.wait_for_timeout(3000) # Without this timeout prepare_button is always set to false
     prepare_button = page.get_by_role("button", name="Prepare Batch").is_visible()
 
-    #If not prepared it will click on the prepare button and wait 5 seconds (ideally would be a loop)
+    #If not prepared it will click on the prepare button
     if prepare_button:
         page.get_by_role("button", name="Prepare Batch").click()
-        page.wait_for_timeout(5000)
 
-    # Start waiting for the download
-    with page.expect_download() as download_info:
-        # Perform the action that initiates download
-        page.get_by_role("button", name="Retrieve").click()
-    download = download_info.value
+    page.locator('text="Retrieve"').nth(0).wait_for()
+    page.wait_for_timeout(5000) # This 5 second wait is to allow other Retrieve buttons to show as they do not show up at the same time
 
-    # Wait for the download process to complete and save the downloaded file in a temp folder
-    download.save_as(f"/temp/{download.suggested_filename}")
+    # This loops through each Retrieve button and clicks each one
+    for retrieve_button in range (page.get_by_role("button", name="Retrieve").count()):
+        # Start waiting for the pdf download
+        with page.expect_download() as download_info:
+            # Perform the action that initiates download
+            page.get_by_role("button", name="Retrieve").nth(retrieve_button-1).click()
+        download_file = download_info.value
+        file = download_file.suggested_filename
+        # Wait for the download process to complete and save the downloaded file in a temp folder
+        download_file.save_as(f"/temp/{file}")
+        page.wait_for_timeout(1000)
+        if file.endswith(".pdf"):
+            nhs_no = pdf_Reader(file)
+        elif file.endswith(".csv"):
+            csv_df = csv_Reader(file)
 
-    reader = PdfReader(f"/temp/{download.suggested_filename}")
+    page.locator('text="Confirm Printed"').nth(0).wait_for()
+    page.wait_for_timeout(1000) # This 1 second wait is to allow other Confirm printed buttons to show as they do not show up at the same time
+
+    # This loops through each Confirm printed button and clicks each one
+    for confirm_button in range (page.get_by_role("button", name="Confirm Printed").count()):
+        page.on("dialog", lambda dialog: dialog.accept())
+        page.get_by_role("button", name="Confirm Printed").nth(0).click()
+        page.wait_for_timeout(1000)
+
+    main_menu_available(page)
+    page.get_by_role("link", name="Communications Production").click()
+    page.get_by_role("link", name="Archived Batch List").click()
+    page.locator("#batchIdFilter").click()
+    page.locator("#batchIdFilter").fill(link_text)
+    page.locator("#batchIdFilter").press("Enter")
+    expect(page.locator("td").filter(has_text=link_text)).to_be_visible() # Checks to see if the batch is now archived
+
+    subject_search_by_nhs_no(page, nhs_no, latest_event_status)
+
+def pdf_Reader(file: str):
+    reader = PdfReader(f"/temp/{file}")
 
     # For loop looping through all pages of the file to find the NHS Number
     for pages in reader.pages:
@@ -127,22 +156,17 @@ def active_batch_processing(page: Page, batch_type: str, batch_description: str,
             text = text.splitlines(True)
             for split_text in text:
                 if "NHS No" in split_text:
-                    # If a string is found containing "NHS No" all characters but digits are stored into nhs_no
+                    # If a string is found containing "NHS No" only digits are stored into nhs_no
                     nhs_no = res = "".join([ele for ele in split_text if ele.isdigit()])
                     break
+    return nhs_no
 
-    page.on("dialog", lambda dialog: dialog.accept())
-    page.get_by_role("button", name="Confirm Printed").click()
+def csv_Reader(file: str):
+    csv_df = pd.read_csv(f"/temp/{file}")
+    return csv_df
 
-    page.get_by_role("link", name="Back").click()
-    page.get_by_role("link", name="Back").click()
-    page.get_by_role("link", name="Archived Batch List").click()
-    page.locator("#batchIdFilter").click()
-    page.locator("#batchIdFilter").fill(link_text)
-    page.locator("#batchIdFilter").press("Enter")
-    expect(page.locator("td").filter(has_text=link_text)).to_be_visible()
-
-    page.get_by_role("link", name="Main Menu").click()
+def subject_search_by_nhs_no(page: Page, nhs_no: str, latest_event_status: str):
+    main_menu_available(page)
     page.get_by_role("link", name="Screening Subject Search").click()
     page.get_by_role("textbox", name="NHS Number").click()
     page.get_by_role("textbox", name="NHS Number").fill(nhs_no)
@@ -152,89 +176,8 @@ def active_batch_processing(page: Page, batch_type: str, batch_description: str,
     expect(page.get_by_role("cell", name="Latest Event Status", exact=True)).to_be_visible()
     expect(page.get_by_role("cell", name=latest_event_status, exact=True)).to_be_visible()
 
+def main_menu_available(page: str):
+    is_main_menu_available = page.get_by_role("link", name="Main Menu").is_visible()
 
-def active_batch_processing_csv(page: Page, batch_type: str, batch_description: str, latest_event_status: str) -> None:
-    # Print the batch of Pre-Invitation Letters
-    page.get_by_role("link", name="Main Menu").click()
-    page.get_by_role("link", name="Communications Production").click()
-    page.get_by_role("link", name="Active Batch List").click()
-    page.locator("#eventCodeFilter").click()
-    page.locator("#eventCodeFilter").fill(batch_type)
-    page.locator("#eventCodeFilter").press("Enter")
-    pre_invitation_cells = page.locator(f"//td[text()='{batch_description}']")
-
-    for i in range(pre_invitation_cells.count()):
-        row = pre_invitation_cells.nth(i).locator("..")  # Get the parent row
-
-        # Check if the row contains "Prepared" or "Open"
-        if row.locator("td", has_text="Prepared").count() > 0 or row.locator("td", has_text="Open").count() > 0 or row.locator("td", has_text="Closed").count() > 0:
-            # Find the first link in that row and click it
-            link = row.locator("a").first
-            link_text = link.inner_text()  # Get the link text dynamically
-            link.click()
-
-    # Checks to see if batch is already prepared
-    page.wait_for_timeout(3000) # Without this timeout prepare_button is always set to false
-    prepare_button = page.get_by_role("button", name="Prepare Batch").is_visible()
-
-    #If not prepared it will click on the prepare button and wait 5 seconds (ideally would be a loop)
-    if prepare_button:
-        page.get_by_role("button", name="Prepare Batch").click()
-        page.wait_for_timeout(5000)
-
-    # Start waiting for the pdf download
-    with page.expect_download() as download_info:
-        # Perform the action that initiates download
-        page.get_by_role("button", name="Retrieve").nth(0).click()
-    download_pdf = download_info.value
-    # Wait for the download process to complete and save the downloaded file in a temp folder
-    download_pdf.save_as(f"/temp/{download_pdf.suggested_filename}")
-
-    reader = PdfReader(f"/temp/{download_pdf.suggested_filename}")
-
-    # For loop looping through all pages of the file to find the NHS Number
-    for pages in reader.pages:
-        text = pages.extract_text()
-        if "NHS No" in text:
-            # If NHS number is found split the text by every new line into a list
-            text = text.splitlines(True)
-            for split_text in text:
-                if "NHS No" in split_text:
-                    # If a string is found containing "NHS No" all characters but digits are stored into nhs_no
-                    nhs_no_pdf = res = "".join([ele for ele in split_text if ele.isdigit()])
-                    break
-
-    page.on("dialog", lambda dialog: dialog.accept())
-    expect(page.get_by_role("button", name="Confirm Printed").nth(0)).to_be_visible()
-    page.get_by_role("button", name="Confirm Printed").nth(0).click()
-    # Start waiting for the csv download
-    with page.expect_download() as download_info:
-        # Perform the action that initiates download
-        page.get_by_role("button", name="Retrieve").nth(1).click()
-    download_csv = download_info.value
-    # Wait for the download process to complete and save the downloaded file in a temp folder
-    download_csv.save_as(f"/temp/{download_csv.suggested_filename}")
-
-    page.on("dialog", lambda dialog: dialog.accept())
-    expect(page.get_by_role("button", name="Confirm Printed").nth(0)).to_be_visible()
-    page.get_by_role("button", name="Confirm Printed").nth(0).click()
-    # Storing the downloaded csv into a pandas dataframe
-    csv_df = pd.read_csv(download_csv.suggested_filename)
-
-    page.get_by_role("link", name="Back").click()
-    page.get_by_role("link", name="Back").click()
-    page.get_by_role("link", name="Archived Batch List").click()
-    page.locator("#batchIdFilter").click()
-    page.locator("#batchIdFilter").fill(link_text)
-    page.locator("#batchIdFilter").press("Enter")
-    expect(page.locator("td").filter(has_text=link_text)).to_be_visible()
-
-    page.get_by_role("link", name="Main Menu").click()
-    page.get_by_role("link", name="Screening Subject Search").click()
-    page.get_by_role("textbox", name="NHS Number").click()
-    page.get_by_role("textbox", name="NHS Number").fill(nhs_no_pdf)
-    page.get_by_role("textbox", name="NHS Number").press("Enter")
-    page.get_by_role("button", name="Search").click()
-    expect(page.get_by_role("cell", name="Subject Screening Summary", exact=True)).to_be_visible()
-    expect(page.get_by_role("cell", name="Latest Event Status", exact=True)).to_be_visible()
-    expect(page.get_by_role("cell", name=latest_event_status, exact=True)).to_be_visible()
+    if is_main_menu_available:
+         page.get_by_role("link", name="Main Menu").click()
