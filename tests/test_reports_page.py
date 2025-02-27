@@ -284,7 +284,7 @@ def test_operational_reports_appointment_attendance_not_updated(page: Page) -> N
     expect(page.locator("b")).to_contain_text(report_timestamp)
 
     # Open an appointment record from the report
-    page.get_by_role("link", name="934 9288").click()
+    page.locator("#listReportDataTable > tbody > tr:nth-child(3) > td:nth-child(1) > a").click()
 
     # Verify the page title is "Appointment Detail"
     expect(page.locator("#ntshPageTitle")).to_contain_text("Appointment Detail")
