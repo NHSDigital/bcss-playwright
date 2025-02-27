@@ -4,7 +4,7 @@ from playwright.sync_api import Page
 class FitTestKitsPage:
     def __init__(self, page: Page):
         self.page = page
-        # Downloads Page
+        # FitTestKits Page
         self.log_in_page = self.page.get_by_role("button", name="Log in")
         self.fit_rollout_summary_page = self.page.get_by_role("link", name="FIT Rollout Summary")
         self.log_devices_page = self.page.get_by_role("link", name="Log Devices")
