@@ -87,25 +87,30 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
     NavigationBar(page).click_main_menu_link()
     MainMenu(page).go_to_communications_production_page()
     CommunicationsProduction(page).go_to_active_batch_list_page()
-    ActiveBatchList(page).event_code_filter.click()
-    ActiveBatchList(page).event_code_filter.fill(batch_type)
+    ActiveBatchList(page).enter_event_code_filter(batch_type)
     pre_invitation_cells = page.locator(f"//td[text()='{batch_description}']")
+
+    if pre_invitation_cells.count() == 0 and batch_description == "Pre-invitation (FIT) (digital leaflet)":
+        print(f"No S1 Pre-invitation (FIT) (digital leaflet) batch found. Skipping to next step")
+        return
+    elif page.locator("td", has_text="No matching records found"):
+        pytest.fail(f"No {batch_type} {batch_description} batch found")
 
     for i in range(pre_invitation_cells.count()):
         row = pre_invitation_cells.nth(i).locator("..")  # Get the parent row
 
         # Check if the row contains "Prepared" or "Open"
-        if row.locator("td", has_text="Prepared").count() > 0 or row.locator("td", has_text="Open").count() > 0 or row.locator("td", has_text="Closed").count() > 0:
+        if row.locator("td", has_text="Prepared").count() > 0 or row.locator("td", has_text="Open").count() > 0:
             # Find the first link in that row and click it
             link = row.locator("a").first
             link_text = link.inner_text()  # Get the batch id dynamically
             link.click()
             break
         else:
-            pytest.fail(f"No open/prepared {batch_type} batch found")
+            pytest.fail(f"No open/prepared '{batch_type} - {batch_description}' batch found")
 
     # Checks to see if batch is already prepared
-    page.wait_for_timeout(1000) # Without this timeout prepare_button is always set to false
+    page.wait_for_timeout(3000) # Without this timeout prepare_button is always set to false
     prepare_button = page.get_by_role("button", name="Prepare Batch").is_visible()
 
     #If not prepared it will click on the prepare button
@@ -145,8 +150,7 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
     NavigationBar(page).click_main_menu_link()
     MainMenu(page).go_to_communications_production_page()
     CommunicationsProduction(page).go_to_archived_batch_list_page()
-    ArchivedBatchList(page).event_code_filter.click()
-    ArchivedBatchList(page).event_code_filter.fill(link_text)
+    ArchivedBatchList(page).enter_id_filter(link_text)
     expect(page.locator("td").filter(has_text=link_text)).to_be_visible() # Checks to see if the batch is now archived
 
     subject_search_by_nhs_no(page, nhs_no, latest_event_status)
