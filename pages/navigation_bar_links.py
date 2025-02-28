@@ -12,7 +12,7 @@ class NavigationBar:
 
     def click_main_menu_link(self):
         for _ in range(3):  # Try up to 3 times
-            self.page.wait_for_timeout(1000) # Wait for 1 second before trying (as sometimes this button is clicked as a redirect happens)
+            self.page.wait_for_timeout(2000) # Wait for 2 seconds before trying (as sometimes this button is clicked as a redirect happens)
             if self.main_menu_link.is_visible():
                 self.main_menu_link.click()
                 return  # Exit if successful

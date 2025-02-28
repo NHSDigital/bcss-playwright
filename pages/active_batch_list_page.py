@@ -12,6 +12,10 @@ class ActiveBatchList:
         self.batch_split_by_filter = self.page.locator("#splitByFilter")
         self.screening_centre_filter = self.page.locator("#screeningCentreFilter")
         self.count_filter = self.page.locator("#countFilter")
+    #     self.td = self.page.locator("td")
+
+    # def filter_td(self, filter):
+    #     self.td.
 
     def enter_id_filter(self, search_text: str):
         self.id_filter.click()

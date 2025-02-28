@@ -15,18 +15,42 @@ from pages.archived_batch_list_page import *
 from pages.navigation_bar_links import *
 from pages.subject_screening_page import *
 
+# @pytest.mark.wip2 # Not working at the moment
+# def test_prereq():
+#     database_connection_exec("prereq_check")
+
+#     paramater_32 = database_connection_query("select DEFAULT_VALUE from PARAMETERS where PARAM_ID = 32")
+#     print(f"paramater_32: {paramater_32}")
+#     if paramater_32[0] != "-1":
+#         database_connection_query("UPDATE PARAMETERS SET DEFAULT_VALUE = -1 WHERE PARAM_ID = 32")
+#         database_connection_query("COMMIT")
+#     paramater_31 = database_connection_query("select DEFAULT_VALUE from PARAMETERS where PARAM_ID = 31")
+#     print(f"paramater_31: {paramater_31}")
+#     if paramater_31[0] != "-1":
+#         database_connection_query("UPDATE PARAMETERS SET DEFAULT_VALUE = -1 WHERE PARAM_ID = 31")
+#         database_connection_query("COMMIT")
+
+
+# To Do:
+# Create more POM
+# Remove as many hard coded timeouts as possible
+# Add more fail states
+# Add more logging to understand what is going on
+# Convert import pages * into 1 line
+# Move functions to utils
+
 @pytest.mark.wip
 def test_example(page: Page) -> None:
     page.goto("/")
     BcssLoginPage(page).login_as_user_bcss401()
 
-    # Create plan
+    # 2 - Create plan
     MainMenu(page).go_to_call_and_recall_page()
     CallAndRecall(page).go_to_planning_and_monitoring_page()
     page.get_by_role("link", name="BCS001").click()
     page.get_by_role("button", name="Create a Plan").click()
     page.get_by_role("link", name="Set all").click()
-    page.get_by_placeholder("Enter weekly invitation rate").fill("1")
+    page.get_by_placeholder("Enter daily invitation rate").fill("1")
     page.get_by_role("button", name="Update").click()
     page.get_by_role("button", name="Confirm").click()
     page.get_by_role("link", name="Set all").click()
@@ -54,7 +78,7 @@ def test_example(page: Page) -> None:
     # Loop until the table no longer contains "Queued"
     while elapsed < timeout:
         table_text = page.locator("#displayRS").text_content()
-        if "Queued" in table_text:
+        if "Queued" in table_text or "In Progress" in table_text:
             # Click the Refresh button
             page.get_by_role("button", name="Refresh").click()
             page.wait_for_timeout(wait_interval)
@@ -93,7 +117,7 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
     if pre_invitation_cells.count() == 0 and batch_description == "Pre-invitation (FIT) (digital leaflet)":
         print(f"No S1 Pre-invitation (FIT) (digital leaflet) batch found. Skipping to next step")
         return
-    elif page.locator("td", has_text="No matching records found"):
+    elif pre_invitation_cells.count() == 0 and page.locator("td", has_text="No matching records found"):
         pytest.fail(f"No {batch_type} {batch_description} batch found")
 
     for i in range(pre_invitation_cells.count()):
@@ -146,6 +170,8 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
         page.on("dialog", lambda dialog: dialog.accept())
         page.get_by_role("button", name="Confirm Printed").nth(0).click()
         page.wait_for_timeout(1000)
+
+    # Add wait for batch successfully archived
 
     NavigationBar(page).click_main_menu_link()
     MainMenu(page).go_to_communications_production_page()

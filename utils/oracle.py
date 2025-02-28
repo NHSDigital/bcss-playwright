@@ -19,3 +19,4 @@ def database_connection_query(sql: str): # To use when "select a from b"
         with connection.cursor() as cursor:
             for r in cursor.execute(sql):
                 print(r)
+            return r
