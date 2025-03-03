@@ -31,6 +31,7 @@ def test_example(page: Page) -> None:
     CreateAPlan(page).click_save_button()
     CreateAPlan(page).fill_note_field("test data")
     CreateAPlan(page).click_saveNote_button()
+    expect(page).to_have_url("https://bcss-bcss-18680-ddc-bcss.k8s-nonprod.texasplatform.uk/invitation/plan/23159/23162/")
 
     # Generate Invitations
     NavigationBar(page).click_main_menu_link()
@@ -45,7 +46,7 @@ def test_example(page: Page) -> None:
 
     # Set timeout parameters
     timeout = 120000  # Total timeout of 120 seconds (in milliseconds)
-    wait_interval = 10000  # Wait 10 seconds between refreshes (in milliseconds)
+    wait_interval = 5000  # Wait 5 seconds between refreshes (in milliseconds)
     elapsed = 0
 
     # Loop until the table no longer contains "Queued"
@@ -106,19 +107,13 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
         else:
             pytest.fail(f"No open/prepared '{batch_type} - {batch_description}' batch found")
 
-    # Checks to see if batch is already prepared
-    page.wait_for_timeout(3000) # Without this timeout prepare_button is always set to false
-    prepare_button = ManageActiveBatch(page).prepare_button_text.is_visible()
+    ManageActiveBatch(page).click_prepare_button()
 
-    #If not prepared it will click on the prepare button
-    if prepare_button:
-        ManageActiveBatch(page).click_prepare_button()
-
-    ManageActiveBatch(page).retrieve_button_text.nth(0).wait_for()
-    page.wait_for_timeout(5000) # This 5 second wait is to allow other Retrieve buttons to show as they do not show up at the same time
-
+    ManageActiveBatch(page).reprepare_batch_text.wait_for()
+    retrieve_button_count = 0
     # This loops through each Retrieve button and clicks each one
     for retrieve_button in range (ManageActiveBatch(page).retrieve_button.count()):
+        retrieve_button_count += 1
         # Start waiting for the pdf download
         with page.expect_download() as download_info:
             # Perform the action that initiates download
@@ -127,7 +122,6 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
         file = download_file.suggested_filename
         # Wait for the download process to complete and save the downloaded file in a temp folder
         download_file.save_as(file)
-        page.wait_for_timeout(1000)
         if file.endswith(".pdf"):
             nhs_no = pdf_Reader(file)
             os.remove(file) # Deletes the file after extracting the necessary data
@@ -135,16 +129,12 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
             csv_df = csv_Reader(file) # Currently no use in compartment 1, will be necessary for future compartments
             os.remove(file) # Deletes the file after extracting the necessary data
 
-    ManageActiveBatch(page).confirm_button_text.nth(0).wait_for()
-    page.wait_for_timeout(1000) # This 1 second wait is to allow other Confirm printed buttons to show as they do not show up at the same time
-
     # This loops through each Confirm printed button and clicks each one
-    for _ in range (ManageActiveBatch(page).confirm_button.count()):
+    for _ in range (retrieve_button_count):
         page.on("dialog", lambda dialog: dialog.accept())
         ManageActiveBatch(page).confirm_button.nth(0).click()
-        page.wait_for_timeout(1000)
 
-    # Add wait for batch successfully archived
+    page.locator('text="Batch Successfully Archived and Printed"').wait_for()
 
     NavigationBar(page).click_main_menu_link()
     MainMenu(page).go_to_communications_production_page()

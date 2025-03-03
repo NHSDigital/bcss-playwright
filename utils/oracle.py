@@ -14,7 +14,6 @@ def database_connection_exec(procedure: str): # To use when "exec xxxx" (stored 
         with connection.cursor() as cursor:
             for r in cursor.callproc(procedure):
                 print(r)
-            connection.close()
 
 def database_connection_query(sql: str): # To use when "select a from b"
     load_dotenv()
@@ -26,5 +25,4 @@ def database_connection_query(sql: str): # To use when "select a from b"
         with connection.cursor() as cursor:
             for r in cursor.execute(sql):
                 print(r)
-            connection.close()
             return r
