@@ -10,7 +10,7 @@ class NavigationBar:
         self.help_link = self.page.get_by_role("link", name="Help")
         self.log_out_link = self.page.get_by_role("link", name="Log-out")
 
-    def click_main_menu_link(self):
+    def click_main_menu_link(self): # change to check if URL is correct
         for _ in range(3):  # Try up to 3 times
             self.page.wait_for_timeout(2000) # Wait for 2 seconds before trying (as sometimes this button is clicked as a redirect happens)
             if self.main_menu_link.is_visible():

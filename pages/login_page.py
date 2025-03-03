@@ -32,7 +32,7 @@ class BcssLoginPage:
         user_details = UserTools.retrieve_user("BCSS401")
         self.username.fill(user_details["username"])
         # Retrieve and enter password from .env file
-        password = os.getenv("BCSS401_PASS")
+        password = os.getenv("BCSS_PASS")
         self.password.fill(password)
         # Click submit button
         self.submit_button.click()
@@ -45,7 +45,7 @@ class BcssLoginPage:
         user_details = UserTools.retrieve_user("BCSS118")
         self.username.fill(user_details["username"])
         # Retrieve and enter password from .env file
-        password = os.getenv("BCSS118_PASS")
+        password = os.getenv("BCSS_PASS")
         self.password.fill(password)
         # Click submit button
         self.submit_button.click()
