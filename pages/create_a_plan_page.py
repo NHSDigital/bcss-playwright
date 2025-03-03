@@ -1,6 +1,6 @@
 from playwright.sync_api import Page
 
-class CreateaPlan:
+class CreateAPlan:
     def __init__(self, page: Page):
         self.page = page
         # Call and Recall - page links

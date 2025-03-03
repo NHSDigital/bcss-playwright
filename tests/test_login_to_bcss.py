@@ -1,3 +1,6 @@
+import os
+
+from dotenv import load_dotenv
 from playwright.sync_api import Page, expect
 from pages.login_page import BcssLoginPage
 
@@ -16,9 +19,13 @@ def test_login_to_bcss_with_invalid_username(page: Page) -> None:
     """
     Confirms that a user with a valid password, and invalid username, can NOT log in to bcss
     """
-    # Enter a valid password with an invalid username and click 'sign in' button
+    # Take environment variables from .env
+    load_dotenv()
+    # Set an invalid username
     username = "BCSSZZZ"
-    password = "changeme"
+    # Retrieve valid password from .env file
+    password = os.getenv("BCSS_PASS")
+    # Enter valid password with an invalid username and click 'sign in' button
     BcssLoginPage(page).login(username, password)
     # Confirm error message is displayed
     expect(page.locator("body")).to_contain_text("Incorrect username or password.")

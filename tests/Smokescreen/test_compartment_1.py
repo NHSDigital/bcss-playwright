@@ -14,50 +14,37 @@ from pages.active_batch_list_page import *
 from pages.archived_batch_list_page import *
 from pages.navigation_bar_links import *
 from pages.subject_screening_page import *
-
-# @pytest.mark.wip2 # Not working at the moment
-# def test_prereq():
-#     database_connection_exec("prereq_check")
-
-#     paramater_32 = database_connection_query("select DEFAULT_VALUE from PARAMETERS where PARAM_ID = 32")
-#     print(f"paramater_32: {paramater_32}")
-#     if paramater_32[0] != "-1":
-#         database_connection_query("UPDATE PARAMETERS SET DEFAULT_VALUE = -1 WHERE PARAM_ID = 32")
-#         database_connection_query("COMMIT")
-#     paramater_31 = database_connection_query("select DEFAULT_VALUE from PARAMETERS where PARAM_ID = 31")
-#     print(f"paramater_31: {paramater_31}")
-#     if paramater_31[0] != "-1":
-#         database_connection_query("UPDATE PARAMETERS SET DEFAULT_VALUE = -1 WHERE PARAM_ID = 31")
-#         database_connection_query("COMMIT")
-
+from pages.manage_active_batch_page import *
+from pages.invitations_monitoring_page import *
+from pages.create_a_plan_page import *
+from pages.invitations_plans_page import *
 
 # To Do:
-# Create more POM
-# Remove as many hard coded timeouts as possible
+# Create more POMs
 # Add more fail states
 # Add more logging to understand what is going on
 # Convert import pages * into 1 line
 # Move functions to utils
+# Remove as many hard coded timeouts as possible
+# Create a generic click() function -> this aims to solve an issue where sometimes it thinks it has clicked the element but the page does not change
 
 @pytest.mark.wip
 def test_example(page: Page) -> None:
     page.goto("/")
     BcssLoginPage(page).login_as_user_bcss401()
 
-    # 2 - Create plan
+    # Create plan
     MainMenu(page).go_to_call_and_recall_page()
     CallAndRecall(page).go_to_planning_and_monitoring_page()
-    page.get_by_role("link", name="BCS001").click()
-    page.get_by_role("button", name="Create a Plan").click()
-    page.get_by_role("link", name="Set all").click()
-    page.get_by_placeholder("Enter daily invitation rate").fill("1")
-    page.get_by_role("button", name="Update").click()
-    page.get_by_role("button", name="Confirm").click()
-    page.get_by_role("link", name="Set all").click()
-    page.get_by_role("button", name="Close").click()
-    page.get_by_role("button", name="Save").click()
-    page.get_by_placeholder("Enter note").fill("test data")
-    page.locator("#saveNote").get_by_role("button", name="Save").click()
+    InvitationsMonitoring(page).go_to_bcss001_invitations_plan_page()
+    InvitationsPlans(page).go_to_create_a_plan_page()
+    CreateAPlan(page).click_set_all_button()
+    CreateAPlan(page).fill_daily_invitation_rate_field("1")
+    CreateAPlan(page).click_update_button()
+    CreateAPlan(page).click_confirm_button()
+    CreateAPlan(page).click_save_button()
+    CreateAPlan(page).fill_note_field("test data")
+    CreateAPlan(page).click_saveNote_button()
 
     # Generate Invitations
     NavigationBar(page).click_main_menu_link()
@@ -135,21 +122,21 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
 
     # Checks to see if batch is already prepared
     page.wait_for_timeout(3000) # Without this timeout prepare_button is always set to false
-    prepare_button = page.get_by_role("button", name="Prepare Batch").is_visible()
+    prepare_button = ManageActiveBatch(page).prepare_button_text.is_visible()
 
     #If not prepared it will click on the prepare button
     if prepare_button:
-        page.get_by_role("button", name="Prepare Batch").click()
+        ManageActiveBatch(page).click_prepare_button()
 
-    page.locator('text="Retrieve"').nth(0).wait_for()
+    ManageActiveBatch(page).retrieve_button_text.nth(0).wait_for()
     page.wait_for_timeout(5000) # This 5 second wait is to allow other Retrieve buttons to show as they do not show up at the same time
 
     # This loops through each Retrieve button and clicks each one
-    for retrieve_button in range (page.get_by_role("button", name="Retrieve").count()):
+    for retrieve_button in range (ManageActiveBatch(page).retrieve_button.count()):
         # Start waiting for the pdf download
         with page.expect_download() as download_info:
             # Perform the action that initiates download
-            page.get_by_role("button", name="Retrieve").nth(retrieve_button-1).click()
+            ManageActiveBatch(page).retrieve_button.nth(retrieve_button-1).click()
         download_file = download_info.value
         file = download_file.suggested_filename
         # Wait for the download process to complete and save the downloaded file in a temp folder
@@ -162,13 +149,13 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
             csv_df = csv_Reader(file) # Currently no use in compartment 1, will be necessary for future compartments
             os.remove(file) # Deletes the file after extracting the necessary data
 
-    page.locator('text="Confirm Printed"').nth(0).wait_for()
+    ManageActiveBatch(page).confirm_button_text.nth(0).wait_for()
     page.wait_for_timeout(1000) # This 1 second wait is to allow other Confirm printed buttons to show as they do not show up at the same time
 
     # This loops through each Confirm printed button and clicks each one
-    for _ in range (page.get_by_role("button", name="Confirm Printed").count()):
+    for _ in range (ManageActiveBatch(page).confirm_button.count()):
         page.on("dialog", lambda dialog: dialog.accept())
-        page.get_by_role("button", name="Confirm Printed").nth(0).click()
+        ManageActiveBatch(page).confirm_button.nth(0).click()
         page.wait_for_timeout(1000)
 
     # Add wait for batch successfully archived
@@ -193,7 +180,7 @@ def pdf_Reader(file: str):
             for split_text in text:
                 if "NHS No" in split_text:
                     # If a string is found containing "NHS No" only digits are stored into nhs_no
-                    nhs_no = res = "".join([ele for ele in split_text if ele.isdigit()])
+                    nhs_no = "".join([ele for ele in split_text if ele.isdigit()])
                     break
     return nhs_no
 
