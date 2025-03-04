@@ -6,6 +6,7 @@ from pages.active_batch_list_page import *
 from pages.archived_batch_list_page import *
 from pages.navigation_bar_links import *
 from pages.subject_screening_page import *
+from pages.subject_screening_summary import *
 from pages.manage_active_batch_page import *
 from pages.invitations_monitoring_page import *
 from pages.create_a_plan_page import *

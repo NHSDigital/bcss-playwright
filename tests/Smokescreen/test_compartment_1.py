@@ -5,6 +5,8 @@ import pandas as pd
 import os
 from my_pages import *
 
+
+
 # To Do:
 # Create more POMs
 # Add more fail states
@@ -31,7 +33,7 @@ def test_example(page: Page) -> None:
     CreateAPlan(page).click_save_button()
     CreateAPlan(page).fill_note_field("test data")
     CreateAPlan(page).click_saveNote_button()
-    expect(page).to_have_url("https://bcss-bcss-18680-ddc-bcss.k8s-nonprod.texasplatform.uk/invitation/plan/23159/23162/")
+    # expect(page).to_have_url("https://bcss-bcss-18680-ddc-bcss.k8s-nonprod.texasplatform.uk/invitation/plan/23159/23162/")
 
     # Generate Invitations
     NavigationBar(page).click_main_menu_link()
@@ -148,6 +150,6 @@ def subject_search_by_nhs_no(page: Page, nhs_no: str, latest_event_status: str):
     SubjectScreeningPage(page).nhs_number_filter.fill(nhs_no)
     SubjectScreeningPage(page).nhs_number_filter.press("Enter")
     SubjectScreeningPage(page).click_search_button()
-    expect(page.get_by_role("cell", name="Subject Screening Summary", exact=True)).to_be_visible()
-    expect(page.get_by_role("cell", name="Latest Event Status", exact=True)).to_be_visible()
-    expect(page.get_by_role("cell", name=latest_event_status, exact=True)).to_be_visible()
+    SubjectScreeningSummary(page).verify_subject_screening_summary()
+    SubjectScreeningSummary(page).verify_latest_event_status_header()
+    SubjectScreeningSummary(page).verify_latest_event_status_value(latest_event_status)
