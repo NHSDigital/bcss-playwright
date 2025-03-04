@@ -31,7 +31,7 @@ def test_example(page: Page) -> None:
     CreateAPlan(page).click_save_button()
     CreateAPlan(page).fill_note_field("test data")
     CreateAPlan(page).click_saveNote_button()
-    expect(page).to_have_url("https://bcss-bcss-18680-ddc-bcss.k8s-nonprod.texasplatform.uk/invitation/plan/23159/23162/")
+    page.locator('#page-title:has-text("Invitation Plans")').wait_for()
 
     # Generate Invitations
     NavigationBar(page).click_main_menu_link()
