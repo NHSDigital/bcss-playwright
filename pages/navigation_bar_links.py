@@ -11,7 +11,10 @@ class NavigationBar:
         self.log_out_link = self.page.get_by_role("link", name="Log-out")
 
     def click_main_menu_link(self):
-        self.main_menu_link.click()
+        for _ in range(3):  # Try up to 3 times
+            if self.main_menu_link.is_visible():
+                self.main_menu_link.click()
+                return  # Exit if successful
 
     def click_back_link(self):
         self.back_link.click()

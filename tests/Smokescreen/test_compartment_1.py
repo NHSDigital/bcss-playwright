@@ -37,33 +37,8 @@ def test_example(page: Page) -> None:
     NavigationBar(page).click_main_menu_link()
     MainMenu(page).go_to_call_and_recall_page()
     CallAndRecall(page).go_to_generate_invitations_page()
-    page.get_by_role("button", name="Generate Invitations").click()
-
-    page.wait_for_selector("#displayRS", timeout=5000)
-
-    # Initially, ensure the table contains "Queued"
-    expect(page.locator("#displayRS")).to_contain_text("Queued")
-
-    # Set timeout parameters
-    timeout = 120000  # Total timeout of 120 seconds (in milliseconds)
-    wait_interval = 5000  # Wait 5 seconds between refreshes (in milliseconds)
-    elapsed = 0
-
-    # Loop until the table no longer contains "Queued"
-    while elapsed < timeout:
-        table_text = page.locator("#displayRS").text_content()
-        if "Queued" in table_text or "In Progress" in table_text:
-            # Click the Refresh button
-            page.get_by_role("button", name="Refresh").click()
-            page.wait_for_timeout(wait_interval)
-            elapsed += wait_interval
-        elif "Failed" in table_text:
-            pytest.fail("Invitation has failed to generate")
-        else:
-            break
-
-    # Final check: ensure that the table now contains "Completed"
-    expect(page.locator("#displayRS")).to_contain_text("Completed")
+    GenerateInvitations(page).click_generate_invitations_button()
+    GenerateInvitations(page).wait_for_invitation_generation_complete()
 
     # Print the batch of Pre-Invitation Letters
     batch_processing(page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent")
@@ -86,16 +61,17 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
     MainMenu(page).go_to_communications_production_page()
     CommunicationsProduction(page).go_to_active_batch_list_page()
     ActiveBatchList(page).enter_event_code_filter(batch_type)
-    pre_invitation_cells = page.locator(f"//td[text()='{batch_description}']")
 
-    if pre_invitation_cells.count() == 0 and batch_description == "Pre-invitation (FIT) (digital leaflet)":
+    batch_description_cells = page.locator(f"//td[text()='{batch_description}']")
+
+    if batch_description_cells.count() == 0 and batch_description == "Pre-invitation (FIT) (digital leaflet)":
         print(f"No S1 Pre-invitation (FIT) (digital leaflet) batch found. Skipping to next step")
         return
-    elif pre_invitation_cells.count() == 0 and page.locator("td", has_text="No matching records found"):
+    elif batch_description_cells.count() == 0 and page.locator("td", has_text="No matching records found"):
         pytest.fail(f"No {batch_type} {batch_description} batch found")
 
-    for i in range(pre_invitation_cells.count()):
-        row = pre_invitation_cells.nth(i).locator("..")  # Get the parent row
+    for i in range(batch_description_cells.count()):
+        row = batch_description_cells.nth(i).locator("..")  # Get the parent row
 
         # Check if the row contains "Prepared" or "Open"
         if row.locator("td", has_text="Prepared").count() > 0 or row.locator("td", has_text="Open").count() > 0:
@@ -110,8 +86,9 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
     ManageActiveBatch(page).click_prepare_button()
 
     ManageActiveBatch(page).reprepare_batch_text.wait_for()
-    retrieve_button_count = 0
+
     # This loops through each Retrieve button and clicks each one
+    retrieve_button_count = 0
     for retrieve_button in range (ManageActiveBatch(page).retrieve_button.count()):
         retrieve_button_count += 1
         # Start waiting for the pdf download
@@ -126,7 +103,7 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
             nhs_no = pdf_Reader(file)
             os.remove(file) # Deletes the file after extracting the necessary data
         elif file.endswith(".csv"):
-            csv_df = csv_Reader(file) # Currently no use in compartment 1, will be necessary for future compartments
+            # csv_df = csv_Reader(file) # Currently no use in compartment 1, will be necessary for future compartments
             os.remove(file) # Deletes the file after extracting the necessary data
 
     # This loops through each Confirm printed button and clicks each one
