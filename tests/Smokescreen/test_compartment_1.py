@@ -31,7 +31,7 @@ def test_example(page: Page) -> None:
     CreateAPlan(page).click_save_button()
     CreateAPlan(page).fill_note_field("test data")
     CreateAPlan(page).click_saveNote_button()
-    page.locator('#page-title:has-text("Invitation Plans")').wait_for()
+    InvitationsPlans(page).invitations_plans_title.wait_for()
 
     # Generate Invitations
     NavigationBar(page).click_main_menu_link()
@@ -54,7 +54,7 @@ def test_example(page: Page) -> None:
 
     # Log out
     NavigationBar(page).click_log_out_link()
-    expect(page.get_by_role("heading", name="You have logged out")).to_be_visible()
+    Logout(page).verify_log_out_page()
 
 def batch_processing(page: Page, batch_type: str, batch_description: str, latest_event_status: str):
     NavigationBar(page).click_main_menu_link()
@@ -111,13 +111,13 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
         page.on("dialog", lambda dialog: dialog.accept())
         ManageActiveBatch(page).confirm_button.nth(0).click()
 
-    page.locator('text="Batch Successfully Archived and Printed"').wait_for()
+    ActiveBatchList(page).batch_successfully_archived_msg.wait_for()
 
     NavigationBar(page).click_main_menu_link()
     MainMenu(page).go_to_communications_production_page()
     CommunicationsProduction(page).go_to_archived_batch_list_page()
     ArchivedBatchList(page).enter_id_filter(link_text)
-    expect(page.locator("td").filter(has_text=link_text)).to_be_visible() # Checks to see if the batch is now archived
+    ArchivedBatchList(page).verify_table_data(link_text)
 
     subject_search_by_nhs_no(page, nhs_no, latest_event_status)
 

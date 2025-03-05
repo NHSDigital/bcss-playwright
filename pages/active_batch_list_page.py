@@ -12,6 +12,7 @@ class ActiveBatchList:
         self.batch_split_by_filter = self.page.locator("#splitByFilter")
         self.screening_centre_filter = self.page.locator("#screeningCentreFilter")
         self.count_filter = self.page.locator("#countFilter")
+        self.batch_successfully_archived_msg = self.page.locator('text="Batch Successfully Archived and Printed"')
 
     def enter_id_filter(self, search_text: str):
         self.id_filter.click()
