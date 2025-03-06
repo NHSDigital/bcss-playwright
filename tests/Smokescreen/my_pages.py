@@ -13,4 +13,3 @@ from pages.create_a_plan_page import *
 from pages.invitations_plans_page import *
 from pages.generate_invitations_page import *
 from pages.log_out_page import *
-from utils.oracle import *
