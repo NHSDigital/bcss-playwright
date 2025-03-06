@@ -4,10 +4,9 @@ from pages.communications_production_page import CommunicationsProduction
 from pages.active_batch_list_page import ActiveBatchList
 from pages.manage_active_batch_page import ManageActiveBatch
 from pages.archived_batch_list_page import ArchivedBatchList
-from utils.extract_nhs_no_from_pdf import pdf_reader
-from utils.csv_reader import csv_reader
-from utils.subject_search_by_nhs_no import subject_search_by_nhs_no
-from utils.oracle import database_connection_exec, database_connection_query
+from utils.pdf_reader import extract_nhs_no_from_pdf
+from utils.csv_reader import convert_csv_to_df
+from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
 import os
 import pytest
 from playwright.sync_api import Page
@@ -56,10 +55,10 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
         # Wait for the download process to complete and save the downloaded file in a temp folder
         download_file.save_as(file)
         if file.endswith(".pdf"):
-            nhs_no = pdf_reader(file)
+            nhs_no = extract_nhs_no_from_pdf(file)
             os.remove(file) # Deletes the file after extracting the necessary data
         elif file.endswith(".csv"):
-            csv_df = csv_reader(file) # Currently no use in compartment 1, will be necessary for future compartments
+            csv_df = convert_csv_to_df(file) # Currently no use in compartment 1, will be necessary for future compartments
             os.remove(file) # Deletes the file after extracting the necessary data
 
     # This loops through each Confirm printed button and clicks each one
@@ -75,5 +74,5 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
     ArchivedBatchList(page).enter_id_filter(link_text)
     ArchivedBatchList(page).verify_table_data(link_text)
 
-    subject_search_by_nhs_no(page, nhs_no, latest_event_status)
+    verify_subject_event_status_by_nhs_no(page, nhs_no, latest_event_status)
     return nhs_no

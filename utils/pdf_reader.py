@@ -1,6 +1,6 @@
 from pypdf import PdfReader
 
-def pdf_reader(file: str):
+def extract_nhs_no_from_pdf(file: str):
     reader = PdfReader(file)
 
     # For loop looping through all pages of the file to find the NHS Number

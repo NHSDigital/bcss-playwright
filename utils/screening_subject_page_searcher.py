@@ -4,7 +4,7 @@ from pages.subject_screening_page import SubjectScreeningPage
 from pages.subject_screening_summary import SubjectScreeningSummary
 from playwright.sync_api import Page
 
-def subject_search_by_nhs_no(page: Page, nhs_no: str, latest_event_status: str):
+def verify_subject_event_status_by_nhs_no(page: Page, nhs_no: str, latest_event_status: str):
     NavigationBar(page).click_main_menu_link()
     MainMenu(page).go_to_screening_subject_search_page()
     SubjectScreeningPage(page).click_nhs_number_filter()

@@ -2,10 +2,11 @@ import pytest
 from playwright.sync_api import Page
 from my_pages import *
 from utils.batch_processing import batch_processing
-from utils.oracle import exec_bcss_timed_events
+from utils.oracle import OracleDB
 
 # To Do:
-# Create a generic click() function -> this aims to solve an issue where sometimes it thinks it has clicked the element but the page does not change
+# Create a common click() function -> this aims to solve an issue where sometimes it thinks it has clicked the element but the page does not change
+# playwright._impl._errors.Error: Dialog.accept: Cannot accept dialog which is already handled! - Have a look at removing this error (probably from line 67 of batch_processing)
 
 @pytest.mark.wip
 def test_example(page: Page) -> None:
@@ -35,12 +36,12 @@ def test_example(page: Page) -> None:
 
     # Print the batch of Pre-Invitation Letters
     s1_nhs_no = batch_processing(page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent")
-    exec_bcss_timed_events(s1_nhs_no)
     batch_processing(page, "S1", "Pre-invitation (FIT) (digital leaflet)", "S9 - Pre-invitation Sent")
+    OracleDB().exec_bcss_timed_events(s1_nhs_no)
 
     # Print the batch of Invitation & Test Kit Letters
     s9_nhs_no = batch_processing(page, "S9", "Invitation & Test Kit (FIT)", "S10 - Invitation & Test Kit Sent")
-    exec_bcss_timed_events(s9_nhs_no)
+    OracleDB().exec_bcss_timed_events(s9_nhs_no)
 
     # Print a set of reminder letters
     batch_processing(page, "S10", "Test Kit Reminder", "S19 - Reminder of Initial Test Sent")
@@ -48,3 +49,4 @@ def test_example(page: Page) -> None:
     # Log out
     NavigationBar(page).click_log_out_link()
     Logout(page).verify_log_out_page()
+    page.close()
