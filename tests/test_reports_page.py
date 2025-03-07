@@ -13,7 +13,7 @@ def before_each(page: Page):
     reports page
     """
     # Log in to BCSS
-    BcssLoginPage(page).login_as_user_bcss401()
+    BcssLoginPage(page).login_as_user("BCSS401")
 
     # Open reports page
     MainMenu(page).go_to_reports_page()

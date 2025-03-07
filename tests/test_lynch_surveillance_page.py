@@ -12,7 +12,7 @@ def before_each(page: Page):
     lynch surveillance page
     """
     # Log in to BCSS
-    BcssLoginPage(page).login_as_user_bcss401()
+    BcssLoginPage(page).login_as_user("BCSS401")
 
     # Go to Lynch Surveillance page
     MainMenu(page).go_to_lynch_surveillance_page()

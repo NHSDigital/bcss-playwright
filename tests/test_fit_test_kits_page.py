@@ -12,7 +12,7 @@ def before_each(page: Page):
     fit test kits page
     """
     # Log in to BCSS
-    BcssLoginPage(page).login_as_user_bcss401()
+    BcssLoginPage(page).login_as_user("BCSS401")
 
     # Go to fit test kits page
     MainMenu(page).go_to_fit_test_kits_page()

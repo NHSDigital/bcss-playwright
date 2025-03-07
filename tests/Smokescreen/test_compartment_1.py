@@ -9,9 +9,9 @@ from utils.oracle import OracleDB
 # playwright._impl._errors.Error: Dialog.accept: Cannot accept dialog which is already handled! - Have a look at removing this error (probably from line 67 of batch_processing)
 
 @pytest.mark.wip
-def test_example(page: Page) -> None:
+def test_compartment_1(page: Page) -> None:
     page.goto("/")
-    BcssLoginPage(page).login_as_user_bcss401()
+    BcssLoginPage(page).login_as_user("BCSS401")
 
     # Create plan
     MainMenu(page).go_to_call_and_recall_page()
