@@ -49,5 +49,4 @@ class GenerateInvitations:
 
         value = self.planned_invitations_total.text_content().strip()  # Get text and remove extra spaces
         if int(value) <= 5:
-            print("Total invitations are less than 5")
-            pytest.fail("There are no enough invitations generated")
+            pytest.fail("There are less than 5 invitations generated")
