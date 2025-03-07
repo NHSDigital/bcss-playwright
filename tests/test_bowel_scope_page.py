@@ -11,7 +11,7 @@ def before_each(page: Page):
     Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the bowel scope page
     """
     # Log in to BCSS
-    BcssLoginPage(page).login_as_user_bcss401()
+    BcssLoginPage(page).login_as_user("BCSS401")
 
     # Go to bowel scope page
     MainMenu(page).go_to_bowel_scope_page()

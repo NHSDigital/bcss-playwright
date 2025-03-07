@@ -3,7 +3,6 @@ pytest-html>=4.1.1
 pytest-json-report>=1.5.0
 
 playwright~=1.47.0
-dotenv~=0.9.9
 python-dotenv~=1.0.1
 pytest~=8.3.3
 Flask~=3.0.3

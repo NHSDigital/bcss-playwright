@@ -14,7 +14,7 @@ def before_each(page: Page):
     screening_subject_search page
     """
     # Log in to BCSS
-    BcssLoginPage(page).login_as_user_bcss401()
+    BcssLoginPage(page).login_as_user("BCSS401")
 
     # Go to screening subject search page
     MainMenu(page).go_to_screening_subject_search_page()
