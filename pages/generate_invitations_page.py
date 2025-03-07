@@ -1,6 +1,7 @@
 from playwright.sync_api import Page, expect
 import pytest
 
+
 class GenerateInvitations:
     def __init__(self, page: Page):
         self.page = page
@@ -9,7 +10,6 @@ class GenerateInvitations:
         self.displayRS = self.page.locator("#displayRS")
         self.refresh_button = self.page.get_by_role("button", name="Refresh")
         self.planned_invitations_total = self.page.locator("#col8_total")
-
 
     def click_generate_invitations_button(self):
         self.generate_invitations_button.click()
@@ -46,3 +46,8 @@ class GenerateInvitations:
 
         # Final check: ensure that the table now contains "Completed"
         expect(self.displayRS).to_contain_text("Completed")
+
+        value = self.planned_invitations_total.text_content().strip()  # Get text and remove extra spaces
+        if int(value) <= 5:
+            print("Total invitations are less than 5")
+            pytest.fail("There are no enough invitations generated")
