@@ -55,10 +55,12 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
         # Wait for the download process to complete and save the downloaded file in a temp folder
         download_file.save_as(file)
         if file.endswith(".pdf"):
-            nhs_no = extract_nhs_no_from_pdf(file)
+            nhs_numbers = extract_nhs_no_from_pdf(file)
+            first_nhs_no = nhs_numbers[0]
             os.remove(file) # Deletes the file after extracting the necessary data
         elif file.endswith(".csv"):
             csv_df = convert_csv_to_df(file) # Currently no use in compartment 1, will be necessary for future compartments
+            csv_df.to_parquet('subject_kit_number.parquet', engine='fastparquet')
             os.remove(file) # Deletes the file after extracting the necessary data
 
     # This loops through each Confirm printed button and clicks each one
@@ -74,5 +76,5 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
     ArchivedBatchList(page).enter_id_filter(link_text)
     ArchivedBatchList(page).verify_table_data(link_text)
 
-    verify_subject_event_status_by_nhs_no(page, nhs_no, latest_event_status)
-    return nhs_no
+    verify_subject_event_status_by_nhs_no(page, first_nhs_no, latest_event_status)
+    return nhs_numbers

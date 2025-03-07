@@ -7,3 +7,4 @@ pandas>=2.2.3
 dotenv~=0.9.9
 python-dotenv~=1.0.1
 Flask~=3.0.3
+fastparquet>=2024.11.0

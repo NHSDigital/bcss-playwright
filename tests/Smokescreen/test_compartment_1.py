@@ -19,7 +19,7 @@ def test_example(page: Page) -> None:
     InvitationsMonitoring(page).go_to_bcss001_invitations_plan_page()
     InvitationsPlans(page).go_to_create_a_plan_page()
     CreateAPlan(page).click_set_all_button()
-    CreateAPlan(page).fill_daily_invitation_rate_field("1")
+    CreateAPlan(page).fill_daily_invitation_rate_field("10")
     CreateAPlan(page).click_update_button()
     CreateAPlan(page).click_confirm_button()
     CreateAPlan(page).click_save_button()
@@ -35,13 +35,15 @@ def test_example(page: Page) -> None:
     GenerateInvitations(page).wait_for_invitation_generation_complete()
 
     # Print the batch of Pre-Invitation Letters
-    s1_nhs_no = batch_processing(page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent")
+    s1_nhs_numbers = batch_processing(page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent")
     batch_processing(page, "S1", "Pre-invitation (FIT) (digital leaflet)", "S9 - Pre-invitation Sent")
-    OracleDB().exec_bcss_timed_events(s1_nhs_no)
+    for nhs_no in range(len(s1_nhs_numbers)):
+        OracleDB().exec_bcss_timed_events(s1_nhs_numbers[nhs_no-1])
 
     # Print the batch of Invitation & Test Kit Letters
-    s9_nhs_no = batch_processing(page, "S9", "Invitation & Test Kit (FIT)", "S10 - Invitation & Test Kit Sent")
-    OracleDB().exec_bcss_timed_events(s9_nhs_no)
+    s9_nhs_numbers = batch_processing(page, "S9", "Invitation & Test Kit (FIT)", "S10 - Invitation & Test Kit Sent")
+    for nhs_no in range(len(s9_nhs_numbers)):
+        OracleDB().exec_bcss_timed_events(s9_nhs_numbers[nhs_no-1])
 
     # Print a set of reminder letters
     batch_processing(page, "S10", "Test Kit Reminder", "S19 - Reminder of Initial Test Sent")
