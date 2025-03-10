@@ -4,7 +4,7 @@ from my_pages import *
 from utils.batch_processing import batch_processing
 from datetime import datetime
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
-import pandas as pd
+from utils.fit_kit_generation import create_fit_id_df
 
 @pytest.mark.wip1
 def test_compartment_2(page: Page) -> None:
@@ -13,23 +13,22 @@ def test_compartment_2(page: Page) -> None:
 
     MainMenu(page).go_to_fit_test_kits_page()
     FITTestKits(page).go_to_log_devices_page()
-    subjectdf = pd.read_parquet('subject_kit_number.parquet', engine='fastparquet')
-    os.remove('subject_kit_number.parquet')
+    subjectdf = create_fit_id_df()
 
     for subject in range(4):
-        fit_device_id = subjectdf["FIT_Device_ID"].iloc[subject-1]
+        fit_device_id = subjectdf["fit_device_id"].iloc[subject]
         LogDevices(page).fill_fit_device_id_field(fit_device_id)
         sample_date = datetime.now().strftime("%#d %b %Y")
         LogDevices(page).fill_sample_date_field(sample_date)
         LogDevices(page).verify_successfully_logged_device_text()
 
-    nhs_no = subjectdf["NHS_Number"].iloc[0]
+    nhs_no = subjectdf["subject_nhs_number"].iloc[0]
     verify_subject_event_status_by_nhs_no(page, nhs_no, "S43 - Kit Returned and Logged (Initial Test)")
 
     NavigationBar(page).click_main_menu_link()
     MainMenu(page).go_to_fit_test_kits_page()
     FITTestKits(page).go_to_log_devices_page()
-    spoilt_fit_device_id = subjectdf["FIT_Device_ID"].iloc[4]
+    spoilt_fit_device_id = subjectdf["fit_device_id"].iloc[-1]
     LogDevices(page).fill_fit_device_id_field(spoilt_fit_device_id)
     LogDevices(page).click_device_spoilt_button()
     LogDevices(page).select_spoilt_device_dropdown_option()

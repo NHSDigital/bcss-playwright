@@ -5,7 +5,6 @@ from pages.active_batch_list_page import ActiveBatchList
 from pages.manage_active_batch_page import ManageActiveBatch
 from pages.archived_batch_list_page import ArchivedBatchList
 from utils.pdf_reader import extract_nhs_no_from_pdf
-from utils.csv_reader import convert_csv_to_df
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
 import os
 import pytest
@@ -59,9 +58,6 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
             first_nhs_no = nhs_numbers[0]
             os.remove(file) # Deletes the file after extracting the necessary data
         elif file.endswith(".csv"):
-            if batch_type == "S9":
-                csv_df = convert_csv_to_df(file) # Currently no use in compartment 1, will be necessary for future compartments
-                csv_df.to_parquet('subject_kit_number.parquet', engine='fastparquet')
             os.remove(file) # Deletes the file after extracting the necessary data
 
     # This loops through each Confirm printed button and clicks each one

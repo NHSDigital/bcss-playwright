@@ -1,7 +1,8 @@
 import oracledb
 import os
 from dotenv import load_dotenv
-
+from sqlalchemy import create_engine
+import pandas as pd
 class OracleDB:
     def __init__(self):
         load_dotenv()
@@ -74,7 +75,26 @@ class OracleDB:
         except Exception as connectionError:
             print(f"Failed to connect to the DB! with connection error {connectionError}")
 
-    # The following two functions are commented out as they are not used currently, but may be needed in future compartments
+    def execute_query(self, query: str,): # To use when "select xxxx" (stored procedures)
+        try:
+            print("Attempting DB connection...")
+            conn = oracledb.connect(user=self.user, password=self.password, dsn=self.dns)
+            engine = create_engine('oracle+oracledb://', creator=lambda: conn)
+            print(conn.version, "DB connection successful!")
+            try:
+                print(f"Attempting to execute query")
+                df = pd.read_sql(query, engine)
+                print(conn.version, "query execution successful!")
+            except Exception as executionError:
+                print(f"Failed to execute query with execution error {executionError}")
+            finally:
+                if conn is not None:
+                    conn.close()
+                    return df
+        except Exception as connectionError:
+                print(f"Failed to connect to the DB! with connection error {connectionError}")
+
+    # The following function is commented out as it is not used currently, but may be needed in future compartments
 
     # def execute_stored_procedure(self, procedure: str): # To use when "exec xxxx" (stored procedures)
     #     try:
@@ -93,23 +113,3 @@ class OracleDB:
     #                 conn.close()
     #     except Exception as connectionError:
     #             print(f"Failed to connect to the DB! with connection error: {connectionError}")
-
-    # def execute_query(self, query: str,): # To use when "select xxxx" (stored procedures)
-    #     try:
-    #         print("Attempting DB connection...")
-    #         conn = oracledb.connect(user=self.user, password=self.password, dsn=self.dns)
-    #         print(conn.version, "DB connection successful!")
-    #         try:
-    #             print(f"Attempting to execute query: {query}")
-    #             cursor = conn.cursor()
-    #             cursor.execute(query)
-    #             result = cursor.fetchall()
-    #             print(conn.version, "query execution successful!")
-    #         except Exception as executionError:
-    #             print(f"Failed to execute query with execution error {executionError}")
-    #         finally:
-    #             if conn is not None:
-    #                 conn.close()
-    #                 return result
-    #     except Exception as connectionError:
-    #             print(f"Failed to connect to the DB! with connection error {connectionError}")
