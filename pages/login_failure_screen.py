@@ -6,5 +6,5 @@ class LoginFailureScreen:
         # Login failure message
         self.login_failure_msg = self.page.get_by_role("heading", name="Sorry, BCSS is unavailable")
 
-    def verify_login_failure_screen(self):
+    def verify_login_failure_screen_is_displayed(self):
         expect(self.login_failure_msg).to_be_visible()
