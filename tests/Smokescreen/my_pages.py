@@ -15,3 +15,4 @@ from pages.generate_invitations_page import *
 from pages.fit_test_kits_page import *
 from pages.log_devices_page import *
 from pages.log_out_page import *
+from pages.login_failure_screen import  *

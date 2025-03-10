@@ -1,4 +1,4 @@
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 
 
 class BcssHomePage:
@@ -13,6 +13,8 @@ class BcssHomePage:
         self.refresh_alerts_link = self.page.get_by_role("link", name="Refresh alerts")
         self.user_guide_link = self.page.get_by_role("link", name="User guide")
         self.help_link = self.page.get_by_role("link", name="Help")
+        # Bowel Cancer Screening System header
+        self.bowel_cancer_screening_system_header = self.page.locator("#ntshAppTitle")
 
     def click_sub_menu_link(self):
         self.sub_menu_link.click()
@@ -37,6 +39,9 @@ class BcssHomePage:
 
     def click_help_link(self):
         self.help_link.click()
+
+    def bowel_cancer_screening_system_header_is_displayed(self):
+        expect(self.bowel_cancer_screening_system_header).to_contain_text("Bowel Cancer Screening System")
 
 
 class MainMenu:
