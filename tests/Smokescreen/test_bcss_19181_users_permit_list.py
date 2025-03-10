@@ -3,13 +3,6 @@ from playwright.sync_api import Page
 from my_pages import *
 from utils.oracle import OracleDB
 
-#Login successfully with bcss401 user
-#Login successfully with bcss118 user
-#Add bcss401 user to approved users list table
-#Login successfully with bcss401 user
-#Login unsuccessfully with bcss118 user and verify expected error message
-#Delete bcss401 user from approved users list table
-
 @pytest.fixture(scope="function", autouse=True)
 def before_test(page: Page):
     """
@@ -29,7 +22,7 @@ def before_test(page: Page):
     yield
     OracleDB().delete_all_users_from_approved_users_table()
 
-@pytest.mark.wip3
+@pytest.mark.smoke
 def test_only_users_on_approved_can_login_to_bcss(page: Page) -> None:
     # Add bcss401 user to approved users list table
     OracleDB().populate_ui_approved_users_table("BCSS401")

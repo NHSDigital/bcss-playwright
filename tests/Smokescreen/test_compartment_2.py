@@ -6,7 +6,8 @@ from datetime import datetime
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
 from utils.fit_kit_generation import create_fit_id_df
 
-@pytest.mark.wip1
+@pytest.mark.wip2
+@pytest.mark.smokescreen
 def test_compartment_2(page: Page) -> None:
     page.goto("/")
     BcssLoginPage(page).login_as_user("BCSS401")

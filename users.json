@@ -12,5 +12,23 @@
     "roles": [
       "Screening Centre Manager for Wolverhampton, Midlands and North West"
     ]
+  },
+  "BCSS402": {
+    "username": "BCSS402",
+    "roles": [
+      "Hub Manager"
+    ]
+  },
+  "BCSS33": {
+    "username": "BCSS33",
+    "roles": [
+      "BCSS Bureau Staff"
+    ]
+  },
+  "BCSS406": {
+    "username": "BCSS406",
+    "roles": [
+      "Assistant Laboratory Lead - state registered"
+    ]
   }
 }

@@ -8,7 +8,8 @@ from utils.oracle import OracleDB
 # Create a common click() function -> this aims to solve an issue where sometimes it thinks it has clicked the element but the page does not change
 # playwright._impl._errors.Error: Dialog.accept: Cannot accept dialog which is already handled! - Have a look at removing this error (probably from line 67 of batch_processing)
 
-@pytest.mark.wip
+@pytest.mark.smoke
+@pytest.mark.smokescreen
 def test_compartment_1(page: Page) -> None:
     page.goto("/")
     BcssLoginPage(page).login_as_user("BCSS401")
