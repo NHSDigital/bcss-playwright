@@ -28,10 +28,11 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
         row = batch_description_cells.nth(i).locator("..")  # Get the parent row
 
         # Check if the row contains "Prepared" or "Open"
-        if row.locator("td", has_text="Prepared").count() > 0 or row.locator("td", has_text="Open").count() > 0:
+        if row.locator("td", has_text="Prepared").count() > 0 or row.locator("td", has_text="Open").count() > 0: #Within if statement get nhs_number from DB TODO
             # Find the first link in that row and click it
             link = row.locator("a").first
             link_text = link.inner_text()  # Get the batch id dynamically
+            # new code here query DB (getSubjectsFromLetterBatchID function in selenium code) passing in a batch id to get the nhs numbers of the subjects TODO
             link.click()
             break
         else:
@@ -54,7 +55,7 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
         # Wait for the download process to complete and save the downloaded file in a temp folder
         download_file.save_as(file)
         if file.endswith(".pdf"):
-            nhs_numbers = extract_nhs_no_from_pdf(file)
+            nhs_numbers = extract_nhs_no_from_pdf(file) # Remove pdf_reader TODO
             first_nhs_no = nhs_numbers[0]
             os.remove(file) # Deletes the file after extracting the necessary data
         elif file.endswith(".csv"):
@@ -73,5 +74,5 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
     ArchivedBatchList(page).enter_id_filter(link_text)
     ArchivedBatchList(page).verify_table_data(link_text)
 
-    verify_subject_event_status_by_nhs_no(page, first_nhs_no, latest_event_status)
+    verify_subject_event_status_by_nhs_no(page, first_nhs_no, latest_event_status) # This needs to be changed to pass an NHS number from the new DF first_nhs_no = df["COL NAME"].iloc[0] TODO
     return nhs_numbers

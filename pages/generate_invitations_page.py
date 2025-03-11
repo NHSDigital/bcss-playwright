@@ -32,7 +32,7 @@ class GenerateInvitations:
         elapsed = 0
 
         # Loop until the table no longer contains "Queued"
-        while elapsed < timeout:
+        while elapsed < timeout: # there may be a stored procedure to speed this process up
             table_text = self.displayRS.text_content()
             if "Queued" in table_text or "In Progress" in table_text:
                 # Click the Refresh button

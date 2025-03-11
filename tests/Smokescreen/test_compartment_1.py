@@ -6,7 +6,6 @@ from utils.oracle import OracleDB
 
 # To Do:
 # Create a common click() function -> this aims to solve an issue where sometimes it thinks it has clicked the element but the page does not change
-# playwright._impl._errors.Error: Dialog.accept: Cannot accept dialog which is already handled! - Have a look at removing this error (probably from line 67 of batch_processing)
 
 @pytest.mark.smoke
 @pytest.mark.smokescreen
@@ -17,7 +16,7 @@ def test_compartment_1(page: Page) -> None:
     # Create plan
     MainMenu(page).go_to_call_and_recall_page()
     CallAndRecall(page).go_to_planning_and_monitoring_page()
-    InvitationsMonitoring(page).go_to_bcss001_invitations_plan_page()
+    InvitationsMonitoring(page).go_to_bcss001_invitations_plan_page() # Replicate this for bcss009 (IOM) TODO
     InvitationsPlans(page).go_to_create_a_plan_page()
     CreateAPlan(page).click_set_all_button()
     CreateAPlan(page).fill_daily_invitation_rate_field("10")
@@ -36,15 +35,15 @@ def test_compartment_1(page: Page) -> None:
     GenerateInvitations(page).wait_for_invitation_generation_complete()
 
     # Print the batch of Pre-Invitation Letters
-    s1_nhs_numbers = batch_processing(page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent")
     batch_processing(page, "S1", "Pre-invitation (FIT) (digital leaflet)", "S9 - Pre-invitation Sent")
-    for nhs_no in range(len(s1_nhs_numbers)):
+    s1_nhs_numbers = batch_processing(page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent") # New batch processing for S1 IOM TODO
+    for nhs_no in range(len(s1_nhs_numbers)): # Change this to get nhs numbers from DF instead of list TODO
         OracleDB().exec_bcss_timed_events(s1_nhs_numbers[nhs_no-1])
 
     # Print the batch of Invitation & Test Kit Letters
-    s9_nhs_numbers = batch_processing(page, "S9", "Invitation & Test Kit (FIT)", "S10 - Invitation & Test Kit Sent")
+    s9_nhs_numbers = batch_processing(page, "S9", "Invitation & Test Kit (FIT)", "S10 - Invitation & Test Kit Sent") # New batch processing for S9 IOM TODO
     for nhs_no in range(len(s9_nhs_numbers)):
-        OracleDB().exec_bcss_timed_events(s9_nhs_numbers[nhs_no-1])
+        OracleDB().exec_bcss_timed_events(s9_nhs_numbers[nhs_no-1]) # Change this to get nhs numbers from DF instead of list TODO
 
     # Print a set of reminder letters
     batch_processing(page, "S10", "Test Kit Reminder", "S19 - Reminder of Initial Test Sent")
