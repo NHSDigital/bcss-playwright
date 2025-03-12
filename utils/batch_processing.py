@@ -6,6 +6,7 @@ from pages.manage_active_batch_page import ManageActiveBatch
 from pages.archived_batch_list_page import ArchivedBatchList
 from utils.pdf_reader import extract_nhs_no_from_pdf
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
+from utils.get_nhs_no_from_batch_id import get_nhs_no_from_batch_id
 import os
 import pytest
 from playwright.sync_api import Page
@@ -28,18 +29,18 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
         row = batch_description_cells.nth(i).locator("..")  # Get the parent row
 
         # Check if the row contains "Prepared" or "Open"
-        if row.locator("td", has_text="Prepared").count() > 0 or row.locator("td", has_text="Open").count() > 0: #Within if statement get nhs_number from DB TODO
+        if row.locator("td", has_text="Prepared").count() > 0 or row.locator("td", has_text="Open").count() > 0:
             # Find the first link in that row and click it
             link = row.locator("a").first
             link_text = link.inner_text()  # Get the batch id dynamically
-            # new code here query DB (getSubjectsFromLetterBatchID function in selenium code) passing in a batch id to get the nhs numbers of the subjects TODO
+            nhs_no_df = get_nhs_no_from_batch_id(link_text)
             link.click()
             break
         else:
             pytest.fail(f"No open/prepared '{batch_type} - {batch_description}' batch found")
 
     ManageActiveBatch(page).click_prepare_button()
-
+    page.wait_for_timeout(1000) # This one second timeout does not affect the time to execute, as it is just used to ensure the reprepare batch button is clicked and does not instantly advance to the next step
     ManageActiveBatch(page).reprepare_batch_text.wait_for()
 
     # This loops through each Retrieve button and clicks each one
@@ -55,8 +56,6 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
         # Wait for the download process to complete and save the downloaded file in a temp folder
         download_file.save_as(file)
         if file.endswith(".pdf"):
-            nhs_numbers = extract_nhs_no_from_pdf(file) # Remove pdf_reader TODO
-            first_nhs_no = nhs_numbers[0]
             os.remove(file) # Deletes the file after extracting the necessary data
         elif file.endswith(".csv"):
             os.remove(file) # Deletes the file after extracting the necessary data
@@ -74,5 +73,6 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
     ArchivedBatchList(page).enter_id_filter(link_text)
     ArchivedBatchList(page).verify_table_data(link_text)
 
-    verify_subject_event_status_by_nhs_no(page, first_nhs_no, latest_event_status) # This needs to be changed to pass an NHS number from the new DF first_nhs_no = df["COL NAME"].iloc[0] TODO
-    return nhs_numbers
+    first_nhs_no = nhs_no_df["subject_nhs_number"].iloc[0]
+    verify_subject_event_status_by_nhs_no(page, first_nhs_no, latest_event_status)
+    return nhs_no_df
