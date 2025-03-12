@@ -11,5 +11,5 @@ def get_nhs_no_from_batch_id(batch_id):
     WHERE lbr.BATCH_ID IN {batch_id}
     AND ss.screening_status_id != 4008
     ORDER BY ss.subject_nhs_number
-    FETCH FIRST 5 ROWS ONLY""")
+    """)
     return nhs_number_df

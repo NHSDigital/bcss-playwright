@@ -7,13 +7,11 @@ from utils.oracle import OracleDB
 @pytest.mark.smoke
 @pytest.mark.smokescreen
 def test_compartment_1(page: Page) -> None:
-    execute_iom = False
 
     page.goto("/")
     BcssLoginPage(page).login_as_user("BCSS401")
 
-    # Create plan
-    # England
+    # Create plan - England
     MainMenu(page).go_to_call_and_recall_page()
     CallAndRecall(page).go_to_planning_and_monitoring_page()
     InvitationsMonitoring(page).go_to_bcss001_invitations_plan_page()
@@ -26,20 +24,6 @@ def test_compartment_1(page: Page) -> None:
     CreateAPlan(page).fill_note_field("test data")
     CreateAPlan(page).click_saveNote_button()
     InvitationsPlans(page).invitations_plans_title.wait_for()
-
-    # Isle Of Man
-    if execute_iom:
-        NavigationBar(page).click_back_link()
-        InvitationsMonitoring(page).go_to_bcss009_invitations_plan_page()
-        InvitationsPlans(page).go_to_create_a_plan_page()
-        CreateAPlan(page).click_set_all_button()
-        CreateAPlan(page).fill_daily_invitation_rate_field("1") # This step will fail as currently there are insufficient subjects in the next invitations shortlist (we are working on this with  compartment 0)
-        CreateAPlan(page).click_update_button()
-        CreateAPlan(page).click_confirm_button()
-        CreateAPlan(page).click_save_button()
-        CreateAPlan(page).fill_note_field("test data")
-        CreateAPlan(page).click_saveNote_button()
-        InvitationsPlans(page).invitations_plans_title.wait_for()
 
     # Generate Invitations
     NavigationBar(page).click_main_menu_link()
@@ -54,22 +38,10 @@ def test_compartment_1(page: Page) -> None:
     for index, row in nhs_number_df.iterrows():
         OracleDB().exec_bcss_timed_events(row["subject_nhs_number"])
 
-    # Print the batch of Pre-Invitation Letters - Isle Of Man
-    if execute_iom:
-        nhs_number_df = batch_processing(page, "S1", "Pre-invitation (gFOBT)", "S9 - Pre-invitation Sent")
-        for index, row in nhs_number_df.iterrows():
-            OracleDB().exec_bcss_timed_events(row["subject_nhs_number"])
-
     # Print the batch of Invitation & Test Kit Letters - England
     nhs_number_df = batch_processing(page, "S9", "Invitation & Test Kit (FIT)", "S10 - Invitation & Test Kit Sent")
     for index, row in nhs_number_df.iterrows():
         OracleDB().exec_bcss_timed_events(row["subject_nhs_number"])
-
-    # Print the batch of Pre-Invitation Letters - Isle Of Man
-    if execute_iom:
-        nhs_number_df = batch_processing(page, "S9", "Invitation & Test Kit (gFOBT)", "S10 - Invitation & Test Kit Sent")
-        for index, row in nhs_number_df.iterrows():
-            OracleDB().exec_bcss_timed_events(row["subject_nhs_number"])
 
     # Print a set of reminder letters
     batch_processing(page, "S10", "Test Kit Reminder", "S19 - Reminder of Initial Test Sent")
