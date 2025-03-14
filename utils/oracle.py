@@ -94,22 +94,40 @@ class OracleDB:
         except Exception as connectionError:
                 print(f"Failed to connect to the DB! with connection error {connectionError}")
 
-    # The following function is commented out as it is not used currently, but may be needed in future compartments
+    def execute_stored_procedure(self, procedure: str): # To use when "exec xxxx" (stored procedures)
+        try:
+            print("Attempting DB connection...")
+            conn = oracledb.connect(user=self.user, password=self.password, dsn=self.dns)
+            print(conn.version, "DB connection successful!")
+            try:
+                print(f"Attempting to execute stored procedure: {procedure}")
+                cursor = conn.cursor()
+                cursor.callproc(procedure)
+                conn.commit()
+                print(conn.version, "stored procedure execution successful!")
+            except Exception as executionError:
+                print(f"Failed to execute stored procedure with execution error: {executionError}")
+            finally:
+                if conn is not None:
+                    conn.close()
+        except Exception as connectionError:
+                print(f"Failed to connect to the DB! with connection error: {connectionError}")
 
-    # def execute_stored_procedure(self, procedure: str): # To use when "exec xxxx" (stored procedures)
-    #     try:
-    #         print("Attempting DB connection...")
-    #         conn = oracledb.connect(user=self.user, password=self.password, dsn=self.dns)
-    #         print(conn.version, "DB connection successful!")
-    #         try:
-    #             print(f"Attempting to execute stored procedure: {procedure}")
-    #             cursor = conn.cursor()
-    #             cursor.callproc(procedure)
-    #             print(conn.version, "stored procedure execution successful!")
-    #         except Exception as executionError:
-    #             print(f"Failed to execute stored procedure with execution error: {executionError}")
-    #         finally:
-    #             if conn is not None:
-    #                 conn.close()
-    #     except Exception as connectionError:
-    #             print(f"Failed to connect to the DB! with connection error: {connectionError}")
+    def update_or_insert_data_to_table(self, statement):  # To update or insert data into a table
+        try:
+            print("Attempting DB connection...")
+            conn = oracledb.connect(user=self.user, password=self.password, dsn=self.dns)
+            print(conn.version, "DB connection successful!")
+            try:
+                print("Attempting to insert/update table")
+                cursor = conn.cursor()
+                cursor.execute(statement)
+                conn.commit()
+                print(conn.version, "DB table successfully updated!")
+            except Exception as dbUpdateInsertError:
+                print(f"Failed to insert/update values from the DB table! with error {dbUpdateInsertError}")
+            finally:
+                if conn is not None:
+                    conn.close()
+        except Exception as connectionError:
+            print(f"Failed to connect to the DB! with connection error {connectionError}")
