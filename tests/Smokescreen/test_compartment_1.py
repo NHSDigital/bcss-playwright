@@ -6,6 +6,7 @@ from utils.oracle import OracleDB
 
 @pytest.mark.smoke
 @pytest.mark.smokescreen
+@pytest.mark.compartment1
 def test_compartment_1(page: Page) -> None:
 
     page.goto("/")
@@ -19,7 +20,8 @@ def test_compartment_1(page: Page) -> None:
     CreateAPlan(page).click_set_all_button()
     CreateAPlan(page).fill_daily_invitation_rate_field("10")
     CreateAPlan(page).click_update_button()
-    CreateAPlan(page).click_confirm_button()
+    if CreateAPlan(page).confirm_button.is_visible():
+        CreateAPlan(page).click_confirm_button()
     CreateAPlan(page).click_save_button()
     CreateAPlan(page).fill_note_field("test data")
     CreateAPlan(page).click_saveNote_button()

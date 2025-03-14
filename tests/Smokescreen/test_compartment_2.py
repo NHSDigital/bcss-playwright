@@ -23,7 +23,7 @@ def test_compartment_2(page: Page) -> None:
         LogDevices(page).fill_sample_date_field(sample_date)
         LogDevices(page).verify_successfully_logged_device_text()
 
-    nhs_no = subjectdf["subject_nhs_number"].iloc[0]
+    nhs_no = subjectdf["nhs_number"].iloc[0]
     verify_subject_event_status_by_nhs_no(page, nhs_no, "S43 - Kit Returned and Logged (Initial Test)")
 
     NavigationBar(page).click_main_menu_link()
