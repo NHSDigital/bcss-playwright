@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 
 from my_pages import *
-from utils import oracle
+from utils import oracle, fit_kit_logged
 from utils.fit_kit_generation import create_fit_id_df
 from utils.oracle import OracleDB
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
@@ -11,6 +11,12 @@ from utils.screening_subject_page_searcher import verify_subject_event_status_by
 def test_compartment_3(page: Page) -> None:
     page.goto("/")
     BcssLoginPage(page).login_as_user("BCSS401")
+
+    # Add results to the test records in the KIT_QUEUE table (i.e. mimic receiving results from the middleware)
+    fit_kit_logged.process_kit_data()
+    #  Run the database procedure to process any kit queue records at status BCSS_READY
+    fit_kit_logged.execute_stored_procedures()
+
 
     # (STEP - 4) Run two stored procedures to process any kit queue records at status BCSS_READY
     # (processKitQueue function in selenium tests)
