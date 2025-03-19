@@ -114,7 +114,7 @@ class OracleDB:
         except Exception as connectionError:
                 print(f"Failed to connect to the DB! with connection error: {connectionError}")
 
-    def update_or_insert_data_to_table(self, statement):  # To update or insert data into a table
+    def update_or_insert_data_to_table(self, statement,params):  # To update or insert data into a table
         try:
             print("Attempting DB connection...")
             conn = oracledb.connect(user=self.user, password=self.password, dsn=self.dns)
@@ -122,7 +122,7 @@ class OracleDB:
             try:
                 print("Attempting to insert/update table")
                 cursor = conn.cursor()
-                cursor.execute(statement)
+                cursor.execute(statement,params)
                 conn.commit()
                 print(conn.version, "DB table successfully updated!")
             except Exception as dbUpdateInsertError:
