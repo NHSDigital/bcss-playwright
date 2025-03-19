@@ -58,35 +58,35 @@ def split_fit_kits(kit_id_df):
 
 def get_service_management_by_device_id(deviceid):
     get_service_management_df = OracleDB().execute_query(f"""SELECT kq.device_id, kq.test_kit_name, kq.test_kit_type, kq.test_kit_status,
-               CASE WHEN tki.logged_in_flag = 'Y' THEN kq.logged_by_hub END AS logged_by_hub,
-               CASE WHEN tki.logged_in_flag = 'Y' THEN kq.date_time_logged END AS date_time_logged,
-               tki.logged_in_on AS tk_logged_date_time, kq.test_result, kq.calculated_result,
-               kq.error_code,
-               (SELECT vvt.description
-                FROM tk_analyser_t tka
-                INNER JOIN tk_analyser_type_error tkate ON tkate.tk_analyser_type_id = tka.tk_analyser_type_id
-                INNER JOIN valid_values vvt ON tkate.tk_analyser_error_type_id = vvt.valid_value_id
-                WHERE tka.analyser_code = kq.analyser_code AND tkate.error_code = kq.error_code)
-               AS analyser_error_description, kq.analyser_code, kq.date_time_authorised,
-               kq.authoriser_user_code, kq.datestamp, kq.bcss_error_id,
-               REPLACE(mt.description, 'ERROR - ', '') AS error_type,
-               NVL(mta.allowed_value, 'N') AS error_ok_to_archive,
-               kq.post_response, kq.post_attempts, kq.put_response,
-               kq.put_attempts, kq.date_time_error_archived,
-               kq.error_archived_user_code, sst.screening_subject_id,
-               sst.subject_nhs_number, tki.test_results, tki.issue_date,
-               o.org_code AS issued_by_hub
-        FROM kit_queue kq
-        LEFT OUTER JOIN tk_items_t tki ON tki.device_id = kq.device_id
-        OR (tki.device_id IS NULL AND tki.kitid = pkg_test_kit.f_get_kit_id_from_device_id(kq.device_id))
-        LEFT OUTER JOIN screening_subject_t sst ON sst.screening_subject_id = tki.screening_subject_id
-        LEFT OUTER JOIN ep_subject_episode_t ep ON ep.subject_epis_id = tki.subject_epis_id
-        LEFT OUTER JOIN message_types mt ON kq.bcss_error_id = mt.message_type_id
-        LEFT OUTER JOIN valid_values mta ON mta.valid_value_id = mt.message_attribute_id AND mta.valid_value_id = 305482
-        LEFT OUTER JOIN ORG o ON ep.start_hub_id = o.org_id
-        LEFT OUTER JOIN ORG lo ON lo.org_code = kq.logged_by_hub
-         WHERE kq.test_kit_type = 'FIT' AND kq.device_id = '{deviceid}'
-        """)
+    CASE WHEN tki.logged_in_flag = 'Y' THEN kq.logged_by_hub END AS logged_by_hub,
+    CASE WHEN tki.logged_in_flag = 'Y' THEN kq.date_time_logged END AS date_time_logged,
+    tki.logged_in_on AS tk_logged_date_time, kq.test_result, kq.calculated_result,
+    kq.error_code,
+    (SELECT vvt.description
+    FROM tk_analyser_t tka
+    INNER JOIN tk_analyser_type_error tkate ON tkate.tk_analyser_type_id = tka.tk_analyser_type_id
+    INNER JOIN valid_values vvt ON tkate.tk_analyser_error_type_id = vvt.valid_value_id
+    WHERE tka.analyser_code = kq.analyser_code AND tkate.error_code = kq.error_code)
+    AS analyser_error_description, kq.analyser_code, kq.date_time_authorised,
+    kq.authoriser_user_code, kq.datestamp, kq.bcss_error_id,
+    REPLACE(mt.description, 'ERROR - ', '') AS error_type,
+    NVL(mta.allowed_value, 'N') AS error_ok_to_archive,
+    kq.post_response, kq.post_attempts, kq.put_response,
+    kq.put_attempts, kq.date_time_error_archived,
+    kq.error_archived_user_code, sst.screening_subject_id,
+    sst.subject_nhs_number, tki.test_results, tki.issue_date,
+    o.org_code AS issued_by_hub
+    FROM kit_queue kq
+    LEFT OUTER JOIN tk_items_t tki ON tki.device_id = kq.device_id
+    OR (tki.device_id IS NULL AND tki.kitid = pkg_test_kit.f_get_kit_id_from_device_id(kq.device_id))
+    LEFT OUTER JOIN screening_subject_t sst ON sst.screening_subject_id = tki.screening_subject_id
+    LEFT OUTER JOIN ep_subject_episode_t ep ON ep.subject_epis_id = tki.subject_epis_id
+    LEFT OUTER JOIN message_types mt ON kq.bcss_error_id = mt.message_type_id
+    LEFT OUTER JOIN valid_values mta ON mta.valid_value_id = mt.message_attribute_id AND mta.valid_value_id = 305482
+    LEFT OUTER JOIN ORG o ON ep.start_hub_id = o.org_id
+    LEFT OUTER JOIN ORG lo ON lo.org_code = kq.logged_by_hub
+    WHERE kq.test_kit_type = 'FIT' AND kq.device_id = '{deviceid}'
+    """)
     return get_service_management_df
 
 
@@ -115,50 +115,50 @@ def update_kit_service_management_entity(device_id, normal):
         test_result = 150
         # Parameterized query
     update_query = """
-           UPDATE kit_queue kq
-           SET kq.test_kit_name = :test_kit_name,
-               kq.test_kit_type = :test_kit_type,
-               kq.test_kit_status =:test_kit_status,
-               kq.logged_by_hub = :logged_by_hub,
-               kq.date_time_logged = :date_time_logged,
-               kq.test_result = :test_result,
-               kq.calculated_result = :calculated_result,
-               kq.error_code = NULL,
-               kq.analyser_code = 'HMJackalt1',
-               kq.date_time_authorised = TO_TIMESTAMP(:date_time_authorised, 'DD-Mon-YY HH24.MI.SS.FF9'),
-               kq.authoriser_user_code = 'AUTO1',
-               kq.post_response = :post_response,
-               kq.post_attempts = :post_attempts,
-               kq.put_response = :put_response,
-               kq.put_attempts = :put_attempts
-           WHERE kq.device_id = :device_id
-       """
+    UPDATE kit_queue kq
+    SET kq.test_kit_name = :test_kit_name,
+    kq.test_kit_type = :test_kit_type,
+    kq.test_kit_status =:test_kit_status,
+    kq.logged_by_hub = :logged_by_hub,
+    kq.date_time_logged = :date_time_logged,
+    kq.test_result = :test_result,
+    kq.calculated_result = :calculated_result,
+    kq.error_code = NULL,
+    kq.analyser_code = 'HMJackalt1',
+    kq.date_time_authorised = TO_TIMESTAMP(:date_time_authorised, 'DD-Mon-YY HH24.MI.SS.FF9'),
+    kq.authoriser_user_code = 'AUTO1',
+    kq.post_response = :post_response,
+    kq.post_attempts = :post_attempts,
+    kq.put_response = :put_response,
+    kq.put_attempts = :put_attempts
+    WHERE kq.device_id = :device_id
+    """
 
     # Parameters dictionary
     params = {
-        "test_kit_name": test_kit_name,
-        "test_kit_type": test_kit_type,
-        "test_kit_status": 'BCSS_READY',
-        "logged_by_hub": logged_by_hub,
-        "date_time_logged": date_time_logged,
-        "test_result": int(test_result),
-        "calculated_result": calculated_result,
-        "date_time_authorised": str(date_time_authorised),
-        "post_response": int(post_response),
-        "post_attempts": int(post_attempts),
-        "put_response": put_response,
-        "put_attempts": put_attempts,
-        "device_id": device_id
+    "test_kit_name": test_kit_name,
+    "test_kit_type": test_kit_type,
+    "test_kit_status": 'BCSS_READY',
+    "logged_by_hub": logged_by_hub,
+    "date_time_logged": date_time_logged,
+    "test_result": int(test_result),
+    "calculated_result": calculated_result,
+    "date_time_authorised": str(date_time_authorised),
+    "post_response": int(post_response),
+    "post_attempts": int(post_attempts),
+    "put_response": put_response,
+    "put_attempts": put_attempts,
+    "device_id": device_id
     }
 
     # Execute query
     print("Parameters before execution:", params)
-    rows_affected=OracleDB().update_or_insert_data_to_table(update_query, params)
+    rows_affected = OracleDB().update_or_insert_data_to_table(update_query, params)
     print(f"Rows affected: {rows_affected}")
 
 
 def get_nhs_number_from_subject_id(subject_ids, df):
     temp_df = OracleDB().execute_query(
-        f"SELECT SCREENING_SUBJECT_ID, SUBJECT_NHS_NUMBER FROM SCREENING_SUBJECT_T WHERE SCREENING_SUBJECT_ID = {subject_ids}")
+    f"SELECT SCREENING_SUBJECT_ID, SUBJECT_NHS_NUMBER FROM SCREENING_SUBJECT_T WHERE SCREENING_SUBJECT_ID = {subject_ids}")
     df = df.merge(temp_df[["screening_subject_id", "subject_nhs_number"]], on="screening_subject_id", how="left")
     return df
