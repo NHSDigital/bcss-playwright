@@ -1,6 +1,6 @@
 import pytest
 from playwright.sync_api import Page, expect
-from pages.login_page import BcssLoginPage
+from utils.user_tools import UserTools
 from pages.bcss_home_page import BcssHomePage
 from utils.date_time_utils import DateTimeUtils
 
@@ -8,11 +8,11 @@ from utils.date_time_utils import DateTimeUtils
 @pytest.fixture(scope="function", autouse=True)
 def before_each(page: Page):
     """
-    Before every test is executed, this fixture logs in to BCSS as a test user and results in the home page
+    Before every test is executed, this fixture logs in to BCSS as the specified user and results in the home page
     being displayed
     """
     # Log in to BCSS
-    BcssLoginPage(page).login_as_user("BCSS401")
+    UserTools.user_login(page, "Hub Manager State Registered")
 
 
 @pytest.mark.smoke

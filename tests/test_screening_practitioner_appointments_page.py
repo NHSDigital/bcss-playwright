@@ -1,18 +1,17 @@
 import pytest
 from playwright.sync_api import Page, expect
-
 from pages.bcss_home_page import MainMenu
-from pages.login_page import BcssLoginPage
+from utils.user_tools import UserTools
 
 
 @pytest.fixture(scope="function", autouse=True)
 def before_each(page: Page):
     """
-    Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the
+    Before every test is executed, this fixture logs in to BCSS as the specified user and navigates to the
     screening_practitioner_appointments page
     """
     # Log in to BCSS
-    BcssLoginPage(page).login_as_user("BCSS401")
+    UserTools.user_login(page, "Hub Manager State Registered")
 
     # Go to screening practitioner appointments page
     MainMenu(page).go_to_screening_practitioner_appointments_page()
