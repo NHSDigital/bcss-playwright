@@ -4,6 +4,7 @@ from datetime import datetime
 import logging
 
 
+
 def process_kit_data():
     # Get test data for compartment 3
     kit_id_df = get_kit_id_logged_from_db()
@@ -11,22 +12,27 @@ def process_kit_data():
     # Split dataframe into two different dataframes, normal and abnormal
     normal_fit_kit_df, abnormal_fit_kit_df = split_fit_kits(kit_id_df)
 
+    # Prepare a list to store device IDs and their respective flags
+    device_ids = []
+
     # Process normal kits (only 1)
     if not normal_fit_kit_df.empty:
         device_id = normal_fit_kit_df["device_id"].iloc[0]
         logging.info(f"Processing normal kit with Device ID: {device_id}")  # Logging normal device_id
-        update_kit_service_management_entity(device_id, True)
+        device_ids.append((device_id, True))  # Add to the list with normal flag
     else:
         logging.warning("No normal kits found for processing.")  # Log warning
 
-    # Process abnormal kits (multiple, loop through)
+        # Process abnormal kits (multiple, loop through)
     if not abnormal_fit_kit_df.empty:
         for index, row in abnormal_fit_kit_df.iterrows():
             device_id = row["device_id"]
             logging.info(f"Processing abnormal kit with Device ID: {device_id}")  # Logging abnormal device_id
-            update_kit_service_management_entity(device_id, False)
+            device_ids.append((device_id, False))  # Add to the list with abnormal flag
     else:
         logging.warning("No abnormal kits found for processing.")  # Log warning
+
+    return device_ids
 
 
 def get_kit_id_logged_from_db():
@@ -101,6 +107,9 @@ def execute_stored_procedures():
 
 def update_kit_service_management_entity(device_id, normal):
     get_service_management_df = get_service_management_by_device_id(device_id)
+
+    # Extract the NHS number from the DataFrame
+    subject_nhs_number = get_service_management_df["subject_nhs_number"].iloc[0]
     test_kit_name = get_service_management_df["test_kit_name"].iloc[0]
     test_kit_type = get_service_management_df["test_kit_type"].iloc[0]
     logged_by_hub = get_service_management_df["logged_by_hub"].iloc[0]
@@ -127,7 +136,7 @@ def update_kit_service_management_entity(device_id, normal):
     kq.test_result = :test_result,
     kq.calculated_result = :calculated_result,
     kq.error_code = NULL,
-    kq.analyser_code = 'HMJackalt1',
+    kq.analyser_code = '3Wjvy',
     kq.date_time_authorised = TO_TIMESTAMP(:date_time_authorised, 'DD-Mon-YY HH24.MI.SS.FF9'),
     kq.authoriser_user_code = 'AUTO1',
     kq.post_response = :post_response,
@@ -147,8 +156,8 @@ def update_kit_service_management_entity(device_id, normal):
     "test_result": int(test_result),
     "calculated_result": calculated_result,
     "date_time_authorised": str(date_time_authorised),
-    "post_response": int(post_response),
-    "post_attempts": int(post_attempts),
+    "post_response":int(post_response)if post_response is not None else 0,
+    "post_attempts":int(post_attempts)if post_attempts is not None else 0,
     "put_response": put_response,
     "put_attempts": put_attempts,
     "device_id": device_id
@@ -158,10 +167,8 @@ def update_kit_service_management_entity(device_id, normal):
     print("Parameters before execution:", params)
     rows_affected = OracleDB().update_or_insert_data_to_table(update_query, params)
     print(f"Rows affected: {rows_affected}")
+ # Return the subject NHS number
+    return subject_nhs_number
 
 
-def get_nhs_number_from_subject_id(subject_ids, df):
-    temp_df = OracleDB().execute_query(
-    f"SELECT SCREENING_SUBJECT_ID, SUBJECT_NHS_NUMBER FROM SCREENING_SUBJECT_T WHERE SCREENING_SUBJECT_ID = {subject_ids}")
-    df = df.merge(temp_df[["screening_subject_id", "subject_nhs_number"]], on="screening_subject_id", how="left")
-    return df
+

@@ -27,7 +27,7 @@ def get_kit_id_from_db():
     and device_id is null
     and tk.invalidated_date is null
     and se.latest_event_status_id in (11198, 11213)
-    fetch first 5 rows only""")
+    fetch first 10 rows only""")
 
     return kit_id_df
 
