@@ -92,8 +92,11 @@ def get_service_management_by_device_id(deviceid):
 
 def execute_stored_procedures():
     db_instance = OracleDB()  # Create an instance of the OracleDB class
-    db_instance.execute_stored_procedure('PKG_TEST_KIT_QUEUE.p_validate_kit_queue')
-    db_instance.execute_stored_procedure('PKG_TEST_KIT_QUEUE.p_calculate_result')
+    logging.info("start: oracle.OracleDB.execute_stored_procedure")
+    db_instance.execute_stored_procedure('PKG_TEST_KIT_QUEUE.p_validate_kit_queue') # Run stored procedure - validate kit queue
+    db_instance.execute_stored_procedure('PKG_TEST_KIT_QUEUE.p_calculate_result') # Run stored procedure - calculate result
+    logging.info("exit: oracle.OracleDB.execute_stored_procedure")
+
 
 
 def update_kit_service_management_entity(device_id, normal):

@@ -9,27 +9,13 @@ from utils.screening_subject_page_searcher import verify_subject_event_status_by
 
 
 def test_compartment_3(page: Page) -> None:
-    page.goto("/")
-    BcssLoginPage(page).login_as_user("BCSS401")
+    UserTools.user_login(page, "Hub Manager State Registered")
 
     # Add results to the test records in the KIT_QUEUE table (i.e. mimic receiving results from the middleware)
     fit_kit_logged.process_kit_data()
-    #  Run the database procedure to process any kit queue records at status BCSS_READY
-    fit_kit_logged.execute_stored_procedures()
-
 
     # (STEP - 4) Run two stored procedures to process any kit queue records at status BCSS_READY
-    # (processKitQueue function in selenium tests)
-
-    logging.info("start: oracle.OracleDB.execute_stored_procedure")
-
-    # Run stored procedure 1 - validate kit queue
-    oracle.OracleDB.execute_stored_procedure(OracleDB,"PKG_TEST_KIT_QUEUE.p_validate_kit_queue")
-
-    # Run stored procedure 2 - calculate result
-    oracle.OracleDB.execute_stored_procedure(OracleDB,"PKG_TEST_KIT_QUEUE.p_calculate_result")
-
-    logging.info("exit: oracle.OracleDB.execute_stored_procedure")
+    fit_kit_logged.execute_stored_procedures()
 
     # (STEP - 5) Check the results of the processed FIT kits have correctly updated the status of the associated subjects
     # Navigate to log devices page
