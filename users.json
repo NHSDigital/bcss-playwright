@@ -1,34 +1,16 @@
 {
   "_comment": "This file can be used to store data on users for your application, and then pulled through using the utils.user_tools UserTools utility. The documentation for this utility explains how this file is read.",
 
-  "BCSS401": {
+  "Hub Manager State Registered": {
     "username": "BCSS401",
     "roles": [
       "Hub Manager State Registered, Midlands and North West"
     ]
   },
-  "BCSS118": {
+  "Screening Centre Manager": {
     "username": "BCSS118",
     "roles": [
       "Screening Centre Manager for Wolverhampton, Midlands and North West"
-    ]
-  },
-  "BCSS402": {
-    "username": "BCSS402",
-    "roles": [
-      "Hub Manager"
-    ]
-  },
-  "BCSS33": {
-    "username": "BCSS33",
-    "roles": [
-      "BCSS Bureau Staff"
-    ]
-  },
-  "BCSS406": {
-    "username": "BCSS406",
-    "roles": [
-      "Assistant Laboratory Lead - state registered"
     ]
   }
 }
