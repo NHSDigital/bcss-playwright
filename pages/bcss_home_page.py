@@ -1,4 +1,5 @@
 from playwright.sync_api import Page, expect
+from utils.click_helper import click
 
 
 class BcssHomePage:
@@ -17,28 +18,28 @@ class BcssHomePage:
         self.bowel_cancer_screening_system_header = self.page.locator("#ntshAppTitle")
 
     def click_sub_menu_link(self):
-        self.sub_menu_link.click()
+        click(self.page, self.sub_menu_link)
 
     def click_hide_sub_menu_link(self):
-        self.hide_sub_menu_link.click()
+        click(self.page, self.hide_sub_menu_link)
 
     def click_select_org_link(self):
-        self.select_org_link.click()
+        click(self.page, self.select_org_link)
 
     def click_back_button(self):
-        self.back_button.click()
+        click(self.page, self.back_button)
 
     def click_release_notes_link(self):
-        self.release_notes_link.click()
+        click(self.page, self.release_notes_link)
 
     def click_refresh_alerts_link(self):
-        self.refresh_alerts_link.click()
+        click(self.page, self.refresh_alerts_link)
 
     def click_user_guide_link(self):
-        self.user_guide_link.click()
+        click(self.page, self.user_guide_link)
 
     def click_help_link(self):
-        self.help_link.click()
+        click(self.page, self.help_link)
 
     def bowel_cancer_screening_system_header_is_displayed(self):
         expect(self.bowel_cancer_screening_system_header).to_contain_text("Bowel Cancer Screening System")
@@ -62,37 +63,37 @@ class MainMenu:
         self.screening_subject_search_page = self.page.get_by_role("link", name="Screening Subject Search")
 
     def go_to_contacts_list_page(self):
-        self.contacts_list_page.click()
+        click(self.page, self.contacts_list_page)
 
     def go_to_bowel_scope_page(self):
-        self.bowel_scope_page.click()
+        click(self.page, self.bowel_scope_page)
 
     def go_to_call_and_recall_page(self):
-        self.call_and_recall_page.click()
+        click(self.page, self.call_and_recall_page)
 
     def go_to_communications_production_page(self):
-        self.communications_production_page.click()
+        click(self.page, self.communications_production_page)
 
     def go_to_download_page(self):
-        self.download_page.click()
+        click(self.page, self.download_page)
 
     def go_to_fit_test_kits_page(self):
-        self.fit_test_kits_page.click()
+        click(self.page, self.fit_test_kits_page)
 
     def go_to_gfob_test_kits_page(self):
-        self.gfob_test_kits_page.click()
+        click(self.page, self.gfob_test_kits_page)
 
     def go_to_lynch_surveillance_page(self):
-        self.lynch_surveillance_page.click()
+        click(self.page, self.lynch_surveillance_page)
 
     def go_to_organisations_page(self):
-        self.organisations_page.click()
+        click(self.page, self.organisations_page)
 
     def go_to_reports_page(self):
-        self.reports_page.click()
+        click(self.page, self.reports_page)
 
     def go_to_screening_practitioner_appointments_page(self):
-        self.screening_practitioner_appointments_page.click()
+        click(self.page, self.screening_practitioner_appointments_page)
 
     def go_to_screening_subject_search_page(self):
-        self.screening_subject_search_page.click()
+        click(self.page, self.screening_subject_search_page)

@@ -2,6 +2,7 @@ import pytest
 from playwright.sync_api import Page, expect
 from pages.login_page import BcssLoginPage
 from pages.bcss_home_page import MainMenu
+from utils.click_helper import click
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -16,7 +17,6 @@ def before_each(page: Page):
     # Go to communications production page
     MainMenu(page).go_to_communications_production_page()
 
-
 @pytest.mark.smoke
 def test_communications_production_page_navigation(page: Page) -> None:
     """
@@ -24,32 +24,33 @@ def test_communications_production_page_navigation(page: Page) -> None:
     are loaded when the links are clicked
     """
     # Active batch list page loads as expected
-    page.get_by_role("link", name="Active Batch List").click()
+    click(page, page.get_by_role("link", name="Active Batch List"))
     expect(page.locator("#page-title")).to_contain_text("Active Batch List")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # Archived batch list page loads as expected
-    page.get_by_role("link", name="Archived Batch List").click()
+    click(page, page.get_by_role("link", name="Archived Batch List"))
     expect(page.locator("#page-title")).to_contain_text("Archived Batch List")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # Letter library index page loads as expected
-    page.get_by_role("link", name="Letter Library Index").click()
+    click(page, page.get_by_role("link", name="Letter Library Index"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("Letter Library Index")
-    page.get_by_role("link", name="Back", exact=True).click()
+    click(page, page.get_by_role("link", name="Back", exact=True))
 
     # Manage individual letter link is visible (not clickable due to user role permissions)
     expect(page.get_by_text("Manage Individual Letter")).to_be_visible()
 
     # Letter signatory page loads as expected
-    page.get_by_role("link", name="Letter Signatory").click()
+    click(page, page.get_by_role("link", name="Letter Signatory"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("Letter Signatory")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # Electronic communication management page loads as expected
-    page.get_by_role("link", name="Electronic Communication").click()
+    click(page, page.get_by_role("link", name="Electronic Communication"))
     expect(page.locator("#page-title")).to_contain_text("Electronic Communication Management")
 
     # Return to main menu
-    page.get_by_role("link", name="Main Menu").click()
+    # main_menu_link = page.get_by_role("link", name="Main Menu")
+    click(page, page.get_by_role("link", name="Main Menu"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("Main Menu")

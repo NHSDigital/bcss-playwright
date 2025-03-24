@@ -1,4 +1,5 @@
 from playwright.sync_api import Page
+from utils.click_helper import click
 
 
 class DownloadsPage:
@@ -12,16 +13,16 @@ class DownloadsPage:
 
 
     def go_to_individual_download_request_page(self):
-        self.individual_download_request_page.click()
+        click(self.page, self.individual_download_request_page)
 
     def go_to_list_of_individual_downloads_page(self):
-        self.list_of_individual_downloads_page.click()
+        click(self.page, self.list_of_individual_downloads_page)
 
     def go_to_batch_download_request_and_page(self):
-        self.batch_download_request_and_page.click()
+        click(self.page, self.batch_download_request_and_page)
 
     def go_to_list_of_batch_downloads_page(self):
-        self.list_of_batch_downloads_page.click()
+        click(self.page, self.list_of_batch_downloads_page)
 
 
 

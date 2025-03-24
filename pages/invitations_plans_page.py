@@ -1,4 +1,5 @@
 from playwright.sync_api import Page
+from utils.click_helper import click
 
 class InvitationsPlans:
     def __init__(self, page: Page):
@@ -8,7 +9,7 @@ class InvitationsPlans:
         self.invitations_plans_title = self.page.locator('#page-title:has-text("Invitation Plans")')
 
     def go_to_create_a_plan_page(self):
-        self.create_a_plan.click()
+        click(self.page, self.create_a_plan)
 
 
 

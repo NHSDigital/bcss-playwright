@@ -23,7 +23,7 @@ def before_test(page: Page):
     yield
     OracleDB().delete_all_users_from_approved_users_table()
 
-@pytest.mark.smoke
+# @pytest.mark.smoke
 def test_only_users_on_approved_can_login_to_bcss(page: Page) -> None:
     # Add bcss401 user to approved users list table
     OracleDB().populate_ui_approved_users_table("BCSS401")

@@ -1,6 +1,6 @@
 import pytest
 from playwright.sync_api import Page, expect
-
+from utils.click_helper import click
 from pages.bcss_home_page import MainMenu
 from pages.login_page import BcssLoginPage
 
@@ -25,56 +25,56 @@ def test_fit_test_kits_page_navigation(page: Page) -> None:
     are loaded when the links are clicked
     """
     # Verify FIT rollout summary page opens as expected
-    page.get_by_role("link", name="FIT Rollout Summary").click()
+    click(page, page.get_by_role("link", name="FIT Rollout Summary"))
     expect(page.locator("body")).to_contain_text("FIT Rollout Summary")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # Verify Log Devices page opens as expected
-    page.get_by_role("link", name="Log Devices").click()
+    click(page, page.get_by_role("link", name="Log Devices"))
     expect(page.locator("#page-title")).to_contain_text("Scan Device")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # Verify View FIT Kit Result page opens as expected
-    page.get_by_role("link", name="View FIT Kit Result").click()
+    click(page, page.get_by_role("link", name="View FIT Kit Result"))
     expect(page.locator("body")).to_contain_text("View FIT Kit Result")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # Verify Kit Service Management page opens as expected
-    page.get_by_role("link", name="Kit Service Management").click()
+    click(page, page.get_by_role("link", name="Kit Service Management"))
     expect(page.locator("#page-title")).to_contain_text("Kit Service Management")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # Verify Kit Result Audit page opens as expected
-    page.get_by_role("link", name="Kit Result Audit").click()
+    click(page, page.get_by_role("link", name="Kit Result Audit"))
     expect(page.locator("#page-title")).to_contain_text("Kit Result Audit")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # Verify View Algorithm page opens as expected
-    page.get_by_role("link", name="View Algorithm").click()
+    click(page, page.get_by_role("link", name="View Algorithm"))
     expect(page.locator("body")).to_contain_text("Select Algorithm")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # Verify View Screening Centre FIT page opens as expected
-    page.get_by_role("link", name="View Screening Centre FIT").click()
+    click(page, page.get_by_role("link", name="View Screening Centre FIT"))
     expect(page.locator("body")).to_contain_text("Select Screening Centre")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # Verify Screening Incidents List page opens as expected
-    page.get_by_role("link", name="Screening Incidents List").click()
+    click(page, page.get_by_role("link", name="Screening Incidents List"))
     expect(page.locator("#page-title")).to_contain_text("Screening Incidents List")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # Verify FIT QC Products page opens as expected
-    page.get_by_role("link", name="Manage QC Products").click()
+    click(page, page.get_by_role("link", name="Manage QC Products"))
     expect(page.locator("#page-title")).to_contain_text("FIT QC Products")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # Verify Maintain Analysers page opens as expected
-    page.get_by_role("link", name="Maintain Analysers").click()
+    click(page, page.get_by_role("link", name="Maintain Analysers"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("Maintain Analysers")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("FIT Test Kits")
 
     # Return to main menu
-    page.get_by_role("link", name="Main Menu").click()
+    click(page, page.get_by_role("link", name="Main Menu"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("Main Menu")

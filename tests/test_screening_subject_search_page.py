@@ -1,6 +1,6 @@
 import pytest
 from playwright.sync_api import Page, expect
-
+from utils.click_helper import click
 from pages.bcss_home_page import MainMenu
 from pages.login_page import BcssLoginPage
 from pages.screening_subject_search_page import ScreeningStatusSearchOptions, LatestEpisodeStatusSearchOptions, \
@@ -26,7 +26,7 @@ def test_search_screening_subject_by_nhs_number(page: Page) -> None:
     Confirms a screening subject can be searched for, using their nhs number
     """
     # Clear filters (if any filters have persisted the NHS number field is inactive)
-    page.get_by_role("button", name="Clear Filters").click()
+    click(page, page.get_by_role("button", name="Clear Filters"))
 
     # Enter an NHS number
     page.get_by_label("NHS Number").fill("966 529 9271")
@@ -35,7 +35,7 @@ def test_search_screening_subject_by_nhs_number(page: Page) -> None:
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the Subject Screening Summary page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Screening Summary")
@@ -52,7 +52,7 @@ def test_search_screening_subject_by_surname(page: Page) -> None:
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject summary page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Screening Summary")
@@ -69,7 +69,7 @@ def test_search_screening_subject_by_forename(page: Page) -> None:
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject summary page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Screening Summary")
@@ -86,7 +86,7 @@ def test_search_screening_subject_by_dob(page: Page) -> None:
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject search results page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -103,7 +103,7 @@ def test_search_screening_subject_by_postcode(page: Page) -> None:
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject search results page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -120,7 +120,7 @@ def test_search_screening_subject_by_episode_closed_date(page: Page) -> None:
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject search results page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -138,7 +138,7 @@ def test_search_criteria_clear_filters_button(page: Page) -> None:
     expect(page.get_by_label("NHS Number")).to_have_value("34344554353")
 
     # Click clear filters button and verify field is empty
-    page.get_by_role("button", name="Clear Filters").click()
+    click(page, page.get_by_role("button", name="Clear Filters"))
     expect(page.get_by_label("NHS Number")).to_be_empty()
 
 
@@ -154,7 +154,7 @@ def test_search_screening_subject_by_status_call(page: Page) -> None:
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject search results page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -171,7 +171,7 @@ def test_search_screening_subject_by_status_inactive(page: Page) -> None:
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject search results page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -188,7 +188,7 @@ def test_search_screening_subject_by_status_opt_in(page: Page) -> None:
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject search results page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -205,7 +205,7 @@ def test_search_screening_subject_by_status_recall(page: Page) -> None:
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject search results page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -222,7 +222,7 @@ def test_search_screening_subject_by_status_self_referral(page: Page) -> None:
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject search results page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -239,7 +239,7 @@ def test_search_screening_subject_by_status_surveillance(page: Page) -> None:
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject search results page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -256,7 +256,7 @@ def test_search_screening_subject_by_status_seeking_further_data(page: Page) -> 
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject search results page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -273,7 +273,7 @@ def test_search_screening_subject_by_status_ceased(page: Page) -> None:
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject search results page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -290,7 +290,7 @@ def test_search_screening_subject_by_status_bowel_scope(page: Page) -> None:
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject search results page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -307,7 +307,7 @@ def test_search_screening_subject_by_status_lynch_surveillance(page: Page) -> No
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject search results page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -324,7 +324,7 @@ def test_search_screening_subject_by_status_lynch_self_referral(page: Page) -> N
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject search results page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Screening Summary")
@@ -342,7 +342,7 @@ def test_search_screening_subject_by_latest_episode_status_open_paused(page: Pag
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject search results page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -359,7 +359,7 @@ def test_search_screening_subject_by_latest_episode_status_closed(page: Page) ->
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject search results page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -376,7 +376,7 @@ def test_search_screening_subject_by_latest_episode_status_no_episode(page: Page
     page.keyboard.press("Tab")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject search results page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -394,7 +394,7 @@ def test_search_screening_subject_by_home_hub(page: Page) -> None:
     SearchAreaSearchOptions(page).select_search_area_home_hub()
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify search results are displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -414,7 +414,7 @@ def test_search_screening_subject_by_gp_practice(page: Page) -> None:
     page.get_by_label("Appropriate Code").fill("C81001")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify the subject search results page is displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -440,7 +440,7 @@ def test_search_screening_subject_by_ccg(page: Page) -> None:
     page.get_by_label("GP Practice in CCG").fill("C81001")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify search results are displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -460,7 +460,7 @@ def test_search_screening_subject_by_screening_centre(page: Page) -> None:
     page.get_by_label("Appropriate Code").fill("BCS001")
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify search results are displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
@@ -477,7 +477,7 @@ def test_search_screening_subject_by_whole_database(page: Page) -> None:
     SearchAreaSearchOptions(page).select_search_area_whole_database()
 
     # Click search button
-    page.get_by_role("button", name="Search").click()
+    click(page, page.get_by_role("button", name="Search"))
 
     # Verify search results are displayed
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")

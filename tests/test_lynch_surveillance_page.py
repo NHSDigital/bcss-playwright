@@ -1,6 +1,6 @@
 import pytest
 from playwright.sync_api import Page, expect
-
+from utils.click_helper import click
 from pages.bcss_home_page import MainMenu
 from pages.login_page import BcssLoginPage
 
@@ -25,9 +25,9 @@ def test_lynch_surveillance_page_navigation(page: Page) -> None:
     expected page when clicked
     """
     # 'Set lynch invitation rates' page loads as expected
-    page.get_by_role("link", name="Set Lynch Invitation Rates").click()
+    click(page, page.get_by_role("link", name="Set Lynch Invitation Rates"))
     expect(page.locator("#page-title")).to_contain_text("Set Lynch Surveillance Invitation Rates")
 
     # Return to main menu
-    page.get_by_role("link", name="Main Menu").click()
+    click(page, page.get_by_role("link", name="Main Menu"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("Main Menu")

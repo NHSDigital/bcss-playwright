@@ -1,6 +1,6 @@
 import pytest
 from playwright.sync_api import Page, expect
-
+from utils.click_helper import click
 from pages.bcss_home_page import MainMenu
 from pages.login_page import BcssLoginPage
 
@@ -24,29 +24,29 @@ def test_contacts_list_page_navigation(page: Page) -> None:
     are loaded when the links are clicked
     """
     # View contacts page loads as expected
-    page.get_by_role("link", name="View Contacts").click()
+    click(page, page.get_by_role("link", name="View Contacts"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("View Contacts")
-    page.get_by_role("link", name="Back", exact=True).click()
+    click(page, page.get_by_role("link", name="Back", exact=True))
 
     # Edit my contact details page loads as expected
-    page.get_by_role("link", name="Edit My Contact Details").click()
+    click(page, page.get_by_role("link", name="Edit My Contact Details"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("Edit My Contact Details")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # Maintain contacts page loads as expected
-    page.get_by_role("link", name="Maintain Contacts").click()
+    click(page, page.get_by_role("link", name="Maintain Contacts"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("Maintain Contacts")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # My preference settings page loads as expected
-    page.get_by_role("link", name="My Preference Settings").click()
+    click(page, page.get_by_role("link", name="My Preference Settings"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("My Preference Settings")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # Other links are visible (Not clickable due to user role permissions)
     expect(page.get_by_text("Extract Contact Details")).to_be_visible()
     expect(page.get_by_text("Resect and Discard Accredited")).to_be_visible()
 
     # Return to main menu
-    page.get_by_role("link", name="Main Menu").click()
+    click(page, page.get_by_role("link", name="Main Menu"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("Main Menu")

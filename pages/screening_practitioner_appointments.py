@@ -1,4 +1,5 @@
 from playwright.sync_api import Page
+from utils.click_helper import click
 
 
 class ScreeningPractitionerAppointmentsPage:
@@ -11,13 +12,13 @@ class ScreeningPractitionerAppointmentsPage:
 
 
     def go_to_log_in_page(self):
-        self.log_in_page.click()
+        click(self.page, self.log_in_page)
 
     def go_to_view_appointments_page(self):
-        self.view_appointments_page.click()
+        click(self.page, self.view_appointments_page)
 
     def go_to_patients_that_require_page(self):
-        self.patients_that_require_page.click()
+        click(self.page, self.view_appointments_page)
 
 
 

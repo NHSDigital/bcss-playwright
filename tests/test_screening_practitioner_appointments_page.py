@@ -1,6 +1,6 @@
 import pytest
 from playwright.sync_api import Page, expect
-
+from utils.click_helper import click
 from pages.bcss_home_page import MainMenu
 from pages.login_page import BcssLoginPage
 
@@ -25,14 +25,14 @@ def test_screening_practitioner_appointments_page_navigation(page: Page) -> None
     and clickable (where the user has required permissions).
     """
     # Verify View appointments page opens as expected
-    page.get_by_role("link", name="View appointments").click()
+    click(page, page.get_by_role("link", name="View appointments"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("Appointment Calendar")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # Verify Patients that Require Colonoscopy Assessment Appointments page opens as expected
-    page.get_by_role("link", name="Patients that Require").click()
+    click(page, page.get_by_role("link", name="Patients that Require"))
     expect(page.locator("#page-title")).to_contain_text("Patients that Require Colonoscopy Assessment Appointments")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # Verify below links are visible (not clickable due to user role permissions)
     expect(page.get_by_text("Patients that Require Colonoscopy Assessment Appointments - Bowel Scope")).to_be_visible()
@@ -41,5 +41,5 @@ def test_screening_practitioner_appointments_page_navigation(page: Page) -> None
     expect(page.get_by_text("Set Availability")).to_be_visible()
 
     # Return to main menu
-    page.get_by_role("link", name="Main Menu").click()
+    click(page, page.get_by_role("link", name="Main Menu"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("Main Menu")

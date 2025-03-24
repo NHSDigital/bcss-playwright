@@ -1,6 +1,6 @@
 import pytest
 from playwright.sync_api import Page, expect
-
+from utils.click_helper import click
 from pages import reports_page
 from pages.bcss_home_page import MainMenu
 from pages.login_page import BcssLoginPage
@@ -31,33 +31,33 @@ def test_reports_page_navigation(page: Page) -> None:
     # Failsafe reports page opens as expected
     reports_page.go_to_failsafe_reports_page(page)
     expect(page.locator("#ntshPageTitle")).to_contain_text("Failsafe Reports")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # Operational reports page opens as expected
     reports_page.go_to_operational_reports_page(page)
     expect(page.locator("#ntshPageTitle")).to_contain_text("Operational Reports")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # Strategic reports page opens as expected
     reports_page.go_to_strategic_reports_page(page)
     expect(page.locator("#ntshPageTitle")).to_contain_text("Strategic Reports")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # "Cancer waiting times reports" page opens as expected
     reports_page.go_to_cancer_waiting_times_reports_page(page)
     expect(page.locator("#ntshPageTitle")).to_contain_text("Cancer Waiting Times Reports")
-    page.get_by_role("link", name="Back").click()
+    click(page, page.get_by_role("link", name="Back"))
 
     # Dashboard opens as expected TODO - this step may be failing legitimately
     # reports_page.go_to_dashboard(page)
     # expect(page.locator("#ntshPageTitle")).to_contain_text("Dashboard")
-    # page.get_by_role("link", name="Back").click()
+    # click(page, page.get_by_role("link", name="Back")
 
     # QA Report : Dataset Completion link is visible
     expect(page.get_by_text("QA Report : Dataset Completion")).to_be_visible()
 
     # Return to main menu
-    page.get_by_role("link", name="Main Menu").click()
+    click(page, page.get_by_role("link", name="Main Menu"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("Main Menu")
 
 
@@ -77,14 +77,14 @@ def test_failsafe_reports_date_report_last_requested(page: Page) -> None:
     expect(page.locator("#ntshPageTitle")).to_contain_text("Date Report Last Requested")
 
     # Click 'generate report' button
-    page.get_by_role("button", name="Generate Report").click()
+    click(page, page.get_by_role("button", name="Generate Report"))
 
     # Verify timestamp has updated (equals current date and time)
     report_timestamp = reports_page.report_timestamp_date_format()
     expect(page.locator("b")).to_contain_text(report_timestamp)
 
     # Click 'refresh' button
-    page.get_by_role("button", name="Refresh").click()
+    click(page, page.get_by_role("button", name="Refresh"))
 
     # Verify timestamp has updated (equals current date and time)
     report_timestamp = reports_page.report_timestamp_date_format()
@@ -106,10 +106,10 @@ def test_failsafe_reports_screening_subjects_with_inactive_open_episode(page: Pa
     expect(page.locator("#page-title")).to_contain_text("Screening Subjects With Inactive Open Episode")
 
     # Click 'Generate Report' button
-    page.get_by_role("button", name="Generate Report").click()
+    click(page, page.get_by_role("button", name="Generate Report"))
 
     # Open a screening subject record
-    page.get_by_role("cell", name="401 7652").click()
+    click(page, page.get_by_role("cell", name="401 7652"))
 
     # Verify "Subject Screening Summary" is the page title
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Screening Summary")
@@ -129,19 +129,19 @@ def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(page: Pag
     reports_page.go_to_subjects_ceased_due_to_date_of_birth_changes_page(page)
 
     # Select a "report start date" from the calendar
-    page.get_by_role("button", name="Calendar").click()
-    page.get_by_text("«").click()
-    page.get_by_role("cell", name="18", exact=True).click()
+    click(page, page.get_by_role("button", name="Calendar"))
+    click(page, page.get_by_text("«"))
+    click(page, page.get_by_role("cell", name="18", exact=True))
 
     # Click "Generate Report"
-    page.get_by_role("button", name="Generate Report").click()
+    click(page, page.get_by_role("button", name="Generate Report"))
 
     # Verify timestamp has updated to current date and time
     report_timestamp = reports_page.report_timestamp_date_format()
     expect(page.locator("b")).to_contain_text(report_timestamp)
 
     # Open a screening subject record from the search results
-    page.get_by_role("cell", name="954 296 8175", exact=True).click()
+    click(page, page.get_by_role("cell", name="954 296 8175", exact=True))
 
     # Verify page title is "Subject Demographic"
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Demographic")
@@ -165,14 +165,14 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
     expect(page.locator("#ntshPageTitle")).to_contain_text("Allocate SC for Patient Movements within Hub Boundaries")
 
     # Click "Generate Report"
-    page.get_by_role("button", name="Generate Report").click()
+    click(page, page.get_by_role("button", name="Generate Report"))
 
     # Verify timestamp has updated to current date and time
     report_timestamp = reports_page.report_timestamp_date_format()
     expect(page.locator("b")).to_contain_text(report_timestamp)
 
     # Open a screening subject record from the first row/first cell of the table
-    page.locator("//*[@id='listReportDataTable']/tbody/tr[3]/td[1]").click()
+    click(page, page.locator("//*[@id='listReportDataTable']/tbody/tr[3]/td[1]"))
 
     # Verify page title is "Set Patient's Screening Centre"
     expect(page.locator("#ntshPageTitle")).to_contain_text("Set Patient's Screening Centre")
@@ -181,7 +181,7 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
     page.locator("#cboScreeningCentre").select_option("23643")
 
     # Click update
-    page.get_by_role("button", name="Update").click()
+    click(page, page.get_by_role("button", name="Update"))
 
     # Verify new screening centre has saved
     expect(page.locator("#cboScreeningCentre")).to_have_value("23643")
@@ -203,14 +203,14 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_into_your_hub(page: 
     expect(page.locator("#ntshPageTitle")).to_contain_text("Allocate SC for Patient Movements into your Hub")
 
     # Click "Generate Report" button
-    page.get_by_role("button", name="Generate Report").click()
+    click(page, page.get_by_role("button", name="Generate Report"))
 
     # Verify timestamp has updated to current date and time
     report_timestamp = reports_page.report_timestamp_date_format()
     expect(page.locator("b")).to_contain_text(report_timestamp)
 
     # Click "Refresh" button
-    page.get_by_role("button", name="Refresh").click()
+    click(page, page.get_by_role("button", name="Refresh"))
 
     # Verify timestamp has updated to current date and time
     report_timestamp = reports_page.report_timestamp_date_format()
@@ -235,21 +235,21 @@ def test_failsafe_reports_identify_and_link_new_gp(page: Page) -> None:
     expect(page.locator("#ntshPageTitle")).to_contain_text("Identify and link new GP practices")
 
     # Click on "Generate Report"
-    page.get_by_role("button", name="Generate Report").click()
+    click(page, page.get_by_role("button", name="Generate Report"))
 
     # Verify timestamp has updated to current date and time
     report_timestamp = reports_page.report_timestamp_date_format()
     expect(page.locator("b")).to_contain_text(report_timestamp)
 
     # Click "Refresh" button
-    page.get_by_role("button", name="Refresh").click()
+    click(page, page.get_by_role("button", name="Refresh"))
 
     # Verify timestamp has updated to current date and time
     report_timestamp = reports_page.report_timestamp_date_format()
     expect(page.locator("b")).to_contain_text(report_timestamp)
 
     # Open a screening subject record from the first row/second cell of the table
-    page.locator("//*[@id='listReportDataTable']/tbody/tr[3]/td[2]").click()
+    click(page, page.locator("//*[@id='listReportDataTable']/tbody/tr[3]/td[2]"))
 
     # Verify page title is "Link GP practice to Screening Centre"
     expect(page.locator("#ntshPageTitle")).to_contain_text("Link GP practice to Screening Centre")
@@ -277,14 +277,14 @@ def test_operational_reports_appointment_attendance_not_updated(page: Page) -> N
     page.get_by_label("Screening Centre").select_option("23643")
 
     # Click "Generate Report" button
-    page.get_by_role("button", name="Generate Report").click()
+    click(page, page.get_by_role("button", name="Generate Report"))
 
     # Verify timestamp has updated to current date and time
     report_timestamp = reports_page.report_timestamp_date_format()
     expect(page.locator("b")).to_contain_text(report_timestamp)
 
     # Open an appointment record from the report
-    page.get_by_role("link", name="934 9288").click()
+    click(page, page.get_by_role("link", name="934 9288"))
 
     # Verify the page title is "Appointment Detail"
     expect(page.locator("#ntshPageTitle")).to_contain_text("Appointment Detail")
@@ -306,7 +306,7 @@ def test_operational_reports_fobt_kits_logged_but_not_read(page: Page) -> None:
     expect(page.locator("#page-title")).to_contain_text("FOBT Kits Logged but Not Read - Summary View")
 
     # Click refresh button
-    page.get_by_role("button", name="Refresh").click()
+    click(page, page.get_by_role("button", name="Refresh"))
 
     # Verify timestamp has updated to current date and time
     report_timestamp = reports_page.fobt_kits_logged_but_not_read_report_timestamp_date_format()
@@ -349,14 +349,14 @@ def test_operational_reports_screening_practitioner_6_weeks_availability_not_set
     page.get_by_label("Screening Centre").select_option("23643")
 
     # Click "Generate Report"
-    page.get_by_role("button", name="Generate Report").click()
+    click(page, page.get_by_role("button", name="Generate Report"))
 
     # Verify timestamp has updated to current date and time
     report_timestamp = reports_page.report_timestamp_date_format()
     expect(page.locator("#displayGenerateDate")).to_contain_text(report_timestamp)
 
     # Click "Refresh" button
-    page.get_by_role("button", name="Refresh").click()
+    click(page, page.get_by_role("button", name="Refresh"))
 
     # Verify timestamp has updated to current date and time
     report_timestamp = reports_page.report_timestamp_date_format()
@@ -386,7 +386,7 @@ def test_operational_reports_screening_practitioner_appointments(page: Page) -> 
     page.locator("#A_C_NURSE").select_option("1982")
 
     # Click "Generate Report"
-    page.locator("#submitThisForm").click()
+    click(page, page.locator("#submitThisForm"))
 
     # Verify timestamp has updated to current date and time
     report_timestamp = reports_page.screening_practitioner_appointments_report_timestamp_date_format()

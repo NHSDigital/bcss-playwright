@@ -1,4 +1,6 @@
 from playwright.sync_api import Page
+from utils.click_helper import click
+
 
 class NavigationBar:
     def __init__(self, page: Page):
@@ -17,13 +19,13 @@ class NavigationBar:
                 return  # Exit if successful
 
     def click_back_link(self):
-        self.back_link.click()
+        click(self.page, self.back_link)
 
     def click_select_org_link(self):
-        self.select_org_link.click()
+        click(self.page, self.click_select_org_link)
 
     def click_help_link(self):
-        self.help_link.click()
+        click(self.page, self.help_link)
 
     def click_log_out_link(self):
-        self.log_out_link.click()
+        click(self.page, self.log_out_link)

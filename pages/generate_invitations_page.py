@@ -1,5 +1,6 @@
 from playwright.sync_api import Page, expect
 import pytest
+from utils.click_helper import click
 
 
 class GenerateInvitations:
@@ -12,10 +13,10 @@ class GenerateInvitations:
         self.planned_invitations_total = self.page.locator("#col8_total")
 
     def click_generate_invitations_button(self):
-        self.generate_invitations_button.click()
+        click(self.page, self.generate_invitations_button)
 
     def click_refresh_button(self):
-        self.refresh_button.click()
+        click(self.page, self.refresh_button)
 
     def wait_for_invitation_generation_complete(self):
         self.page.wait_for_selector("#displayRS", timeout=5000)

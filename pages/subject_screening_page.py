@@ -1,4 +1,5 @@
 from playwright.sync_api import Page
+from utils.click_helper import click
 
 class SubjectScreeningPage:
     def __init__(self, page: Page):
@@ -24,7 +25,7 @@ class SubjectScreeningPage:
         self.search_button = self.page.get_by_role("button", name="Search")
 
     def click_search_button(self):
-        self.search_button.click()
+        click(self.page, self.search_button)
 
     def click_episodes_filter(self):
         self.episodes_filter.check()
@@ -36,43 +37,43 @@ class SubjectScreeningPage:
         self.datasets_filter.check()
 
     def click_nhs_number_filter(self):
-        self.nhs_number_filter.click()
+        click(self.page, self.nhs_number_filter)
 
     def click_surname_filter(self):
-        self.surname_filter.click()
+        click(self.page, self.surname_filter)
 
     def click_soundex_filter(self):
         self.soundex_filter.check()
 
     def click_forename_filter(self):
-        self.forename_filter.click()
+        click(self.page, self.forename_filter)
 
     def click_date_of_birth_filter(self):
-        self.date_of_birth_filter.click()
+        click(self.page, self.date_of_birth_filter)
 
     def click_date_of_birth_range_filter(self):
-        self.data_of_birth_range_filter.click()
+        click(self.page, self.data_of_birth_range_filter)
 
     def click_postcode_filter(self):
-        self.postcode_filter.click()
+        click(self.page, self.postcode_filter)
 
     def click_episodes_closed_date_filter(self):
-        self.episode_closed_date_filter.click()
+        click(self.page, self.episode_closed_date_filter)
 
     def click_kit_batch_number_filter(self):
-        self.kit_batch_number_filter.click()
+        click(self.page, self.kit_batch_number_filter)
 
     def click_kit_number_filter(self):
-        self.kit_number_filter.click()
+        click(self.page, self.kit_number_filter)
 
     def click_fit_device_id_filter(self):
-        self.fit_device_id_filter.click()
+        click(self.page, self.fit_device_id_filter)
 
     def click_laboratory_name_filter(self):
-        self.laboratory_name_filter.click()
+        click(self.page, self.laboratory_name_filter)
 
     def click_laboratory_test_date_filter(self):
-        self.laboratory_test_date_filter.click()
+        click(self.page, self.laboratory_test_date_filter)
 
     def click_diagnostic_test_actual_date_filter(self):
-        self.diagnostic_test_actual_date_filter.click()
+        click(self.page, self.diagnostic_test_actual_date_filter)

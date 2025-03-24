@@ -1,4 +1,5 @@
 from playwright.sync_api import Page, expect
+from utils.click_helper import click
 
 
 class SubjectScreeningSummary:
@@ -35,25 +36,25 @@ class SubjectScreeningSummary:
         expect(latest_event_status_cell).to_be_visible()
 
     def click_subjects_events_notes(self):
-        self.subjects_events_notes.click()
+        click(self.page, self.subjects_events_notes)
 
     def click_list_episodes(self):
-        self.list_episodes.click()
+        click(self.page, self.list_episodes)
 
     def click_subject_demographics(self):
-        self.subject_demographics.click()
+        click(self.page, self.subject_demographics)
 
     def click_datasets(self):
-        self.datasets.click()
+        click(self.page, self.datasets)
 
     def click_individual_letters(self):
-        self.individual_letters.click()
+        click(self.page, self.individual_letters)
 
     def click_patient_contacts(self):
-        self.patient_contacts.click()
+        click(self.page, self.patient_contacts)
 
     def click_more(self):
-        self.more.click()
+        click(self.page, self.more)
 
     def select_change_screening_status(self):
         self.change_screening_status.select_option("4007")
@@ -62,13 +63,13 @@ class SubjectScreeningSummary:
         self.reason.select_option("11314")
 
     def click_update_subject_data(self):
-        self.update_subject_data.click()
+        click(self.page, self.update_subject_data)
 
     def click_close_FOBT_screening_episode(self):
-        self.close_FOBT_screening_episode.click()
+        click(self.page, self.close_FOBT_screening_episode)
 
     def go_to_a_page_to_advance_the_episode(self):
-        self.go_to_a_page_to_advance_the_episode.click()
+        click(self.page, self.go_to_a_page_to_advance_the_episode)
 
     def go_to_a_page_to_close_the_episode(self):
-        self.go_to_a_page_to_close_the_episode.click()
+        click(self.page, self.go_to_a_page_to_close_the_episode)

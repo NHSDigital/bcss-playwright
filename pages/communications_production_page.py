@@ -1,4 +1,5 @@
 from playwright.sync_api import Page
+from utils.click_helper import click
 
 class CommunicationsProduction:
     def __init__(self, page: Page):
@@ -12,16 +13,16 @@ class CommunicationsProduction:
 
 
     def go_to_active_batch_list_page(self):
-        self.active_batch_list_page.click()
+        click(self.page, self.active_batch_list_page)
 
     def go_to_archived_batch_list_page(self):
-        self.archived_batch_list_page.click()
+        click(self.page, self.archived_batch_list_page)
 
     def go_to_letter_library_index_page(self):
-        self.letter_library_index_page.click()
+        click(self.page, self.letter_library_index_page)
 
     def go_to_letter_signatory_page(self):
-        self.letter_signatory_page.click()
+        click(self.page, self.letter_signatory_page)
 
     def go_to_electronic_communication_management_page(self):
-        self.electronic_communication_management_page.click()
+        click(self.page, self.electronic_communication_management_page)

@@ -24,7 +24,7 @@ def test_compartment_1(page: Page) -> None:
         CreateAPlan(page).click_confirm_button()
     CreateAPlan(page).click_save_button()
     CreateAPlan(page).fill_note_field("test data")
-    CreateAPlan(page).click_saveNote_button()
+    CreateAPlan(page).click_save_note_button()
     InvitationsPlans(page).invitations_plans_title.wait_for()
 
     # Generate Invitations

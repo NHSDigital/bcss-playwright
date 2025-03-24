@@ -4,7 +4,7 @@ from pages.communications_production_page import CommunicationsProduction
 from pages.active_batch_list_page import ActiveBatchList
 from pages.manage_active_batch_page import ManageActiveBatch
 from pages.archived_batch_list_page import ArchivedBatchList
-from utils.pdf_reader import extract_nhs_no_from_pdf
+from utils.click_helper import click
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
 from utils.get_nhs_no_from_batch_id import get_nhs_no_from_batch_id
 import os
@@ -34,7 +34,7 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
             link = row.locator("a").first
             link_text = link.inner_text()  # Get the batch id dynamically
             nhs_no_df = get_nhs_no_from_batch_id(link_text)
-            link.click()
+            click(page,link)
             break
         else:
             pytest.fail(f"No open/prepared '{batch_type} - {batch_description}' batch found")
@@ -50,7 +50,7 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
         # Start waiting for the pdf download
         with page.expect_download() as download_info:
             # Perform the action that initiates download
-            ManageActiveBatch(page).retrieve_button.nth(retrieve_button-1).click()
+            click(page, ManageActiveBatch(page).retrieve_button.nth(retrieve_button-1))
         download_file = download_info.value
         file = download_file.suggested_filename
         # Wait for the download process to complete and save the downloaded file in a temp folder
@@ -63,7 +63,7 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
     # This loops through each Confirm printed button and clicks each one
     for _ in range (retrieve_button_count):
         page.on("dialog", lambda dialog: dialog.accept())
-        ManageActiveBatch(page).confirm_button.nth(0).click()
+        click(page, ManageActiveBatch(page).confirm_button.nth(0))
 
     ActiveBatchList(page).batch_successfully_archived_msg.wait_for()
 

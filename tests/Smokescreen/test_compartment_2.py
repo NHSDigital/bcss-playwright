@@ -19,7 +19,7 @@ def test_compartment_2(page: Page) -> None:
     for subject in range(4):
         fit_device_id = subjectdf["fit_device_id"].iloc[subject]
         LogDevices(page).fill_fit_device_id_field(fit_device_id)
-        sample_date = datetime.now().strftime("%#d %b %Y")
+        sample_date = datetime.now().strftime("%d %b %Y")
         LogDevices(page).fill_sample_date_field(sample_date)
         LogDevices(page).verify_successfully_logged_device_text()
 

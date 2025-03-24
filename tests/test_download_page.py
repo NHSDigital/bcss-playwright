@@ -1,6 +1,6 @@
 import pytest
 from playwright.sync_api import Page, expect
-
+from utils.click_helper import click
 from pages.bcss_home_page import MainMenu
 from pages.login_page import BcssLoginPage
 
@@ -25,26 +25,26 @@ def test_download_facility_page_navigation(page: Page) -> None:
     on the relevant pages
     """
     # Individual download request and retrieval page loads as expected
-    page.get_by_role("link", name="Individual Download Request").click()
+    click(page, page.get_by_role("link", name="Individual Download Request"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("Individual Download Request and Retrieval")
 
     # Individual download request and retrieval page contains warning message
     expect(page.locator("form[name=\"frm\"]")).to_contain_text("Warning - FS Screening data will not be downloaded")
-    page.get_by_role("link", name="Back", exact=True).click()
+    click(page, page.get_by_role("link", name="Back", exact=True))
 
     # List of Individual downloads page loads as expected
-    page.get_by_role("link", name="List of Individual Downloads").click()
+    click(page, page.get_by_role("link", name="List of Individual Downloads"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("List of Individual Downloads")
-    page.get_by_role("link", name="Back", exact=True).click()
+    click(page, page.get_by_role("link", name="Back", exact=True))
 
     # Batch download request and retrieval page loads as expected
-    page.get_by_role("link", name="Batch Download Request and").click()
+    click(page, page.get_by_role("link", name="Batch Download Request and"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("Batch Download Request and Retrieval")
 
     # Batch download request and retrieval page contains warning message
     expect(page.locator("form[name=\"frm\"]")).to_contain_text("Warning - FS Screening data will not be downloaded")
-    page.get_by_role("link", name="Back", exact=True).click()
+    click(page, page.get_by_role("link", name="Back", exact=True))
 
     # Return to main menu
-    page.get_by_role("link", name="Main Menu").click()
+    click(page, page.get_by_role("link", name="Main Menu"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("Main Menu")

@@ -2,6 +2,7 @@ import os
 
 from playwright.sync_api import Page
 from utils.user_tools import UserTools
+from utils.click_helper import click
 from dotenv import load_dotenv
 
 
@@ -27,4 +28,5 @@ class BcssLoginPage:
         password = os.getenv("BCSS_PASS")
         self.password.fill(password)
         # Click Submit
-        self.submit_button.click()
+        click(self.page, self.submit_button)
+

@@ -1,4 +1,5 @@
 from playwright.sync_api import Page
+from utils.click_helper import click
 
 
 class ContactsListPage:
@@ -12,15 +13,15 @@ class ContactsListPage:
 
 
     def go_to_view_contacts_page(self):
-        self.view_contacts_page.click()
+        click(self.page, self.view_contacts_page)
 
     def go_to_edit_my_contact_details_page(self):
-        self.edit_my_contact_details_page.click()
+        click(self.page, self.edit_my_contact_details_page)
 
     def go_to_maintain_contacts_details_page(self):
-        self.maintain_contacts_page.click()
+        click(self.page, self.maintain_contacts_page)
 
     def go_to_my_preference_settings_page(self):
-        self.my_preference_settings_page.click()
+        click(self.page, self.my_preference_settings_page)
 
 

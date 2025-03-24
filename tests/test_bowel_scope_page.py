@@ -1,6 +1,6 @@
 import pytest
 from playwright.sync_api import Page, expect
-
+from utils.click_helper import click
 from pages.bcss_home_page import MainMenu
 from pages.login_page import BcssLoginPage
 
@@ -24,9 +24,9 @@ def test_bowel_scope_page_navigation(page: Page) -> None:
     main menu button returns the user to the main menu
     """
     # Bowel scope appointments page loads as expected
-    page.get_by_role("link", name="View Bowel Scope Appointments").click()
+    click(page, page.get_by_role("link", name="View Bowel Scope Appointments"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("Appointment Calendar")
 
     # Return to main menu
-    page.get_by_role("link", name="Main Menu").click()
+    click(page, page.get_by_role("link", name="Main Menu"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("Main Menu")

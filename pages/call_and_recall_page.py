@@ -1,4 +1,6 @@
 from playwright.sync_api import Page
+from utils.click_helper import click
+
 
 class CallAndRecall:
     def __init__(self, page: Page):
@@ -12,16 +14,16 @@ class CallAndRecall:
 
 
     def go_to_planning_and_monitoring_page(self):
-        self.planning_and_monitoring_page.click()
+        click(self.page, self.planning_and_monitoring_page)
 
     def go_to_generate_invitations_page(self):
-        self.generate_invitations_page.click()
+        click(self.page, self.generate_invitations_page)
 
     def go_to_invitation_generation_progress_page(self):
-        self.invitation_generation_progress_page.click()
+        click(self.page, self.invitation_generation_progress_page)
 
     def go_to_non_invitation_days_page(self):
-        self.non_invitation_days_page.click()
+        click(self.page, self.non_invitation_days_page)
 
     def go_to_age_extension_rollout_plans_page(self):
-        self.age_extension_rollout_plans_page.click()
+        click(self.page, self.age_extension_rollout_plans_page)
