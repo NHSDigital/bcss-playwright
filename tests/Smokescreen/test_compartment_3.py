@@ -56,6 +56,7 @@ def test_compartment_3(page: Page) -> None:
     OracleDB().exec_bcss_timed_events(nhs_number_df)
 
     # Log out
+    logging.info("Logging Out")
     NavigationBar(page).click_log_out_link()
     Logout(page).verify_log_out_page()
     page.close()

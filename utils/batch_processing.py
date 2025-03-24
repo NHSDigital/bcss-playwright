@@ -39,7 +39,7 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
                 nhs_no_df = get_nhs_no_from_batch_id(link_text)
                 logging.info(f"Successfully retrieved NHS Numbers from batch: {link_text}")
             except Exception as e:
-                logging.error(f"Failed to retrieve NHS Numbers from batch: {link_text}")
+                pytest.fail(f"Failed to retrieve NHS Numbers from batch: {link_text}, {str(e)}")
             link.click()
             break
         else:
@@ -65,7 +65,7 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
             download_file.save_as(file)
             os.remove(file) # Deletes the file after extracting the necessary data
     except Exception as e:
-        logging.error(f"No retrieve button available to click: {str(e)}")
+        pytest.fail(f"No retrieve button available to click: {str(e)}")
 
     # This loops through each Confirm printed button and clicks each one
     try:
@@ -74,13 +74,13 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
             page.once("dialog", lambda dialog: dialog.accept())
             ManageActiveBatch(page).confirm_button.nth(0).click()
     except Exception as e:
-        logging.error(f"No confirm printed button available to click: {str(e)}")
+        pytest.fail(f"No confirm printed button available to click: {str(e)}")
 
     try:
         ActiveBatchList(page).batch_successfully_archived_msg.wait_for()
         logging.info(f"Batch {link_text} successfully archived")
     except Exception as e:
-        logging.error(f"Batch successfully archived message is not shown: {str(e)}")
+        pytest.fail(f"Batch successfully archived message is not shown: {str(e)}")
 
     NavigationBar(page).click_main_menu_link()
     MainMenu(page).go_to_communications_production_page()
@@ -89,13 +89,13 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
     try:
         ArchivedBatchList(page).verify_table_data(link_text)
         logging.info(f"Batch {link_text} visible in archived batch list")
-    except Exception:
-        logging.error(f"Batch {link_text} not visible in archived batch list")
+    except Exception as e:
+        logging.error(f"Batch {link_text} not visible in archived batch list: {str(e)}")
 
     first_nhs_no = nhs_no_df["subject_nhs_number"].iloc[0]
     try:
         verify_subject_event_status_by_nhs_no(page, first_nhs_no, latest_event_status)
         logging.info(f"Successfully verified NHS number {first_nhs_no} with status {latest_event_status}")
     except Exception as e:
-        logging.error(f"Verification failed for NHS number {first_nhs_no} with status {latest_event_status}: {str(e)}")
+        pytest.fail(f"Verification failed for NHS number {first_nhs_no}: {str(e)}")
     return nhs_no_df
