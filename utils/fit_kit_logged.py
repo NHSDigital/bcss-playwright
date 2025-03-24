@@ -167,7 +167,7 @@ def update_kit_service_management_entity(device_id, normal):
     print("Parameters before execution:", params)
     rows_affected = OracleDB().update_or_insert_data_to_table(update_query, params)
     print(f"Rows affected: {rows_affected}")
- # Return the subject NHS number
+    # Return the subject NHS number
     return subject_nhs_number
 
 
