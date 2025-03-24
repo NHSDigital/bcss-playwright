@@ -8,9 +8,9 @@ from utils.fit_kit_generation import create_fit_id_df
 
 
 @pytest.mark.smokescreen
+@pytest.mark.compartment2
 def test_compartment_2(page: Page) -> None:
-    page.goto("/")
-    BcssLoginPage(page).login_as_user("BCSS401")
+    UserTools.user_login(page, "Hub Manager State Registered")
 
     MainMenu(page).go_to_fit_test_kits_page()
     FITTestKits(page).go_to_log_devices_page()

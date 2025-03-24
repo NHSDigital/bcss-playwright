@@ -2,7 +2,7 @@ from oracle import OracleDB
 import pandas as pd
 from datetime import datetime
 import logging
-
+import pytest
 
 
 def process_kit_data():
@@ -21,7 +21,7 @@ def process_kit_data():
         logging.info(f"Processing normal kit with Device ID: {device_id}")  # Logging normal device_id
         device_ids.append((device_id, True))  # Add to the list with normal flag
     else:
-        logging.warning("No normal kits found for processing.")  # Log warning
+        pytest.fail("No normal kits found for processing.")
 
         # Process abnormal kits (multiple, loop through)
     if not abnormal_fit_kit_df.empty:
@@ -30,7 +30,7 @@ def process_kit_data():
             logging.info(f"Processing abnormal kit with Device ID: {device_id}")  # Logging abnormal device_id
             device_ids.append((device_id, False))  # Add to the list with abnormal flag
     else:
-        logging.warning("No abnormal kits found for processing.")  # Log warning
+        pytest.fail("No abnormal kits found for processing.")
 
     return device_ids
 

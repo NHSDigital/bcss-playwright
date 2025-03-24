@@ -1,6 +1,6 @@
 from playwright.sync_api import Page, expect
 import pytest
-
+import logging
 
 class GenerateInvitations:
     def __init__(self, page: Page):
@@ -32,6 +32,7 @@ class GenerateInvitations:
         elapsed = 0
 
         # Loop until the table no longer contains "Queued"
+        logging.info(f"Waiting for successful generation")
         while elapsed < timeout: # there may be a stored procedure to speed this process up
             table_text = self.displayRS.text_content()
             if "Queued" in table_text or "In Progress" in table_text:
@@ -45,8 +46,13 @@ class GenerateInvitations:
                 break
 
         # Final check: ensure that the table now contains "Completed"
-        expect(self.displayRS).to_contain_text("Completed")
+        try:
+            expect(self.displayRS).to_contain_text("Completed")
+            logging.info("Invitations successfully generated")
+            logging.info(f"Invitations took {elapsed/1000} seconds to generate")
+        except Exception as e:
+            pytest.fail("Invitations not generated successfully")
 
         value = self.planned_invitations_total.text_content().strip()  # Get text and remove extra spaces
-        if int(value) <= 5:
+        if int(value) < 5:
             pytest.fail("There are less than 5 invitations generated")
