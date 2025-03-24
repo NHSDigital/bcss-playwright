@@ -34,7 +34,7 @@ def process_kit_data():
 
     return device_ids
 
-
+# find test data from db for compartment 3
 def get_kit_id_logged_from_db():
     kit_id_df = OracleDB().execute_query("""SELECT tk.kitid,tk.device_id,tk.screening_subject_id
 FROM tk_items_t tk
@@ -48,11 +48,11 @@ AND se.latest_event_status_id = 11223
 AND tk.logged_in_at = 23159
 AND tk.reading_flag = 'N'
 AND tk.test_results IS NULL
-fetch first 10 rows only""")
+fetch first 9 rows only""")
 
     return kit_id_df
 
-
+# Seperate kits into normal and abnormal
 def split_fit_kits(kit_id_df):
     number_of_normal = 1
     number_of_abnormal = 9
@@ -61,7 +61,7 @@ def split_fit_kits(kit_id_df):
     abnormal_fit_kit_df = kit_id_df.iloc[number_of_normal:number_of_normal + number_of_abnormal]
     return normal_fit_kit_df, abnormal_fit_kit_df
 
-
+# Get device_id from the kit_queue table
 def get_service_management_by_device_id(deviceid):
     get_service_management_df = OracleDB().execute_query(f"""SELECT kq.device_id, kq.test_kit_name, kq.test_kit_type, kq.test_kit_status,
     CASE WHEN tki.logged_in_flag = 'Y' THEN kq.logged_by_hub END AS logged_by_hub,
@@ -95,7 +95,7 @@ def get_service_management_by_device_id(deviceid):
     """)
     return get_service_management_df
 
-
+# Stored procedure to to process any kit queue records at status BCSS_READY
 def execute_stored_procedures():
     db_instance = OracleDB()  # Create an instance of the OracleDB class
     logging.info("start: oracle.OracleDB.execute_stored_procedure")
@@ -104,7 +104,7 @@ def execute_stored_procedures():
     logging.info("exit: oracle.OracleDB.execute_stored_procedure")
 
 
-
+# Add kits to the kit queue table
 def update_kit_service_management_entity(device_id, normal):
     get_service_management_df = get_service_management_by_device_id(device_id)
 

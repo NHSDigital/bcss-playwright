@@ -14,17 +14,9 @@ from utils.screening_subject_page_searcher import verify_subject_event_status_by
 def test_compartment_3(page: Page) -> None:
     UserTools.user_login(page, "Hub Manager State Registered")
 
-    # (STEP 1 & 2) Add results to the test records in the KIT_QUEUE table (i.e. mimic receiving results from the middleware)
+    # (STEP 1 ,2 & 3) find data , seperate it into normal and abnormal, Add results to the test records in the KIT_QUEUE table (i.e. mimic receiving results from the middleware)
     # and get device IDs and their flags
     device_ids = process_kit_data()
-    # (STEP - 4) Run two stored procedures to process any kit queue records at status BCSS_READY
-    try:
-        fit_kit_logged.execute_stored_procedures()
-        logging.info("Stored procedures executed successfully.")
-    except Exception as e:
-        logging.error(f"Error executing stored procedures: {str(e)}")
-        raise
-
     # Retrieve NHS numbers for each device_id and determine normal/abnormal status
     nhs_numbers = []
     normal_flags = []
@@ -33,7 +25,14 @@ def test_compartment_3(page: Page) -> None:
         nhs_number = update_kit_service_management_entity(device_id, is_normal)
         nhs_numbers.append(nhs_number)
         normal_flags.append(is_normal)  # Store the flag (True for normal, False for abnormal)
-
+    # (STEP - 4) Run two stored procedures to process any kit queue records at status BCSS_READY
+    try:
+        fit_kit_logged.execute_stored_procedures()
+        logging.info("Stored procedures executed successfully.")
+    except Exception as e:
+        logging.error(f"Error executing stored procedures: {str(e)}")
+        raise
+    # (STEP - 5) Check the results of the processed FIT kits have correctly updated the status of the associated subjects
     # Verify subject event status based on normal or abnormal classification
     for nhs_number, is_normal in zip(nhs_numbers, normal_flags):
         expected_status = "S2 - Normal" if is_normal else "A8 - Abnormal"  # S2 for normal, A8 for abnormal
@@ -46,7 +45,7 @@ def test_compartment_3(page: Page) -> None:
             logging.error(f"Verification failed for NHS number {nhs_number} with status {expected_status}: {str(e)}")
             raise
 
-    # (STEP - 5) Check the results of the processed FIT kits have correctly updated the status of the associated subjects
+
     # Navigate to log devices page
     MainMenu(page).go_to_fit_test_kits_page()
     FITTestKits(page).go_to_log_devices_page()
