@@ -17,7 +17,7 @@ def test_compartment_2(page: Page) -> None:
     FITTestKits(page).go_to_log_devices_page()
     subjectdf = create_fit_id_df()
 
-    for subject in range(4):
+    for subject in range(9):
         fit_device_id = subjectdf["fit_device_id"].iloc[subject]
         logging.info(f"Logging FIT Device ID: {fit_device_id}")
         LogDevices(page).fill_fit_device_id_field(fit_device_id)
