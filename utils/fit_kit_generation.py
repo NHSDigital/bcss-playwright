@@ -16,7 +16,7 @@ def get_kit_id_from_db():
     inner join ep_subject_episode_t se on se.screening_subject_id = tk.screening_subject_id
     inner join screening_subject_t sst on (sst.screening_subject_id = tk.screening_subject_id)
     inner join sd_contact_t sdc on (sdc.nhs_number = sst.subject_nhs_number)
-    where tk.tk_type_id = 3
+    where tk.tk_type_id = 2
     and tk.logged_in_flag = 'N'
     and sdc.hub_id = 23159
     and device_id is null

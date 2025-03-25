@@ -43,7 +43,7 @@ INNER JOIN ep_subject_episode_t se ON se.screening_subject_id = tk.screening_sub
 WHERE tk.logged_in_flag = 'Y'
 AND kq.test_kit_status IN ('LOGGED', 'POSTED')
 AND se.episode_status_id = 11352
-AND tk.tk_type_id = 3
+AND tk.tk_type_id = 2
 AND se.latest_event_status_id = 11223
 AND tk.logged_in_at = 23159
 AND tk.reading_flag = 'N'
