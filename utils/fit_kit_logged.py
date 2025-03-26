@@ -136,7 +136,7 @@ def update_kit_service_management_entity(device_id, normal):
     kq.test_result = :test_result,
     kq.calculated_result = :calculated_result,
     kq.error_code = NULL,
-    kq.analyser_code = '3Wjvy',
+    kq.analyser_code = 'UU2_tdH3',
     kq.date_time_authorised = TO_TIMESTAMP(:date_time_authorised, 'DD-Mon-YY HH24.MI.SS.FF9'),
     kq.authoriser_user_code = 'AUTO1',
     kq.post_response = :post_response,
