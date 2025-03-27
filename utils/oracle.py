@@ -23,7 +23,7 @@ class OracleDB:
                     cursor.execute(f"SELECT SCREENING_SUBJECT_ID FROM SCREENING_SUBJECT_T WHERE SUBJECT_NHS_NUMBER = {int(row["subject_nhs_number"])}")
                     result = cursor.fetchall()
                     subject_id = result[0][0]
-                    logging.info("Able to extract subject ID")
+                    logging.info(f"Able to extract subject ID: {subject_id}")
                     try:
                         logging.info(f"Attempting to execute stored procedure: {f"'bcss_timed_events', [{subject_id},'Y']"}")
                         cursor = conn.cursor()

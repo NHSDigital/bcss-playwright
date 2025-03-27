@@ -35,13 +35,13 @@ class GenerateInvitations:
         logging.info(f"Waiting for successful generation")
         while elapsed < timeout: # there may be a stored procedure to speed this process up
             table_text = self.displayRS.text_content()
-            if "Queued" in table_text or "In Progress" in table_text:
+            if "Failed" in table_text:
+                pytest.fail("Invitation has failed to generate")
+            elif "Queued" in table_text or "In Progress" in table_text:
                 # Click the Refresh button
                 self.click_refresh_button()
                 self.page.wait_for_timeout(wait_interval)
                 elapsed += wait_interval
-            elif "Failed" in table_text:
-                pytest.fail("Invitation has failed to generate")
             else:
                 break
 

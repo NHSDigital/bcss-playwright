@@ -34,12 +34,13 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
             # Find the first link in that row and click it
             link = row.locator("a").first
             link_text = link.inner_text()  # Get the batch id dynamically
+            logging.info(f"Successfully found open '{batch_type} - {batch_description}' batch")
             try:
-                logging.info(f"Attempting to get NHS Numbers for batch: {link_text} from the DB")
+                logging.info(f"Attempting to get NHS Numbers for batch {link_text} from the DB")
                 nhs_no_df = get_nhs_no_from_batch_id(link_text)
-                logging.info(f"Successfully retrieved NHS Numbers from batch: {link_text}")
+                logging.info(f"Successfully retrieved NHS Numbers from batch {link_text}")
             except Exception as e:
-                pytest.fail(f"Failed to retrieve NHS Numbers from batch: {link_text}, {str(e)}")
+                pytest.fail(f"Failed to retrieve NHS Numbers from batch {link_text}, {str(e)}")
             link.click()
             break
         else:

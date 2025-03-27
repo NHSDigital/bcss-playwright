@@ -5,11 +5,10 @@ from utils.batch_processing import batch_processing
 from utils.oracle import OracleDB
 
 @pytest.mark.smoke
-@pytest.mark.smokescreen
 @pytest.mark.compartment1
-def test_compartment_1(page: Page) -> None:
+def test_create_invitations_plan(page: Page) -> None:
+    logging.info("Compartment 1 - Create Invitations Plan")
     UserTools.user_login(page, "Hub Manager State Registered")
-
     # Create plan - England
     MainMenu(page).go_to_call_and_recall_page()
     CallAndRecall(page).go_to_planning_and_monitoring_page()
@@ -24,29 +23,36 @@ def test_compartment_1(page: Page) -> None:
     CreateAPlan(page).fill_note_field("test data")
     CreateAPlan(page).click_saveNote_button()
     InvitationsPlans(page).invitations_plans_title.wait_for()
+    logging.info("Invitation plan created")
+
+@pytest.mark.smoke
+@pytest.mark.smokescreen
+@pytest.mark.compartment1
+def test_compartment_1(page: Page) -> None:
+    logging.info("Compartment 1 - Generate Invitations")
+    UserTools.user_login(page, "Hub Manager State Registered")
 
     # Generate Invitations
-    NavigationBar(page).click_main_menu_link()
     MainMenu(page).go_to_call_and_recall_page()
     CallAndRecall(page).go_to_generate_invitations_page()
-    logging.info("Generating Invitations")
+    logging.info("Generating invitations based on the invitations plan")
     GenerateInvitations(page).click_generate_invitations_button()
     GenerateInvitations(page).wait_for_invitation_generation_complete()
 
     # Print the batch of Pre-Invitation Letters - England
+    logging.info("Compartment 1 - Process S1 Batch")
     batch_processing(page, "S1", "Pre-invitation (FIT) (digital leaflet)", "S9 - Pre-invitation Sent")
     nhs_number_df = batch_processing(page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent")
     OracleDB().exec_bcss_timed_events(nhs_number_df)
 
     # Print the batch of Invitation & Test Kit Letters - England
+    logging.info("Compartment 1 - Process S9 Batch")
     nhs_number_df = batch_processing(page, "S9", "Invitation & Test Kit (FIT)", "S10 - Invitation & Test Kit Sent")
     OracleDB().exec_bcss_timed_events(nhs_number_df)
 
     # Print a set of reminder letters
+    logging.info("Compartment 1 - Process S10 Batch")
     batch_processing(page, "S10", "Test Kit Reminder", "S19 - Reminder of Initial Test Sent")
 
     # Log out
-    logging.info("Logging Out")
-    NavigationBar(page).click_log_out_link()
-    Logout(page).verify_log_out_page()
-    page.close()
+    Logout(page).log_out()

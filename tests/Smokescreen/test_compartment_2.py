@@ -56,7 +56,4 @@ def test_compartment_2(page: Page) -> None:
     batch_processing(page, "S3", "Retest (Spoilt) (FIT)", "S11 - Retest Kit Sent (Spoilt)")
 
     # Log out
-    logging.info("Logging Out")
-    NavigationBar(page).click_log_out_link()
-    Logout(page).verify_log_out_page()
-    page.close()
+    Logout(page).log_out()
