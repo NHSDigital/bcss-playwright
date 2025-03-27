@@ -4,14 +4,15 @@ from pages.communications_production_page import CommunicationsProduction
 from pages.active_batch_list_page import ActiveBatchList
 from pages.manage_active_batch_page import ManageActiveBatch
 from pages.archived_batch_list_page import ArchivedBatchList
-from utils.click_helper import click
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
 from utils.get_nhs_no_from_batch_id import get_nhs_no_from_batch_id
 import os
 import pytest
 from playwright.sync_api import Page
+import logging
 
 def batch_processing(page: Page, batch_type: str, batch_description: str, latest_event_status: str):
+    logging.info(f"Processing {batch_type} - {batch_description} batch")
     NavigationBar(page).click_main_menu_link()
     MainMenu(page).go_to_communications_production_page()
     CommunicationsProduction(page).go_to_active_batch_list_page()
@@ -20,7 +21,7 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
     batch_description_cells = page.locator(f"//td[text()='{batch_description}']")
 
     if batch_description_cells.count() == 0 and batch_description == "Pre-invitation (FIT) (digital leaflet)":
-        print(f"No S1 Pre-invitation (FIT) (digital leaflet) batch found. Skipping to next step")
+        logging.warning("No S1 Pre-invitation (FIT) (digital leaflet) batch found. Skipping to next step")
         return
     elif batch_description_cells.count() == 0 and page.locator("td", has_text="No matching records found"):
         pytest.fail(f"No {batch_type} {batch_description} batch found")
@@ -28,16 +29,22 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
     for i in range(batch_description_cells.count()):
         row = batch_description_cells.nth(i).locator("..")  # Get the parent row
 
-        # Check if the row contains "Prepared" or "Open"
-        if row.locator("td", has_text="Prepared").count() > 0 or row.locator("td", has_text="Open").count() > 0:
+        # Check if the row contains "Open"
+        if row.locator("td", has_text="Open").count() > 0:
             # Find the first link in that row and click it
             link = row.locator("a").first
             link_text = link.inner_text()  # Get the batch id dynamically
-            nhs_no_df = get_nhs_no_from_batch_id(link_text)
-            click(page,link)
+            logging.info(f"Successfully found open '{batch_type} - {batch_description}' batch")
+            try:
+                logging.info(f"Attempting to get NHS Numbers for batch {link_text} from the DB")
+                nhs_no_df = get_nhs_no_from_batch_id(link_text)
+                logging.info(f"Successfully retrieved NHS Numbers from batch {link_text}")
+            except Exception as e:
+                pytest.fail(f"Failed to retrieve NHS Numbers from batch {link_text}, {str(e)}")
+            link.click()
             break
         else:
-            pytest.fail(f"No open/prepared '{batch_type} - {batch_description}' batch found")
+            pytest.fail(f"No open '{batch_type} - {batch_description}' batch found")
 
     ManageActiveBatch(page).click_prepare_button()
     page.wait_for_timeout(1000) # This one second timeout does not affect the time to execute, as it is just used to ensure the reprepare batch button is clicked and does not instantly advance to the next step
@@ -45,34 +52,51 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
 
     # This loops through each Retrieve button and clicks each one
     retrieve_button_count = 0
-    for retrieve_button in range (ManageActiveBatch(page).retrieve_button.count()):
-        retrieve_button_count += 1
-        # Start waiting for the pdf download
-        with page.expect_download() as download_info:
-            # Perform the action that initiates download
-            click(page, ManageActiveBatch(page).retrieve_button.nth(retrieve_button-1))
-        download_file = download_info.value
-        file = download_file.suggested_filename
-        # Wait for the download process to complete and save the downloaded file in a temp folder
-        download_file.save_as(file)
-        if file.endswith(".pdf"):
+    try:
+        for retrieve_button in range (ManageActiveBatch(page).retrieve_button.count()):
+            retrieve_button_count += 1
+            logging.info(f"Clicking retrieve button {retrieve_button_count}")
+            # Start waiting for the pdf download
+            with page.expect_download() as download_info:
+                # Perform the action that initiates download
+                ManageActiveBatch(page).retrieve_button.nth(retrieve_button-1).click()
+            download_file = download_info.value
+            file = download_file.suggested_filename
+            # Wait for the download process to complete and save the downloaded file in a temp folder
+            download_file.save_as(file)
             os.remove(file) # Deletes the file after extracting the necessary data
-        elif file.endswith(".csv"):
-            os.remove(file) # Deletes the file after extracting the necessary data
+    except Exception as e:
+        pytest.fail(f"No retrieve button available to click: {str(e)}")
 
     # This loops through each Confirm printed button and clicks each one
-    for _ in range (retrieve_button_count):
-        page.on("dialog", lambda dialog: dialog.accept())
-        click(page, ManageActiveBatch(page).confirm_button.nth(0))
+    try:
+        for confirm_printed_button in range (retrieve_button_count):
+            logging.info(f"Clicking confirm printed button {confirm_printed_button+1}")
+            page.once("dialog", lambda dialog: dialog.accept())
+            ManageActiveBatch(page).confirm_button.nth(0).click()
+    except Exception as e:
+        pytest.fail(f"No confirm printed button available to click: {str(e)}")
 
-    ActiveBatchList(page).batch_successfully_archived_msg.wait_for()
+    try:
+        ActiveBatchList(page).batch_successfully_archived_msg.wait_for()
+        logging.info(f"Batch {link_text} successfully archived")
+    except Exception as e:
+        pytest.fail(f"Batch successfully archived message is not shown: {str(e)}")
 
     NavigationBar(page).click_main_menu_link()
     MainMenu(page).go_to_communications_production_page()
     CommunicationsProduction(page).go_to_archived_batch_list_page()
     ArchivedBatchList(page).enter_id_filter(link_text)
-    ArchivedBatchList(page).verify_table_data(link_text)
+    try:
+        ArchivedBatchList(page).verify_table_data(link_text)
+        logging.info(f"Batch {link_text} visible in archived batch list")
+    except Exception as e:
+        logging.error(f"Batch {link_text} not visible in archived batch list: {str(e)}")
 
     first_nhs_no = nhs_no_df["subject_nhs_number"].iloc[0]
-    verify_subject_event_status_by_nhs_no(page, first_nhs_no, latest_event_status)
+    try:
+        verify_subject_event_status_by_nhs_no(page, first_nhs_no, latest_event_status)
+        logging.info(f"Successfully verified NHS number {first_nhs_no} with status {latest_event_status}")
+    except Exception as e:
+        pytest.fail(f"Verification failed for NHS number {first_nhs_no}: {str(e)}")
     return nhs_no_df

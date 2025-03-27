@@ -1,5 +1,6 @@
 from playwright.sync_api import Page,expect
-
+from pages.navigation_bar_links import NavigationBar
+import logging
 class Logout:
     def __init__(self, page: Page):
         self.page = page
@@ -9,7 +10,8 @@ class Logout:
     def verify_log_out_page(self):
         expect(self.log_out_msg).to_be_visible()
 
-
-
-
-
+    def log_out(self):
+        logging.info("Test Complete - Logging Out")
+        NavigationBar(self.page).click_log_out_link()
+        expect(self.log_out_msg).to_be_visible()
+        self.page.close()

@@ -23,6 +23,10 @@ class SubjectScreeningPage:
         self.laboratory_test_date_filter = self.page.get_by_role("textbox", name="Laboratory Test Date")
         self.diagnostic_test_actual_date_filter = self.page.get_by_role("textbox", name="Diagnostic Test Actual Date")
         self.search_button = self.page.get_by_role("button", name="Search")
+        self.search_area = self.page.locator("#A_C_SEARCH_DOMAIN")
+
+    def select_whole_database_search_area(self):
+        self.search_area.select_option("07")
 
     def click_search_button(self):
         click(self.page, self.search_button)
