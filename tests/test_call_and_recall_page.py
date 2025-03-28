@@ -2,7 +2,23 @@ import pytest
 from playwright.sync_api import Page, expect
 from utils.click_helper import click
 from pages.bcss_home_page import MainMenu
-from pages.login_page import BcssLoginPage
+from utils.user_tools import UserTools
+from jproperties import Properties
+
+
+@pytest.fixture
+def tests_properties() -> dict:
+    """
+    Reads the 'bcss_tests.properties' file and populates a 'Properties' object.
+    Returns a dictionary of properties for use in tests.
+
+    Returns:
+        dict: A dictionary containing the values loaded from the 'bcss_tests.properties' file.
+    """
+    configs = Properties()
+    with open('bcss_tests.properties', 'rb') as read_prop:
+        configs.load(read_prop)
+    return configs.properties
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -55,7 +71,7 @@ def test_call_and_recall_page_navigation(page: Page) -> None:
     expect(page.locator("#ntshPageTitle")).to_contain_text("Main Menu")
 
 
-def test_view_an_invitation_plan(page: Page) -> None:
+def test_view_an_invitation_plan(page: Page, tests_properties: dict) -> None:
     """
     Confirms that an invitation plan can be viewed via a screening centre from the planning ad monitoring page
     """
@@ -63,7 +79,7 @@ def test_view_an_invitation_plan(page: Page) -> None:
     click(page, page.get_by_role("link", name="Planning and Monitoring"))
 
     # Select a screening centre
-    click(page, page.get_by_role("link", name="BCS009"))
+    page.get_by_role("link", name=tests_properties["screening_centre_code"]).click()
 
     # Select an invitation plan
     click(page, page.get_by_role("row").nth(1).get_by_role("link"))

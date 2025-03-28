@@ -96,6 +96,8 @@ def test_failsafe_reports_screening_subjects_with_inactive_open_episode(page: Pa
     Confirms 'screening_subjects_with_inactive_open_episode' page loads, 'generate report' button works as expected
     and that a screening subject record can be opened
     """
+    nhs_number_link = page.get_by_role("cell", name="7652")
+
     # Go to failsafe reports page
     reports_page.go_to_failsafe_reports_page(page)
 
@@ -109,7 +111,7 @@ def test_failsafe_reports_screening_subjects_with_inactive_open_episode(page: Pa
     click(page, page.get_by_role("button", name="Generate Report"))
 
     # Open a screening subject record
-    click(page, page.get_by_role("cell", name="401 7652"))
+    nhs_number_link.click()
 
     # Verify "Subject Screening Summary" is the page title
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Screening Summary")
@@ -122,6 +124,10 @@ def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(page: Pag
     the timestamp updates to current date and time when refreshed and
     a screening subject record can be opened
     """
+
+    nhs_number_link = page.locator("#listReportDataTable > tbody > tr.oddTableRow > td:nth-child(1) > a")
+    timestamp = page.locator("#displayGenerateDate > tbody > tr > td > b")
+
     # Go to failsafe reports page
     reports_page.go_to_failsafe_reports_page(page)
 
@@ -138,10 +144,10 @@ def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(page: Pag
 
     # Verify timestamp has updated to current date and time
     report_timestamp = reports_page.report_timestamp_date_format()
-    expect(page.locator("b")).to_contain_text(report_timestamp)
+    expect(timestamp).to_contain_text(report_timestamp)
 
     # Open a screening subject record from the search results
-    click(page, page.get_by_role("cell", name="954 296 8175", exact=True))
+    nhs_number_link.click()
 
     # Verify page title is "Subject Demographic"
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Demographic")
@@ -155,6 +161,10 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
     a screening subject record can be opened and
     a different SC can be allocated to a patient record
     """
+
+    nhs_number_link = page.locator("//*[@id='listReportDataTable']/tbody/tr[3]/td[1]")
+    coventry_and_warwickshire_bcs_centre = "23643"
+
     # Go to failsafe reports page
     reports_page.go_to_failsafe_reports_page(page)
 
@@ -172,19 +182,19 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
     expect(page.locator("b")).to_contain_text(report_timestamp)
 
     # Open a screening subject record from the first row/first cell of the table
-    click(page, page.locator("//*[@id='listReportDataTable']/tbody/tr[3]/td[1]"))
+    nhs_number_link.click()
 
     # Verify page title is "Set Patient's Screening Centre"
     expect(page.locator("#ntshPageTitle")).to_contain_text("Set Patient's Screening Centre")
 
     # Select another screening centre
-    page.locator("#cboScreeningCentre").select_option("23643")
+    page.locator("#cboScreeningCentre").select_option(coventry_and_warwickshire_bcs_centre)
 
     # Click update
     click(page, page.get_by_role("button", name="Update"))
 
     # Verify new screening centre has saved
-    expect(page.locator("#cboScreeningCentre")).to_have_value("23643")
+    expect(page.locator("#cboScreeningCentre")).to_have_value(coventry_and_warwickshire_bcs_centre)
 
 
 def test_failsafe_reports_allocate_sc_for_patient_movements_into_your_hub(page: Page) -> None:
@@ -225,6 +235,9 @@ def test_failsafe_reports_identify_and_link_new_gp(page: Page) -> None:
     a screening subject record can be opened and the Link GP practice to Screening Centre page
     can be opened from here
     """
+
+    nhs_number_link = page.locator("//*[@id='listReportDataTable']/tbody/tr[3]/td[2]")
+
     # Go to failsafe reports page
     reports_page.go_to_failsafe_reports_page(page)
 
@@ -249,7 +262,7 @@ def test_failsafe_reports_identify_and_link_new_gp(page: Page) -> None:
     expect(page.locator("b")).to_contain_text(report_timestamp)
 
     # Open a screening subject record from the first row/second cell of the table
-    click(page, page.locator("//*[@id='listReportDataTable']/tbody/tr[3]/td[2]"))
+    nhs_number_link.click()
 
     # Verify page title is "Link GP practice to Screening Centre"
     expect(page.locator("#ntshPageTitle")).to_contain_text("Link GP practice to Screening Centre")
@@ -264,6 +277,10 @@ def test_operational_reports_appointment_attendance_not_updated(page: Page) -> N
     the timestamp updates to current date and time when refreshed and
     an appointment record can be opened from here
     """
+
+    coventry_and_warwickshire_bcs_centre = "23643"
+    nhs_number_link = page.locator("#listReportDataTable > tbody > tr:nth-child(3) > td:nth-child(1) > a")
+
     # Go to operational reports page
     reports_page.go_to_operational_reports_page(page)
 
@@ -274,7 +291,7 @@ def test_operational_reports_appointment_attendance_not_updated(page: Page) -> N
     expect(page.locator("#ntshPageTitle")).to_contain_text("Appointment Attendance Not Updated")
 
     # Select a screening centre from the drop-down options
-    page.get_by_label("Screening Centre").select_option("23643")
+    page.get_by_label("Screening Centre").select_option(coventry_and_warwickshire_bcs_centre)
 
     # Click "Generate Report" button
     click(page, page.get_by_role("button", name="Generate Report"))
@@ -284,7 +301,7 @@ def test_operational_reports_appointment_attendance_not_updated(page: Page) -> N
     expect(page.locator("b")).to_contain_text(report_timestamp)
 
     # Open an appointment record from the report
-    click(page, page.get_by_role("link", name="934 9288"))
+    nhs_number_link.click()
 
     # Verify the page title is "Appointment Detail"
     expect(page.locator("#ntshPageTitle")).to_contain_text("Appointment Detail")
@@ -336,6 +353,9 @@ def test_operational_reports_screening_practitioner_6_weeks_availability_not_set
     the 'generate report' and 'refresh' buttons work as expected and
     the timestamp updates to current date and time when refreshed
     """
+
+    coventry_and_warwickshire_bcs_centre = "23643"
+
     # Go to operational reports page
     reports_page.go_to_operational_reports_page(page)
 
@@ -346,7 +366,7 @@ def test_operational_reports_screening_practitioner_6_weeks_availability_not_set
     expect(page.locator("#ntshPageTitle")).to_contain_text("Screening Practitioner 6 Weeks Availability Not Set Up")
 
     # Select a screening centre
-    page.get_by_label("Screening Centre").select_option("23643")
+    page.get_by_label("Screening Centre").select_option(coventry_and_warwickshire_bcs_centre)
 
     # Click "Generate Report"
     click(page, page.get_by_role("button", name="Generate Report"))
@@ -370,6 +390,10 @@ def test_operational_reports_screening_practitioner_appointments(page: Page) -> 
     the 'generate report' button works as expected and
     the timestamp updates to current date and time when refreshed
     """
+
+    coventry_and_warwickshire_bcs_centre = "23643"
+    screening_practitioner_named_another_stubble = "1982"
+
     # Go to operational reports page
     reports_page.go_to_operational_reports_page(page)
 
@@ -380,10 +404,10 @@ def test_operational_reports_screening_practitioner_appointments(page: Page) -> 
     expect(page.locator("#ntshPageTitle")).to_contain_text("Screening Practitioner Appointments")
 
     # Select a screening centre
-    page.get_by_label("Screening Centre").select_option("23643")
+    page.get_by_label("Screening Centre").select_option(coventry_and_warwickshire_bcs_centre)
 
     # Select a screening practitioner
-    page.locator("#A_C_NURSE").select_option("1982")
+    page.locator("#A_C_NURSE").select_option(screening_practitioner_named_another_stubble)
 
     # Click "Generate Report"
     click(page, page.locator("#submitThisForm"))

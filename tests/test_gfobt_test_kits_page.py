@@ -52,16 +52,24 @@ def test_create_a_qc_kit(page: Page) -> None:
     """
     Confirms that a qc test kit can be created and that each of the dropdowns has an option set available for selection
     """
+    # 'Reading' dropdown locators
+    reading1dropdown = page.locator("#A_C_Reading_999_0_0")
+    reading2dropdown = page.locator("#A_C_Reading_999_0_1")
+    reading3dropdown = page.locator("#A_C_Reading_999_1_0")
+    reading4dropdown = page.locator("#A_C_Reading_999_1_1")
+    reading5dropdown = page.locator("#A_C_Reading_999_2_0")
+    reading6dropdown = page.locator("#A_C_Reading_999_2_1")
+
     # Navigate to create QC kit page
     click(page, page.get_by_role("link", name="Create QC Kit"))
 
     # Select QC kit drop down options
-    page.locator("#A_C_Reading_999_0_0").select_option("NEGATIVE")
-    page.locator("#A_C_Reading_999_0_1").select_option("POSITIVE")
-    page.locator("#A_C_Reading_999_1_0").select_option("POSITIVE")
-    page.locator("#A_C_Reading_999_1_1").select_option("UNUSED")
-    page.locator("#A_C_Reading_999_2_0").select_option("NEGATIVE")
-    page.locator("#A_C_Reading_999_2_1").select_option("POSITIVE")
+    reading1dropdown.select_option("NEGATIVE")
+    reading2dropdown.select_option("POSITIVE")
+    reading3dropdown.select_option("POSITIVE")
+    reading4dropdown.select_option("UNUSED")
+    reading5dropdown.select_option("NEGATIVE")
+    reading6dropdown.select_option("POSITIVE")
 
     # Click save
     click(page, page.get_by_role("button", name="Save Kit"))

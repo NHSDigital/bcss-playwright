@@ -1,6 +1,7 @@
 from playwright.sync_api import Page
 from utils.click_helper import click
 
+
 class CreateAPlan:
     def __init__(self, page: Page):
         self.page = page
@@ -17,7 +18,7 @@ class CreateAPlan:
     def click_set_all_button(self):
         click(self.page, self.set_all_button)
 
-    def fill_daily_invitation_rate_field(self,value):
+    def fill_daily_invitation_rate_field(self,value: str):
         self.daily_invitation_rate_field.fill(value)
 
     def fill_weekly_invitation_rate_field(self,value):

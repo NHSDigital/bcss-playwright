@@ -5,6 +5,23 @@ from pages.bcss_home_page import MainMenu
 from pages.login_page import BcssLoginPage
 from pages.screening_subject_search_page import ScreeningStatusSearchOptions, LatestEpisodeStatusSearchOptions, \
     SearchAreaSearchOptions
+from utils.user_tools import UserTools
+from jproperties import Properties
+
+
+@pytest.fixture
+def tests_properties() -> dict:
+    """
+    Reads the 'bcss_tests.properties' file and populates a 'Properties' object.
+    Returns a dictionary of properties for use in tests.
+
+    Returns:
+        dict: A dictionary containing the values loaded from the 'bcss_tests.properties' file.
+    """
+    configs = Properties()
+    with open('bcss_tests.properties', 'rb') as read_prop:
+        configs.load(read_prop)
+    return configs.properties
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -21,7 +38,7 @@ def before_each(page: Page):
 
 
 @pytest.mark.smoke
-def test_search_screening_subject_by_nhs_number(page: Page) -> None:
+def test_search_screening_subject_by_nhs_number(page: Page, tests_properties: dict) -> None:
     """
     Confirms a screening subject can be searched for, using their nhs number
     """
@@ -29,7 +46,7 @@ def test_search_screening_subject_by_nhs_number(page: Page) -> None:
     click(page, page.get_by_role("button", name="Clear Filters"))
 
     # Enter an NHS number
-    page.get_by_label("NHS Number").fill("966 529 9271")
+    page.get_by_label("NHS Number").fill(tests_properties["nhs_number"])
 
     # Press Tab (required after text input, to make the search button become active).
     page.keyboard.press("Tab")
@@ -41,12 +58,12 @@ def test_search_screening_subject_by_nhs_number(page: Page) -> None:
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Screening Summary")
 
 
-def test_search_screening_subject_by_surname(page: Page) -> None:
+def test_search_screening_subject_by_surname(page: Page, tests_properties: dict) -> None:
     """
     Confirms a screening subject can be searched for, using their surname
     """
     # Enter a surname
-    page.locator("#A_C_Surname").fill("Absurd")
+    page.locator("#A_C_Surname").fill(tests_properties["surname"])
 
     # Press Tab (required after text input, to make the search button become active).
     page.keyboard.press("Tab")
@@ -58,12 +75,12 @@ def test_search_screening_subject_by_surname(page: Page) -> None:
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Screening Summary")
 
 
-def test_search_screening_subject_by_forename(page: Page) -> None:
+def test_search_screening_subject_by_forename(page: Page, tests_properties: dict) -> None:
     """
     Confirms a screening subject can be searched for, using their forename
     """
     # Enter a forename
-    page.get_by_label("Forename").fill("Pentagram")
+    page.get_by_label("Forename").fill(tests_properties["forename"])
 
     # Press Tab (required after text input, to make the search button become active).
     page.keyboard.press("Tab")
@@ -75,12 +92,12 @@ def test_search_screening_subject_by_forename(page: Page) -> None:
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Screening Summary")
 
 
-def test_search_screening_subject_by_dob(page: Page) -> None:
+def test_search_screening_subject_by_dob(page: Page, tests_properties: dict) -> None:
     """
     Confirms a screening subject can be searched for, using their date of birth
     """
     # Enter a date in the dob field
-    page.locator("#A_C_DOB_From").fill("11/01/1934")
+    page.locator("#A_C_DOB_From").fill(tests_properties["subject_dob"])
 
     # Press Tab (required after text input, to make the search button become active).
     page.keyboard.press("Tab")
@@ -109,12 +126,12 @@ def test_search_screening_subject_by_postcode(page: Page) -> None:
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
 
 
-def test_search_screening_subject_by_episode_closed_date(page: Page) -> None:
+def test_search_screening_subject_by_episode_closed_date(page: Page, tests_properties: dict) -> None:
     """
     Confirms a screening subject can be searched for, using their episode closed date
     """
     # Enter an "episode closed date"
-    page.get_by_label("Episode Closed Date").fill("22/09/2020")
+    page.get_by_label("Episode Closed Date").fill(tests_properties["episode_closed_date"])
 
     # Press Tab (required after text input, to make the search button become active).
     page.keyboard.press("Tab")
@@ -126,16 +143,16 @@ def test_search_screening_subject_by_episode_closed_date(page: Page) -> None:
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
 
     # Verify the results contain the date that was searched for
-    expect(page.locator("#displayRS")).to_contain_text("22/09/2020")
+    expect(page.locator("#displayRS")).to_contain_text(tests_properties["episode_closed_date"])
 
 
-def test_search_criteria_clear_filters_button(page: Page) -> None:
+def test_search_criteria_clear_filters_button(page: Page, tests_properties: dict) -> None:
     """
     Confirms the 'clear filters' button on the search page works as expected
     """
     # Enter number in NHS field and verify value
-    page.get_by_label("NHS Number").fill("34344554353")
-    expect(page.get_by_label("NHS Number")).to_have_value("34344554353")
+    page.get_by_label("NHS Number").fill(tests_properties["nhs_number"])
+    expect(page.get_by_label("NHS Number")).to_have_value(tests_properties["nhs_number"])
 
     # Click clear filters button and verify field is empty
     click(page, page.get_by_role("button", name="Clear Filters"))
@@ -400,7 +417,7 @@ def test_search_screening_subject_by_home_hub(page: Page) -> None:
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
 
 
-def test_search_screening_subject_by_gp_practice(page: Page) -> None:
+def test_search_screening_subject_by_gp_practice(page: Page, tests_properties: dict) -> None:
     """
     Confirms screening subjects can be searched for, using the search area (gp practice)
     """
@@ -411,7 +428,7 @@ def test_search_screening_subject_by_gp_practice(page: Page) -> None:
     SearchAreaSearchOptions(page).select_search_area_gp_practice()
 
     # Enter GP practice code
-    page.get_by_label("Appropriate Code").fill("C81001")
+    page.get_by_label("Appropriate Code").fill(tests_properties["gp_practice_code"])
 
     # Click search button
     click(page, page.get_by_role("button", name="Search"))
@@ -423,7 +440,7 @@ def test_search_screening_subject_by_gp_practice(page: Page) -> None:
     expect(page.locator("#displayRS")).to_contain_text("SPRINGS HEALTH CENTRE")
 
 
-def test_search_screening_subject_by_ccg(page: Page) -> None:
+def test_search_screening_subject_by_ccg(page: Page, tests_properties: dict) -> None:
     """
     Confirms screening subjects can be searched for, using the search area (ccg)
     """
@@ -434,10 +451,10 @@ def test_search_screening_subject_by_ccg(page: Page) -> None:
     SearchAreaSearchOptions(page).select_search_area_ccg()
 
     # Enter CCG code
-    page.get_by_label("Appropriate Code").fill("Z1Z1Z")
+    page.get_by_label("Appropriate Code").fill(tests_properties["ccg_code"])
 
     # Enter GP practice code
-    page.get_by_label("GP Practice in CCG").fill("C81001")
+    page.get_by_label("GP Practice in CCG").fill(tests_properties["gp_practice_code"])
 
     # Click search button
     click(page, page.get_by_role("button", name="Search"))
@@ -446,7 +463,7 @@ def test_search_screening_subject_by_ccg(page: Page) -> None:
     expect(page.locator("#ntshPageTitle")).to_contain_text("Subject Search Results")
 
 
-def test_search_screening_subject_by_screening_centre(page: Page) -> None:
+def test_search_screening_subject_by_screening_centre(page: Page, tests_properties: dict) -> None:
     """
     Confirms screening subjects can be searched for, using the search area (screening centre)
     """
@@ -457,7 +474,7 @@ def test_search_screening_subject_by_screening_centre(page: Page) -> None:
     SearchAreaSearchOptions(page).select_search_area_screening_centre()
 
     # Enter a screening centre code
-    page.get_by_label("Appropriate Code").fill("BCS001")
+    page.get_by_label("Appropriate Code").fill(tests_properties["screening_centre_code"])
 
     # Click search button
     click(page, page.get_by_role("button", name="Search"))
