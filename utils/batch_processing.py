@@ -12,7 +12,15 @@ import pytest
 from playwright.sync_api import Page
 import logging
 
-def batch_processing(page: Page, batch_type: str, batch_description: str, latest_event_status: str, run_timed_events: bool = False):
+def batch_processing(page: Page, batch_type: str, batch_description: str, latest_event_status: str, run_timed_events: bool = False) -> None:
+    """
+    This util is used to process batches. It expects the following inputs:
+    - page: This is playwright page variable
+    - batch_type: This is the event code of the batch. E.g. S1 or S9
+    - batch_description: This is the description of the batch. E.g. Pre-invitation (FIT)
+    - latest_event_status: This is the status the subject will get updated to after the batch has been processed.
+    - run_timed_events: This is an optional input that executes bcss_timed_events if set to True
+    """
     logging.info(f"Processing {batch_type} - {batch_description} batch")
     NavigationBar(page).click_main_menu_link()
     MainMenu(page).go_to_communications_production_page()

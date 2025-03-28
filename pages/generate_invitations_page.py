@@ -19,7 +19,12 @@ class GenerateInvitations:
     def click_refresh_button(self):
         click(self.page, self.refresh_button)
 
-    def wait_for_invitation_generation_complete(self):
+    def wait_for_invitation_generation_complete(self) -> bool:
+        """
+        This function is used to wait for the invitations to be generated.
+        Every 5 seconds it refreshes the table and checks to see if the invitations have been generated.
+        It also checks that enough invitations were generated and checks to see if self referrals are present
+        """
         self.page.wait_for_selector("#displayRS", timeout=5000)
 
         if self.planned_invitations_total == "0":
@@ -55,12 +60,13 @@ class GenerateInvitations:
         except Exception as e:
             pytest.fail("Invitations not generated successfully")
 
+        value = self.planned_invitations_total.text_content().strip()  # Get text and remove extra spaces
+        if int(value) < 5:
+            pytest.fail("There are less than 5 invitations generated")
+
         self_referrals_total = int(self.self_referrals_total.text_content().strip())
         if self_referrals_total >= 1:
             return True
         else:
             logging.warning("No S1 Digital Leaflet batch will be generated")
-
-        value = self.planned_invitations_total.text_content().strip()  # Get text and remove extra spaces
-        if int(value) < 5:
-            pytest.fail("There are less than 5 invitations generated")
+            return False
