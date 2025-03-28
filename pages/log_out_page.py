@@ -1,6 +1,8 @@
-from playwright.sync_api import Page,expect
+from playwright.sync_api import Page, expect
 from pages.navigation_bar_links import NavigationBar
 import logging
+
+
 class Logout:
     def __init__(self, page: Page):
         self.page = page

@@ -1,6 +1,7 @@
 from playwright.sync_api import Page
 from utils.click_helper import click
 
+
 class SubjectScreeningPage:
     def __init__(self, page: Page):
         self.page = page
@@ -15,7 +16,7 @@ class SubjectScreeningPage:
         self.date_of_birth_filter = self.page.locator("#A_C_DOB_From")
         self.data_of_birth_range_filter = self.page.get_by_role("textbox", name="(for a date range, enter a to")
         self.postcode_filter = self.page.get_by_role("textbox", name="Postcode")
-        self.episode_closed_date_filter = self. page.get_by_role("textbox", name="Episode Closed Date")
+        self.episode_closed_date_filter = self.page.get_by_role("textbox", name="Episode Closed Date")
         self.kit_batch_number_filter = self.page.get_by_role("textbox", name="Kit Batch Number")
         self.kit_number_filter = self.page.get_by_role("textbox", name="Kit Number")
         self.fit_device_id_filter = self.page.get_by_role("textbox", name="FIT Device ID")

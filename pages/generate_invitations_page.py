@@ -3,6 +3,7 @@ import pytest
 from utils.click_helper import click
 import logging
 
+
 class GenerateInvitations:
     def __init__(self, page: Page):
         self.page = page
@@ -40,7 +41,7 @@ class GenerateInvitations:
 
         # Loop until the table no longer contains "Queued"
         logging.info(f"Waiting for successful generation")
-        while elapsed < timeout: # there may be a stored procedure to speed this process up
+        while elapsed < timeout:  # there may be a stored procedure to speed this process up
             table_text = self.displayRS.text_content()
             if "Failed" in table_text:
                 pytest.fail("Invitation has failed to generate")
@@ -56,7 +57,7 @@ class GenerateInvitations:
         try:
             expect(self.displayRS).to_contain_text("Completed")
             logging.info("Invitations successfully generated")
-            logging.info(f"Invitations took {elapsed/1000} seconds to generate")
+            logging.info(f"Invitations took {elapsed / 1000} seconds to generate")
         except Exception as e:
             pytest.fail("Invitations not generated successfully")
 

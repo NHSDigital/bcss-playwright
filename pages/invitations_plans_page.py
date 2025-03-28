@@ -1,6 +1,7 @@
 from playwright.sync_api import Page
 from utils.click_helper import click
 
+
 class InvitationsPlans:
     def __init__(self, page: Page):
         self.page = page
@@ -10,8 +11,3 @@ class InvitationsPlans:
 
     def go_to_create_a_plan_page(self):
         click(self.page, self.create_a_plan)
-
-
-
-
-

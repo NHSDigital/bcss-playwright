@@ -1,5 +1,4 @@
 import os
-
 from playwright.sync_api import Page
 from utils.user_tools import UserTools
 from utils.click_helper import click
@@ -29,4 +28,3 @@ class BcssLoginPage:
         self.password.fill(password)
         # Click Submit
         click(self.page, self.submit_button)
-

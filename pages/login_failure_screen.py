@@ -1,4 +1,5 @@
-from playwright.sync_api import Page,expect
+from playwright.sync_api import Page, expect
+
 
 class LoginFailureScreen:
     def __init__(self, page: Page):

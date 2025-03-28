@@ -1,7 +1,9 @@
 import pytest
 from playwright.sync_api import Page
-from pages import (login_page as login, bcss_home_page as bcss_home, navigation_bar_links as nav_bar_links, log_out_page as logout, login_failure_screen as login_failure)
+from pages import (login_page as login, bcss_home_page as bcss_home, navigation_bar_links as nav_bar_links,
+                   log_out_page as logout, login_failure_screen as login_failure)
 from utils.oracle import OracleDB
+
 
 @pytest.fixture(scope="function", autouse=True)
 def before_test(page: Page):
@@ -21,6 +23,7 @@ def before_test(page: Page):
 
     yield
     OracleDB().delete_all_users_from_approved_users_table()
+
 
 # @pytest.mark.smoke
 def test_only_users_on_approved_can_login_to_bcss(page: Page) -> None:

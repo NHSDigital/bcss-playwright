@@ -1,7 +1,10 @@
 from playwright.sync_api import Page, expect
 from utils.click_helper import click
 
+
 class LogDevices:
+    SPOILT_DEVICE_OPTION = "205156"
+
     def __init__(self, page: Page):
         self.page = page
         # Log Devices - page links
@@ -33,7 +36,7 @@ class LogDevices:
         expect(self.successfully_logged_device_text).to_be_visible()
 
     def select_spoilt_device_dropdown_option(self):
-        self.spoilt_device_dropdown.select_option("205156")
+        self.spoilt_device_dropdown.select_option(self.SPOILT_DEVICE_OPTION)
 
     def click_log_as_spoilt_button(self):
         click(self.page, self.log_as_spoilt_button)

@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 import pandas as pd
 import logging
+
+
 class OracleDB:
     def __init__(self):
         load_dotenv()
@@ -11,7 +13,7 @@ class OracleDB:
         self.dns = os.getenv("cs")
         self.password = os.getenv("pw")
 
-    def exec_bcss_timed_events(self, nhs_number_df): # Executes bcss_timed_events when given NHS numbers
+    def exec_bcss_timed_events(self, nhs_number_df):  # Executes bcss_timed_events when given NHS numbers
         try:
             logging.info("Attempting DB connection...")
             conn = oracledb.connect(user=self.user, password=self.password, dsn=self.dns)
@@ -20,14 +22,16 @@ class OracleDB:
                 for index, row in nhs_number_df.iterrows():
                     logging.info(f"Attempting to get subject_id from nhs number: {row["subject_nhs_number"]}")
                     cursor = conn.cursor()
-                    cursor.execute(f"SELECT SCREENING_SUBJECT_ID FROM SCREENING_SUBJECT_T WHERE SUBJECT_NHS_NUMBER = {int(row["subject_nhs_number"])}")
+                    cursor.execute(
+                        f"SELECT SCREENING_SUBJECT_ID FROM SCREENING_SUBJECT_T WHERE SUBJECT_NHS_NUMBER = {int(row["subject_nhs_number"])}")
                     result = cursor.fetchall()
                     subject_id = result[0][0]
                     logging.info(f"Able to extract subject ID: {subject_id}")
                     try:
-                        logging.info(f"Attempting to execute stored procedure: {f"'bcss_timed_events', [{subject_id},'Y']"}")
+                        logging.info(
+                            f"Attempting to execute stored procedure: {f"'bcss_timed_events', [{subject_id},'Y']"}")
                         cursor = conn.cursor()
-                        cursor.callproc('bcss_timed_events', [subject_id,'Y'])
+                        cursor.callproc('bcss_timed_events', [subject_id, 'Y'])
                         logging.info("Stored procedure execution successful!")
                     except Exception as spExecutionError:
                         logging.error(f"Failed to execute stored procedure with execution error: {spExecutionError}")
@@ -38,9 +42,9 @@ class OracleDB:
                     conn.close()
                     logging.info("Connection closed")
         except Exception as connectionError:
-                logging.error(f"Failed to connect to the DB! with connection error: {connectionError}")
+            logging.error(f"Failed to connect to the DB! with connection error: {connectionError}")
 
-    def populate_ui_approved_users_table(self, user: str): # To add users to the UI_APPROVED_USERS table
+    def populate_ui_approved_users_table(self, user: str):  # To add users to the UI_APPROVED_USERS table
         try:
             logging.info("Attempting DB connection...")
             conn = oracledb.connect(user=self.user, password=self.password, dsn=self.dns)
@@ -58,7 +62,7 @@ class OracleDB:
                     conn.close()
                     logging.info("Connection closed")
         except Exception as connectionError:
-                logging.error(f"Failed to connect to the DB! with connection error {connectionError}")
+            logging.error(f"Failed to connect to the DB! with connection error {connectionError}")
 
     def delete_all_users_from_approved_users_table(self):  # To remove all users from the UI_APPROVED_USERS table
         try:
@@ -72,7 +76,8 @@ class OracleDB:
                 conn.commit()
                 logging.info("DB table values successfully deleted!")
             except Exception as dbValuesDeleteError:
-                logging.error(f"Failed to delete values from the DB table! with data deletion error {dbValuesDeleteError}")
+                logging.error(
+                    f"Failed to delete values from the DB table! with data deletion error {dbValuesDeleteError}")
             finally:
                 if conn is not None:
                     conn.close()
@@ -80,7 +85,7 @@ class OracleDB:
         except Exception as connectionError:
             logging.error(f"Failed to connect to the DB! with connection error {connectionError}")
 
-    def execute_query(self, query: str,): # To use when "select xxxx" (stored procedures)
+    def execute_query(self, query: str, ):  # To use when "select xxxx" (stored procedures)
         try:
             logging.info("Attempting DB connection...")
             conn = oracledb.connect(user=self.user, password=self.password, dsn=self.dns)
@@ -98,10 +103,9 @@ class OracleDB:
                     logging.info("Connection Closed - Returning results")
                     return df
         except Exception as connectionError:
-                logging.error(f"Failed to connect to the DB! with connection error {connectionError}")
+            logging.error(f"Failed to connect to the DB! with connection error {connectionError}")
 
-
-    def execute_stored_procedure(self, procedure: str): # To use when "exec xxxx" (stored procedures)
+    def execute_stored_procedure(self, procedure: str):  # To use when "exec xxxx" (stored procedures)
         try:
             logging.info("Attempting DB connection...")
             conn = oracledb.connect(user=self.user, password=self.password, dsn=self.dns)
@@ -121,7 +125,7 @@ class OracleDB:
         except Exception as connectionError:
             logging.error(f"Failed to connect to the DB! with connection error: {connectionError}")
 
-    def update_or_insert_data_to_table(self, statement,params):  # To update or insert data into a table
+    def update_or_insert_data_to_table(self, statement, params):  # To update or insert data into a table
         try:
             logging.info("Attempting DB connection...")
             conn = oracledb.connect(user=self.user, password=self.password, dsn=self.dns)
@@ -129,7 +133,7 @@ class OracleDB:
             try:
                 logging.info("Attempting to insert/update table")
                 cursor = conn.cursor()
-                cursor.execute(statement,params)
+                cursor.execute(statement, params)
                 conn.commit()
                 logging.info("DB table successfully updated!")
             except Exception as dbUpdateInsertError:

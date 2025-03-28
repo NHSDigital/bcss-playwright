@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from playwright.sync_api import Page, expect
 from pages.login_page import BcssLoginPage
 
+
 @pytest.mark.smoke
 def test_successful_login_to_bcss(page: Page) -> None:
     """

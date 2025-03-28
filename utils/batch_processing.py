@@ -12,7 +12,9 @@ import pytest
 from playwright.sync_api import Page
 import logging
 
-def batch_processing(page: Page, batch_type: str, batch_description: str, latest_event_status: str, run_timed_events: bool = False) -> None:
+
+def batch_processing(page: Page, batch_type: str, batch_description: str, latest_event_status: str,
+                     run_timed_events: bool = False) -> None:
     """
     This util is used to process batches. It expects the following inputs:
     - page: This is playwright page variable
@@ -53,13 +55,14 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
             pytest.fail(f"No open '{batch_type} - {batch_description}' batch found")
 
     ManageActiveBatch(page).click_prepare_button()
-    page.wait_for_timeout(1000) # This one second timeout does not affect the time to execute, as it is just used to ensure the reprepare batch button is clicked and does not instantly advance to the next step
+    page.wait_for_timeout(
+        1000)  # This one second timeout does not affect the time to execute, as it is just used to ensure the reprepare batch button is clicked and does not instantly advance to the next step
     ManageActiveBatch(page).reprepare_batch_text.wait_for()
 
     # This loops through each Retrieve button and clicks each one
     retrieve_button_count = 0
     try:
-        for retrieve_button in range (ManageActiveBatch(page).retrieve_button.count()):
+        for retrieve_button in range(ManageActiveBatch(page).retrieve_button.count()):
             retrieve_button_count += 1
             logging.info(f"Clicking retrieve button {retrieve_button_count}")
             # Start waiting for the pdf download
@@ -70,14 +73,14 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
             file = download_file.suggested_filename
             # Wait for the download process to complete and save the downloaded file in a temp folder
             download_file.save_as(file)
-            os.remove(file) # Deletes the file after extracting the necessary data
+            os.remove(file)  # Deletes the file after extracting the necessary data
     except Exception as e:
         pytest.fail(f"No retrieve button available to click: {str(e)}")
 
     # This loops through each Confirm printed button and clicks each one
     try:
-        for confirm_printed_button in range (retrieve_button_count):
-            logging.info(f"Clicking confirm printed button {confirm_printed_button+1}")
+        for confirm_printed_button in range(retrieve_button_count):
+            logging.info(f"Clicking confirm printed button {confirm_printed_button + 1}")
             page.once("dialog", lambda dialog: dialog.accept())
             ManageActiveBatch(page).confirm_button.nth(0).click()
     except Exception as e:

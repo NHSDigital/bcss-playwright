@@ -18,10 +18,10 @@ class CreateAPlan:
     def click_set_all_button(self):
         click(self.page, self.set_all_button)
 
-    def fill_daily_invitation_rate_field(self,value: str):
+    def fill_daily_invitation_rate_field(self, value: str):
         self.daily_invitation_rate_field.fill(value)
 
-    def fill_weekly_invitation_rate_field(self,value):
+    def fill_weekly_invitation_rate_field(self, value):
         self.weekly_invitation_rate_field.fill(value)
 
     def click_update_button(self):
@@ -33,11 +33,8 @@ class CreateAPlan:
     def click_save_button(self):
         click(self.page, self.save_button)
 
-    def fill_note_field(self,value):
+    def fill_note_field(self, value):
         self.note_field.fill(value)
 
     def click_save_note_button(self):
         click(self.page, self.save_note_button)
-
-
-

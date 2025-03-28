@@ -16,7 +16,7 @@ class FITTestKits:
         self.screening_incidents_list_page = self.page.get_by_role("link", name="Screening Incidents List")
         self.manage_qc_products_page = self.page.get_by_role("link", name="Manage QC Products")
         self.maintain_analysers_page = self.page.get_by_role("link", name="Maintain Analysers")
-        self.fit_device_id=self.page.get_by_role("textbox", name="FIT Device ID")
+        self.fit_device_id = self.page.get_by_role("textbox", name="FIT Device ID")
 
     def go_to_fit_rollout_summary_page(self):
         click(self.page, self.fit_rollout_summary_page)
@@ -49,4 +49,4 @@ class FITTestKits:
         click(self.page, self.maintain_analysers_page)
 
     def go_to_fit_device_id(self):
-            self.fit_device_id.enter()
+        self.fit_device_id.enter()

@@ -1,5 +1,6 @@
-from playwright.sync_api import Page,expect
+from playwright.sync_api import Page, expect
 from utils.click_helper import click
+
 
 class ArchivedBatchList:
     def __init__(self, page: Page):
@@ -15,7 +16,7 @@ class ArchivedBatchList:
         self.count_filter = self.page.locator("#countFilter")
         self.table_data = self.page.locator("td")
 
-    def verify_table_data(self,value):
+    def verify_table_data(self, value):
         expect(self.table_data.filter(has_text=value)).to_be_visible()
 
     def text_id_filter(self, search_text: str):
@@ -62,5 +63,3 @@ class ArchivedBatchList:
         click(self.page, self.count_filter)
         self.count_filter.fill(search_text)
         self.count_filter.press("Enter")
-
-

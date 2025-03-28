@@ -1,6 +1,7 @@
 from playwright.sync_api import Page, expect
 
-def click(page: Page, locator)-> None:
+
+def click(page: Page, locator) -> None:
     try:
         page.wait_for_load_state('load')
         page.wait_for_load_state('domcontentloaded')

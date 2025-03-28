@@ -1,6 +1,7 @@
 from playwright.sync_api import Page
 from utils.click_helper import click
 
+
 class ActiveBatchList:
     def __init__(self, page: Page):
         self.page = page

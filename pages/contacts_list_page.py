@@ -11,7 +11,6 @@ class ContactsListPage:
         self.maintain_contacts_page = self.page.get_by_role("link", name="Maintain Contacts")
         self.my_preference_settings_page = self.page.get_by_role("link", name="My Preference Settings")
 
-
     def go_to_view_contacts_page(self):
         click(self.page, self.view_contacts_page)
 
@@ -23,5 +22,3 @@ class ContactsListPage:
 
     def go_to_my_preference_settings_page(self):
         click(self.page, self.my_preference_settings_page)
-
-

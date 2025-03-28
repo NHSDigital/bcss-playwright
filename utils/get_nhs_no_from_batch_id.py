@@ -1,6 +1,7 @@
 import pandas as pd
 from oracle import OracleDB
 
+
 def get_nhs_no_from_batch_id(batch_id):
     nhs_number_df = OracleDB().execute_query(f"""
     SELECT SUBJECT_NHS_NUMBER

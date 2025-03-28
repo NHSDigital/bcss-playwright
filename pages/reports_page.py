@@ -48,7 +48,6 @@ def go_to_failsafe_reports_page(page: Page) -> None:
     click(page, page.get_by_role("link", name="Failsafe Reports"))
 
 
-
 def go_to_operational_reports_page(page: Page) -> None:
     click(page, page.get_by_role("link", name="Operational Reports"))
 

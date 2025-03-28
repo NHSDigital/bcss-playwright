@@ -10,7 +10,6 @@ class ScreeningPractitionerAppointmentsPage:
         self.view_appointments_page = self.page.get_by_role("link", name="View appointments")
         self.patients_that_require_page = self.page.get_by_role("link", name="Patients that Require")
 
-
     def go_to_log_in_page(self):
         click(self.page, self.log_in_page)
 
@@ -19,10 +18,3 @@ class ScreeningPractitionerAppointmentsPage:
 
     def go_to_patients_that_require_page(self):
         click(self.page, self.view_appointments_page)
-
-
-
-
-
-
-

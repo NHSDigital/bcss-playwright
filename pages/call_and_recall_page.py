@@ -12,7 +12,6 @@ class CallAndRecall:
         self.non_invitation_days_page = self.page.get_by_role("link", name="Non Invitation Days")
         self.age_extension_rollout_plans_page = self.page.get_by_role("link", name="Age Extension Rollout Plans")
 
-
     def go_to_planning_and_monitoring_page(self):
         click(self.page, self.planning_and_monitoring_page)
 
