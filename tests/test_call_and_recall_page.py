@@ -27,7 +27,7 @@ def before_each(page: Page):
     Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the call and recall page
     """
     # Log in to BCSS
-    BcssLoginPage(page).login_as_user("BCSS401")
+    UserTools.user_login(page, "Hub Manager State Registered")
 
     # Go to call and recall page
     MainMenu(page).go_to_call_and_recall_page()

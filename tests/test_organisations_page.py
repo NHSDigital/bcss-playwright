@@ -28,7 +28,7 @@ def before_each(page: Page):
     organisations page
     """
     # Log in to BCSS
-    BcssLoginPage(page).login_as_user("BCSS401")
+    UserTools.user_login(page, "Hub Manager State Registered")
 
     # Go to organisations page
     MainMenu(page).go_to_organisations_page()
