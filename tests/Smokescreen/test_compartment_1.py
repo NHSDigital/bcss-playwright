@@ -1,22 +1,39 @@
 import pytest
-from playwright.sync_api import Page
+from jproperties import Properties
+
 from my_pages import *
 from utils.batch_processing import batch_processing
 from utils.oracle import OracleDB
 
+
+@pytest.fixture
+def smokescreen_properties() -> dict:
+    """
+    Reads the 'bcss_smokescreen_tests.properties' file and populates a 'Properties' object.
+    Returns a dictionary of properties for use in tests.
+
+    Returns:
+        dict: A dictionary containing the values loaded from the 'bcss_smokescreen_tests.properties' file.
+    """
+    configs = Properties()
+    with open('bcss_smokescreen_tests.properties', 'rb') as read_prop:
+        configs.load(read_prop)
+    return configs.properties
+
+
 @pytest.mark.smoke
 @pytest.mark.compartment1
-def test_create_invitations_plan(page: Page) -> None:
+def test_compartment_1(page: Page, smokescreen_properties: dict) -> None:
     logging.info("Compartment 1 - Create Invitations Plan")
     UserTools.user_login(page, "Hub Manager State Registered")
     # Create plan - England
     MainMenu(page).go_to_call_and_recall_page()
     CallAndRecall(page).go_to_planning_and_monitoring_page()
-    InvitationsMonitoring(page).go_to_bcss001_invitations_plan_page()
+    InvitationsMonitoring(page).go_to_invitation_plan_page(smokescreen_properties["c1_screening_centre_code"])
     InvitationsPlans(page).go_to_create_a_plan_page()
     logging.info("Setting daily invitation rate")
     CreateAPlan(page).click_set_all_button()
-    CreateAPlan(page).fill_daily_invitation_rate_field("10")
+    CreateAPlan(page).fill_daily_invitation_rate_field(smokescreen_properties["c1_daily_invitation_rate"])
     CreateAPlan(page).click_update_button()
     CreateAPlan(page).click_confirm_button()
     CreateAPlan(page).click_save_button()

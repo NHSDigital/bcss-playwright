@@ -7,6 +7,7 @@ from utils.screening_subject_page_searcher import verify_subject_event_status_by
 from utils.fit_kit_generation import create_fit_id_df
 import logging
 
+
 @pytest.mark.smoke
 @pytest.mark.smokescreen
 @pytest.mark.compartment2
@@ -22,7 +23,7 @@ def test_compartment_2(page: Page) -> None:
         logging.info(f"Logging FIT Device ID: {fit_device_id}")
         LogDevices(page).fill_fit_device_id_field(fit_device_id)
         sample_date = datetime.now().strftime("%#d %b %Y")
-        logging.info("Setting sample date to todays date")
+        logging.info("Setting sample date to today's date")
         LogDevices(page).fill_sample_date_field(sample_date)
         try:
             LogDevices(page).verify_successfully_logged_device_text()
@@ -33,7 +34,8 @@ def test_compartment_2(page: Page) -> None:
     nhs_no = subjectdf["subject_nhs_number"].iloc[0]
     try:
         verify_subject_event_status_by_nhs_no(page, nhs_no, "S43 - Kit Returned and Logged (Initial Test)")
-        logging.info(f"Successfully verified NHS number {nhs_no} with status S43 - Kit Returned and Logged (Initial Test)")
+        logging.info(
+            f"Successfully verified NHS number {nhs_no} with status S43 - Kit Returned and Logged (Initial Test)")
     except Exception as e:
         pytest.fail(f"Verification failed for NHS number {nhs_no}: {str(e)}")
 
@@ -50,8 +52,7 @@ def test_compartment_2(page: Page) -> None:
         LogDevices(page).verify_successfully_logged_device_text()
         logging.info(f"{spoilt_fit_device_id} Successfully logged")
     except:
-        pytest.fail(f"{spoilt_fit_device_id} unsuccessfully logged")
-
+        pytest.fail(f"{spoilt_fit_device_id} Unsuccessfully logged")
 
     batch_processing(page, "S3", "Retest (Spoilt) (FIT)", "S11 - Retest Kit Sent (Spoilt)")
 
