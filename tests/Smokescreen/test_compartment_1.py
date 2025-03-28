@@ -37,11 +37,14 @@ def test_compartment_1(page: Page) -> None:
     CallAndRecall(page).go_to_generate_invitations_page()
     logging.info("Generating invitations based on the invitations plan")
     GenerateInvitations(page).click_generate_invitations_button()
-    GenerateInvitations(page).wait_for_invitation_generation_complete()
+    self_referrals_available = GenerateInvitations(page).wait_for_invitation_generation_complete()
 
     # Print the batch of Pre-Invitation Letters - England
     logging.info("Compartment 1 - Process S1 Batch")
-    batch_processing(page, "S1", "Pre-invitation (FIT) (digital leaflet)", "S9 - Pre-invitation Sent")
+    if self_referrals_available:
+        batch_processing(page, "S1", "Pre-invitation (FIT) (digital leaflet)", "S9 - Pre-invitation Sent")
+    else:
+        logging.warning("Skipping S1 Pre-invitation (FIT) (digital leaflet) as no self referral invitations were generated")
     nhs_number_df = batch_processing(page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent")
     OracleDB().exec_bcss_timed_events(nhs_number_df)
 

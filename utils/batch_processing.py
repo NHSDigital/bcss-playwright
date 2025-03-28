@@ -20,10 +20,7 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
 
     batch_description_cells = page.locator(f"//td[text()='{batch_description}']")
 
-    if batch_description_cells.count() == 0 and batch_description == "Pre-invitation (FIT) (digital leaflet)":
-        logging.warning("No S1 Pre-invitation (FIT) (digital leaflet) batch found. Skipping to next step")
-        return
-    elif batch_description_cells.count() == 0 and page.locator("td", has_text="No matching records found"):
+    if batch_description_cells.count() == 0 and page.locator("td", has_text="No matching records found"):
         pytest.fail(f"No {batch_type} {batch_description} batch found")
 
     for i in range(batch_description_cells.count()):
@@ -58,8 +55,8 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
             logging.info(f"Clicking retrieve button {retrieve_button_count}")
             # Start waiting for the pdf download
             with page.expect_download() as download_info:
-                # Perform the action that initiates download
-                ManageActiveBatch(page).retrieve_button.nth(retrieve_button-1).click()
+                # Perform the action that initiates download. The line below is running in a FOR loop to click every retrieve button as in some cases more than 1 is present
+                ManageActiveBatch(page).retrieve_button.nth(retrieve_button).click()
             download_file = download_info.value
             file = download_file.suggested_filename
             # Wait for the download process to complete and save the downloaded file in a temp folder

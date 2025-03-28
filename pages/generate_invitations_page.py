@@ -11,6 +11,7 @@ class GenerateInvitations:
         self.displayRS = self.page.locator("#displayRS")
         self.refresh_button = self.page.get_by_role("button", name="Refresh")
         self.planned_invitations_total = self.page.locator("#col8_total")
+        self.self_referrals_total = self.page.locator("#col9_total")
 
     def click_generate_invitations_button(self):
         click(self.page, self.generate_invitations_button)
@@ -53,6 +54,11 @@ class GenerateInvitations:
             logging.info(f"Invitations took {elapsed/1000} seconds to generate")
         except Exception as e:
             pytest.fail("Invitations not generated successfully")
+
+        self_referrals_total = int(self.self_referrals_total.text_content().strip())
+        if self_referrals_total >= 1:
+            logging.warning("No S1 Digital Leaflet batch will be generated")
+            return True
 
         value = self.planned_invitations_total.text_content().strip()  # Get text and remove extra spaces
         if int(value) < 5:
