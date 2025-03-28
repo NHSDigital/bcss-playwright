@@ -12,7 +12,7 @@ import pytest
 from playwright.sync_api import Page
 import logging
 
-def batch_processing(page: Page, batch_type: str, batch_description: str, latest_event_status: str, run_timed_events: bool):
+def batch_processing(page: Page, batch_type: str, batch_description: str, latest_event_status: str, run_timed_events: bool = False):
     logging.info(f"Processing {batch_type} - {batch_description} batch")
     NavigationBar(page).click_main_menu_link()
     MainMenu(page).go_to_communications_production_page()

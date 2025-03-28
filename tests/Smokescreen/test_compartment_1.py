@@ -51,7 +51,7 @@ def test_compartment_1(page: Page) -> None:
     # Print the batch of Pre-Invitation Letters - England
     logging.info("Compartment 1 - Process S1 Batch")
     if self_referrals_available:
-        batch_processing(page, "S1", "Pre-invitation (FIT) (digital leaflet)", "S9 - Pre-invitation Sent", False)
+        batch_processing(page, "S1", "Pre-invitation (FIT) (digital leaflet)", "S9 - Pre-invitation Sent")
     else:
         logging.warning("Skipping S1 Pre-invitation (FIT) (digital leaflet) as no self referral invitations were generated")
     batch_processing(page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent", True)
@@ -62,7 +62,7 @@ def test_compartment_1(page: Page) -> None:
 
     # Print a set of reminder letters
     logging.info("Compartment 1 - Process S10 Batch")
-    batch_processing(page, "S10", "Test Kit Reminder", "S19 - Reminder of Initial Test Sent", False)
+    batch_processing(page, "S10", "Test Kit Reminder", "S19 - Reminder of Initial Test Sent")
 
     # Log out
     Logout(page).log_out()
