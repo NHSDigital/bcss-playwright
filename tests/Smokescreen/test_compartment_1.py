@@ -1,9 +1,17 @@
+import logging
+from sys import platform
 import pytest
 from jproperties import Properties
-
-from my_pages import *
+from pages.bcss_home_page import MainMenu
+from pages.call_and_recall_page import CallAndRecall
+from pages.create_a_plan_page import *
+from pages.generate_invitations_page import GenerateInvitations
+from pages.invitations_monitoring_page import InvitationsMonitoring
+from pages.invitations_plans_page import InvitationsPlans
+from pages.log_out_page import Logout
+from pages.navigation_bar_links import NavigationBar
 from utils.batch_processing import batch_processing
-from utils.oracle import OracleDB
+from utils.user_tools import UserTools
 
 
 @pytest.fixture
@@ -16,14 +24,21 @@ def smokescreen_properties() -> dict:
         dict: A dictionary containing the values loaded from the 'bcss_smokescreen_tests.properties' file.
     """
     configs = Properties()
-    with open('bcss_smokescreen_tests.properties', 'rb') as read_prop:
-        configs.load(read_prop)
+    if platform == "win32": # File path from content root is required on Windows OS
+        with open('tests/smokescreen/bcss_smokescreen_tests.properties', 'rb') as read_prop:
+            configs.load(read_prop)
+    elif platform == "darwin": # Only the filename is required on macOS
+        with open('bcss_smokescreen_tests.properties', 'rb') as read_prop:
+            configs.load(read_prop)
     return configs.properties
 
 
 @pytest.mark.smoke
 @pytest.mark.compartment1
-def test_compartment_1(page: Page, smokescreen_properties: dict) -> None:
+def test_create_invitations_plan(page: Page, smokescreen_properties: dict) -> None:
+    """
+    This is used to create the invitations plan. As it is not always needed it is separate to the main Compartment 1 function
+    """
     logging.info("Compartment 1 - Create Invitations Plan")
     UserTools.user_login(page, "Hub Manager State Registered")
     # Create plan - England
@@ -42,30 +57,41 @@ def test_compartment_1(page: Page, smokescreen_properties: dict) -> None:
     InvitationsPlans(page).invitations_plans_title.wait_for()
     logging.info("Invitation plan created")
 
+
 @pytest.mark.smoke
 @pytest.mark.smokescreen
 @pytest.mark.compartment1
 def test_compartment_1(page: Page) -> None:
+    """
+    This is the main compartment 1 function. It covers the following:
+    - Generating invitations based on the invitation plan
+    - Processes S1 (FIT) batches
+    - Processes S9 (FIT) batches
+    - Processes S10 (FIT) batches
+    """
     logging.info("Compartment 1 - Generate Invitations")
     UserTools.user_login(page, "Hub Manager State Registered")
 
     # Generate Invitations
+    NavigationBar(page).click_main_menu_link()
     MainMenu(page).go_to_call_and_recall_page()
     CallAndRecall(page).go_to_generate_invitations_page()
     logging.info("Generating invitations based on the invitations plan")
     GenerateInvitations(page).click_generate_invitations_button()
-    GenerateInvitations(page).wait_for_invitation_generation_complete()
+    self_referrals_available = GenerateInvitations(page).wait_for_invitation_generation_complete()
 
     # Print the batch of Pre-Invitation Letters - England
     logging.info("Compartment 1 - Process S1 Batch")
-    batch_processing(page, "S1", "Pre-invitation (FIT) (digital leaflet)", "S9 - Pre-invitation Sent")
-    nhs_number_df = batch_processing(page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent")
-    OracleDB().exec_bcss_timed_events(nhs_number_df)
+    if self_referrals_available:
+        batch_processing(page, "S1", "Pre-invitation (FIT) (digital leaflet)", "S9 - Pre-invitation Sent")
+    else:
+        logging.warning(
+            "Skipping S1 Pre-invitation (FIT) (digital leaflet) as no self referral invitations were generated")
+    batch_processing(page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent", True)
 
     # Print the batch of Invitation & Test Kit Letters - England
     logging.info("Compartment 1 - Process S9 Batch")
-    nhs_number_df = batch_processing(page, "S9", "Invitation & Test Kit (FIT)", "S10 - Invitation & Test Kit Sent")
-    OracleDB().exec_bcss_timed_events(nhs_number_df)
+    batch_processing(page, "S9", "Invitation & Test Kit (FIT)", "S10 - Invitation & Test Kit Sent", True)
 
     # Print a set of reminder letters
     logging.info("Compartment 1 - Process S10 Batch")

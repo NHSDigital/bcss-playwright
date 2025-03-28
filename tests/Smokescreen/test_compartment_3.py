@@ -1,13 +1,13 @@
 import logging
-from datetime import datetime
-
-from my_pages import *
+import pytest
+from playwright.sync_api import Page
+from pages.log_out_page import Logout
 from utils import fit_kit_logged
 from utils.batch_processing import batch_processing
-from utils.fit_kit_generation import create_fit_id_df
 from utils.fit_kit_logged import process_kit_data, update_kit_service_management_entity
 from utils.oracle import OracleDB
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
+from utils.user_tools import UserTools
 
 
 @pytest.mark.smokescreen
@@ -27,7 +27,7 @@ def test_compartment_3(page: Page) -> None:
         nhs_numbers.append(nhs_number)
         normal_flags.append(is_normal)  # Store the flag (True for normal, False for abnormal)
 
-    # (STEP - 4) Run two stored procedures to process any kit queue records at status BCSS_READY
+    # (STEP 4) Run two stored procedures to process any kit queue records at status BCSS_READY
     try:
         fit_kit_logged.execute_stored_procedures()
         logging.info("Stored procedures executed successfully.")
@@ -35,7 +35,7 @@ def test_compartment_3(page: Page) -> None:
         logging.error(f"Error executing stored procedures: {str(e)}")
         raise
 
-    # (STEP - 5) Check the results of the processed FIT kits have correctly updated the status of the associated subjects
+    # (STEP 5) Check the results of the processed FIT kits have correctly updated the status of the associated subjects
     # Verify subject event status based on normal or abnormal classification
     for nhs_number, is_normal in zip(nhs_numbers, normal_flags):
         expected_status = "S2 - Normal" if is_normal else "A8 - Abnormal"  # S2 for normal, A8 for abnormal

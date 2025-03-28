@@ -1,4 +1,5 @@
 import pytest
+from sys import platform
 from playwright.sync_api import Page, expect
 from pages.bcss_home_page import MainMenu
 from pages.screening_subject_search_page import ScreeningStatusSearchOptions, LatestEpisodeStatusSearchOptions, \
@@ -17,8 +18,12 @@ def tests_properties() -> dict:
         dict: A dictionary containing the values loaded from the 'bcss_tests.properties' file.
     """
     configs = Properties()
-    with open('bcss_tests.properties', 'rb') as read_prop:
-        configs.load(read_prop)
+    if platform == "win32":  # File path from content root is required on Windows OS
+        with open('tests/bcss_tests.properties', 'rb') as read_prop:
+            configs.load(read_prop)
+    elif platform == "darwin":  # Only the filename is required on macOS
+        with open('bcss_tests.properties', 'rb') as read_prop:
+            configs.load(read_prop)
     return configs.properties
 
 
