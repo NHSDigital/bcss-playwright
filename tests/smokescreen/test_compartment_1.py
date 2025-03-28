@@ -1,7 +1,16 @@
-import pytest
-from jproperties import Properties
+from sys import platform
 
-from my_pages import *
+import pytest
+import logging
+from jproperties import Properties
+from utils.user_tools import UserTools
+from pages.login_page import BcssLoginPage
+from pages.bcss_home_page import MainMenu
+from pages.call_and_recall_page import CallAndRecall
+from pages.invitations_monitoring_page import InvitationsMonitoring
+from pages.invitations_plans_page import InvitationsPlans
+from pages.create_a_plan_page import *
+from playwright.sync_api import Page
 from utils.batch_processing import batch_processing
 
 
@@ -15,14 +24,18 @@ def smokescreen_properties() -> dict:
         dict: A dictionary containing the values loaded from the 'bcss_smokescreen_tests.properties' file.
     """
     configs = Properties()
-    with open('bcss_smokescreen_tests.properties', 'rb') as read_prop:
-        configs.load(read_prop)
+    if platform == "win32":
+        with open('tests/smokescreen/bcss_smokescreen_tests.properties', 'rb') as read_prop:
+            configs.load(read_prop)
+    elif platform == "darwin":
+        with open('bcss_smokescreen_tests.properties', 'rb') as read_prop:
+            configs.load(read_prop)
     return configs.properties
 
 
 @pytest.mark.smoke
 @pytest.mark.compartment1
-def test_create_invitations_plan(page: Page) -> None:
+def test_create_invitations_plan(page: Page, smokescreen_properties: dict) -> None:
     """
     This is used to create the invitations plan. As it is not always needed it is separate to the main Compartment 1 function
     """
@@ -44,6 +57,7 @@ def test_create_invitations_plan(page: Page) -> None:
     InvitationsPlans(page).invitations_plans_title.wait_for()
     logging.info("Invitation plan created")
 
+
 @pytest.mark.smoke
 @pytest.mark.smokescreen
 @pytest.mark.compartment1
@@ -59,6 +73,7 @@ def test_compartment_1(page: Page) -> None:
     UserTools.user_login(page, "Hub Manager State Registered")
 
     # Generate Invitations
+    NavigationBar(page).click_main_menu_link()
     MainMenu(page).go_to_call_and_recall_page()
     CallAndRecall(page).go_to_generate_invitations_page()
     logging.info("Generating invitations based on the invitations plan")
@@ -70,7 +85,8 @@ def test_compartment_1(page: Page) -> None:
     if self_referrals_available:
         batch_processing(page, "S1", "Pre-invitation (FIT) (digital leaflet)", "S9 - Pre-invitation Sent")
     else:
-        logging.warning("Skipping S1 Pre-invitation (FIT) (digital leaflet) as no self referral invitations were generated")
+        logging.warning(
+            "Skipping S1 Pre-invitation (FIT) (digital leaflet) as no self referral invitations were generated")
     batch_processing(page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent", True)
 
     # Print the batch of Invitation & Test Kit Letters - England
