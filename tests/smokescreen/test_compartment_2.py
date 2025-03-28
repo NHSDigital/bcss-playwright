@@ -1,11 +1,16 @@
+import logging
+from datetime import datetime
 import pytest
 from playwright.sync_api import Page
-from my_pages import *
+from pages.fit_test_kits_page import FITTestKits
+from pages.bcss_home_page import MainMenu
+from pages.log_out_page import Logout
+from pages.navigation_bar_links import NavigationBar
+from pages.log_devices_page import LogDevices
 from utils.batch_processing import batch_processing
-from datetime import datetime
-from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
 from utils.fit_kit_generation import create_fit_id_df
-import logging
+from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
+from utils.user_tools import UserTools
 
 
 @pytest.mark.smoke
