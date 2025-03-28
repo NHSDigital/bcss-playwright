@@ -57,8 +57,9 @@ class GenerateInvitations:
 
         self_referrals_total = int(self.self_referrals_total.text_content().strip())
         if self_referrals_total >= 1:
-            logging.warning("No S1 Digital Leaflet batch will be generated")
             return True
+        else:
+            logging.warning("No S1 Digital Leaflet batch will be generated")
 
         value = self.planned_invitations_total.text_content().strip()  # Get text and remove extra spaces
         if int(value) < 5:

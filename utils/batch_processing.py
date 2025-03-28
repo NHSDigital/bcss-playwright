@@ -6,12 +6,13 @@ from pages.manage_active_batch_page import ManageActiveBatch
 from pages.archived_batch_list_page import ArchivedBatchList
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
 from utils.get_nhs_no_from_batch_id import get_nhs_no_from_batch_id
+from utils.oracle import OracleDB
 import os
 import pytest
 from playwright.sync_api import Page
 import logging
 
-def batch_processing(page: Page, batch_type: str, batch_description: str, latest_event_status: str):
+def batch_processing(page: Page, batch_type: str, batch_description: str, latest_event_status: str, run_timed_events: bool):
     logging.info(f"Processing {batch_type} - {batch_description} batch")
     NavigationBar(page).click_main_menu_link()
     MainMenu(page).go_to_communications_production_page()
@@ -96,4 +97,6 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
         logging.info(f"Successfully verified NHS number {first_nhs_no} with status {latest_event_status}")
     except Exception as e:
         pytest.fail(f"Verification failed for NHS number {first_nhs_no}: {str(e)}")
-    return nhs_no_df
+
+    if run_timed_events:
+        OracleDB().exec_bcss_timed_events(nhs_no_df)

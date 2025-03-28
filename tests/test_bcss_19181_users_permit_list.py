@@ -1,7 +1,6 @@
 import pytest
 from playwright.sync_api import Page
-from pages import (login_page as login, bcss_home_page as bcss_home, navigation_bar_links as nav_bar_links, log_out_page as logout,
-                   login_failure_screen as login_failure)
+from pages import (login_page as login, bcss_home_page as bcss_home, navigation_bar_links as nav_bar_links, log_out_page as logout, login_failure_screen as login_failure)
 from utils.oracle import OracleDB
 
 @pytest.fixture(scope="function", autouse=True)
