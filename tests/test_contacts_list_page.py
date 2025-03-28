@@ -2,7 +2,7 @@ import pytest
 from playwright.sync_api import Page, expect
 from utils.click_helper import click
 from pages.bcss_home_page import MainMenu
-from pages.login_page import BcssLoginPage
+from utils.user_tools import UserTools
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -11,7 +11,7 @@ def before_each(page: Page):
     Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the contacts list page
     """
     # Log in to BCSS
-    BcssLoginPage(page).login_as_user("BCSS401")
+    UserTools.user_login(page, "Hub Manager State Registered")
 
     # Go to contacts list page
     MainMenu(page).go_to_contacts_list_page()

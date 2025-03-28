@@ -1,6 +1,6 @@
 import pytest
 from playwright.sync_api import Page, expect
-from pages.login_page import BcssLoginPage
+from utils.user_tools import UserTools
 from pages.bcss_home_page import BcssHomePage
 from utils.date_time_utils import DateTimeUtils
 
@@ -12,7 +12,7 @@ def before_each(page: Page):
     being displayed
     """
     # Log in to BCSS
-    BcssLoginPage(page).login_as_user("BCSS401")
+    UserTools.user_login(page, "Hub Manager State Registered")
 
 
 @pytest.mark.smoke
@@ -53,7 +53,7 @@ def test_home_page_links_navigation(page: Page) -> None:
     homepage.click_refresh_alerts_link()
     # Verify that the 'last updated' timestamp matches the current date and time
     (expect(page.locator("form[name=\"refreshCockpit\"]")).to_contain_text
-    ("Refresh alerts (last updated :" + DateTimeUtils.current_datetime()))
+     ("Refresh alerts (last updated :" + DateTimeUtils.current_datetime()))
 
     # Click the user guide link
     with page.expect_popup() as page1_info:

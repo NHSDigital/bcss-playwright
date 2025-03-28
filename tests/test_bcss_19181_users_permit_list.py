@@ -1,5 +1,6 @@
 import pytest
 from playwright.sync_api import Page
+from utils.user_tools import UserTools
 from pages import (login_page as login, bcss_home_page as bcss_home, navigation_bar_links as nav_bar_links,
                    log_out_page as logout, login_failure_screen as login_failure)
 from utils.oracle import OracleDB
@@ -11,7 +12,7 @@ def before_test(page: Page):
     This fixture confirms that users can log in successfully in to BCSS whilst the approved users list is empty
     """
     # Log in to BCSS as bcss401 user, then log out
-    login.BcssLoginPage(page).login_as_user("BCSS401")
+    UserTools.user_login(page, "Hub Manager State Registered")
     bcss_home.BcssHomePage(page).bowel_cancer_screening_system_header_is_displayed()
     nav_bar_links.NavigationBar(page).click_log_out_link()
     logout.Logout(page).verify_log_out_page()
@@ -37,7 +38,7 @@ def test_only_users_on_approved_can_login_to_bcss(page: Page) -> None:
     logout.Logout(page).verify_log_out_page()
 
     # BCSS118 user fails to logs in to BCSS as they are not on the approved list
-    login.BcssLoginPage(page).login_as_user("BCSS118")
+    UserTools.user_login(page,"Screening Centre Manager")
     # Verify relevant error message is displayed
     login_failure.LoginFailureScreen(page).verify_login_failure_screen_is_displayed()
     page.close()

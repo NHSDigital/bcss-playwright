@@ -2,7 +2,7 @@ import pytest
 from playwright.sync_api import Page, expect
 from utils.click_helper import click
 from pages.bcss_home_page import MainMenu
-from pages.login_page import BcssLoginPage
+from utils.user_tools import UserTools
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -12,7 +12,7 @@ def before_each(page: Page):
     lynch surveillance page
     """
     # Log in to BCSS
-    BcssLoginPage(page).login_as_user("BCSS401")
+    UserTools.user_login(page, "Hub Manager State Registered")
 
     # Go to Lynch Surveillance page
     MainMenu(page).go_to_lynch_surveillance_page()

@@ -25,13 +25,14 @@ def smokescreen_properties() -> dict:
         dict: A dictionary containing the values loaded from the 'bcss_smokescreen_tests.properties' file.
     """
     configs = Properties()
-    if platform == "win32":
+    if platform == "win32": # File path from content root is required on Windows OS
         with open('tests/smokescreen/bcss_smokescreen_tests.properties', 'rb') as read_prop:
             configs.load(read_prop)
-    elif platform == "darwin":
+    elif platform == "darwin": # Only the filename is required on macOS
         with open('bcss_smokescreen_tests.properties', 'rb') as read_prop:
             configs.load(read_prop)
     return configs.properties
+
 
 
 @pytest.mark.smoke

@@ -1,4 +1,5 @@
 import pytest
+from sys import platform
 from playwright.sync_api import Page, expect
 from utils.click_helper import click
 from pages.bcss_home_page import MainMenu
@@ -16,8 +17,12 @@ def tests_properties() -> dict:
         dict: A dictionary containing the values loaded from the 'bcss_tests.properties' file.
     """
     configs = Properties()
-    with open('bcss_tests.properties', 'rb') as read_prop:
-        configs.load(read_prop)
+    if platform == "win32":  # File path from content root is required on Windows OS
+        with open('tests/bcss_tests.properties', 'rb') as read_prop:
+            configs.load(read_prop)
+    elif platform == "darwin":  # Only the filename is required on macOS
+        with open('bcss_tests.properties', 'rb') as read_prop:
+            configs.load(read_prop)
     return configs.properties
 
 
@@ -48,12 +53,10 @@ def test_call_and_recall_page_navigation(page: Page) -> None:
     expect(page.locator("#ntshPageTitle")).to_contain_text("Generate Invitations")
     click(page, page.get_by_role("link", name="Back"))
 
-
     # Invitation generation progress page loads as expected
     click(page, page.get_by_role("link", name="Invitation Generation Progress"))
     expect(page.locator("#ntshPageTitle")).to_contain_text("Invitation Generation Progress")
     click(page, page.get_by_role("link", name="Back"))
-
 
     # Non invitation days page loads as expected
     click(page, page.get_by_role("link", name="Non Invitation Days"))
@@ -64,7 +67,6 @@ def test_call_and_recall_page_navigation(page: Page) -> None:
     click(page, page.get_by_role("link", name="Age Extension Rollout Plans"))
     expect(page.locator("#page-title")).to_contain_text("Age Extension Rollout Plans")
     click(page, page.get_by_role("link", name="Back"))
-
 
     # Return to main menu
     click(page, page.get_by_role("link", name="Main Menu"))

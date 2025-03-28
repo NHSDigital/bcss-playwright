@@ -1,8 +1,8 @@
 import pytest
+from sys import platform
 from playwright.sync_api import Page, expect
 from utils.click_helper import click
 from pages.bcss_home_page import MainMenu
-from pages.login_page import BcssLoginPage
 from pages.screening_subject_search_page import ScreeningStatusSearchOptions, LatestEpisodeStatusSearchOptions, \
     SearchAreaSearchOptions
 from utils.user_tools import UserTools
@@ -19,8 +19,12 @@ def tests_properties() -> dict:
         dict: A dictionary containing the values loaded from the 'bcss_tests.properties' file.
     """
     configs = Properties()
-    with open('bcss_tests.properties', 'rb') as read_prop:
-        configs.load(read_prop)
+    if platform == "win32":  # File path from content root is required on Windows OS
+        with open('tests/bcss_tests.properties', 'rb') as read_prop:
+            configs.load(read_prop)
+    elif platform == "darwin":  # Only the filename is required on macOS
+        with open('bcss_tests.properties', 'rb') as read_prop:
+            configs.load(read_prop)
     return configs.properties
 
 
@@ -31,7 +35,7 @@ def before_each(page: Page):
     screening_subject_search page
     """
     # Log in to BCSS
-    BcssLoginPage(page).login_as_user("BCSS401")
+    UserTools.user_login(page, "Hub Manager State Registered")
 
     # Go to screening subject search page
     MainMenu(page).go_to_screening_subject_search_page()
