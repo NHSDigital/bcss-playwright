@@ -1,20 +1,18 @@
 from pages.navigation_bar_links import NavigationBar
 from pages.bcss_home_page import MainMenu
 from pages.communications_production_page import CommunicationsProduction
-from pages.active_batch_list_page import ActiveBatchList
 from pages.manage_active_batch_page import ManageActiveBatch
-from pages.archived_batch_list_page import ArchivedBatchList
+from pages.batch_list_page import ActiveBatchList, ArchivedBatchList
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
-from utils.get_nhs_no_from_batch_id import get_nhs_no_from_batch_id
-from utils.oracle import OracleDB
+from utils.oracle.oracle_specific_functions import get_nhs_no_from_batch_id
+from utils.oracle.oracle import OracleDB
 import os
 import pytest
 from playwright.sync_api import Page
 import logging
 
 
-def batch_processing(page: Page, batch_type: str, batch_description: str, latest_event_status: str,
-                     run_timed_events: bool = False) -> None:
+def batch_processing(page: Page, batch_type: str, batch_description: str, latest_event_status: str, run_timed_events: bool = False) -> None:
     """
     This util is used to process batches. It expects the following inputs:
     - page: This is playwright page variable
@@ -88,6 +86,7 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
 
     try:
         ActiveBatchList(page).batch_successfully_archived_msg.wait_for()
+
         logging.info(f"Batch {link_text} successfully archived")
     except Exception as e:
         pytest.fail(f"Batch successfully archived message is not shown: {str(e)}")

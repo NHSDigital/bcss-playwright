@@ -10,8 +10,7 @@ class CommunicationsProduction:
         self.archived_batch_list_page = self.page.get_by_role("link", name="Archived Batch List")
         self.letter_library_index_page = self.page.get_by_role("link", name="Letter Library Index")
         self.letter_signatory_page = self.page.get_by_role("link", name="Letter Signatory")
-        self.electronic_communication_management_page = self.page.get_by_role("link",
-                                                                              name="Electronic Communication Management")
+        self.electronic_communication_management_page = self.page.get_by_role("link", name="Electronic Communication Management")
 
     def go_to_active_batch_list_page(self):
         click(self.page, self.active_batch_list_page)
