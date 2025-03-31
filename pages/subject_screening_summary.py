@@ -18,7 +18,7 @@ class SubjectScreeningSummary:
         self.change_screening_status = self.page.get_by_label("Change Screening Status")
         self.reason = self.page.get_by_label("Reason", exact=True)
         self.update_subject_data = self.page.get_by_role("button", name="Update Subject Data")
-        self.close_FOBT_screening_episode = self.page.get_by_role("button", name="Close FOBT Screening Episode")
+        self.close_fobt_screening_episode = self.page.get_by_role("button", name="Close FOBT Screening Episode")
         self.go_to_a_page_to_advance_the_episode = self.page.get_by_text("go to a page to Advance the")
         self.go_to_a_page_to_close_the_episode = self.page.get_by_text("go to a page to Close the")
 
@@ -65,8 +65,8 @@ class SubjectScreeningSummary:
     def click_update_subject_data(self):
         click(self.page, self.update_subject_data)
 
-    def click_close_FOBT_screening_episode(self):
-        click(self.page, self.close_FOBT_screening_episode)
+    def click_close_fobt_screening_episode(self):
+        click(self.page, self.close_fobt_screening_episode)
 
     def go_to_a_page_to_advance_the_episode(self):
         click(self.page, self.go_to_a_page_to_advance_the_episode)

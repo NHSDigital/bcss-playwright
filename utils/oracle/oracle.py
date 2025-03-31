@@ -14,6 +14,9 @@ class OracleDB:
         self.password = os.getenv("pw")
 
     def connect_to_db(self) -> oracledb.Connection:
+        """
+        This function is used to connect to the Oracle DB. All the credentials are retrieved from a .env file
+        """
         try:
             logging.info("Attempting DB connection...")
             conn = oracledb.connect(user=self.user, password=self.password, dsn=self.dns)
@@ -22,8 +25,16 @@ class OracleDB:
         except Exception as queryExecutionError:
             logging.error(f"Failed to to extract subject ID with error: {queryExecutionError}")
 
+    def disconnect_from_db(self, conn):
+        conn.close()
+        logging.info("Connection Closed")
 
     def exec_bcss_timed_events(self, nhs_number_df):  # Executes bcss_timed_events when given NHS numbers
+        """
+        this function is used to execute bcss_timed_events against NHS Numbers.
+        It expects the nhs_numbers to be in a dataframe, and runs a for loop to get the subject_screening_id for each nhs number
+        Once a subject_screening_id is retrieved, it will then run the command: exec bcss_timed_events [<subject_id>,'Y']
+        """
         conn = self.connect_to_db()
         try:
             for index, row in nhs_number_df.iterrows():
@@ -40,10 +51,12 @@ class OracleDB:
             logging.error(f"Failed to to extract subject ID with error: {queryExecutionError}")
         finally:
             if conn is not None:
-                conn.close()
-                logging.info("Connection closed")
+                self.disconnect_from_db(conn)
 
     def get_subject_id_from_nhs_number(self, nhs_number) -> str:
+        """
+        This function is used to obtain the subject_screening_id of a subject when given an nhs number
+        """
         conn = self.connect_to_db()
         logging.info(f"Attempting to get subject_id from nhs number: {nhs_number}")
         cursor = conn.cursor()
@@ -55,6 +68,9 @@ class OracleDB:
         return subject_id
 
     def populate_ui_approved_users_table(self, user: str):  # To add users to the UI_APPROVED_USERS table
+        """
+        This function is used to add a user to the UI_APPROVED_USERS table
+        """
         conn = self.connect_to_db()
         try:
             logging.info("Attempting to write to the db...")
@@ -66,15 +82,17 @@ class OracleDB:
             logging.error(f"Failed to write to the DB! with write error {dbWriteError}")
         finally:
             if conn is not None:
-                conn.close()
-                logging.info("Connection closed")
+                self.disconnect_from_db(conn)
 
     def delete_all_users_from_approved_users_table(self):  # To remove all users from the UI_APPROVED_USERS table
+        """
+        This function is used to remove users from the UI_APPROVED_USERS table where OE_USER_CODE is not null
+        """
         conn = self.connect_to_db()
         try:
             logging.info("Attempting to delete users from DB table...")
             cursor = conn.cursor()
-            cursor.execute(f"DELETE FROM UI_APPROVED_USERS WHERE OE_USER_CODE is not null")
+            cursor.execute("DELETE FROM UI_APPROVED_USERS WHERE OE_USER_CODE is not null")
             conn.commit()
             logging.info("DB table values successfully deleted!")
         except Exception as dbValuesDeleteError:
@@ -82,25 +100,31 @@ class OracleDB:
                 f"Failed to delete values from the DB table! with data deletion error {dbValuesDeleteError}")
         finally:
             if conn is not None:
-                conn.close()
-                logging.info("Connection Closed")
+                self.disconnect_from_db(conn)
 
     def execute_query(self, query: str) -> pd.DataFrame:  # To use when "select xxxx" (stored procedures)
+        """
+        This is used to execute any sql queries.
+        A query is provided and then the result is returned as a pandas dataframe
+        """
         conn = self.connect_to_db()
         engine = create_engine('oracle+oracledb://', creator=lambda: conn)
         try:
-            logging.info(f"Attempting to execute query")
+            logging.info("Attempting to execute query")
             df = pd.read_sql(query, engine)
-            logging.info("query execution successful!")
+            logging.info("Query execution successful!")
         except Exception as executionError:
             logging.error(f"Failed to execute query with execution error {executionError}")
         finally:
             if conn is not None:
-                conn.close()
-                logging.info("Connection Closed - Returning results")
+                self.disconnect_from_db(conn)
         return df
 
     def execute_stored_procedure(self, procedure: str):  # To use when "exec xxxx" (stored procedures)
+        """
+        This is to be used whenever we need to execute a stored procedure.
+        It is provided with the stored procedure name and then executes it
+        """
         conn = self.connect_to_db()
         try:
             logging.info(f"Attempting to execute stored procedure: {procedure}")
@@ -112,10 +136,13 @@ class OracleDB:
             logging.error(f"Failed to execute stored procedure with execution error: {executionError}")
         finally:
             if conn is not None:
-                conn.close()
-                logging.info("Connection Closed")
+                self.disconnect_from_db(conn)
 
     def update_or_insert_data_to_table(self, statement, params):  # To update or insert data into a table
+        """
+        This is used to update or insert data into a table.
+        It is provided with the SQL statement along with the arguments
+        """
         conn = self.connect_to_db()
         try:
             logging.info("Attempting to insert/update table")
@@ -127,5 +154,4 @@ class OracleDB:
             logging.error(f"Failed to insert/update values from the DB table! with error {dbUpdateInsertError}")
         finally:
             if conn is not None:
-                conn.close()
-                logging.info("Connection Closed")
+                self.disconnect_from_db(conn)

@@ -11,19 +11,46 @@ from utils.batch_processing import batch_processing
 from utils.fit_kit_generation import create_fit_id_df
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
 from utils.user_tools import UserTools
+from jproperties import Properties
+from sys import platform
 
+@pytest.fixture
+def smokescreen_properties() -> dict:
+    """
+    Reads the 'bcss_smokescreen_tests.properties' file and populates a 'Properties' object.
+    Returns a dictionary of properties for use in tests.
+
+    Returns:
+        dict: A dictionary containing the values loaded from the 'bcss_smokescreen_tests.properties' file.
+    """
+    configs = Properties()
+    if platform == "win32": # File path from content root is required on Windows OS
+        with open('tests/smokescreen/bcss_smokescreen_tests.properties', 'rb') as read_prop:
+            configs.load(read_prop)
+    elif platform == "darwin": # Only the filename is required on macOS
+        with open('bcss_smokescreen_tests.properties', 'rb') as read_prop:
+            configs.load(read_prop)
+    return configs.properties
 
 @pytest.mark.smoke
 @pytest.mark.smokescreen
 @pytest.mark.compartment2
-def test_compartment_2(page: Page) -> None:
+def test_compartment_2(page: Page, smokescreen_properties: dict) -> None:
+    """
+    This is the main compartment 2 function. It covers the following:
+    - Obtaining test data from the DB
+    - Creating FIT Device IDs from the obtained test data
+    - Logging FIT Devices
+    - Logging FIT Devices as Spoilt
+    - Processing the generated S3 batch
+    """
     UserTools.user_login(page, "Hub Manager State Registered")
 
     MainMenu(page).go_to_fit_test_kits_page()
     FITTestKits(page).go_to_log_devices_page()
     subjectdf = create_fit_id_df()
 
-    for subject in range(9):
+    for subject in range(int(smokescreen_properties["c2_normal_kits_to_log"])):
         fit_device_id = subjectdf["fit_device_id"].iloc[subject]
         logging.info(f"Logging FIT Device ID: {fit_device_id}")
         LogDevices(page).fill_fit_device_id_field(fit_device_id)
@@ -33,8 +60,8 @@ def test_compartment_2(page: Page) -> None:
         try:
             LogDevices(page).verify_successfully_logged_device_text()
             logging.info(f"{fit_device_id} Successfully logged")
-        except:
-            pytest.fail(f"{fit_device_id} unsuccessfully logged")
+        except Exception as e:
+            pytest.fail(f"{fit_device_id} unsuccessfully logged: {str(e)}")
 
     nhs_no = subjectdf["subject_nhs_number"].iloc[0]
     try:
@@ -56,8 +83,8 @@ def test_compartment_2(page: Page) -> None:
     try:
         LogDevices(page).verify_successfully_logged_device_text()
         logging.info(f"{spoilt_fit_device_id} Successfully logged")
-    except:
-        pytest.fail(f"{spoilt_fit_device_id} Unsuccessfully logged")
+    except Exception as e:
+        pytest.fail(f"{spoilt_fit_device_id} Unsuccessfully logged: {str(e)}")
 
     batch_processing(page, "S3", "Retest (Spoilt) (FIT)", "S11 - Retest Kit Sent (Spoilt)")
 

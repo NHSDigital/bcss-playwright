@@ -8,7 +8,7 @@ from pages.bcss_home_page import MainMenu
 from pages.call_and_recall_page import CallAndRecall
 from pages.invitations_monitoring_page import InvitationsMonitoring
 from pages.invitations_plans_page import InvitationsPlans
-from pages.create_a_plan_page import *
+from pages.create_a_plan_page import CreateAPlan
 from pages.navigation_bar_links import NavigationBar
 from pages.generate_invitations_page import GenerateInvitations
 from playwright.sync_api import Page
