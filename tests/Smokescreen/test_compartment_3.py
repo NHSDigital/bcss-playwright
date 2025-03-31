@@ -35,7 +35,7 @@ def test_compartment_3(page: Page) -> None:
         logging.error(f"Error executing stored procedures: {str(e)}")
         raise
 
-    # (STEP 5) Check the results of the processed FIT kits have correctly updated the status of the associated subjects
+    # (STEP- 5) Check the results of the processed FIT kits have correctly updated the status of the associated subjects
     # Verify subject event status based on normal or abnormal classification
     for nhs_number, is_normal in zip(nhs_numbers, normal_flags):
         expected_status = "S2 - Normal" if is_normal else "A8 - Abnormal"  # S2 for normal, A8 for abnormal
