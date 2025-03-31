@@ -21,37 +21,37 @@ class ScreeningStatusSearchOptions:
         self.select_status = self.page.locator("#A_C_ScreeningStatus")
 
     # Select screening status options
-    def select_status_call(self):
+    def select_status_call(self)->None:
         self.select_status.select_option(self.CALL_STATUS)
 
-    def select_status_inactive(self):
+    def select_status_inactive(self)->None:
         self.select_status.select_option(self.INACTIVE_STATUS)
 
-    def select_status_recall(self):
+    def select_status_recall(self)->None:
         self.select_status.select_option(self.RECALL_STATUS)
 
-    def select_status_opt_in(self):
+    def select_status_opt_in(self)->None:
         self.select_status.select_option(self.OPT_IN_STATUS)
 
-    def select_status_self_referral(self):
+    def select_status_self_referral(self)->None:
         self.select_status.select_option(self.SELF_REFERRAL_STATUS)
 
-    def select_status_surveillance(self):
+    def select_status_surveillance(self)->None:
         self.select_status.select_option(self.SURVEILLANCE_STATUS)
 
-    def select_status_seeking_further_data(self):
+    def select_status_seeking_further_data(self)->None:
         self.select_status.select_option(self.SEEKING_FURTHER_DATA_STATUS)
 
-    def select_status_ceased(self):
+    def select_status_ceased(self)->None:
         self.select_status.select_option(self.CEASED_STATUS)
 
-    def select_status_bowel_scope(self):
+    def select_status_bowel_scope(self)->None:
         self.select_status.select_option(self.BOWEL_SCOPE_STATUS)
 
-    def select_status_lynch_surveillance(self):
+    def select_status_lynch_surveillance(self)->None:
         self.select_status.select_option(self.LYNCH_SURVEILLANCE_STATUS)
 
-    def select_status_lynch_self_referral(self):
+    def select_status_lynch_self_referral(self)->None:
         self.select_status.select_option(self.LYNCH_SELF_REFERRAL_STATUS)
 
 
@@ -67,13 +67,13 @@ class LatestEpisodeStatusSearchOptions:
         self.select_status = self.page.locator("#A_C_EpisodeStatus")
 
     # Select latest episode status options
-    def select_status_open_paused(self):
+    def select_status_open_paused(self)->None:
         self.select_status.select_option(self.OPEN_PAUSED_STATUS)
 
-    def select_status_closed(self):
+    def select_status_closed(self)->None:
         self.select_status.select_option(self.CLOSED_STATUS)
 
-    def select_status_no_episode(self):
+    def select_status_no_episode(self)->None:
         self.select_status.select_option(self.NO_EPISODE_STATUS)
 
 
@@ -92,20 +92,20 @@ class SearchAreaSearchOptions:
         self.select_area = self.page.locator("#A_C_SEARCH_DOMAIN")
 
     # Select search area options
-    def select_search_area_home_hub(self):
+    def select_search_area_home_hub(self)->None:
         self.select_area.select_option(self.SEARCH_AREA_HOME_HUB)
 
-    def select_search_area_gp_practice(self):
+    def select_search_area_gp_practice(self)->None:
         self.select_area.select_option(self.SEARCH_AREA_GP_PRACTICE)
 
-    def select_search_area_ccg(self):
+    def select_search_area_ccg(self)->None:
         self.select_area.select_option(self.SEARCH_AREA_CCG)
 
-    def select_search_area_screening_centre(self):
+    def select_search_area_screening_centre(self)->None:
         self.select_area.select_option(self.SEARCH_AREA_SCREENING_CENTRE)
 
-    def select_search_area_other_hub(self):
+    def select_search_area_other_hub(self)->None:
         self.select_area.select_option(self.SEARCH_AREA_OTHER_HUB)
 
-    def select_search_area_whole_database(self):
+    def select_search_area_whole_database(self)->None:
         self.select_area.select_option(self.SEARCH_AREA_WHOLE_DATABASE)

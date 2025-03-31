@@ -15,11 +15,11 @@ class ManageActiveBatch:
         self.confirm_button_text = self.page.locator('text="Confirm Printed"')
         self.reprepare_batch_text = self.page.locator('text="Re-Prepare Batch"')
 
-    def click_prepare_button(self):
+    def click_prepare_button(self)->None:
         click(self.page, self.prepare_button)
 
-    def click_retrieve_button(self):
+    def click_retrieve_button(self)->None:
         click(self.page, self.retrieve_button)
 
-    def click_confirm_button(self):
+    def click_confirm_button(self)->None:
         click(self.page, self.confirm_button)

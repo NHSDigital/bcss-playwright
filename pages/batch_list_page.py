@@ -17,38 +17,38 @@ class BatchList:
         self.table_data = self.page.locator("td")
         self.batch_successfully_archived_msg = self.page.locator('text="Batch Successfully Archived and Printed"')
 
-    def verify_table_data(self, value):
+    def verify_table_data(self, value)->None:
         expect(self.table_data.filter(has_text=value)).to_be_visible()
 
-    def enter_id_filter(self, search_text: str):
+    def enter_id_filter(self, search_text: str)->None:
         self.id_filter.fill(search_text)
         self.id_filter.press("Enter")
 
-    def enter_type_filter(self, search_text: str):
+    def enter_type_filter(self, search_text: str)->None:
         self.type_filter.fill(search_text)
         self.type_filter.press("Enter")
 
-    def enter_original_filter(self, search_text: str):
+    def enter_original_filter(self, search_text: str)->None:
         self.original_filter.fill(search_text)
         self.original_filter.press("Enter")
 
-    def enter_event_code_filter(self, search_text: str):
+    def enter_event_code_filter(self, search_text: str)->None:
         self.event_code_filter.fill(search_text)
         self.event_code_filter.press("Enter")
 
-    def enter_description_filter(self, search_text: str):
+    def enter_description_filter(self, search_text: str)->None:
         self.description_filter.fill(search_text)
         self.description_filter.press("Enter")
 
-    def enter_batch_split_by_filter(self, search_text: str):
+    def enter_batch_split_by_filter(self, search_text: str)->None:
         self.batch_split_by_filter.fill(search_text)
         self.batch_split_by_filter.press("Enter")
 
-    def enter_screening_centre_filter(self, search_text: str):
+    def enter_screening_centre_filter(self, search_text: str)->None:
         self.screening_centre_filter.fill(search_text)
         self.screening_centre_filter.press("Enter")
 
-    def enter_count_filter(self, search_text: str):
+    def enter_count_filter(self, search_text: str)->None:
         self.count_filter.fill(search_text)
         self.count_filter.press("Enter")
 

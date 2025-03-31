@@ -12,17 +12,17 @@ class CommunicationsProduction:
         self.letter_signatory_page = self.page.get_by_role("link", name="Letter Signatory")
         self.electronic_communication_management_page = self.page.get_by_role("link", name="Electronic Communication Management")
 
-    def go_to_active_batch_list_page(self):
+    def go_to_active_batch_list_page(self)->None:
         click(self.page, self.active_batch_list_page)
 
-    def go_to_archived_batch_list_page(self):
+    def go_to_archived_batch_list_page(self)->None:
         click(self.page, self.archived_batch_list_page)
 
-    def go_to_letter_library_index_page(self):
+    def go_to_letter_library_index_page(self)->None:
         click(self.page, self.letter_library_index_page)
 
-    def go_to_letter_signatory_page(self):
+    def go_to_letter_signatory_page(self)->None:
         click(self.page, self.letter_signatory_page)
 
-    def go_to_electronic_communication_management_page(self):
+    def go_to_electronic_communication_management_page(self)->None:
         click(self.page, self.electronic_communication_management_page)

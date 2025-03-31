@@ -25,59 +25,59 @@ class SubjectScreeningPage:
         self.search_button = self.page.get_by_role("button", name="Search")
         self.search_area = self.page.locator("#A_C_SEARCH_DOMAIN")
 
-    def select_whole_database_search_area(self):
+    def select_whole_database_search_area(self)->None:
         self.search_area.select_option("07")
 
-    def click_search_button(self):
+    def click_search_button(self)->None:
         click(self.page, self.search_button)
 
-    def click_episodes_filter(self):
+    def click_episodes_filter(self)->None:
         self.episodes_filter.check()
 
-    def click_demographics_filter(self):
+    def click_demographics_filter(self)->None:
         self.demographics_filter.check()
 
-    def click_datasets_filter(self):
+    def click_datasets_filter(self)->None:
         self.datasets_filter.check()
 
-    def click_nhs_number_filter(self):
+    def click_nhs_number_filter(self)->None:
         click(self.page, self.nhs_number_filter)
 
-    def click_surname_filter(self):
+    def click_surname_filter(self)->None:
         click(self.page, self.surname_filter)
 
-    def click_soundex_filter(self):
+    def click_soundex_filter(self)->None:
         self.soundex_filter.check()
 
-    def click_forename_filter(self):
+    def click_forename_filter(self)->None:
         click(self.page, self.forename_filter)
 
-    def click_date_of_birth_filter(self):
+    def click_date_of_birth_filter(self)->None:
         click(self.page, self.date_of_birth_filter)
 
-    def click_date_of_birth_range_filter(self):
+    def click_date_of_birth_range_filter(self)->None:
         click(self.page, self.data_of_birth_range_filter)
 
-    def click_postcode_filter(self):
+    def click_postcode_filter(self)->None:
         click(self.page, self.postcode_filter)
 
-    def click_episodes_closed_date_filter(self):
+    def click_episodes_closed_date_filter(self)->None:
         click(self.page, self.episode_closed_date_filter)
 
-    def click_kit_batch_number_filter(self):
+    def click_kit_batch_number_filter(self)->None:
         click(self.page, self.kit_batch_number_filter)
 
-    def click_kit_number_filter(self):
+    def click_kit_number_filter(self)->None:
         click(self.page, self.kit_number_filter)
 
-    def click_fit_device_id_filter(self):
+    def click_fit_device_id_filter(self)->None:
         click(self.page, self.fit_device_id_filter)
 
-    def click_laboratory_name_filter(self):
+    def click_laboratory_name_filter(self)->None:
         click(self.page, self.laboratory_name_filter)
 
-    def click_laboratory_test_date_filter(self):
+    def click_laboratory_test_date_filter(self)->None:
         click(self.page, self.laboratory_test_date_filter)
 
-    def click_diagnostic_test_actual_date_filter(self):
+    def click_diagnostic_test_actual_date_filter(self)->None:
         click(self.page, self.diagnostic_test_actual_date_filter)

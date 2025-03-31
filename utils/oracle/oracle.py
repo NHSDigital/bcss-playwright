@@ -25,11 +25,11 @@ class OracleDB:
         except Exception as queryExecutionError:
             logging.error(f"Failed to to extract subject ID with error: {queryExecutionError}")
 
-    def disconnect_from_db(self, conn):
+    def disconnect_from_db(self, conn)->None:
         conn.close()
         logging.info("Connection Closed")
 
-    def exec_bcss_timed_events(self, nhs_number_df):  # Executes bcss_timed_events when given NHS numbers
+    def exec_bcss_timed_events(self, nhs_number_df)->None: # Executes bcss_timed_events when given NHS numbers
         """
         this function is used to execute bcss_timed_events against NHS Numbers.
         It expects the nhs_numbers to be in a dataframe, and runs a for loop to get the subject_screening_id for each nhs number
@@ -67,7 +67,7 @@ class OracleDB:
         logging.info(f"Able to extract subject ID: {subject_id}")
         return subject_id
 
-    def populate_ui_approved_users_table(self, user: str):  # To add users to the UI_APPROVED_USERS table
+    def populate_ui_approved_users_table(self, user: str)->None:  # To add users to the UI_APPROVED_USERS table
         """
         This function is used to add a user to the UI_APPROVED_USERS table
         """
@@ -84,7 +84,7 @@ class OracleDB:
             if conn is not None:
                 self.disconnect_from_db(conn)
 
-    def delete_all_users_from_approved_users_table(self):  # To remove all users from the UI_APPROVED_USERS table
+    def delete_all_users_from_approved_users_table(self)->None:  # To remove all users from the UI_APPROVED_USERS table
         """
         This function is used to remove users from the UI_APPROVED_USERS table where OE_USER_CODE is not null
         """
@@ -120,7 +120,7 @@ class OracleDB:
                 self.disconnect_from_db(conn)
         return df
 
-    def execute_stored_procedure(self, procedure: str):  # To use when "exec xxxx" (stored procedures)
+    def execute_stored_procedure(self, procedure: str)->None:  # To use when "exec xxxx" (stored procedures)
         """
         This is to be used whenever we need to execute a stored procedure.
         It is provided with the stored procedure name and then executes it
@@ -138,7 +138,7 @@ class OracleDB:
             if conn is not None:
                 self.disconnect_from_db(conn)
 
-    def update_or_insert_data_to_table(self, statement, params):  # To update or insert data into a table
+    def update_or_insert_data_to_table(self, statement, params)->None:  # To update or insert data into a table
         """
         This is used to update or insert data into a table.
         It is provided with the SQL statement along with the arguments

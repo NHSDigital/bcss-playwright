@@ -11,14 +11,14 @@ class ContactsListPage:
         self.maintain_contacts_page = self.page.get_by_role("link", name="Maintain Contacts")
         self.my_preference_settings_page = self.page.get_by_role("link", name="My Preference Settings")
 
-    def go_to_view_contacts_page(self):
+    def go_to_view_contacts_page(self)->None:
         click(self.page, self.view_contacts_page)
 
-    def go_to_edit_my_contact_details_page(self):
+    def go_to_edit_my_contact_details_page(self)->None:
         click(self.page, self.edit_my_contact_details_page)
 
-    def go_to_maintain_contacts_details_page(self):
+    def go_to_maintain_contacts_details_page(self)->None:
         click(self.page, self.maintain_contacts_page)
 
-    def go_to_my_preference_settings_page(self):
+    def go_to_my_preference_settings_page(self)->None:
         click(self.page, self.my_preference_settings_page)

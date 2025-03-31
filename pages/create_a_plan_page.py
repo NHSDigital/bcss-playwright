@@ -15,26 +15,26 @@ class CreateAPlan:
         self.note_field = self.page.get_by_placeholder("Enter note")
         self.save_note_button = self.page.locator("#saveNote").get_by_role("button", name="Save")
 
-    def click_set_all_button(self):
+    def click_set_all_button(self)->None:
         click(self.page, self.set_all_button)
 
-    def fill_daily_invitation_rate_field(self, value: str):
+    def fill_daily_invitation_rate_field(self, value: str)->None:
         self.daily_invitation_rate_field.fill(value)
 
-    def fill_weekly_invitation_rate_field(self, value):
+    def fill_weekly_invitation_rate_field(self, value)->None:
         self.weekly_invitation_rate_field.fill(value)
 
-    def click_update_button(self):
+    def click_update_button(self)->None:
         click(self.page, self.update_button)
 
-    def click_confirm_button(self):
+    def click_confirm_button(self)->None:
         click(self.page, self.confirm_button)
 
-    def click_save_button(self):
+    def click_save_button(self)->None:
         click(self.page, self.save_button)
 
-    def fill_note_field(self, value):
+    def fill_note_field(self, value)->None:
         self.note_field.fill(value)
 
-    def click_save_note_button(self):
+    def click_save_note_button(self)->None:
         click(self.page, self.save_note_button)

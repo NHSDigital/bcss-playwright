@@ -9,10 +9,10 @@ class Logout:
         # Call and Recall - page links
         self.log_out_msg = self.page.get_by_role("heading", name="You have logged out")
 
-    def verify_log_out_page(self):
+    def verify_log_out_page(self)->None:
         expect(self.log_out_msg).to_be_visible()
 
-    def log_out(self):
+    def log_out(self)->None:
         logging.info("Test Complete - Logging Out")
         NavigationBar(self.page).click_log_out_link()
         expect(self.log_out_msg).to_be_visible()

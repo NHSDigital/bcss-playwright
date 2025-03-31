@@ -12,20 +12,20 @@ class NavigationBar:
         self.help_link = self.page.get_by_role("link", name="Help")
         self.log_out_link = self.page.get_by_role("link", name="Log-out")
 
-    def click_main_menu_link(self):
+    def click_main_menu_link(self)->None:
         for _ in range(3):  # Try up to 3 times
             if self.main_menu_link.is_visible():
                 self.main_menu_link.click()
                 return  # Exit if successful
 
-    def click_back_link(self):
+    def click_back_link(self)->None:
         click(self.page, self.back_link)
 
-    def click_select_org_link(self):
+    def click_select_org_link(self)->None:
         click(self.page, self.click_select_org_link)
 
-    def click_help_link(self):
+    def click_help_link(self)->None:
         click(self.page, self.help_link)
 
-    def click_log_out_link(self):
+    def click_log_out_link(self)->None:
         click(self.page, self.log_out_link)

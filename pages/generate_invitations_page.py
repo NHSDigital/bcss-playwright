@@ -14,10 +14,10 @@ class GenerateInvitations:
         self.planned_invitations_total = self.page.locator("#col8_total")
         self.self_referrals_total = self.page.locator("#col9_total")
 
-    def click_generate_invitations_button(self):
+    def click_generate_invitations_button(self)->None:
         click(self.page, self.generate_invitations_button)
 
-    def click_refresh_button(self):
+    def click_refresh_button(self)->None:
         click(self.page, self.refresh_button)
 
     def wait_for_invitation_generation_complete(self) -> bool:
