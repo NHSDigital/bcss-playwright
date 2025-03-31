@@ -27,13 +27,7 @@ class OracleDB:
         conn = self.connect_to_db()
         try:
             for index, row in nhs_number_df.iterrows():
-                logging.info(f"Attempting to get subject_id from nhs number: {row["subject_nhs_number"]}")
-                cursor = conn.cursor()
-                cursor.execute(
-                    f"SELECT SCREENING_SUBJECT_ID FROM SCREENING_SUBJECT_T WHERE SUBJECT_NHS_NUMBER = {int(row["subject_nhs_number"])}")
-                result = cursor.fetchall()
-                subject_id = result[0][0]
-                logging.info(f"Able to extract subject ID: {subject_id}")
+                subject_id = self.get_subject_id_from_nhs_number(row["subject_nhs_number"])
                 try:
                     logging.info(
                         f"Attempting to execute stored procedure: {f"'bcss_timed_events', [{subject_id},'Y']"}")
@@ -48,6 +42,17 @@ class OracleDB:
             if conn is not None:
                 conn.close()
                 logging.info("Connection closed")
+
+    def get_subject_id_from_nhs_number(self, nhs_number) -> str:
+        conn = self.connect_to_db()
+        logging.info(f"Attempting to get subject_id from nhs number: {nhs_number}")
+        cursor = conn.cursor()
+        cursor.execute(
+            f"SELECT SCREENING_SUBJECT_ID FROM SCREENING_SUBJECT_T WHERE SUBJECT_NHS_NUMBER = {int(nhs_number)}")
+        result = cursor.fetchall()
+        subject_id = result[0][0]
+        logging.info(f"Able to extract subject ID: {subject_id}")
+        return subject_id
 
     def populate_ui_approved_users_table(self, user: str):  # To add users to the UI_APPROVED_USERS table
         conn = self.connect_to_db()
@@ -93,7 +98,7 @@ class OracleDB:
             if conn is not None:
                 conn.close()
                 logging.info("Connection Closed - Returning results")
-                return df
+        return df
 
     def execute_stored_procedure(self, procedure: str):  # To use when "exec xxxx" (stored procedures)
         conn = self.connect_to_db()
