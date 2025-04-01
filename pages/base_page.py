@@ -103,3 +103,15 @@ class BasePage:
 
     def go_to_screening_subject_search_page(self)->None:
         click(self.page, self.screening_subject_search_page)
+
+    def click(self, locator) -> None:
+        try:
+            self.page.wait_for_load_state('load')
+            self.page.wait_for_load_state('domcontentloaded')
+            locator.wait_for("attached")
+            locator.wait_for("visible")
+            locator.click()
+
+        except Exception as locatorClickError:
+            print(f"Failed to click element with error: {locatorClickError}, trying again...")
+            locator.click()
