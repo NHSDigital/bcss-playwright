@@ -1,5 +1,6 @@
 from playwright.sync_api import Page
 from utils.click_helper import click
+from enum import Enum
 
 class SubjectScreeningPage:
     def __init__(self, page: Page):
@@ -23,10 +24,10 @@ class SubjectScreeningPage:
         self.laboratory_test_date_filter = self.page.get_by_role("textbox", name="Laboratory Test Date")
         self.diagnostic_test_actual_date_filter = self.page.get_by_role("textbox", name="Diagnostic Test Actual Date")
         self.search_button = self.page.get_by_role("button", name="Search")
-        self.search_area = self.page.locator("#A_C_SEARCH_DOMAIN")
 
-    def select_whole_database_search_area(self)->None:
-        self.search_area.select_option("07")
+        self.select_screening_status = self.page.locator("#A_C_ScreeningStatus")
+        self.select_episode_status = self.page.locator("#A_C_EpisodeStatus")
+        self.select_search_area = self.page.locator("#A_C_SEARCH_DOMAIN")
 
     def click_search_button(self)->None:
         click(self.page, self.search_button)
@@ -81,3 +82,38 @@ class SubjectScreeningPage:
 
     def click_diagnostic_test_actual_date_filter(self)->None:
         click(self.page, self.diagnostic_test_actual_date_filter)
+
+    def select_screening_status_options(self, option: str)->None:
+        self.select_screening_status.select_option(option)
+
+    def select_episode_status_option(self, option: str)->None:
+        self.select_episode_status.select_option(option)
+
+    def select_search_area_option(self, option: str)->None:
+        self.select_search_area.select_option(option)
+
+class ScreeningStatusSearchOptions(Enum):
+    CALL_STATUS = "4001"
+    INACTIVE_STATUS = "4002"
+    RECALL_STATUS = "4004"
+    OPT_IN_STATUS = "4003"
+    SELF_REFERRAL_STATUS = "4005"
+    SURVEILLANCE_STATUS = "4006"
+    SEEKING_FURTHER_DATA_STATUS = "4007"
+    CEASED_STATUS = "4008"
+    BOWEL_SCOPE_STATUS = "4009"
+    LYNCH_SURVEILLANCE_STATUS = "306442"
+    LYNCH_SELF_REFERRAL_STATUS = "307129"
+
+class LatestEpisodeStatusSearchOptions(Enum):
+    OPEN_PAUSED_STATUS = "1"
+    CLOSED_STATUS = "2"
+    NO_EPISODE_STATUS = "3"
+
+class SearchAreaSearchOptions(Enum):
+    SEARCH_AREA_HOME_HUB = "01"
+    SEARCH_AREA_GP_PRACTICE = "02"
+    SEARCH_AREA_CCG = "03"
+    SEARCH_AREA_SCREENING_CENTRE = "05"
+    SEARCH_AREA_OTHER_HUB = "06"
+    SEARCH_AREA_WHOLE_DATABASE = "07"

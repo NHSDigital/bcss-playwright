@@ -15,6 +15,7 @@ def get_kit_id_from_db() -> pd.DataFrame:
     and device_id is null
     and tk.invalidated_date is null
     and se.latest_event_status_id in (11198, 11213)
+    order by tk.kitid DESC
     fetch first 10 rows only""")
     return kit_id_df
 
