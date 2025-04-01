@@ -33,10 +33,10 @@ class BasePage:
         self.bowel_cancer_screening_system_header = self.page.locator("#ntshAppTitle")
 
     def click_main_menu_link(self)->None:
-         for _ in range(3):  # Try up to 3 times
-             if self.main_menu_link.is_visible():
-                 click(self.page, self.main_menu_link)
-                 return  # Exit if successful
+        for _ in range(3):  # Try up to 3 times
+            if self.main_menu_link.is_visible():
+                click(self.page, self.main_menu_link)
+                return  # Exit if successful
 
     def click_log_out_link(self)->None:
         click(self.page, self.log_out_link)
