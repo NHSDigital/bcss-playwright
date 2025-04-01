@@ -3,9 +3,8 @@ from datetime import datetime
 import pytest
 from playwright.sync_api import Page
 from pages.fit_test_kits_page import FITTestKits
-from pages.bcss_home_page import MainMenu
+from pages.base_page import BasePage
 from pages.log_out_page import Logout
-from pages.navigation_bar_links import NavigationBar
 from pages.log_devices_page import LogDevices
 from utils.batch_processing import batch_processing
 from utils.fit_kit_generation import create_fit_id_df
@@ -46,7 +45,7 @@ def test_compartment_2(page: Page, smokescreen_properties: dict) -> None:
     """
     UserTools.user_login(page, "Hub Manager State Registered")
 
-    MainMenu(page).go_to_fit_test_kits_page()
+    BasePage(page).go_to_fit_test_kits_page()
     FITTestKits(page).go_to_log_devices_page()
     subjectdf = create_fit_id_df()
 
@@ -71,8 +70,8 @@ def test_compartment_2(page: Page, smokescreen_properties: dict) -> None:
     except Exception as e:
         pytest.fail(f"Verification failed for NHS number {nhs_no}: {str(e)}")
 
-    NavigationBar(page).click_main_menu_link()
-    MainMenu(page).go_to_fit_test_kits_page()
+    BasePage(page).click_main_menu_link()
+    BasePage(page).go_to_fit_test_kits_page()
     FITTestKits(page).go_to_log_devices_page()
     spoilt_fit_device_id = subjectdf["fit_device_id"].iloc[-1]
     logging.info(f"Logging Spoilt FIT Device ID: {spoilt_fit_device_id}")

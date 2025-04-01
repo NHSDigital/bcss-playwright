@@ -1,7 +1,7 @@
 import pytest
 from playwright.sync_api import Page, expect
 from utils.click_helper import click
-from pages.bcss_home_page import MainMenu
+from pages.base_page import BasePage
 from utils.user_tools import UserTools
 
 
@@ -15,7 +15,7 @@ def before_each(page: Page):
     UserTools.user_login(page, "Hub Manager State Registered")
 
     # Go to screening practitioner appointments page
-    MainMenu(page).go_to_screening_practitioner_appointments_page()
+    BasePage(page).go_to_screening_practitioner_appointments_page()
 
 
 @pytest.mark.smoke

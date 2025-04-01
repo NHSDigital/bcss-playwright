@@ -4,12 +4,11 @@ import logging
 from jproperties import Properties
 from pages.log_out_page import Logout
 from utils.user_tools import UserTools
-from pages.bcss_home_page import MainMenu
+from pages.base_page import BasePage
 from pages.call_and_recall_page import CallAndRecall
 from pages.invitations_monitoring_page import InvitationsMonitoring
 from pages.invitations_plans_page import InvitationsPlans
 from pages.create_a_plan_page import CreateAPlan
-from pages.navigation_bar_links import NavigationBar
 from pages.generate_invitations_page import GenerateInvitations
 from playwright.sync_api import Page
 from utils.batch_processing import batch_processing
@@ -44,7 +43,7 @@ def test_create_invitations_plan(page: Page, smokescreen_properties: dict) -> No
     logging.info("Compartment 1 - Create Invitations Plan")
     UserTools.user_login(page, "Hub Manager State Registered")
     # Create plan - England
-    MainMenu(page).go_to_call_and_recall_page()
+    BasePage(page).go_to_call_and_recall_page()
     CallAndRecall(page).go_to_planning_and_monitoring_page()
     InvitationsMonitoring(page).go_to_invitation_plan_page(smokescreen_properties["c1_screening_centre_code"])
     InvitationsPlans(page).go_to_create_a_plan_page()
@@ -75,8 +74,8 @@ def test_compartment_1(page: Page) -> None:
     UserTools.user_login(page, "Hub Manager State Registered")
 
     # Generate Invitations
-    NavigationBar(page).click_main_menu_link()
-    MainMenu(page).go_to_call_and_recall_page()
+    BasePage(page).click_main_menu_link()
+    BasePage(page).go_to_call_and_recall_page()
     CallAndRecall(page).go_to_generate_invitations_page()
     logging.info("Generating invitations based on the invitations plan")
     GenerateInvitations(page).click_generate_invitations_button()

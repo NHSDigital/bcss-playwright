@@ -1,5 +1,4 @@
-from pages.navigation_bar_links import NavigationBar
-from pages.bcss_home_page import MainMenu
+from pages.base_page import BasePage
 from pages.communications_production_page import CommunicationsProduction
 from pages.manage_active_batch_page import ManageActiveBatch
 from pages.batch_list_page import ActiveBatchList, ArchivedBatchList
@@ -22,8 +21,8 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
     - run_timed_events: This is an optional input that executes bcss_timed_events if set to True
     """
     logging.info(f"Processing {batch_type} - {batch_description} batch")
-    NavigationBar(page).click_main_menu_link()
-    MainMenu(page).go_to_communications_production_page()
+    BasePage(page).click_main_menu_link()
+    BasePage(page).go_to_communications_production_page()
     CommunicationsProduction(page).go_to_active_batch_list_page()
     ActiveBatchList(page).enter_event_code_filter(batch_type)
 
@@ -91,8 +90,8 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
     except Exception as e:
         pytest.fail(f"Batch successfully archived message is not shown: {str(e)}")
 
-    NavigationBar(page).click_main_menu_link()
-    MainMenu(page).go_to_communications_production_page()
+    BasePage(page).click_main_menu_link()
+    BasePage(page).go_to_communications_production_page()
     CommunicationsProduction(page).go_to_archived_batch_list_page()
     ArchivedBatchList(page).enter_id_filter(link_text)
     try:

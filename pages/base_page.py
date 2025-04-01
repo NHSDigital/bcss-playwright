@@ -2,10 +2,10 @@ from playwright.sync_api import Page, expect
 from utils.click_helper import click
 
 
-class BcssHomePage:
+class BasePage:
     def __init__(self, page: Page):
         self.page = page
-        # Homepage links
+        # Homepage/Navigation Bar links
         self.sub_menu_link = self.page.get_by_role("link", name="Show Sub-menu")
         self.hide_sub_menu_link = self.page.get_by_role("link", name="Hide Sub-menu")
         self.select_org_link = self.page.get_by_role("link", name="Select Org")
@@ -14,8 +14,29 @@ class BcssHomePage:
         self.refresh_alerts_link = self.page.get_by_role("link", name="Refresh alerts")
         self.user_guide_link = self.page.get_by_role("link", name="User guide")
         self.help_link = self.page.get_by_role("link", name="Help")
+        self.main_menu_link = self.page.get_by_role("link", name="Main Menu")
+        self.log_out_link = self.page.get_by_role("link", name="Log-out")
+        # Main menu - page links
+        self.contacts_list_page = self.page.get_by_role("link", name="Contacts List")
+        self.bowel_scope_page = self.page.get_by_role("link", name="Bowel Scope")
+        self.call_and_recall_page = self.page.get_by_role("link", name="Call and Recall")
+        self.communications_production_page = self.page.get_by_role("link", name="Communications Production")
+        self.download_page = self.page.get_by_role("link", name="Download")
+        self.fit_test_kits_page = self.page.get_by_role("link", name="FIT Test Kits")
+        self.gfob_test_kits_page = self.page.get_by_role("link", name="gFOBT Test Kits")
+        self.lynch_surveillance_page = self.page.get_by_role("link", name="Lynch Surveillance")
+        self.organisations_page = self.page.get_by_role("link", name="Organisations")
+        self.reports_page = self.page.get_by_role("link", name="Reports")
+        self.screening_practitioner_appointments_page = self.page.get_by_role("link", name="Screening Practitioner")
+        self.screening_subject_search_page = self.page.get_by_role("link", name="Screening Subject Search")
         # Bowel Cancer Screening System header
         self.bowel_cancer_screening_system_header = self.page.locator("#ntshAppTitle")
+
+    def click_main_menu_link(self)->None:
+        click(self.page, self.main_menu_link)
+
+    def click_log_out_link(self)->None:
+        click(self.page, self.log_out_link)
 
     def click_sub_menu_link(self)->None:
         click(self.page, self.sub_menu_link)
@@ -43,24 +64,6 @@ class BcssHomePage:
 
     def bowel_cancer_screening_system_header_is_displayed(self)->None:
         expect(self.bowel_cancer_screening_system_header).to_contain_text("Bowel Cancer Screening System")
-
-
-class MainMenu:
-    def __init__(self, page: Page):
-        self.page = page
-        # Main menu - page links
-        self.contacts_list_page = self.page.get_by_role("link", name="Contacts List")
-        self.bowel_scope_page = self.page.get_by_role("link", name="Bowel Scope")
-        self.call_and_recall_page = self.page.get_by_role("link", name="Call and Recall")
-        self.communications_production_page = self.page.get_by_role("link", name="Communications Production")
-        self.download_page = self.page.get_by_role("link", name="Download")
-        self.fit_test_kits_page = self.page.get_by_role("link", name="FIT Test Kits")
-        self.gfob_test_kits_page = self.page.get_by_role("link", name="gFOBT Test Kits")
-        self.lynch_surveillance_page = self.page.get_by_role("link", name="Lynch Surveillance")
-        self.organisations_page = self.page.get_by_role("link", name="Organisations")
-        self.reports_page = self.page.get_by_role("link", name="Reports")
-        self.screening_practitioner_appointments_page = self.page.get_by_role("link", name="Screening Practitioner")
-        self.screening_subject_search_page = self.page.get_by_role("link", name="Screening Subject Search")
 
     def go_to_contacts_list_page(self)->None:
         click(self.page, self.contacts_list_page)

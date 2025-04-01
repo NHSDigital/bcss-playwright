@@ -1,7 +1,7 @@
 import pytest
 from playwright.sync_api import Page, expect
 from utils.user_tools import UserTools
-from pages.bcss_home_page import BcssHomePage
+from pages.base_page import BasePage
 from utils.date_time_utils import DateTimeUtils
 
 
@@ -20,7 +20,7 @@ def test_home_page_links_navigation(page: Page) -> None:
     """
     Confirms that homepage links are visible and clickable, and the expected pages open when clicking the links
     """
-    homepage = BcssHomePage(page)
+    homepage = BasePage(page)
 
     # Click 'show sub menu' link
     homepage.click_sub_menu_link()
