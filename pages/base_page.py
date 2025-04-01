@@ -1,6 +1,6 @@
 from playwright.sync_api import Page, expect
 from utils.click_helper import click
-
+import logging
 
 class BasePage:
     def __init__(self, page: Page):
@@ -105,6 +105,12 @@ class BasePage:
         click(self.page, self.screening_subject_search_page)
 
     def click(self, locator) -> None:
+        """
+        This is used to click on a locator
+        The reason for this being used over the normal playwright click method is due to:
+        - BCSS sometimes takes a while to render and so the normal click function 'clicks' on a locator before its available
+        - Increases the reliability of clicks to avoid issues with the normal click method
+        """
         try:
             self.page.wait_for_load_state('load')
             self.page.wait_for_load_state('domcontentloaded')
@@ -113,5 +119,5 @@ class BasePage:
             locator.click()
 
         except Exception as locatorClickError:
-            print(f"Failed to click element with error: {locatorClickError}, trying again...")
+            logging.warning(f"Failed to click element with error: {locatorClickError}, trying again...")
             locator.click()
