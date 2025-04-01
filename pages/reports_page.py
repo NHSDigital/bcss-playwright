@@ -1,46 +1,5 @@
-from datetime import datetime
-from utils import date_time_utils
 from utils.click_helper import click
 from playwright.sync_api import Page
-
-
-class ReportsPageUtils:
-    def __init__(self):
-        pass
-
-
-# Timestamp Date Formatting
-def report_timestamp_date_format() -> str:
-    """Gets the current date time and converts it to the timestamp format used on the report pages
-
-    Returns:
-        date report last requested (str): The current datetime in the "date report last requested" timestamp format.
-
-    """
-    dtu = date_time_utils.DateTimeUtils
-    return dtu.format_date(datetime.now(), "%d/%m/%Y" + " at " + "%H:%M:%S")
-
-
-def fobt_kits_logged_but_not_read_report_timestamp_date_format() -> str:
-    """Gets the current date time and converts it to the timestamp format used on the fobt_kits_logged_but_not_read report page
-
-    Returns:
-        fobt_kits_logged_but_not_read timestamp (str): The current datetime in the "fobt_kits_logged_but_not_read report" timestamp format.
-
-    """
-    dtu = date_time_utils.DateTimeUtils
-    return dtu.format_date(datetime.now(), "%d %b %Y %H:%M:%S")
-
-
-def screening_practitioner_appointments_report_timestamp_date_format() -> str:
-    """Gets the current date time and converts it to the timestamp format used on the screening practitioner appointments report page
-
-    Returns:
-        screening practitioner appointments timestamp (str): The current datetime in the "screening practitioner appointments report" timestamp format.
-
-    """
-    dtu = date_time_utils.DateTimeUtils
-    return dtu.format_date(datetime.now(), "%d.%m.%Y" + " at " + "%H:%M:%S")
 
 
 # Reports page main menu links
