@@ -48,7 +48,7 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
                 pytest.fail(f"Failed to retrieve NHS Numbers from batch {link_text}, {str(e)}")
             link.click()
             break
-        else:
+        elif (i+1) == batch_description_cells.count():
             pytest.fail(f"No open '{batch_type} - {batch_description}' batch found")
 
     ManageActiveBatch(page).click_prepare_button()
