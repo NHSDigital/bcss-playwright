@@ -16,7 +16,7 @@ def before_test(page: Page):
     bcss_home.BasePage(page).click_log_out_link()
     logout.Logout(page).verify_log_out_page()
     # Log in to BCSS as bcss118 user, then log out
-    login.BcssLoginPage(page).login_as_user("BCSS118")
+    UserTools.user_login(page, "Screening Centre Manager")
     bcss_home.BasePage(page).bowel_cancer_screening_system_header_is_displayed()
     bcss_home.BasePage(page).click_log_out_link()
     logout.Logout(page).verify_log_out_page()
@@ -25,19 +25,19 @@ def before_test(page: Page):
     OracleDB().delete_all_users_from_approved_users_table()
 
 
-# @pytest.mark.smoke
+#@pytest.mark.smoke
 def test_only_users_on_approved_can_login_to_bcss(page: Page) -> None:
     # Add bcss401 user to approved users list table
     OracleDB().populate_ui_approved_users_table("BCSS401")
     # BCSS401 user successfully logs in to BCSS whilst on the approved list
-    login.BcssLoginPage(page).login_as_user("BCSS401")
+    UserTools.user_login(page, "Hub Manager State Registered")
     bcss_home.BasePage(page).bowel_cancer_screening_system_header_is_displayed()
     # BCSS401 user logs out
     bcss_home.BasePage(page).click_log_out_link()
     logout.Logout(page).verify_log_out_page()
 
     # BCSS118 user fails to logs in to BCSS as they are not on the approved list
-    UserTools.user_login(page,"Screening Centre Manager")
+    UserTools.user_login(page, "Screening Centre Manager")
     # Verify relevant error message is displayed
     login_failure.LoginFailureScreen(page).verify_login_failure_screen_is_displayed()
     page.close()
