@@ -1,6 +1,6 @@
 from playwright.sync_api import Page, expect, Locator
 from utils.click_helper import click
-
+from enum import Enum
 
 class SubjectScreeningSummary:
     def __init__(self, page: Page):
@@ -56,12 +56,6 @@ class SubjectScreeningSummary:
     def click_more(self)-> None:
         click(self.page, self.more)
 
-    def select_change_screening_status(self)-> None:
-        self.change_screening_status.select_option("4007")
-
-    def select_reason(self)-> None:
-        self.reason.select_option("11314")
-
     def click_update_subject_data(self)-> None:
         click(self.page, self.update_subject_data)
 
@@ -73,3 +67,15 @@ class SubjectScreeningSummary:
 
     def go_to_a_page_to_close_the_episode(self)-> None:
         click(self.page, self.go_to_a_page_to_close_the_episode)
+
+    def select_change_screening_status(self, option: str)-> None:
+        self.change_screening_status.select_option(option)
+
+    def select_reason(self, option: str)-> None:
+        self.reason.select_option(option)
+
+class ChangeScreeningStatusOptions(Enum):
+    SEEKING_FURTHER_DATA = "4007"
+
+class ReasonOptions(Enum):
+    UNCERTIFIED_DEATH = "11314"
