@@ -1,9 +1,10 @@
 from playwright.sync_api import Page, expect, Locator
-from utils.click_helper import click
+from pages.base_page import BasePage
 from enum import Enum
 
-class SubjectScreeningSummary:
+class SubjectScreeningSummary(BasePage):
     def __init__(self, page: Page):
+        super().__init__(page)
         self.page = page
         # Subject Screening Summary - page filters
         self.subject_screening_summary = self.page.get_by_role("cell", name="Subject Screening Summary", exact=True)
@@ -36,37 +37,37 @@ class SubjectScreeningSummary:
         expect(latest_event_status_cell).to_be_visible()
 
     def click_subjects_events_notes(self)-> None:
-        click(self.page, self.subjects_events_notes)
+        self.click(self.subjects_events_notes)
 
     def click_list_episodes(self)-> None:
-        click(self.page, self.list_episodes)
+        self.click(self.list_episodes)
 
     def click_subject_demographics(self)-> None:
-        click(self.page, self.subject_demographics)
+        self.click(self.subject_demographics)
 
     def click_datasets(self)-> None:
-        click(self.page, self.datasets)
+        self.click(self.datasets)
 
     def click_individual_letters(self)-> None:
-        click(self.page, self.individual_letters)
+        self.click(self.individual_letters)
 
     def click_patient_contacts(self)-> None:
-        click(self.page, self.patient_contacts)
+        self.click(self.patient_contacts)
 
     def click_more(self)-> None:
-        click(self.page, self.more)
+        self.click(self.more)
 
     def click_update_subject_data(self)-> None:
-        click(self.page, self.update_subject_data)
+        self.click(self.update_subject_data)
 
     def click_close_fobt_screening_episode(self)-> None:
-        click(self.page, self.close_fobt_screening_episode)
+        self.click(self.close_fobt_screening_episode)
 
     def go_to_a_page_to_advance_the_episode(self)-> None:
-        click(self.page, self.go_to_a_page_to_advance_the_episode)
+        self.click(self.go_to_a_page_to_advance_the_episode)
 
     def go_to_a_page_to_close_the_episode(self)-> None:
-        click(self.page, self.go_to_a_page_to_close_the_episode)
+        self.click(self.go_to_a_page_to_close_the_episode)
 
     def select_change_screening_status(self, option: str)-> None:
         self.change_screening_status.select_option(option)

@@ -1,5 +1,4 @@
 from playwright.sync_api import Page, expect
-from utils.click_helper import click
 import logging
 
 class BasePage:
@@ -35,74 +34,74 @@ class BasePage:
     def click_main_menu_link(self)->None:
         for _ in range(3):  # Try up to 3 times
             if self.main_menu_link.is_visible():
-                click(self.page, self.main_menu_link)
+                self.click(self.main_menu_link)
                 return  # Exit if successful
 
     def click_log_out_link(self)->None:
-        click(self.page, self.log_out_link)
+        self.click(self.log_out_link)
 
     def click_sub_menu_link(self)->None:
-        click(self.page, self.sub_menu_link)
+        self.click(self.sub_menu_link)
 
     def click_hide_sub_menu_link(self)->None:
-        click(self.page, self.hide_sub_menu_link)
+        self.click(self.hide_sub_menu_link)
 
     def click_select_org_link(self)->None:
-        click(self.page, self.select_org_link)
+        self.click(self.select_org_link)
 
     def click_back_button(self)->None:
-        click(self.page, self.back_button)
+        self.click(self.back_button)
 
     def click_release_notes_link(self)->None:
-        click(self.page, self.release_notes_link)
+        self.click(self.release_notes_link)
 
     def click_refresh_alerts_link(self)->None:
-        click(self.page, self.refresh_alerts_link)
+        self.click(self.refresh_alerts_link)
 
     def click_user_guide_link(self)->None:
-        click(self.page, self.user_guide_link)
+        self.click(self.user_guide_link)
 
     def click_help_link(self)->None:
-        click(self.page, self.help_link)
+        self.click(self.help_link)
 
     def bowel_cancer_screening_system_header_is_displayed(self)->None:
         expect(self.bowel_cancer_screening_system_header).to_contain_text("Bowel Cancer Screening System")
 
     def go_to_contacts_list_page(self)->None:
-        click(self.page, self.contacts_list_page)
+        self.click(self.contacts_list_page)
 
     def go_to_bowel_scope_page(self)->None:
-        click(self.page, self.bowel_scope_page)
+        self.click(self.bowel_scope_page)
 
     def go_to_call_and_recall_page(self)->None:
-        click(self.page, self.call_and_recall_page)
+        self.click(self.call_and_recall_page)
 
     def go_to_communications_production_page(self)->None:
-        click(self.page, self.communications_production_page)
+        self.click(self.communications_production_page)
 
     def go_to_download_page(self)->None:
-        click(self.page, self.download_page)
+        self.click(self.download_page)
 
     def go_to_fit_test_kits_page(self)->None:
-        click(self.page, self.fit_test_kits_page)
+        self.click(self.fit_test_kits_page)
 
     def go_to_gfob_test_kits_page(self)->None:
-        click(self.page, self.gfob_test_kits_page)
+        self.click(self.gfob_test_kits_page)
 
     def go_to_lynch_surveillance_page(self)->None:
-        click(self.page, self.lynch_surveillance_page)
+        self.click(self.lynch_surveillance_page)
 
     def go_to_organisations_page(self)->None:
-        click(self.page, self.organisations_page)
+        self.click(self.organisations_page)
 
     def go_to_reports_page(self)->None:
-        click(self.page, self.reports_page)
+        self.click(self.reports_page)
 
     def go_to_screening_practitioner_appointments_page(self)->None:
-        click(self.page, self.screening_practitioner_appointments_page)
+        self.click(self.screening_practitioner_appointments_page)
 
     def go_to_screening_subject_search_page(self)->None:
-        click(self.page, self.screening_subject_search_page)
+        self.click(self.screening_subject_search_page)
 
     def click(self, locator) -> None:
         """

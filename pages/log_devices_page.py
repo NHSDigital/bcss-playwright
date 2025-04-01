@@ -1,11 +1,11 @@
 from playwright.sync_api import Page, expect
-from utils.click_helper import click
+from pages.base_page import BasePage
+from enum import Enum
 
-
-class LogDevices:
-    SPOILT_DEVICE_OPTION = "205156"
+class LogDevices(BasePage):
 
     def __init__(self, page: Page):
+        super().__init__(page)
         self.page = page
         # Log Devices - page links
         self.fit_device_id_field = self.page.get_by_role("textbox", name="FIT Device ID")
@@ -21,10 +21,10 @@ class LogDevices:
         self.fit_device_id_field.press("Enter")
 
     def click_save_and_log_device_button(self)->None:
-        click(self.page, self.save_and_log_device_button)
+        self.click(self.save_and_log_device_button)
 
     def click_device_spoilt_button(self)->None:
-        click(self.page, self.device_spoilt_button)
+        self.click(self.device_spoilt_button)
 
     def fill_sample_date_field(self, value)->None:
         self.sample_date_field.fill(value)
@@ -34,7 +34,15 @@ class LogDevices:
         expect(self.successfully_logged_device_text).to_be_visible()
 
     def select_spoilt_device_dropdown_option(self)->None:
-        self.spoilt_device_dropdown.select_option(self.SPOILT_DEVICE_OPTION)
+        self.spoilt_device_dropdown.select_option(SpoiltDeviceOptions.BROKEN_IN_TRANSIT.value)
 
     def click_log_as_spoilt_button(self)->None:
-        click(self.page, self.log_as_spoilt_button)
+        self.click(self.log_as_spoilt_button)
+
+class SpoiltDeviceOptions(Enum):
+    BROKEN_IN_TRANSIT = "205156"
+    DEVICE_MISUSE = "205157"
+    NOT_USED = "205159"
+    SAMPLE_BUFFER_LOST = "205158"
+    TOO_MUCH_SAMPLE = "306397"
+    OTHER = "205161"

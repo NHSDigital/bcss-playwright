@@ -1,9 +1,9 @@
 from playwright.sync_api import Page, expect
-from utils.click_helper import click
+from pages.base_page import BasePage
 
-
-class BatchList:
+class BatchList(BasePage):
     def __init__(self, page: Page):
+        super().__init__(page)
         self.page = page
         #Batch List - page filters
         self.id_filter = self.page.locator("#batchIdFilter")

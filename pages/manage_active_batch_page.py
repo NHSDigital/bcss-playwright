@@ -1,9 +1,9 @@
 from playwright.sync_api import Page
-from utils.click_helper import click
+from pages.base_page import BasePage
 
-
-class ManageActiveBatch:
+class ManageActiveBatch(BasePage):
     def __init__(self, page: Page):
+        super().__init__(page)
         self.page = page
         # Manage Active Batch - page buttons
         self.prepare_button = self.page.get_by_role("button", name="Prepare Batch")
@@ -16,10 +16,10 @@ class ManageActiveBatch:
         self.reprepare_batch_text = self.page.locator('text="Re-Prepare Batch"')
 
     def click_prepare_button(self)->None:
-        click(self.page, self.prepare_button)
+        self.click(self.prepare_button)
 
     def click_retrieve_button(self)->None:
-        click(self.page, self.retrieve_button)
+        self.click(self.retrieve_button)
 
     def click_confirm_button(self)->None:
-        click(self.page, self.confirm_button)
+        self.click(self.confirm_button)

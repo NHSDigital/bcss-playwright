@@ -1,9 +1,9 @@
 from playwright.sync_api import Page
-from utils.click_helper import click
+from pages.base_page import BasePage
 
-
-class DownloadsPage:
+class DownloadsPage(BasePage):
     def __init__(self, page: Page):
+        super().__init__(page)
         self.page = page
         # Downloads Page
         self.individual_download_request_page = self.page.get_by_role("link", name="Individual Download Request")
@@ -12,13 +12,13 @@ class DownloadsPage:
         self.list_of_batch_downloads_page = self.page.get_by_role("cell", name="List of Batch Downloads", exact=True)
 
     def go_to_individual_download_request_page(self)->None:
-        click(self.page, self.individual_download_request_page)
+        self.click(self.individual_download_request_page)
 
     def go_to_list_of_individual_downloads_page(self)->None:
-        click(self.page, self.list_of_individual_downloads_page)
+        self.click(self.list_of_individual_downloads_page)
 
     def go_to_batch_download_request_and_page(self)->None:
-        click(self.page, self.batch_download_request_and_page)
+        self.click(self.batch_download_request_and_page)
 
     def go_to_list_of_batch_downloads_page(self)->None:
-        click(self.page, self.list_of_batch_downloads_page)
+        self.click(self.list_of_batch_downloads_page)

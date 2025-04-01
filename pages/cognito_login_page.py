@@ -1,9 +1,9 @@
 from playwright.sync_api import Page
+from pages.base_page import BasePage
 
-
-class CognitoLoginPage:
-
+class CognitoLoginPage(BasePage):
     def __init__(self, page: Page):
+        super().__init__(page)
         self.page = page
         self.username = page.get_by_role("textbox", name="Username")
         self.password = page.get_by_role("textbox", name="Password")

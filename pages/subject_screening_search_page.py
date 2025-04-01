@@ -1,9 +1,10 @@
 from playwright.sync_api import Page
-from utils.click_helper import click
+from pages.base_page import BasePage
 from enum import Enum
 
-class SubjectScreeningPage:
+class SubjectScreeningPage(BasePage):
     def __init__(self, page: Page):
+        super().__init__(page)
         self.page = page
         # Subject Search Criteria - page filters
         self.episodes_filter = self.page.get_by_role("radio", name="Episodes")
@@ -30,7 +31,7 @@ class SubjectScreeningPage:
         self.select_search_area = self.page.locator("#A_C_SEARCH_DOMAIN")
 
     def click_search_button(self)->None:
-        click(self.page, self.search_button)
+        self.click(self.search_button)
 
     def click_episodes_filter(self)->None:
         self.episodes_filter.check()
@@ -42,46 +43,46 @@ class SubjectScreeningPage:
         self.datasets_filter.check()
 
     def click_nhs_number_filter(self)->None:
-        click(self.page, self.nhs_number_filter)
+        self.click(self.nhs_number_filter)
 
     def click_surname_filter(self)->None:
-        click(self.page, self.surname_filter)
+        self.click(self.surname_filter)
 
     def click_soundex_filter(self)->None:
         self.soundex_filter.check()
 
     def click_forename_filter(self)->None:
-        click(self.page, self.forename_filter)
+        self.click(self.forename_filter)
 
     def click_date_of_birth_filter(self)->None:
-        click(self.page, self.date_of_birth_filter)
+        self.click(self.date_of_birth_filter)
 
     def click_date_of_birth_range_filter(self)->None:
-        click(self.page, self.data_of_birth_range_filter)
+        self.click(self.data_of_birth_range_filter)
 
     def click_postcode_filter(self)->None:
-        click(self.page, self.postcode_filter)
+        self.click(self.postcode_filter)
 
     def click_episodes_closed_date_filter(self)->None:
-        click(self.page, self.episode_closed_date_filter)
+        self.click(self.episode_closed_date_filter)
 
     def click_kit_batch_number_filter(self)->None:
-        click(self.page, self.kit_batch_number_filter)
+        self.click(self.kit_batch_number_filter)
 
     def click_kit_number_filter(self)->None:
-        click(self.page, self.kit_number_filter)
+        self.click(self.kit_number_filter)
 
     def click_fit_device_id_filter(self)->None:
-        click(self.page, self.fit_device_id_filter)
+        self.click(self.fit_device_id_filter)
 
     def click_laboratory_name_filter(self)->None:
-        click(self.page, self.laboratory_name_filter)
+        self.click(self.laboratory_name_filter)
 
     def click_laboratory_test_date_filter(self)->None:
-        click(self.page, self.laboratory_test_date_filter)
+        self.click(self.laboratory_test_date_filter)
 
     def click_diagnostic_test_actual_date_filter(self)->None:
-        click(self.page, self.diagnostic_test_actual_date_filter)
+        self.click(self.diagnostic_test_actual_date_filter)
 
     def select_screening_status_options(self, option: str)->None:
         self.select_screening_status.select_option(option)

@@ -1,9 +1,9 @@
 from playwright.sync_api import Page
-from utils.click_helper import click
+from pages.base_page import BasePage
 
-
-class ContactsListPage:
+class ContactsListPage(BasePage):
     def __init__(self, page: Page):
+        super().__init__(page)
         self.page = page
         # ContactsList Page
         self.view_contacts_page = self.page.get_by_role("link", name="View Contacts")
@@ -12,13 +12,13 @@ class ContactsListPage:
         self.my_preference_settings_page = self.page.get_by_role("link", name="My Preference Settings")
 
     def go_to_view_contacts_page(self)->None:
-        click(self.page, self.view_contacts_page)
+        self.click(self.view_contacts_page)
 
     def go_to_edit_my_contact_details_page(self)->None:
-        click(self.page, self.edit_my_contact_details_page)
+        self.click(self.edit_my_contact_details_page)
 
     def go_to_maintain_contacts_details_page(self)->None:
-        click(self.page, self.maintain_contacts_page)
+        self.click(self.maintain_contacts_page)
 
     def go_to_my_preference_settings_page(self)->None:
-        click(self.page, self.my_preference_settings_page)
+        self.click(self.my_preference_settings_page)

@@ -1,11 +1,11 @@
 from playwright.sync_api import Page, expect
+from pages.base_page import BasePage
 import pytest
-from utils.click_helper import click
 import logging
 
-
-class GenerateInvitations:
+class GenerateInvitations(BasePage):
     def __init__(self, page: Page):
+        super().__init__(page)
         self.page = page
         # Generate Invitations - page links
         self.generate_invitations_button = self.page.get_by_role("button", name="Generate Invitations")
@@ -15,10 +15,10 @@ class GenerateInvitations:
         self.self_referrals_total = self.page.locator("#col9_total")
 
     def click_generate_invitations_button(self)->None:
-        click(self.page, self.generate_invitations_button)
+        self.click(self.generate_invitations_button)
 
     def click_refresh_button(self)->None:
-        click(self.page, self.refresh_button)
+        self.click(self.refresh_button)
 
     def wait_for_invitation_generation_complete(self) -> bool:
         """

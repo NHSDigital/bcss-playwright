@@ -1,9 +1,9 @@
 from playwright.sync_api import Page
-from utils.click_helper import click
+from pages.base_page import BasePage
 
-
-class CreateAPlan:
+class CreateAPlan(BasePage):
     def __init__(self, page: Page):
+        super().__init__(page)
         self.page = page
         # Call and Recall - page links
         self.set_all_button = self.page.get_by_role("link", name="Set all")
@@ -16,7 +16,7 @@ class CreateAPlan:
         self.save_note_button = self.page.locator("#saveNote").get_by_role("button", name="Save")
 
     def click_set_all_button(self)->None:
-        click(self.page, self.set_all_button)
+        self.click(self.set_all_button)
 
     def fill_daily_invitation_rate_field(self, value: str)->None:
         self.daily_invitation_rate_field.fill(value)
@@ -25,16 +25,16 @@ class CreateAPlan:
         self.weekly_invitation_rate_field.fill(value)
 
     def click_update_button(self)->None:
-        click(self.page, self.update_button)
+        self.click(self.update_button)
 
     def click_confirm_button(self)->None:
-        click(self.page, self.confirm_button)
+        self.click(self.confirm_button)
 
     def click_save_button(self)->None:
-        click(self.page, self.save_button)
+        self.click(self.save_button)
 
     def fill_note_field(self, value)->None:
         self.note_field.fill(value)
 
     def click_save_note_button(self)->None:
-        click(self.page, self.save_note_button)
+        self.click(self.save_note_button)
