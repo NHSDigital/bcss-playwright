@@ -1,6 +1,7 @@
 from playwright.sync_api import Page, expect
 import logging
 
+
 class BasePage:
     def __init__(self, page: Page):
         self.page = page
@@ -32,79 +33,87 @@ class BasePage:
         self.bowel_cancer_screening_system_header = self.page.locator("#ntshAppTitle")
         self.main_menu__header = self.page.locator("#ntshPageTitle")
 
-    def click_main_menu_link(self)->None:
+    def click_main_menu_link(self) -> None:
         for _ in range(3):  # Try up to 3 times
             if self.main_menu_link.is_visible():
                 self.click(self.main_menu_link)
                 return  # Exit if successful
 
-    def click_log_out_link(self)->None:
+    def click_log_out_link(self) -> None:
         self.click(self.log_out_link)
 
-    def click_sub_menu_link(self)->None:
+    def click_sub_menu_link(self) -> None:
         self.click(self.sub_menu_link)
 
-    def click_hide_sub_menu_link(self)->None:
+    def click_hide_sub_menu_link(self) -> None:
         self.click(self.hide_sub_menu_link)
 
-    def click_select_org_link(self)->None:
+    def click_select_org_link(self) -> None:
         self.click(self.select_org_link)
 
-    def click_back_button(self)->None:
+    def click_back_button(self) -> None:
         self.click(self.back_button)
 
-    def click_release_notes_link(self)->None:
+    def click_release_notes_link(self) -> None:
         self.click(self.release_notes_link)
 
-    def click_refresh_alerts_link(self)->None:
+    def click_refresh_alerts_link(self) -> None:
         self.click(self.refresh_alerts_link)
 
-    def click_user_guide_link(self)->None:
+    def click_user_guide_link(self) -> None:
         self.click(self.user_guide_link)
 
-    def click_help_link(self)->None:
+    def click_help_link(self) -> None:
         self.click(self.help_link)
 
-    def bowel_cancer_screening_system_header_is_displayed(self)->None:
+    def bowel_cancer_screening_system_header_is_displayed(self) -> None:
         expect(self.bowel_cancer_screening_system_header).to_contain_text("Bowel Cancer Screening System")
 
     def main_menu_header_is_displayed(self)->None:
         expect(self.main_menu__header).to_contain_text("Main Menu")
 
-    def go_to_contacts_list_page(self)->None:
+    def bowel_cancer_screening_page_title_contains_text(self, text: str) -> None:
+        """Asserts that the page title contains the specified text.
+
+            Args:
+                text (str): The expected text that you want to assert for the page title ("#ntshPageTitle") element.
+        """
+        expect(self.bowel_cancer_screening_page_header).to_contain_text(text)
+
+    def go_to_contacts_list_page(self) -> None:
         self.click(self.contacts_list_page)
 
-    def go_to_bowel_scope_page(self)->None:
+    def go_to_bowel_scope_page(self) -> None:
         self.click(self.bowel_scope_page)
 
-    def go_to_call_and_recall_page(self)->None:
+    def go_to_call_and_recall_page(self) -> None:
         self.click(self.call_and_recall_page)
 
-    def go_to_communications_production_page(self)->None:
+    def go_to_communications_production_page(self) -> None:
         self.click(self.communications_production_page)
 
-    def go_to_download_page(self)->None:
+    def go_to_download_page(self) -> None:
         self.click(self.download_page)
 
-    def go_to_fit_test_kits_page(self)->None:
+    def go_to_fit_test_kits_page(self) -> None:
         self.click(self.fit_test_kits_page)
 
     def go_to_gfobt_test_kits_page(self)->None:
         self.click(self.gfobt_test_kits_page)
 
-    def go_to_lynch_surveillance_page(self)->None:
+    def go_to_lynch_surveillance_page(self) -> None:
         self.click(self.lynch_surveillance_page)
 
-    def go_to_organisations_page(self)->None:
+    def go_to_organisations_page(self) -> None:
         self.click(self.organisations_page)
 
-    def go_to_reports_page(self)->None:
+    def go_to_reports_page(self) -> None:
         self.click(self.reports_page)
 
-    def go_to_screening_practitioner_appointments_page(self)->None:
+    def go_to_screening_practitioner_appointments_page(self) -> None:
         self.click(self.screening_practitioner_appointments_page)
 
-    def go_to_screening_subject_search_page(self)->None:
+    def go_to_screening_subject_search_page(self) -> None:
         self.click(self.screening_subject_search_page)
 
     def click(self, locator) -> None:
