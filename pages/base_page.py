@@ -31,6 +31,8 @@ class BasePage:
         self.screening_subject_search_page = self.page.get_by_role("link", name="Screening Subject Search")
         # Bowel Cancer Screening System header
         self.bowel_cancer_screening_system_header = self.page.locator("#ntshAppTitle")
+        # Bowel Cancer Screening Page header
+        self.bowel_cancer_screening_page_header = self.page.locator("#ntshPageTitle")
         self.main_menu__header = self.page.locator("#ntshPageTitle")
 
     def click_main_menu_link(self) -> None:
@@ -69,7 +71,7 @@ class BasePage:
     def bowel_cancer_screening_system_header_is_displayed(self) -> None:
         expect(self.bowel_cancer_screening_system_header).to_contain_text("Bowel Cancer Screening System")
 
-    def main_menu_header_is_displayed(self)->None:
+    def main_menu_header_is_displayed(self) -> None:
         expect(self.main_menu__header).to_contain_text("Main Menu")
 
     def bowel_cancer_screening_page_title_contains_text(self, text: str) -> None:
@@ -98,7 +100,7 @@ class BasePage:
     def go_to_fit_test_kits_page(self) -> None:
         self.click(self.fit_test_kits_page)
 
-    def go_to_gfobt_test_kits_page(self)->None:
+    def go_to_gfobt_test_kits_page(self) -> None:
         self.click(self.gfobt_test_kits_page)
 
     def go_to_lynch_surveillance_page(self) -> None:
@@ -126,18 +128,10 @@ class BasePage:
         try:
             self.page.wait_for_load_state('load')
             self.page.wait_for_load_state('domcontentloaded')
-            locator.wait_for(state = "attached")
-            locator.wait_for(state = "visible")
+            locator.wait_for(state="attached")
+            locator.wait_for(state="visible")
             locator.click()
 
         except Exception as locatorClickError:
             logging.warning(f"Failed to click element with error: {locatorClickError}, trying again...")
             locator.click()
-
-    def bowel_cancer_screening_page_title_contains_text(self, text: str) -> None:
-        """Asserts that the page title contains the specified text.
-
-            Args:
-                text (str): The expected text that you want to assert for the page title ("#ntshPageTitle") element.
-        """
-        expect(self.bowel_cancer_screening_page_header).to_contain_text(text)
