@@ -41,7 +41,7 @@ def test_download_facility_page_navigation(page: Page) -> None:
     BasePage(page).click_back_button()
 
     # Batch download request and retrieval page loads as expected
-    DownloadsPage(page).go_to_batch_download_request_and_page
+    DownloadsPage(page).go_to_batch_download_request_and_page()
     BatchDownloadRequestAndRetrieval(page).verify_batch_download_request_and_retrieval_title()
 
     # Batch download request and retrieval page contains warning message
