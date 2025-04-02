@@ -1,9 +1,9 @@
 import pytest
-from playwright.sync_api import Page, expect
-from utils.click_helper import click
+from playwright.sync_api import Page
 from pages.base_page import BasePage
+from pages.lynch_invitation_page import LynchInvitationPage
+from pages.set_lynch_invitation_rates_page import SetLynchInvitationRatesPage
 from utils.user_tools import UserTools
-
 
 @pytest.fixture(scope="function", autouse=True)
 def before_each(page: Page):
@@ -17,7 +17,6 @@ def before_each(page: Page):
     # Go to Lynch Surveillance page
     BasePage(page).go_to_lynch_surveillance_page()
 
-
 @pytest.mark.smoke
 def test_lynch_surveillance_page_navigation(page: Page) -> None:
     """
@@ -25,9 +24,9 @@ def test_lynch_surveillance_page_navigation(page: Page) -> None:
     expected page when clicked
     """
     # 'Set lynch invitation rates' page loads as expected
-    click(page, page.get_by_role("link", name="Set Lynch Invitation Rates"))
-    expect(page.locator("#page-title")).to_contain_text("Set Lynch Surveillance Invitation Rates")
+    LynchInvitationPage(page).click_set_lynch_invitation_rates_link()
+    SetLynchInvitationRatesPage(page).verify_set_lynch_invitation_rates_title()
 
     # Return to main menu
-    click(page, page.get_by_role("link", name="Main Menu"))
-    expect(page.locator("#ntshPageTitle")).to_contain_text("Main Menu")
+    BasePage(page).click_main_menu_link()
+    BasePage(page).main_menu_header_is_displayed()
