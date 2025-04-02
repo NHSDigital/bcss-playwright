@@ -16,6 +16,10 @@ class BatchList(BasePage):
         self.count_filter = self.page.locator("#countFilter")
         self.table_data = self.page.locator("td")
         self.batch_successfully_archived_msg = self.page.locator('text="Batch Successfully Archived and Printed"')
+        self.batch_list_page_title = self.page.locator("#page-title")
+
+    def verify_batch_list_page_title(self, text) -> None:
+        expect(self.batch_list_page_title).to_contain_text(text)
 
     def verify_table_data(self, value)->None:
         expect(self.table_data.filter(has_text=value)).to_be_visible()

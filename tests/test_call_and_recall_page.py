@@ -1,8 +1,14 @@
 import pytest
 from sys import platform
-from playwright.sync_api import Page, expect
-from utils.click_helper import click
+from playwright.sync_api import Page
 from pages.base_page import BasePage
+from pages.call_and_recall_page import CallAndRecall
+from pages.invitations_monitoring_page import InvitationsMonitoring
+from pages.generate_invitations_page import GenerateInvitations
+from pages.non_invitations_days_page import NonInvitationDays
+from pages.age_extension_rollout_plans_page import AgeExtensionRolloutPlans
+from pages.invitations_plans_page import InvitationsPlans
+from pages.create_a_plan_page import CreateAPlan
 from utils.user_tools import UserTools
 from jproperties import Properties
 
@@ -44,33 +50,33 @@ def test_call_and_recall_page_navigation(page: Page) -> None:
     Confirms that the Call and Recall menu displays all menu options and confirms they load the correct pages
     """
     # Planning and monitoring page loads as expected
-    click(page, page.get_by_role("link", name="Planning and Monitoring"))
-    expect(page.locator("#page-title")).to_contain_text("Invitations Monitoring - Screening Centre")
-    click(page, page.get_by_role("link", name="Back"))
+    CallAndRecall(page).go_to_planning_and_monitoring_page()
+    InvitationsMonitoring(page).verify_invitations_monitoring_title()
+    BasePage(page).click_back_button()
 
     # Generate invitations page loads as expected
-    click(page, page.get_by_role("link", name="Generate Invitations"))
-    expect(page.locator("#ntshPageTitle")).to_contain_text("Generate Invitations")
-    click(page, page.get_by_role("link", name="Back"))
+    CallAndRecall(page).go_to_generate_invitations_page()
+    GenerateInvitations(page).verify_generate_invitations_title()
+    BasePage(page).click_back_button()
 
     # Invitation generation progress page loads as expected
-    click(page, page.get_by_role("link", name="Invitation Generation Progress"))
-    expect(page.locator("#ntshPageTitle")).to_contain_text("Invitation Generation Progress")
-    click(page, page.get_by_role("link", name="Back"))
+    CallAndRecall(page).go_to_invitation_generation_progress_page()
+    GenerateInvitations(page).verify_invitation_generation_progress_title()
+    BasePage(page).click_back_button()
 
     # Non invitation days page loads as expected
-    click(page, page.get_by_role("link", name="Non Invitation Days"))
-    expect(page.locator("#ntshPageTitle")).to_contain_text("Non-Invitation Days")
-    click(page, page.get_by_role("link", name="Back"))
+    CallAndRecall(page).go_to_non_invitation_days_page()
+    NonInvitationDays(page).verify_non_invitation_days_tile()
+    BasePage(page).click_back_button()
 
     # Age extension rollout page loads as expected
-    click(page, page.get_by_role("link", name="Age Extension Rollout Plans"))
-    expect(page.locator("#page-title")).to_contain_text("Age Extension Rollout Plans")
-    click(page, page.get_by_role("link", name="Back"))
+    CallAndRecall(page).go_to_age_extension_rollout_plans_page()
+    AgeExtensionRolloutPlans(page).verify_age_extension_rollout_plans_title()
+    BasePage(page).click_back_button()
 
     # Return to main menu
-    click(page, page.get_by_role("link", name="Main Menu"))
-    expect(page.locator("#ntshPageTitle")).to_contain_text("Main Menu")
+    BasePage(page).click_main_menu_link()
+    BasePage(page).main_menu_header_is_displayed()
 
 
 def test_view_an_invitation_plan(page: Page, tests_properties: dict) -> None:
@@ -78,13 +84,13 @@ def test_view_an_invitation_plan(page: Page, tests_properties: dict) -> None:
     Confirms that an invitation plan can be viewed via a screening centre from the planning ad monitoring page
     """
     # Go to planning and monitoring page
-    click(page, page.get_by_role("link", name="Planning and Monitoring"))
+    CallAndRecall(page).go_to_planning_and_monitoring_page()
 
     # Select a screening centre
-    page.get_by_role("link", name=tests_properties["screening_centre_code"]).click()
+    InvitationsMonitoring(page).go_to_invitation_plan_page(tests_properties["screening_centre_code"])
 
     # Select an invitation plan
-    click(page, page.get_by_role("row").nth(1).get_by_role("link"))
+    InvitationsPlans(page).go_to_first_available_plan()
 
     # Verify invitation page is displayed
-    expect(page.locator("#page-title")).to_contain_text("View a plan")
+    CreateAPlan(page).verify_create_a_plan_title()

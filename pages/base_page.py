@@ -8,7 +8,7 @@ class BasePage:
         self.sub_menu_link = self.page.get_by_role("link", name="Show Sub-menu")
         self.hide_sub_menu_link = self.page.get_by_role("link", name="Hide Sub-menu")
         self.select_org_link = self.page.get_by_role("link", name="Select Org")
-        self.back_button = self.page.get_by_role("link", name="Back")
+        self.back_button = self.page.get_by_role("link", name="Back", exact=True)
         self.release_notes_link = self.page.get_by_role("link", name="- Release Notes")
         self.refresh_alerts_link = self.page.get_by_role("link", name="Refresh alerts")
         self.user_guide_link = self.page.get_by_role("link", name="User guide")
@@ -30,6 +30,7 @@ class BasePage:
         self.screening_subject_search_page = self.page.get_by_role("link", name="Screening Subject Search")
         # Bowel Cancer Screening System header
         self.bowel_cancer_screening_system_header = self.page.locator("#ntshAppTitle")
+        self.main_menu__header = self.page.locator("#ntshPageTitle")
 
     def click_main_menu_link(self)->None:
         for _ in range(3):  # Try up to 3 times
@@ -66,6 +67,9 @@ class BasePage:
 
     def bowel_cancer_screening_system_header_is_displayed(self)->None:
         expect(self.bowel_cancer_screening_system_header).to_contain_text("Bowel Cancer Screening System")
+
+    def main_menu_header_is_displayed(self)->None:
+        expect(self.main_menu__header).to_contain_text("Main Menu")
 
     def go_to_contacts_list_page(self)->None:
         self.click(self.contacts_list_page)

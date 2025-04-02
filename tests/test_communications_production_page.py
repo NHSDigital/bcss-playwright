@@ -1,8 +1,11 @@
 import pytest
 from playwright.sync_api import Page, expect
-from pages.login_page import BcssLoginPage
 from pages.base_page import BasePage
-from utils.click_helper import click
+from pages.communications_production_page import CommunicationsProduction
+from pages.batch_list_page import ActiveBatchList,ArchivedBatchList
+from pages.letter_library_index_page import LetterLibraryIndex
+from pages.letter_signatory_page import LetterSignatory
+from pages.electronic_communications_management import ElectronicCommunicationManagement
 from utils.user_tools import UserTools
 
 
@@ -26,33 +29,33 @@ def test_communications_production_page_navigation(page: Page) -> None:
     are loaded when the links are clicked
     """
     # Active batch list page loads as expected
-    click(page, page.get_by_role("link", name="Active Batch List"))
-    expect(page.locator("#page-title")).to_contain_text("Active Batch List")
-    click(page, page.get_by_role("link", name="Back"))
+    CommunicationsProduction(page).go_to_active_batch_list_page()
+    ActiveBatchList(page).verify_batch_list_page_title("Active Batch List")
+    BasePage(page).click_back_button()
 
     # Archived batch list page loads as expected
-    click(page, page.get_by_role("link", name="Archived Batch List"))
-    expect(page.locator("#page-title")).to_contain_text("Archived Batch List")
-    click(page, page.get_by_role("link", name="Back"))
+    CommunicationsProduction(page).go_to_archived_batch_list_page()
+    ArchivedBatchList(page).verify_batch_list_page_title("Archived Batch List")
+    BasePage(page).click_back_button()
 
     # Letter library index page loads as expected
-    click(page, page.get_by_role("link", name="Letter Library Index"))
-    expect(page.locator("#ntshPageTitle")).to_contain_text("Letter Library Index")
-    click(page, page.get_by_role("link", name="Back", exact=True))
+    CommunicationsProduction(page).go_to_letter_library_index_page()
+    LetterLibraryIndex(page).verify_letter_library_index_title()
+    BasePage(page).click_back_button()
 
     # Manage individual letter link is visible (not clickable due to user role permissions)
-    expect(page.get_by_text("Manage Individual Letter")).to_be_visible()
+    CommunicationsProduction(page).verify_manage_individual_letter_page_visible()
 
     # Letter signatory page loads as expected
-    click(page, page.get_by_role("link", name="Letter Signatory"))
-    expect(page.locator("#ntshPageTitle")).to_contain_text("Letter Signatory")
-    click(page, page.get_by_role("link", name="Back"))
+    CommunicationsProduction(page).go_to_letter_signatory_page()
+    LetterSignatory(page).verify_letter_signatory_title()
+    BasePage(page).click_back_button()
 
     # Electronic communication management page loads as expected
-    click(page, page.get_by_role("link", name="Electronic Communication"))
-    expect(page.locator("#page-title")).to_contain_text("Electronic Communication Management")
+    CommunicationsProduction(page).go_to_electronic_communication_management_page()
+    ElectronicCommunicationManagement(page).verify_electronic_communication_management_title()
 
     # Return to main menu
     # main_menu_link = page.get_by_role("link", name="Main Menu")
-    click(page, page.get_by_role("link", name="Main Menu"))
-    expect(page.locator("#ntshPageTitle")).to_contain_text("Main Menu")
+    BasePage(page).click_main_menu_link()
+    BasePage(page).main_menu_header_is_displayed()
