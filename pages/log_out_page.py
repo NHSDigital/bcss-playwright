@@ -1,5 +1,4 @@
 from playwright.sync_api import Page, expect
-from pages.base_page import BasePage
 import logging
 from pages.base_page import BasePage
 
@@ -15,6 +14,6 @@ class Logout(BasePage):
 
     def log_out(self)->None:
         logging.info("Test Complete - Logging Out")
-        BasePage(self.page).click_log_out_link()
+        self.click_log_out_link()
         expect(self.log_out_msg).to_be_visible()
         self.page.close()

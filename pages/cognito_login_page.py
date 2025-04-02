@@ -20,4 +20,4 @@ class CognitoLoginPage(BasePage):
         # Retrieve and enter password from .env file
         self.password.fill(password)
         # Click Submit
-        self.submit_button.click()
+        self.click(self.submit_button)
