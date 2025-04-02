@@ -9,9 +9,9 @@ class BcssLoginPage(BasePage):
         super().__init__(page)
         self.page = page
         self.page.goto("/")
-        self.username = page.get_by_role("textbox", name="Username")
-        self.password = page.get_by_role("textbox", name="Password")
-        self.submit_button = page.get_by_role("button", name="submit")
+        self.username = self.page.get_by_role("textbox", name="Username")
+        self.password = self.page.get_by_role("textbox", name="Password")
+        self.submit_button = self.page.get_by_role("button", name="submit")
         load_dotenv()  # Take environment variables from .env
 
     def login_as_user(self, username: str) -> None:

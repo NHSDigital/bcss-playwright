@@ -1,4 +1,4 @@
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 
 class FITTestKits(BasePage):
@@ -17,6 +17,10 @@ class FITTestKits(BasePage):
         self.manage_qc_products_page = self.page.get_by_role("link", name="Manage QC Products")
         self.maintain_analysers_page = self.page.get_by_role("link", name="Maintain Analysers")
         self.fit_device_id = self.page.get_by_role("textbox", name="FIT Device ID")
+        self.fit_test_kits_title = self.page.locator("#ntshPageTitle")
+
+    def verify_fit_test_kits_title(self) -> None:
+        expect(self.fit_test_kits_title).to_contain_text("FIT Test Kits")
 
     def go_to_fit_rollout_summary_page(self)->None:
         self.click(self.fit_rollout_summary_page)

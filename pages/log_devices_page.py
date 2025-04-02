@@ -15,6 +15,10 @@ class LogDevices(BasePage):
         self.successfully_logged_device_text = self.page.get_by_text("×Successfully logged device")
         self.spoilt_device_dropdown = self.page.get_by_label("Spoil reason drop down")
         self.log_as_spoilt_button = self.page.get_by_role("button", name="Log as Spoilt")
+        self.log_devices_title = self.page.locator("#page-title")
+
+    def verify_log_devices_title(self) -> None:
+        expect(self.log_devices_title).to_contain_text("Scan Device")
 
     def fill_fit_device_id_field(self, value)->None:
         self.fit_device_id_field.fill(value)

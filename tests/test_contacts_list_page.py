@@ -1,7 +1,11 @@
 import pytest
 from playwright.sync_api import Page, expect
-from utils.click_helper import click
 from pages.base_page import BasePage
+from pages.contacts_list_page import ContactsListPage
+from pages.view_contacts_page import ViewContacts
+from pages.edit_my_contact_details_page import EditMyContactDetails
+from pages.maintain_contacts_page import MaintainContacts
+from pages.my_preference_settings_page import MyPreferenceSettings
 from utils.user_tools import UserTools
 
 
@@ -24,29 +28,29 @@ def test_contacts_list_page_navigation(page: Page) -> None:
     are loaded when the links are clicked
     """
     # View contacts page loads as expected
-    click(page, page.get_by_role("link", name="View Contacts"))
-    expect(page.locator("#ntshPageTitle")).to_contain_text("View Contacts")
-    click(page, page.get_by_role("link", name="Back", exact=True))
+    ContactsListPage(page).go_to_view_contacts_page()
+    ViewContacts(page).verify_view_contacts_title()
+    BasePage(page).click_back_button()
 
     # Edit my contact details page loads as expected
-    click(page, page.get_by_role("link", name="Edit My Contact Details"))
-    expect(page.locator("#ntshPageTitle")).to_contain_text("Edit My Contact Details")
-    click(page, page.get_by_role("link", name="Back"))
+    ContactsListPage(page).go_to_edit_my_contact_details_page()
+    EditMyContactDetails(page).verify_edit_my_contact_details_title()
+    BasePage(page).click_back_button()
 
     # Maintain contacts page loads as expected
-    click(page, page.get_by_role("link", name="Maintain Contacts"))
-    expect(page.locator("#ntshPageTitle")).to_contain_text("Maintain Contacts")
-    click(page, page.get_by_role("link", name="Back"))
+    ContactsListPage(page).go_to_maintain_contacts_page()
+    MaintainContacts(page).verify_maintain_contacts_title()
+    BasePage(page).click_back_button()
 
     # My preference settings page loads as expected
-    click(page, page.get_by_role("link", name="My Preference Settings"))
-    expect(page.locator("#ntshPageTitle")).to_contain_text("My Preference Settings")
-    click(page, page.get_by_role("link", name="Back"))
+    ContactsListPage(page).go_to_my_preference_settings_page()
+    MyPreferenceSettings(page).verify_my_preference_settings_title()
+    BasePage(page).click_back_button()
 
     # Other links are visible (Not clickable due to user role permissions)
-    expect(page.get_by_text("Extract Contact Details")).to_be_visible()
-    expect(page.get_by_text("Resect and Discard Accredited")).to_be_visible()
+    ContactsListPage(page).verify_extract_contact_details_page_visible()
+    ContactsListPage(page).verify_resect_and_discard_accredited_page_visible()
 
     # Return to main menu
-    click(page, page.get_by_role("link", name="Main Menu"))
-    expect(page.locator("#ntshPageTitle")).to_contain_text("Main Menu")
+    BasePage(page).click_main_menu_link()
+    BasePage(page).main_menu_header_is_displayed()

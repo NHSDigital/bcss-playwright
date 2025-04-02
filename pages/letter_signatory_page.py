@@ -6,7 +6,7 @@ class LetterSignatory(BasePage):
         super().__init__(page)
         self.page = page
         #Letter Signatory - page locators
-        self.letter_signatory_title = page.locator("#ntshPageTitle")
+        self.letter_signatory_title = self.page.locator("#ntshPageTitle")
 
     def verify_letter_signatory_title(self) -> None:
         expect(self.letter_signatory_title).to_contain_text("Letter Signatory")

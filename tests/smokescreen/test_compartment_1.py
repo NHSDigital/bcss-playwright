@@ -36,6 +36,7 @@ def smokescreen_properties() -> dict:
 
 @pytest.mark.smoke
 @pytest.mark.compartment1
+@pytest.mark.compartment1_plan_creation
 def test_create_invitations_plan(page: Page, smokescreen_properties: dict) -> None:
     """
     This is used to create the invitations plan. As it is not always needed it is separate to the main Compartment 1 function

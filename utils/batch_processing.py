@@ -51,6 +51,25 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
         elif (i+1) == batch_description_cells.count():
             pytest.fail(f"No open '{batch_type} - {batch_description}' batch found")
 
+    prepare_and_print_batch(page, link_text)
+
+    check_batch_in_archived_batch_list(page, link_text)
+
+    first_nhs_no = nhs_no_df["subject_nhs_number"].iloc[0]
+    try:
+        verify_subject_event_status_by_nhs_no(page, first_nhs_no, latest_event_status)
+        logging.info(f"Successfully verified NHS number {first_nhs_no} with status {latest_event_status}")
+    except Exception as e:
+        pytest.fail(f"Verification failed for NHS number {first_nhs_no}: {str(e)}")
+
+    if run_timed_events:
+        OracleDB().exec_bcss_timed_events(nhs_no_df)
+
+def prepare_and_print_batch(page: Page, link_text) -> None:
+    """
+    This method prepares the batch, retreives the files and confirms them as printed
+    Once those buttons have been pressed it waits for the message 'Batch Successfully Archived'
+    """
     ManageActiveBatch(page).click_prepare_button()
     page.wait_for_timeout(
         1000)  # This one second timeout does not affect the time to execute, as it is just used to ensure the reprepare batch button is clicked and does not instantly advance to the next step
@@ -90,6 +109,10 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
     except Exception as e:
         pytest.fail(f"Batch successfully archived message is not shown: {str(e)}")
 
+def check_batch_in_archived_batch_list(page: Page, link_text) -> None:
+    """
+    This method checks the the batch that was just prepared and printed is now visible in the archived batch list
+    """
     BasePage(page).click_main_menu_link()
     BasePage(page).go_to_communications_production_page()
     CommunicationsProduction(page).go_to_archived_batch_list_page()
@@ -99,13 +122,3 @@ def batch_processing(page: Page, batch_type: str, batch_description: str, latest
         logging.info(f"Batch {link_text} visible in archived batch list")
     except Exception as e:
         logging.error(f"Batch {link_text} not visible in archived batch list: {str(e)}")
-
-    first_nhs_no = nhs_no_df["subject_nhs_number"].iloc[0]
-    try:
-        verify_subject_event_status_by_nhs_no(page, first_nhs_no, latest_event_status)
-        logging.info(f"Successfully verified NHS number {first_nhs_no} with status {latest_event_status}")
-    except Exception as e:
-        pytest.fail(f"Verification failed for NHS number {first_nhs_no}: {str(e)}")
-
-    if run_timed_events:
-        OracleDB().exec_bcss_timed_events(nhs_no_df)

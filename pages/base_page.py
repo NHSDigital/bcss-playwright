@@ -117,8 +117,8 @@ class BasePage:
         try:
             self.page.wait_for_load_state('load')
             self.page.wait_for_load_state('domcontentloaded')
-            locator.wait_for("attached")
-            locator.wait_for("visible")
+            locator.wait_for(state = "attached")
+            locator.wait_for(state = "visible")
             locator.click()
 
         except Exception as locatorClickError:

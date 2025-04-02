@@ -6,7 +6,7 @@ class LetterLibraryIndex(BasePage):
         super().__init__(page)
         self.page = page
         #Letter Library Index - page locators
-        self.letter_library_index_title = page.locator("#ntshPageTitle")
+        self.letter_library_index_title = self.page.locator("#ntshPageTitle")
 
     def verify_letter_library_index_title(self) -> None:
         expect(self.letter_library_index_title).to_contain_text("Letter Library Index")
