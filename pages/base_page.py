@@ -22,7 +22,7 @@ class BasePage:
         self.communications_production_page = self.page.get_by_role("link", name="Communications Production")
         self.download_page = self.page.get_by_role("link", name="Download")
         self.fit_test_kits_page = self.page.get_by_role("link", name="FIT Test Kits")
-        self.gfob_test_kits_page = self.page.get_by_role("link", name="gFOBT Test Kits")
+        self.gfobt_test_kits_page = self.page.get_by_role("link", name="gFOBT Test Kits")
         self.lynch_surveillance_page = self.page.get_by_role("link", name="Lynch Surveillance")
         self.organisations_page = self.page.get_by_role("link", name="Organisations")
         self.reports_page = self.page.get_by_role("link", name="Reports")
@@ -89,8 +89,8 @@ class BasePage:
     def go_to_fit_test_kits_page(self)->None:
         self.click(self.fit_test_kits_page)
 
-    def go_to_gfob_test_kits_page(self)->None:
-        self.click(self.gfob_test_kits_page)
+    def go_to_gfobt_test_kits_page(self)->None:
+        self.click(self.gfobt_test_kits_page)
 
     def go_to_lynch_surveillance_page(self)->None:
         self.click(self.lynch_surveillance_page)

@@ -1,7 +1,12 @@
 import pytest
-from playwright.sync_api import Page, expect
-from utils.click_helper import click
+from playwright.sync_api import Page
+
 from pages.base_page import BasePage
+from pages.gFOBT_test_kits_page import GFOBTTestKits
+from pages.gFOBT_test_kit_logging_page import TestKitLogging
+from pages.gFOBT_test_kit_quality_control_reading_page import TestKitQualityControlReading
+from pages.gFOBT_view_test_kit_result import ViewTestKitResult
+from pages.gFOBT_create_qc_kit_page import CreateQCKit, ReadingDropdownOptions
 from utils.user_tools import UserTools
 
 
@@ -9,70 +14,63 @@ from utils.user_tools import UserTools
 def before_each(page: Page):
     """
     Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the
-    gfob test kits page
+    gfobt test kits page
     """
     # Log in to BCSS
     UserTools.user_login(page, "Hub Manager State Registered")
 
     # Go to gFOBT test kits page
-    BasePage(page).go_to_gfob_test_kits_page()
+    BasePage(page).go_to_gfobt_test_kits_page()
 
 
 @pytest.mark.smoke
-def test_gfob_test_kit_page_navigation(page: Page) -> None:
+def test_gfobt_test_kit_page_navigation(page: Page) -> None:
     """
-    Confirms all menu items are displayed on the gfob test kits page, and that the relevant pages
+    Confirms all menu items are displayed on the gfobt test kits page, and that the relevant pages
     are loaded when the links are clicked
     """
     # Test kit logging page opens as expected
-    click(page, page.get_by_role("link", name="Test Kit Logging"))
-    expect(page.locator("#ntshPageTitle")).to_contain_text("Test Kit Logging")
-    click(page, page.get_by_role("link", name="Back"))
+    GFOBTTestKits(page).go_to_test_kit_logging_page()
+    TestKitLogging(page).verify_test_kit_logging_title()
+    BasePage(page).click_back_button()
 
     # Test kit reading page opens as expected
-    click(page, page.get_by_role("link", name="Test Kit Reading"))
-    expect(page.locator("#ntshPageTitle")).to_contain_text("Test Kit Quality Control Reading")
-    click(page, page.get_by_role("link", name="Back"))
+    GFOBTTestKits(page).go_to_test_kit_result_page()
+    TestKitQualityControlReading(page).verify_test_kit_logging_tile()
+    BasePage(page).click_back_button()
 
     # View test kit result page opens as expected
-    click(page, page.get_by_role("link", name="View Test Kit Result"))
-    expect(page.locator("#ntshPageTitle")).to_contain_text("View Test Kit Result")
-    click(page, page.get_by_role("link", name="Back"))
+    GFOBTTestKits(page).go_to_test_kit_result_page()
+    ViewTestKitResult(page).verify_view_test_kit_result_title()
+    BasePage(page).click_back_button()
 
     # Create qc kit page opens as expected
-    click(page, page.get_by_role("link", name="Create QC Kit"))
-    expect(page.locator("#ntshPageTitle")).to_contain_text("Create QC Kit")
+    GFOBTTestKits(page).go_to_create_qc_kit_page()
+    CreateQCKit(page).verify_create_qc_kit_title()
+    BasePage(page).click_back_button()
 
     # Return to main menu
-    click(page, page.get_by_role("link", name="Main Menu"))
-    expect(page.locator("#ntshPageTitle")).to_contain_text("Main Menu")
+    BasePage(page).click_main_menu_link()
+    BasePage(page).main_menu_header_is_displayed()
 
 
 def test_create_a_qc_kit(page: Page) -> None:
     """
     Confirms that a qc test kit can be created and that each of the dropdowns has an option set available for selection
     """
-    # 'Reading' dropdown locators
-    reading1dropdown = page.locator("#A_C_Reading_999_0_0")
-    reading2dropdown = page.locator("#A_C_Reading_999_0_1")
-    reading3dropdown = page.locator("#A_C_Reading_999_1_0")
-    reading4dropdown = page.locator("#A_C_Reading_999_1_1")
-    reading5dropdown = page.locator("#A_C_Reading_999_2_0")
-    reading6dropdown = page.locator("#A_C_Reading_999_2_1")
-
     # Navigate to create QC kit page
-    click(page, page.get_by_role("link", name="Create QC Kit"))
+    GFOBTTestKits(page).go_to_create_qc_kit_page()
 
     # Select QC kit drop down options
-    reading1dropdown.select_option("NEGATIVE")
-    reading2dropdown.select_option("POSITIVE")
-    reading3dropdown.select_option("POSITIVE")
-    reading4dropdown.select_option("UNUSED")
-    reading5dropdown.select_option("NEGATIVE")
-    reading6dropdown.select_option("POSITIVE")
+    CreateQCKit(page).go_to_reading1dropdown(ReadingDropdownOptions.NEGATIVE.value)
+    CreateQCKit(page).go_to_reading2dropdown(ReadingDropdownOptions.POSITIVE.value)
+    CreateQCKit(page).go_to_reading3dropdown(ReadingDropdownOptions.POSITIVE.value)
+    CreateQCKit(page).go_to_reading4dropdown(ReadingDropdownOptions.UNUSED.value)
+    CreateQCKit(page).go_to_reading5dropdown(ReadingDropdownOptions.NEGATIVE.value)
+    CreateQCKit(page).go_to_reading6dropdown(ReadingDropdownOptions.POSITIVE.value)
 
     # Click save
-    click(page, page.get_by_role("button", name="Save Kit"))
+    CreateQCKit(page).go_to_save_kit()
 
     # Verify kit has saved
-    expect(page.locator("th")).to_contain_text("A quality control kit has been created with the following values:")
+    CreateQCKit(page).verify_kit_has_saved()
