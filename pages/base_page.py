@@ -133,3 +133,11 @@ class BasePage:
         except Exception as locatorClickError:
             logging.warning(f"Failed to click element with error: {locatorClickError}, trying again...")
             locator.click()
+
+    def bowel_cancer_screening_page_title_contains_text(self, text: str) -> None:
+        """Asserts that the page title contains the specified text.
+
+            Args:
+                text (str): The expected text that you want to assert for the page title ("#ntshPageTitle") element.
+        """
+        expect(self.bowel_cancer_screening_page_header).to_contain_text(text)
