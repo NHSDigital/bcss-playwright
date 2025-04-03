@@ -1,9 +1,7 @@
 import pytest
 from playwright.sync_api import Page, expect
+from utils.click_helper import click
 from pages.base_page import BasePage
-from pages.screening_practitioner_appointments import ScreeningPractitionerAppointmentsPage
-from pages.bowel_scope_appointments_page import BowelScopeAppointments
-from pages.colonoscopy_assessment_appointments_page import ColonoscopyAssessmentAppointments
 from utils.user_tools import UserTools
 
 
@@ -27,21 +25,21 @@ def test_screening_practitioner_appointments_page_navigation(page: Page) -> None
     and clickable (where the user has required permissions).
     """
     # Verify View appointments page opens as expected
-    ScreeningPractitionerAppointmentsPage(page).go_to_view_appointments_page()
-    BowelScopeAppointments(page).verify_page_title()
-    BowelScopeAppointments(page).click_back_button()
+    click(page, page.get_by_role("link", name="View appointments"))
+    expect(page.locator("#ntshPageTitle")).to_contain_text("Appointment Calendar")
+    click(page, page.get_by_role("link", name="Back"))
 
     # Verify Patients that Require Colonoscopy Assessment Appointments page opens as expected
-    ScreeningPractitionerAppointmentsPage(page).go_to_patients_that_require_page()
-    ColonoscopyAssessmentAppointments(page).verify_page_header()
+    click(page, page.get_by_role("link", name="Patients that Require"))
+    expect(page.locator("#page-title")).to_contain_text("Patients that Require Colonoscopy Assessment Appointments")
+    click(page, page.get_by_role("link", name="Back"))
 
-    ColonoscopyAssessmentAppointments(page).click_back_button()
-
-    expect(ScreeningPractitionerAppointmentsPage(page).patients_that_require_colonoscopy_assessment_appointments_bowel_scope_link).to_be_visible()
-    expect(ScreeningPractitionerAppointmentsPage(page).patients_that_require_surveillance_appointment_link).to_be_visible()
-    expect(ScreeningPractitionerAppointmentsPage(page).patients_that_require_post).to_be_visible()
-    expect(ScreeningPractitionerAppointmentsPage(page).set_availability_link).to_be_visible()
+    # Verify below links are visible (not clickable due to user role permissions)
+    expect(page.get_by_text("Patients that Require Colonoscopy Assessment Appointments - Bowel Scope")).to_be_visible()
+    expect(page.get_by_text("Patients that Require Surveillance Appointments")).to_be_visible()
+    expect(page.get_by_text("Patients that Require Post-")).to_be_visible()
+    expect(page.get_by_text("Set Availability")).to_be_visible()
 
     # Return to main menu
-    ScreeningPractitionerAppointmentsPage(page).click_main_menu_link()
-    ScreeningPractitionerAppointmentsPage(page).main_menu_header_is_displayed()
+    click(page, page.get_by_role("link", name="Main Menu"))
+    expect(page.locator("#ntshPageTitle")).to_contain_text("Main Menu")
