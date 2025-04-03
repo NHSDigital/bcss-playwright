@@ -1,11 +1,31 @@
 import pytest
 from playwright.sync_api import Page, expect
-
+from sys import platform
 from pages.base_page import BasePage
 from pages.reports_page import ReportsPage
 from utils.click_helper import click
 from utils.date_time_utils import DateTimeUtils
 from utils.user_tools import UserTools
+from jproperties import Properties
+
+
+@pytest.fixture
+def tests_properties() -> dict:
+    """
+    Reads the 'bcss_tests.properties' file and populates a 'Properties' object.
+    Returns a dictionary of properties for use in tests.
+
+    Returns:
+        dict: A dictionary containing the values loaded from the 'bcss_tests.properties' file.
+    """
+    configs = Properties()
+    if platform == "win32":  # File path from content root is required on Windows OS
+        with open('tests/bcss_tests.properties', 'rb') as read_prop:
+            configs.load(read_prop)
+    elif platform == "darwin":  # Only the filename is required on macOS
+        with open('bcss_tests.properties', 'rb') as read_prop:
+            configs.load(read_prop)
+    return configs.properties
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -97,13 +117,12 @@ def test_failsafe_reports_date_report_last_requested(page: Page) -> None:
     expect(report_timestamp_element).to_contain_text(report_timestamp)
 
 
-@pytest.mark.only
 def test_failsafe_reports_screening_subjects_with_inactive_open_episode(page: Page) -> None:
     """
     Confirms 'screening_subjects_with_inactive_open_episode' page loads, 'generate report' button works as expected
     and that a screening subject record can be opened
     """
-    nhs_number_link = page.get_by_role("cell", name="7652")
+    nhs_number_link = page.get_by_role("cell", name="7652")  # This value is specific to this test only
 
     # Go to failsafe reports page
     ReportsPage(page).go_to_failsafe_reports_page()
@@ -159,7 +178,9 @@ def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(page: Pag
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Subject Demographic")
 
 
-def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundaries(page: Page) -> None:
+@pytest.mark.only
+def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundaries(page: Page,
+                                                                                  tests_properties: dict) -> None:
     """
     Confirms 'allocate_sc_for_patient_movements_within_hub_boundaries' page loads,
     the 'generate report' button works as expected
@@ -169,9 +190,7 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
     """
 
     report_timestamp_element = page.locator("b")
-
     nhs_number_link = page.locator("//*[@id='listReportDataTable']/tbody/tr[3]/td[1]")
-    coventry_and_warwickshire_bcs_centre = "23643"
 
     # Go to failsafe reports page
     ReportsPage(page).go_to_failsafe_reports_page()
@@ -197,13 +216,13 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Set Patient's Screening Centre")
 
     # Select another screening centre
-    page.locator("#cboScreeningCentre").select_option(coventry_and_warwickshire_bcs_centre)
+    page.locator("#cboScreeningCentre").select_option(tests_properties["coventry_and_warwickshire_bcs_centre"])
 
     # Click update
     ReportsPage(page).click_reports_pages_update_button()
 
     # Verify new screening centre has saved
-    expect(page.locator("#cboScreeningCentre")).to_have_value(coventry_and_warwickshire_bcs_centre)
+    expect(page.locator("#cboScreeningCentre")).to_have_value(tests_properties["coventry_and_warwickshire_bcs_centre"])
 
 
 def test_failsafe_reports_allocate_sc_for_patient_movements_into_your_hub(page: Page) -> None:
@@ -413,7 +432,7 @@ def test_operational_reports_screening_practitioner_appointments(page: Page) -> 
 
     coventry_and_warwickshire_bcs_centre = "23643"
     screening_practitioner_named_another_stubble = "1982"
-    generate_report_button = page.locator("#submitThisForm") #The locator appears to be unique to this button
+    generate_report_button = page.locator("#submitThisForm")  # The locator appears to be unique to this button
     report_timestamp_element = page.locator("b")
 
     # Go to operational reports page
