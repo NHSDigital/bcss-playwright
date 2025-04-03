@@ -25,10 +25,16 @@ class SubjectScreeningPage(BasePage):
         self.laboratory_test_date_filter = self.page.get_by_role("textbox", name="Laboratory Test Date")
         self.diagnostic_test_actual_date_filter = self.page.get_by_role("textbox", name="Diagnostic Test Actual Date")
         self.search_button = self.page.get_by_role("button", name="Search")
+        self.clear_filters_button = self.page.get_by_role("button", name="Clear Filters")
+        self.appropriate_code_filter = self.page.get_by_label("Appropriate Code")
+        self.gp_practice_in_ccg_filter = self.page.get_by_label("GP Practice in CCG")
 
         self.select_screening_status = self.page.locator("#A_C_ScreeningStatus")
         self.select_episode_status = self.page.locator("#A_C_EpisodeStatus")
         self.select_search_area = self.page.locator("#A_C_SEARCH_DOMAIN")
+
+    def click_clear_filters_button(self) -> None:
+        self.click(self.clear_filters_button)
 
     def click_search_button(self)->None:
         self.click(self.search_button)

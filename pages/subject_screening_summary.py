@@ -20,8 +20,16 @@ class SubjectScreeningSummary(BasePage):
         self.reason = self.page.get_by_label("Reason", exact=True)
         self.update_subject_data = self.page.get_by_role("button", name="Update Subject Data")
         self.close_fobt_screening_episode = self.page.get_by_role("button", name="Close FOBT Screening Episode")
-        self.go_to_a_page_to_advance_the_episode = self.page.get_by_text("go to a page to Advance the")
-        self.go_to_a_page_to_close_the_episode = self.page.get_by_text("go to a page to Close the")
+        self.a_page_to_advance_the_episode = self.page.get_by_text("go to a page to Advance the")
+        self.a_page_to_close_the_episode = self.page.get_by_text("go to a page to Close the")
+        self.subject_search_results_title = self.page.locator("#ntshPageTitle")
+        self.display_rs = self.page.locator("#displayRS")
+
+    def verify_result_contains_text(self, text) -> None:
+        expect(self.display_rs).to_contain_text(text)
+
+    def verify_subject_search_results_title(self, text) -> None:
+        expect(self.subject_search_results_title).to_contain_text(text)
 
     def get_latest_event_status_cell(self, latest_event_status: str)-> Locator:
         return self.page.get_by_role("cell", name=latest_event_status, exact=True)
@@ -64,10 +72,10 @@ class SubjectScreeningSummary(BasePage):
         self.click(self.close_fobt_screening_episode)
 
     def go_to_a_page_to_advance_the_episode(self)-> None:
-        self.click(self.go_to_a_page_to_advance_the_episode)
+        self.click(self.a_page_to_advance_the_episode)
 
     def go_to_a_page_to_close_the_episode(self)-> None:
-        self.click(self.go_to_a_page_to_close_the_episode)
+        self.click(self.a_page_to_close_the_episode)
 
     def select_change_screening_status(self, option: str)-> None:
         self.change_screening_status.select_option(option)
