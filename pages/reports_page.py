@@ -6,11 +6,13 @@ class ReportsPage(BasePage):
         super().__init__(page)
         self.page = page
         # Reports page main menu links
+        self.bureau_reports_page = self.page.get_by_role("link", name="Bureau Reports")
         self.failsafe_reports_page = self.page.get_by_role("link", name="Failsafe Reports")
         self.operational_reports_page = self.page.get_by_role("link", name="Operational Reports")
         self.strategic_reports_page = self.page.get_by_role("link", name="Strategic Reports")
         self.cancer_waiting_times_reports_page = self.page.get_by_role("link", name="Cancer Waiting Times Reports")
         self.dashboard = self.page.get_by_role("link", name="Dashboard")
+        self.qa_report_dataset_completion_page = self.page.get_by_role("link", name="QA Report : Dataset Completion")
         # Reports pages shared buttons
         self.refresh_page_button = self.page.get_by_role("button", name="Refresh")
         self.generate_report_button = self.page.get_by_role("button", name="Generate Report")
@@ -45,6 +47,7 @@ class ReportsPage(BasePage):
     def go_to_dashboard(self) -> None:
         self.click(self.dashboard)
 
+    # Reports pages shared buttons actions
     def click_refresh_button(self) -> None:
         self.click(self.refresh_page_button)
 

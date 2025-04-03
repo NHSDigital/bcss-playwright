@@ -1,12 +1,11 @@
 import pytest
 from playwright.sync_api import Page, expect
 
+from pages.base_page import BasePage
 from pages.reports_page import ReportsPage
 from utils.click_helper import click
-from pages import reports_page
-from pages.base_page import BasePage
-from utils.user_tools import UserTools
 from utils.date_time_utils import DateTimeUtils
+from utils.user_tools import UserTools
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -28,27 +27,30 @@ def test_reports_page_navigation(page: Page) -> None:
     Confirms all menu items are displayed on the reports page, and that the relevant pages
     are loaded when the links are clicked
     """
+    bureau_reports_link = page.get_by_text("Bureau Reports")
+    qa_report_data_completion_link = page.get_by_text("QA Report : Dataset Completion")
+
     # Bureau reports link is visible
-    expect(page.get_by_text("Bureau Reports")).to_be_visible()
+    expect(bureau_reports_link).to_be_visible()
 
     # Failsafe reports page opens as expected
     ReportsPage(page).go_to_failsafe_reports_page()
-    BasePage(page).bowel_cancer_screening_page_title_contains_text("Failsafe Reports")
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Failsafe Reports")
     BasePage(page).click_back_button()
 
     # Operational reports page opens as expected
     ReportsPage(page).go_to_operational_reports_page()
-    BasePage(page).bowel_cancer_screening_page_title_contains_text("Operational Reports")
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Operational Reports")
     BasePage(page).click_back_button()
 
     # Strategic reports page opens as expected
     ReportsPage(page).go_to_strategic_reports_page()
-    BasePage(page).bowel_cancer_screening_page_title_contains_text("Strategic Reports")
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Strategic Reports")
     BasePage(page).click_back_button()
 
     # "Cancer waiting times reports" page opens as expected
     ReportsPage(page).go_to_cancer_waiting_times_reports_page()
-    BasePage(page).bowel_cancer_screening_page_title_contains_text("Cancer Waiting Times Reports")
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Cancer Waiting Times Reports")
     BasePage(page).click_back_button()
 
     # Dashboard opens as expected TODO - this step may be failing legitimately
@@ -57,11 +59,11 @@ def test_reports_page_navigation(page: Page) -> None:
     # BasePage(page).click_back_button()
 
     # QA Report : Dataset Completion link is visible
-    expect(page.get_by_text("QA Report : Dataset Completion")).to_be_visible()
+    expect(qa_report_data_completion_link).to_be_visible()
 
     # Return to main menu
     BasePage(page).click_main_menu_link()
-    BasePage(page).bowel_cancer_screening_page_title_contains_text("Main Menu")
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Main Menu")
 
 
 # Failsafe Reports
@@ -77,7 +79,7 @@ def test_failsafe_reports_date_report_last_requested(page: Page) -> None:
     ReportsPage(page).go_to_date_report_last_requested_page()
 
     # Verify 'Date Report Last Requested' is the page title
-    BasePage(page).bowel_cancer_screening_page_title_contains_text("Date Report Last Requested")
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Date Report Last Requested")
 
     # Click 'generate report' button
     ReportsPage(page).click_generate_report_button()
@@ -93,6 +95,7 @@ def test_failsafe_reports_date_report_last_requested(page: Page) -> None:
     expect(page.locator("b")).to_contain_text(report_timestamp)
 
 
+@pytest.mark.only
 def test_failsafe_reports_screening_subjects_with_inactive_open_episode(page: Page) -> None:
     """
     Confirms 'screening_subjects_with_inactive_open_episode' page loads, 'generate report' button works as expected
@@ -107,7 +110,7 @@ def test_failsafe_reports_screening_subjects_with_inactive_open_episode(page: Pa
     ReportsPage(page).go_to_screening_subjects_with_inactive_open_episode_link_page()
 
     # Verify "Screening Subjects With Inactive Open Episode" is the page title
-    expect(page.locator("#page-title")).to_contain_text("Screening Subjects With Inactive Open Episode")
+    BasePage(page).bowel_cancer_screening_page_title_contains_text("Screening Subjects With Inactive Open Episode")
 
     # Click 'Generate Report' button
     ReportsPage(page).click_generate_report_button()
@@ -116,7 +119,7 @@ def test_failsafe_reports_screening_subjects_with_inactive_open_episode(page: Pa
     nhs_number_link.click()
 
     # Verify "Subject Screening Summary" is the page title
-    BasePage(page).bowel_cancer_screening_page_title_contains_text("Subject Screening Summary")
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Subject Screening Summary")
 
 
 def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(page: Page) -> None:
@@ -151,7 +154,7 @@ def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(page: Pag
     nhs_number_link.click()
 
     # Verify page title is "Subject Demographic"
-    BasePage(page).bowel_cancer_screening_page_title_contains_text("Subject Demographic")
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Subject Demographic")
 
 
 def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundaries(page: Page) -> None:
@@ -173,7 +176,7 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
     ReportsPage(page).go_to_allocate_sc_for_patient_movements_within_hub_boundaries_page()
 
     # Verify page title is "Allocate SC for Patient Movements within Hub Boundaries"
-    BasePage(page).bowel_cancer_screening_page_title_contains_text(
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
         "Allocate SC for Patient Movements within Hub Boundaries")
 
     # Click "Generate Report"
@@ -187,7 +190,7 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
     nhs_number_link.click()
 
     # Verify page title is "Set Patient's Screening Centre"
-    BasePage(page).bowel_cancer_screening_page_title_contains_text("Set Patient's Screening Centre")
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Set Patient's Screening Centre")
 
     # Select another screening centre
     page.locator("#cboScreeningCentre").select_option(coventry_and_warwickshire_bcs_centre)
@@ -212,7 +215,8 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_into_your_hub(page: 
     ReportsPage(page).go_to_allocate_sc_for_patient_movements_into_your_hub_page()
 
     # Verify page title is "Date Report Last Requested"
-    BasePage(page).bowel_cancer_screening_page_title_contains_text("Allocate SC for Patient Movements into your Hub")
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
+        "Allocate SC for Patient Movements into your Hub")
 
     # Click "Generate Report" button
     ReportsPage(page).click_generate_report_button()
@@ -247,7 +251,7 @@ def test_failsafe_reports_identify_and_link_new_gp(page: Page) -> None:
     ReportsPage(page).go_to_identify_and_link_new_gp_page()
 
     # Verify page title is "Identify and link new GP practices"
-    BasePage(page).bowel_cancer_screening_page_title_contains_text("Identify and link new GP practices")
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Identify and link new GP practices")
 
     # Click on "Generate Report"
     ReportsPage(page).click_generate_report_button()
@@ -267,7 +271,7 @@ def test_failsafe_reports_identify_and_link_new_gp(page: Page) -> None:
     nhs_number_link.click()
 
     # Verify page title is "Link GP practice to Screening Centre"
-    BasePage(page).bowel_cancer_screening_page_title_contains_text("Link GP practice to Screening Centre")
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Link GP practice to Screening Centre")
 
 
 # Operational Reports
@@ -290,7 +294,7 @@ def test_operational_reports_appointment_attendance_not_updated(page: Page) -> N
     ReportsPage(page).go_to_appointment_attendance_not_updated_page()
 
     # Verify page title is "Appointment Attendance Not Updated"
-    BasePage(page).bowel_cancer_screening_page_title_contains_text("Appointment Attendance Not Updated")
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Appointment Attendance Not Updated")
 
     # Select a screening centre from the drop-down options
     page.get_by_label("Screening Centre").select_option(coventry_and_warwickshire_bcs_centre)
@@ -306,7 +310,7 @@ def test_operational_reports_appointment_attendance_not_updated(page: Page) -> N
     nhs_number_link.click()
 
     # Verify the page title is "Appointment Detail"
-    BasePage(page).bowel_cancer_screening_page_title_contains_text("Appointment Detail")
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Appointment Detail")
 
 
 def test_operational_reports_fobt_kits_logged_but_not_read(page: Page) -> None:
@@ -322,7 +326,7 @@ def test_operational_reports_fobt_kits_logged_but_not_read(page: Page) -> None:
     ReportsPage(page).go_to_fobt_kits_logged_but_not_read_page()
 
     # Verify page title is "FOBT Kits Logged but Not Read - Summary View"
-    expect(page.locator("#page-title")).to_contain_text("FOBT Kits Logged but Not Read - Summary View")
+    BasePage(page).bowel_cancer_screening_page_title_contains_text("FOBT Kits Logged but Not Read - Summary View")
 
     # Click refresh button
     ReportsPage(page).click_refresh_button()
@@ -345,7 +349,7 @@ def test_operational_reports_demographic_update_inconsistent_with_manual_update(
     ReportsPage(page).go_to_demographic_update_inconsistent_with_manual_update_page()
 
     # Verify page title is "Demographic Update Inconsistent With Manual Update"
-    expect(page.locator("#page-title")).to_contain_text("Demographic Update Inconsistent With Manual Update")
+    BasePage(page).bowel_cancer_screening_page_title_contains_text("Demographic Update Inconsistent With Manual Update")
 
 
 def test_operational_reports_screening_practitioner_6_weeks_availability_not_set_up(page: Page) -> None:
@@ -365,7 +369,7 @@ def test_operational_reports_screening_practitioner_6_weeks_availability_not_set
     ReportsPage(page).go_to_screening_practitioner_6_weeks_availability_not_set_up_report_page()
 
     # Verify page title is "Screening Practitioner 6 Weeks Availability Not Set Up"
-    BasePage(page).bowel_cancer_screening_page_title_contains_text(
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
         "Screening Practitioner 6 Weeks Availability Not Set Up")
 
     # Select a screening centre
@@ -396,6 +400,7 @@ def test_operational_reports_screening_practitioner_appointments(page: Page) -> 
 
     coventry_and_warwickshire_bcs_centre = "23643"
     screening_practitioner_named_another_stubble = "1982"
+    generate_report_button = page.locator("#submitThisForm") #The locator appears to be unique to this button
 
     # Go to operational reports page
     ReportsPage(page).go_to_operational_reports_page()
@@ -404,7 +409,7 @@ def test_operational_reports_screening_practitioner_appointments(page: Page) -> 
     ReportsPage(page).go_to_screening_practitioner_appointments_page()
 
     # Verify page title is "Screening Practitioner Appointments"
-    BasePage(page).bowel_cancer_screening_page_title_contains_text("Screening Practitioner Appointments")
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Screening Practitioner Appointments")
 
     # Select a screening centre
     page.get_by_label("Screening Centre").select_option(coventry_and_warwickshire_bcs_centre)
@@ -413,7 +418,7 @@ def test_operational_reports_screening_practitioner_appointments(page: Page) -> 
     page.locator("#A_C_NURSE").select_option(screening_practitioner_named_another_stubble)
 
     # Click "Generate Report"
-    click(page, page.locator("#submitThisForm"))
+    generate_report_button.click()
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.screening_practitioner_appointments_report_timestamp_date_format()

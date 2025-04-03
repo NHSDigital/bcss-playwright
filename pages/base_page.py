@@ -32,7 +32,8 @@ class BasePage:
         # Bowel Cancer Screening System header
         self.bowel_cancer_screening_system_header = self.page.locator("#ntshAppTitle")
         # Bowel Cancer Screening Page header
-        self.bowel_cancer_screening_page_header = self.page.locator("#ntshPageTitle")
+        self.bowel_cancer_screening_page_title = self.page.locator("#page-title")
+        self.bowel_cancer_screening_ntsh_page_title = self.page.locator("#ntshPageTitle")
         self.main_menu__header = self.page.locator("#ntshPageTitle")
 
     def click_main_menu_link(self) -> None:
@@ -78,9 +79,17 @@ class BasePage:
         """Asserts that the page title contains the specified text.
 
             Args:
+                text (str): The expected text that you want to assert for the page title ("#page-title") element.
+        """
+        expect(self.bowel_cancer_screening_page_title).to_contain_text(text)
+
+    def bowel_cancer_screening_ntsh_page_title_contains_text(self, text: str) -> None:
+        """Asserts that the page title contains the specified text.
+
+            Args:
                 text (str): The expected text that you want to assert for the page title ("#ntshPageTitle") element.
         """
-        expect(self.bowel_cancer_screening_page_header).to_contain_text(text)
+        expect(self.bowel_cancer_screening_ntsh_page_title).to_contain_text(text)
 
     def go_to_contacts_list_page(self) -> None:
         self.click(self.contacts_list_page)
