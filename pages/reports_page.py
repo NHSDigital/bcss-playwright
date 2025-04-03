@@ -11,6 +11,10 @@ class ReportsPage(BasePage):
         self.strategic_reports_page = self.page.get_by_role("link", name="Strategic Reports")
         self.cancer_waiting_times_reports_page = self.page.get_by_role("link", name="Cancer Waiting Times Reports")
         self.dashboard = self.page.get_by_role("link", name="Dashboard")
+        # Reports pages shared buttons
+        self.refresh_page_button = self.page.get_by_role("button", name="Refresh")
+        self.generate_report_button = self.page.get_by_role("button", name="Generate Report")
+        self.reports_update_button = self.page.get_by_role("button", name="Update")
         # Failsafe Reports menu links
         self.date_report_last_requested_page = self.page.get_by_role("link", name="Date Report Last Requested")
         self.screening_subjects_with_inactive_open_episode_link_page = self.page.get_by_role("link", name="Screening Subjects With")
@@ -40,6 +44,15 @@ class ReportsPage(BasePage):
 
     def go_to_dashboard(self) -> None:
         self.click(self.dashboard)
+
+    def click_refresh_button(self) -> None:
+        self.click(self.refresh_page_button)
+
+    def click_generate_report_button(self) -> None:
+        self.click(self.generate_report_button)
+
+    def click_reports_pages_update_button(self) -> None:
+        self.click(self.reports_update_button)
 
     # Failsafe Reports menu links
     def go_to_date_report_last_requested_page(self) -> None:
