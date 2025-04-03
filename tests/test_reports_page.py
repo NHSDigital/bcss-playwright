@@ -72,6 +72,8 @@ def test_failsafe_reports_date_report_last_requested(page: Page) -> None:
     Confirms 'date_report_last_requested' page loads, 'generate report' and 'refresh' buttons work as expected
     and the timestamp updates to current date and time when refreshed
     """
+    report_timestamp_element = page.locator("b")
+
     # Go to failsafe reports page
     ReportsPage(page).go_to_failsafe_reports_page()
 
@@ -85,14 +87,14 @@ def test_failsafe_reports_date_report_last_requested(page: Page) -> None:
     ReportsPage(page).click_generate_report_button()
     # Verify timestamp has updated (equals current date and time)
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-    expect(page.locator("b")).to_contain_text(report_timestamp)
+    expect(report_timestamp_element).to_contain_text(report_timestamp)
 
     # Click 'refresh' button
     ReportsPage(page).click_refresh_button()
 
     # Verify timestamp has updated (equals current date and time)
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-    expect(page.locator("b")).to_contain_text(report_timestamp)
+    expect(report_timestamp_element).to_contain_text(report_timestamp)
 
 
 @pytest.mark.only
@@ -131,7 +133,7 @@ def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(page: Pag
     """
 
     nhs_number_link = page.locator("#listReportDataTable > tbody > tr.oddTableRow > td:nth-child(1) > a")
-    timestamp = page.locator("#displayGenerateDate > tbody > tr > td > b")
+    report_timestamp_element = page.locator("#displayGenerateDate > tbody > tr > td > b")
 
     # Go to failsafe reports page
     ReportsPage(page).go_to_failsafe_reports_page()
@@ -148,7 +150,7 @@ def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(page: Pag
     ReportsPage(page).click_generate_report_button()
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-    expect(timestamp).to_contain_text(report_timestamp)
+    expect(report_timestamp_element).to_contain_text(report_timestamp)
 
     # Open a screening subject record from the search results
     nhs_number_link.click()
@@ -165,6 +167,8 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
     a screening subject record can be opened and
     a different SC can be allocated to a patient record
     """
+
+    report_timestamp_element = page.locator("b")
 
     nhs_number_link = page.locator("//*[@id='listReportDataTable']/tbody/tr[3]/td[1]")
     coventry_and_warwickshire_bcs_centre = "23643"
@@ -184,7 +188,7 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-    expect(page.locator("b")).to_contain_text(report_timestamp)
+    expect(report_timestamp_element).to_contain_text(report_timestamp)
 
     # Open a screening subject record from the first row/first cell of the table
     nhs_number_link.click()
@@ -208,6 +212,9 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_into_your_hub(page: 
     the 'generate report' and 'refresh' buttons work as expected and
     the timestamp updates to current date and time when refreshed
     """
+
+    report_timestamp_element = page.locator("b")
+
     # Go to failsafe reports page
     ReportsPage(page).go_to_failsafe_reports_page()
 
@@ -223,14 +230,14 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_into_your_hub(page: 
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-    expect(page.locator("b")).to_contain_text(report_timestamp)
+    expect(report_timestamp_element).to_contain_text(report_timestamp)
 
     # Click "Refresh" button
     ReportsPage(page).click_refresh_button()
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-    expect(page.locator("b")).to_contain_text(report_timestamp)
+    expect(report_timestamp_element).to_contain_text(report_timestamp)
 
 
 def test_failsafe_reports_identify_and_link_new_gp(page: Page) -> None:
@@ -242,7 +249,8 @@ def test_failsafe_reports_identify_and_link_new_gp(page: Page) -> None:
     can be opened from here
     """
 
-    nhs_number_link = page.locator("//*[@id='listReportDataTable']/tbody/tr[3]/td[2]")
+    nhs_number_cell_link = page.locator("//*[@id='listReportDataTable']/tbody/tr[3]/td[2]")
+    report_timestamp_element = page.locator("b")
 
     # Go to failsafe reports page
     ReportsPage(page).go_to_failsafe_reports_page()
@@ -258,17 +266,17 @@ def test_failsafe_reports_identify_and_link_new_gp(page: Page) -> None:
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-    expect(page.locator("b")).to_contain_text(report_timestamp)
+    expect(report_timestamp_element).to_contain_text(report_timestamp)
 
     # Click "Refresh" button
     ReportsPage(page).click_refresh_button()
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-    expect(page.locator("b")).to_contain_text(report_timestamp)
+    expect(report_timestamp_element).to_contain_text(report_timestamp)
 
     # Open a screening subject record from the first row/second cell of the table
-    nhs_number_link.click()
+    nhs_number_cell_link.click()
 
     # Verify page title is "Link GP practice to Screening Centre"
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Link GP practice to Screening Centre")
@@ -286,6 +294,7 @@ def test_operational_reports_appointment_attendance_not_updated(page: Page) -> N
 
     coventry_and_warwickshire_bcs_centre = "23643"
     nhs_number_link = page.locator("#listReportDataTable > tbody > tr:nth-child(3) > td:nth-child(1) > a")
+    report_timestamp_element = page.locator("b")
 
     # Go to operational reports page
     ReportsPage(page).go_to_operational_reports_page()
@@ -304,7 +313,7 @@ def test_operational_reports_appointment_attendance_not_updated(page: Page) -> N
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-    expect(page.locator("b")).to_contain_text(report_timestamp)
+    expect(report_timestamp_element).to_contain_text(report_timestamp)
 
     # Open an appointment record from the report
     nhs_number_link.click()
@@ -319,6 +328,9 @@ def test_operational_reports_fobt_kits_logged_but_not_read(page: Page) -> None:
     the 'refresh' button works as expected and
     the timestamp updates to current date and time when refreshed
     """
+
+    report_generated_timestamp = page.locator("#report-generated")
+
     # Go to operational reports page
     ReportsPage(page).go_to_operational_reports_page()
 
@@ -333,7 +345,7 @@ def test_operational_reports_fobt_kits_logged_but_not_read(page: Page) -> None:
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.fobt_kits_logged_but_not_read_report_timestamp_date_format()
-    expect(page.locator("#report-generated")).to_contain_text(f"Report generated on {report_timestamp}.")
+    expect(report_generated_timestamp).to_contain_text(f"Report generated on {report_timestamp}.")
 
 
 def test_operational_reports_demographic_update_inconsistent_with_manual_update(page: Page) -> None:
@@ -361,6 +373,7 @@ def test_operational_reports_screening_practitioner_6_weeks_availability_not_set
     """
 
     coventry_and_warwickshire_bcs_centre = "23643"
+    report_generated_timestamp_element = page.locator("#displayGenerateDate")
 
     # Go to operational reports page
     ReportsPage(page).go_to_operational_reports_page()
@@ -380,14 +393,14 @@ def test_operational_reports_screening_practitioner_6_weeks_availability_not_set
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-    expect(page.locator("#displayGenerateDate")).to_contain_text(report_timestamp)
+    expect(report_generated_timestamp_element).to_contain_text(report_timestamp)
 
     # Click "Refresh" button
     ReportsPage(page).click_refresh_button()
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-    expect(page.locator("#displayGenerateDate")).to_contain_text(report_timestamp)
+    expect(report_generated_timestamp_element).to_contain_text(report_timestamp)
 
 
 def test_operational_reports_screening_practitioner_appointments(page: Page) -> None:
@@ -401,6 +414,7 @@ def test_operational_reports_screening_practitioner_appointments(page: Page) -> 
     coventry_and_warwickshire_bcs_centre = "23643"
     screening_practitioner_named_another_stubble = "1982"
     generate_report_button = page.locator("#submitThisForm") #The locator appears to be unique to this button
+    report_timestamp_element = page.locator("b")
 
     # Go to operational reports page
     ReportsPage(page).go_to_operational_reports_page()
@@ -422,4 +436,4 @@ def test_operational_reports_screening_practitioner_appointments(page: Page) -> 
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.screening_practitioner_appointments_report_timestamp_date_format()
-    expect(page.locator("b")).to_contain_text(report_timestamp)
+    expect(report_timestamp_element).to_contain_text(report_timestamp)
