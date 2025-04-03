@@ -9,9 +9,9 @@ import logging
 class OracleDB:
     def __init__(self):
         load_dotenv()
-        self.user = os.getenv("un")
-        self.dns = os.getenv("cs")
-        self.password = os.getenv("pw")
+        self.user = os.getenv("ORACLE_USERNAME")
+        self.dns = os.getenv("ORACLE_DB")
+        self.password = os.getenv("ORACLE_PASS")
 
     def connect_to_db(self) -> oracledb.Connection:
         """
