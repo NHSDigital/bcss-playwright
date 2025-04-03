@@ -178,8 +178,10 @@ def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(page: Pag
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Subject Demographic")
 
 
-def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundaries(page: Page,
-                                                                                  tests_properties: dict) -> None:
+def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundaries(
+    page: Page,
+    tests_properties: dict
+) -> None:
     """
     Confirms 'allocate_sc_for_patient_movements_within_hub_boundaries' page loads,
     the 'generate report' button works as expected
@@ -423,6 +425,7 @@ def test_operational_reports_screening_practitioner_6_weeks_availability_not_set
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
     expect(report_generated_timestamp_element).to_contain_text(report_timestamp)
 
+
 @pytest.mark.only
 def test_operational_reports_screening_practitioner_appointments(page: Page, tests_properties: dict) -> None:
     """
@@ -434,7 +437,8 @@ def test_operational_reports_screening_practitioner_appointments(page: Page, tes
 
     set_patients_screening_centre_dropdown = page.get_by_label("Screening Centre")
     screening_practitioner_dropdown = page.locator("#A_C_NURSE")
-    generate_report_button = page.locator("#submitThisForm")  # The locator appears to be unique to this generate report button
+    generate_report_button = page.locator(
+        "#submitThisForm")  # The locator appears to be unique to this generate report button
     report_timestamp_element = page.locator("b")
 
     # Go to operational reports page
