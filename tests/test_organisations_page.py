@@ -40,7 +40,6 @@ def before_each(page: Page):
 
 
 @pytest.mark.smoke
-@pytest.mark.only
 def test_organisations_page_navigation(page: Page) -> None:
     upload_nacs_data_bureau_link = page.get_by_text("Upload NACS data (Bureau)", exact=True)
     bureau_page_link = page.get_by_text("Bureau", exact=True)
