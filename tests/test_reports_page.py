@@ -178,7 +178,6 @@ def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(page: Pag
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Subject Demographic")
 
 
-@pytest.mark.only
 def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundaries(page: Page,
                                                                                   tests_properties: dict) -> None:
     """
@@ -191,6 +190,7 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
 
     report_timestamp_element = page.locator("b")
     nhs_number_link = page.locator("//*[@id='listReportDataTable']/tbody/tr[3]/td[1]")
+    set_patients_screening_centre_dropdown = page.locator("#cboScreeningCentre")
 
     # Go to failsafe reports page
     ReportsPage(page).go_to_failsafe_reports_page()
@@ -216,13 +216,14 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Set Patient's Screening Centre")
 
     # Select another screening centre
-    page.locator("#cboScreeningCentre").select_option(tests_properties["coventry_and_warwickshire_bcs_centre"])
+    set_patients_screening_centre_dropdown.select_option(tests_properties["coventry_and_warwickshire_bcs_centre"])
 
     # Click update
     ReportsPage(page).click_reports_pages_update_button()
 
     # Verify new screening centre has saved
-    expect(page.locator("#cboScreeningCentre")).to_have_value(tests_properties["coventry_and_warwickshire_bcs_centre"])
+    expect(set_patients_screening_centre_dropdown).to_have_value(
+        tests_properties["coventry_and_warwickshire_bcs_centre"])
 
 
 def test_failsafe_reports_allocate_sc_for_patient_movements_into_your_hub(page: Page) -> None:
@@ -302,7 +303,7 @@ def test_failsafe_reports_identify_and_link_new_gp(page: Page) -> None:
 
 
 # Operational Reports
-def test_operational_reports_appointment_attendance_not_updated(page: Page) -> None:
+def test_operational_reports_appointment_attendance_not_updated(page: Page, tests_properties: dict) -> None:
     """
     Confirms 'appointment_attendance_not_updated' page loads,
     a SC can be selected from the dropdown
@@ -311,9 +312,9 @@ def test_operational_reports_appointment_attendance_not_updated(page: Page) -> N
     an appointment record can be opened from here
     """
 
-    coventry_and_warwickshire_bcs_centre = "23643"
     nhs_number_link = page.locator("#listReportDataTable > tbody > tr:nth-child(3) > td:nth-child(1) > a")
     report_timestamp_element = page.locator("b")
+    set_patients_screening_centre_dropdown = page.get_by_label("Screening Centre")
 
     # Go to operational reports page
     ReportsPage(page).go_to_operational_reports_page()
@@ -325,7 +326,7 @@ def test_operational_reports_appointment_attendance_not_updated(page: Page) -> N
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Appointment Attendance Not Updated")
 
     # Select a screening centre from the drop-down options
-    page.get_by_label("Screening Centre").select_option(coventry_and_warwickshire_bcs_centre)
+    set_patients_screening_centre_dropdown.select_option(tests_properties["coventry_and_warwickshire_bcs_centre"])
 
     # Click "Generate Report" button
     ReportsPage(page).click_generate_report_button()
@@ -383,7 +384,8 @@ def test_operational_reports_demographic_update_inconsistent_with_manual_update(
     BasePage(page).bowel_cancer_screening_page_title_contains_text("Demographic Update Inconsistent With Manual Update")
 
 
-def test_operational_reports_screening_practitioner_6_weeks_availability_not_set_up(page: Page) -> None:
+def test_operational_reports_screening_practitioner_6_weeks_availability_not_set_up(page: Page,
+                                                                                    tests_properties: dict) -> None:
     """
     Confirms 'screening_practitioner_6_weeks_availability_not_set_up_report' page loads,
     a SC can be selected
@@ -391,7 +393,7 @@ def test_operational_reports_screening_practitioner_6_weeks_availability_not_set
     the timestamp updates to current date and time when refreshed
     """
 
-    coventry_and_warwickshire_bcs_centre = "23643"
+    set_patients_screening_centre_dropdown = page.get_by_label("Screening Centre")
     report_generated_timestamp_element = page.locator("#displayGenerateDate")
 
     # Go to operational reports page
@@ -405,7 +407,7 @@ def test_operational_reports_screening_practitioner_6_weeks_availability_not_set
         "Screening Practitioner 6 Weeks Availability Not Set Up")
 
     # Select a screening centre
-    page.get_by_label("Screening Centre").select_option(coventry_and_warwickshire_bcs_centre)
+    set_patients_screening_centre_dropdown.select_option(tests_properties["coventry_and_warwickshire_bcs_centre"])
 
     # Click "Generate Report"
     ReportsPage(page).click_generate_report_button()
@@ -421,8 +423,8 @@ def test_operational_reports_screening_practitioner_6_weeks_availability_not_set
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
     expect(report_generated_timestamp_element).to_contain_text(report_timestamp)
 
-
-def test_operational_reports_screening_practitioner_appointments(page: Page) -> None:
+@pytest.mark.only
+def test_operational_reports_screening_practitioner_appointments(page: Page, tests_properties: dict) -> None:
     """
     Confirms 'screening_practitioner_appointments' page loads,
     a SC and Screening Practitioner can be selected
@@ -430,9 +432,9 @@ def test_operational_reports_screening_practitioner_appointments(page: Page) -> 
     the timestamp updates to current date and time when refreshed
     """
 
-    coventry_and_warwickshire_bcs_centre = "23643"
-    screening_practitioner_named_another_stubble = "1982"
-    generate_report_button = page.locator("#submitThisForm")  # The locator appears to be unique to this button
+    set_patients_screening_centre_dropdown = page.get_by_label("Screening Centre")
+    screening_practitioner_dropdown = page.locator("#A_C_NURSE")
+    generate_report_button = page.locator("#submitThisForm")  # The locator appears to be unique to this generate report button
     report_timestamp_element = page.locator("b")
 
     # Go to operational reports page
@@ -445,10 +447,10 @@ def test_operational_reports_screening_practitioner_appointments(page: Page) -> 
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Screening Practitioner Appointments")
 
     # Select a screening centre
-    page.get_by_label("Screening Centre").select_option(coventry_and_warwickshire_bcs_centre)
+    set_patients_screening_centre_dropdown.select_option(tests_properties["coventry_and_warwickshire_bcs_centre"])
 
     # Select a screening practitioner
-    page.locator("#A_C_NURSE").select_option(screening_practitioner_named_another_stubble)
+    screening_practitioner_dropdown.select_option(tests_properties["screening_practitioner_named_another_stubble"])
 
     # Click "Generate Report"
     generate_report_button.click()
