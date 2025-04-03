@@ -28,8 +28,11 @@ class SubjectScreeningSummary(BasePage):
     def verify_result_contains_text(self, text) -> None:
         expect(self.display_rs).to_contain_text(text)
 
-    def verify_subject_search_results_title(self, text) -> None:
-        expect(self.subject_search_results_title).to_contain_text(text)
+    def verify_subject_search_results_title_subject_screening_summary(self) -> None:
+        expect(self.subject_search_results_title).to_contain_text("Subject Screening Summary")
+
+    def verify_subject_search_results_title_subject_search_results(self) -> None:
+        expect(self.subject_search_results_title).to_contain_text("Subject Search Results")
 
     def get_latest_event_status_cell(self, latest_event_status: str)-> Locator:
         return self.page.get_by_role("cell", name=latest_event_status, exact=True)
