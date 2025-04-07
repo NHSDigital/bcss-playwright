@@ -1,0 +1,13 @@
+Index: .env
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># \"DO NOT COMMIT THIS FILE\"\n\nBCSS_PASS=\n
+===================================================================
+diff --git a/.env b/.env
+--- a/.env	(revision 2070270e8da45d2be550e1ae31d97ed723c2e912)
++++ b/.env	(date 1742461827722)
+@@ -1,3 +1,3 @@
+ # "DO NOT COMMIT THIS FILE"
+ 
+-BCSS_PASS=
++BCSS_PASS="changeme"

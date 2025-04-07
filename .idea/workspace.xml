@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="e2db7a9e-e5a7-4293-a117-820f2183f6cf" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="2sOcwWOOridj6zQ9j6J376oKimq" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
+    "Python tests.pytest for test_bcss_19181_users_permit_list.test_only_users_on_approved_can_login_to_bcss.executor": "Run",
+    "Python tests.pytest for test_bowel_scope_page.test_bowel_scope_page_navigation.executor": "Run",
+    "Python tests.pytest for test_call_and_recall_page.test_call_and_recall_page_navigation.executor": "Run",
+    "Python tests.pytest for test_call_and_recall_page.test_view_an_invitation_plan.executor": "Run",
+    "Python tests.pytest for test_communications_production_page.test_communications_production_page_navigation.executor": "Run",
+    "Python tests.pytest for test_compartment_1.test_compartment_1.executor": "Run",
+    "Python tests.pytest for test_compartment_1.test_create_invitations_plan.executor": "Run",
+    "Python tests.pytest for test_compartment_1.test_example.executor": "Run",
+    "Python tests.pytest for test_compartment_2.test_compartment_2.executor": "Run",
+    "Python tests.pytest for test_compartment_3.test_compartment_3.executor": "Run",
+    "Python tests.pytest for test_contacts_list_page.test_contacts_list_page_navigation.executor": "Run",
+    "Python tests.pytest for test_date_time_utils.test_current_datetime.executor": "Run",
+    "Python tests.pytest for test_download_page.test_download_facility_page_navigation.executor": "Run",
+    "Python tests.pytest for test_fit_test_kits_page.test_fit_test_kits_page_navigation.executor": "Run",
+    "Python tests.pytest for test_gfobt_test_kits_page.test_create_a_qc_kit.executor": "Run",
+    "Python tests.pytest for test_gfobt_test_kits_page.test_gfob_test_kit_page_navigation.executor": "Run",
+    "Python tests.pytest for test_home_page_links.test_home_page_links_navigation.executor": "Run",
+    "Python tests.pytest for test_login_to_bcss.test_login_to_bcss_with_invalid_password.executor": "Run",
+    "Python tests.pytest for test_login_to_bcss.test_login_to_bcss_with_invalid_username.executor": "Run",
+    "Python tests.pytest for test_login_to_bcss.test_login_to_bcss_with_no_username_or_password.executor": "Run",
+    "Python tests.pytest for test_login_to_bcss.test_successful_login_to_bcss.executor": "Run",
+    "Python tests.pytest for test_lynch_surveillance_page.test_lynch_surveillance_page_navigation.executor": "Run",
+    "Python tests.pytest for test_nhs_number_tools.test_nhs_number_checks.executor": "Run",
+    "Python tests.pytest for test_organisations_page.test_organisations_page_navigation.executor": "Run",
+    "Python tests.pytest for test_organisations_page.test_view_an_organisations_system_parameters.executor": "Run",
+    "Python tests.pytest for test_reports_page.test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundaries.executor": "Run",
+    "Python tests.pytest for test_reports_page.test_failsafe_reports_date_report_last_requested.executor": "Run",
+    "Python tests.pytest for test_reports_page.test_failsafe_reports_identify_and_link_new_gp.executor": "Run",
+    "Python tests.pytest for test_reports_page.test_failsafe_reports_screening_subjects_with_inactive_open_episode.executor": "Run",
+    "Python tests.pytest for test_reports_page.test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes.executor": "Run",
+    "Python tests.pytest for test_reports_page.test_operational_reports_appointment_attendance_not_updated.executor": "Run",
+    "Python tests.pytest for test_reports_page.test_operational_reports_demographic_update_inconsistent_with_manual_update.executor": "Run",
+    "Python tests.pytest for test_reports_page.test_operational_reports_fobt_kits_logged_but_not_read.executor": "Run",
+    "Python tests.pytest for test_reports_page.test_operational_reports_screening_practitioner_6_weeks_availability_not_set_up.executor": "Run",
+    "Python tests.pytest for test_reports_page.test_operational_reports_screening_practitioner_appointments.executor": "Run",
+    "Python tests.pytest for test_reports_page.test_reports_page_navigation.executor": "Run",
+    "Python tests.pytest for test_reports_page.tests_properties.executor": "Run",
+    "Python tests.pytest for test_screening_practitioner_appointments_page.test_screening_practitioner_appointments_page_navigation.executor": "Run",
+    "Python tests.pytest for test_screening_subject_search_page.test_search_criteria_clear_filters_button.executor": "Run",
+    "Python tests.pytest for test_screening_subject_search_page.test_search_screening_subject_by_ccg.executor": "Run",
+    "Python tests.pytest for test_screening_subject_search_page.test_search_screening_subject_by_dob.executor": "Run",
+    "Python tests.pytest for test_screening_subject_search_page.test_search_screening_subject_by_episode_closed_date.executor": "Run",
+    "Python tests.pytest for test_screening_subject_search_page.test_search_screening_subject_by_forename.executor": "Run",
+    "Python tests.pytest for test_screening_subject_search_page.test_search_screening_subject_by_gp_practice.executor": "Run",
+    "Python tests.pytest for test_screening_subject_search_page.test_search_screening_subject_by_latest_episode_status_open_paused.executor": "Run",
+    "Python tests.pytest for test_screening_subject_search_page.test_search_screening_subject_by_nhs_number.executor": "Run",
+    "Python tests.pytest for test_screening_subject_search_page.test_search_screening_subject_by_postcode.executor": "Run",
+    "Python tests.pytest for test_screening_subject_search_page.test_search_screening_subject_by_screening_centre.executor": "Run",
+    "Python tests.pytest for test_screening_subject_search_page.test_search_screening_subject_by_status_bowel_scope.executor": "Run",
+    "Python tests.pytest for test_screening_subject_search_page.test_search_screening_subject_by_status_call.executor": "Run",
+    "Python tests.pytest for test_screening_subject_search_page.test_search_screening_subject_by_status_lynch_self_referral.executor": "Run",
+    "Python tests.pytest for test_screening_subject_search_page.test_search_screening_subject_by_surname.executor": "Run",
+    "Python tests.pytest for test_screening_subject_search_page.tests_properties.executor": "Run",
+    "Python tests.pytest in test_call_and_recall_page.py.executor": "Run",
+    "Python tests.pytest in test_compartment_1.py.executor": "Run",
+    "Python tests.pytest in test_date_time_utils.py.executor": "Run",
+    "Python tests.pytest in test_gfobt_test_kits_page.py.executor": "Run",
+    "Python tests.pytest in test_login_to_bcss.py.executor": "Run",
+    "Python tests.pytest in test_nhs_number_tools.py.executor": "Run",
+    "Python tests.pytest in test_organisations_page.py.executor": "Run",
+    "Python tests.pytest in test_reports_page.py.executor": "Run",
+    "Python tests.pytest in test_screening_subject_search_page.py.executor": "Run",
+    "Python tests.pytest in tests.executor": "Run",
+    "Python.create_a_plan_page.executor": "Run",
+    "Python.login_page.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "feature/BCSS-20026–refactor-reports-pages-and-tests",
+    "last_opened_file_path": "/Users/andrewgeorge/Documents/NHS Repos/bcss-playwright/tests",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "reference.settingsdialog.IDE.editor.colors.JSON"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/tests" />
+      <recent name="$PROJECT_DIR$/../bcss-playwright_delete" />
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/pages" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/tests/Smokescreen" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python tests.pytest for test_reports_page.test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundaries">
+    <configuration default="true" type="tests" factoryName="py.test">
+      <module name="bcss-playwright" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.12" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for test_reports_page.test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundaries" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="bcss-playwright" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_reports_page.test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundaries&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for test_reports_page.test_operational_reports_appointment_attendance_not_updated" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="bcss-playwright" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.12" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_reports_page.test_operational_reports_appointment_attendance_not_updated&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for test_reports_page.test_operational_reports_fobt_kits_logged_but_not_read" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="bcss-playwright" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.12" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_reports_page.test_operational_reports_fobt_kits_logged_but_not_read&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for test_reports_page.test_operational_reports_screening_practitioner_6_weeks_availability_not_set_up" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="bcss-playwright" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.12" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_reports_page.test_operational_reports_screening_practitioner_6_weeks_availability_not_set_up&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest for test_reports_page.test_operational_reports_screening_practitioner_appointments" type="tests" factoryName="py.test" temporary="true" nameIsGenerated="true">
+      <module name="bcss-playwright" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.12" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_reports_page.test_operational_reports_screening_practitioner_appointments&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python tests.pytest for test_reports_page.test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundaries" />
+        <item itemvalue="Python tests.pytest for test_reports_page.test_operational_reports_screening_practitioner_appointments" />
+        <item itemvalue="Python tests.pytest for test_reports_page.test_operational_reports_screening_practitioner_6_weeks_availability_not_set_up" />
+        <item itemvalue="Python tests.pytest for test_reports_page.test_operational_reports_appointment_attendance_not_updated" />
+        <item itemvalue="Python tests.pytest for test_reports_page.test_operational_reports_fobt_kits_logged_but_not_read" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-d7ad00fb9fc3-c546a90a8094-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-242.23726.102" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="e2db7a9e-e5a7-4293-a117-820f2183f6cf" name="Changes" comment="" />
+      <created>1738330300265</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1738330300265</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName=".env" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/main" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
