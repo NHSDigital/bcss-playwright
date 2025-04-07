@@ -6,7 +6,6 @@ from sys import platform
 >>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
 from pages.base_page import BasePage
 from pages.reports_page import ReportsPage
-from utils.click_helper import click
 from utils.date_time_utils import DateTimeUtils
 from utils.user_tools import UserTools
 from jproperties import Properties
@@ -33,10 +32,10 @@ def tests_properties() -> dict:
 =======
     configs = Properties()
     if platform == "win32":  # File path from content root is required on Windows OS
-        with open('tests/bcss_tests.properties', 'rb') as read_prop:
+        with open("tests/bcss_tests.properties", "rb") as read_prop:
             configs.load(read_prop)
     elif platform == "darwin":  # Only the filename is required on macOS
-        with open('bcss_tests.properties', 'rb') as read_prop:
+        with open("bcss_tests.properties", "rb") as read_prop:
             configs.load(read_prop)
 >>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
     return configs.properties
@@ -80,41 +79,30 @@ def test_reports_page_navigation(page: Page) -> None:
 
     # Failsafe reports page opens as expected
     ReportsPage(page).go_to_failsafe_reports_page()
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Failsafe Reports")
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
+        "Failsafe Reports"
+    )
     BasePage(page).click_back_button()
 
     # Operational reports page opens as expected
     ReportsPage(page).go_to_operational_reports_page()
-<<<<<<< HEAD
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
         "Operational Reports"
     )
-=======
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Operational Reports")
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
     BasePage(page).click_back_button()
 
     # Strategic reports page opens as expected
     ReportsPage(page).go_to_strategic_reports_page()
-<<<<<<< HEAD
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
         "Strategic Reports"
     )
-=======
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Strategic Reports")
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
     BasePage(page).click_back_button()
 
     # "Cancer waiting times reports" page opens as expected
     ReportsPage(page).go_to_cancer_waiting_times_reports_page()
-<<<<<<< HEAD
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
         "Cancer Waiting Times Reports"
     )
-=======
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Cancer Waiting Times Reports")
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
     BasePage(page).click_back_button()
 
     # Dashboard opens as expected TODO - this step may be failing legitimately
@@ -152,13 +140,9 @@ def test_failsafe_reports_date_report_last_requested(page: Page) -> None:
     ReportsPage(page).go_to_date_report_last_requested_page()
 
     # Verify 'Date Report Last Requested' is the page title
-<<<<<<< HEAD
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
         "Date Report Last Requested"
     )
-=======
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Date Report Last Requested")
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
 
     # Click 'generate report' button
     ReportsPage(page).click_generate_report_button()
@@ -193,10 +177,9 @@ def test_failsafe_reports_screening_subjects_with_inactive_open_episode(
     Confirms 'screening_subjects_with_inactive_open_episode' page loads, 'generate report' button works as expected
     and that a screening subject record can be opened
     """
-<<<<<<< HEAD
-=======
-    nhs_number_link = page.get_by_role("cell", name="7652")  # This value is specific to this test only
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
+    nhs_number_link = page.get_by_role(
+        "cell", name="7652"
+    )  # This value is specific to this test only
 
     # Go to failsafe reports page
     ReportsPage(page).go_to_failsafe_reports_page()
@@ -205,13 +188,9 @@ def test_failsafe_reports_screening_subjects_with_inactive_open_episode(
     ReportsPage(page).go_to_screening_subjects_with_inactive_open_episode_link_page()
 
     # Verify "Screening Subjects With Inactive Open Episode" is the page title
-<<<<<<< HEAD
     BasePage(page).bowel_cancer_screening_page_title_contains_text(
         "Screening Subjects With Inactive Open Episode"
     )
-=======
-    BasePage(page).bowel_cancer_screening_page_title_contains_text("Screening Subjects With Inactive Open Episode")
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
 
     # Click 'Generate Report' button
     ReportsPage(page).click_generate_report_button()
@@ -228,8 +207,9 @@ def test_failsafe_reports_screening_subjects_with_inactive_open_episode(
     nhs_number_link.click()
 
     # Verify "Subject Screening Summary" is the page title
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Subject Screening Summary")
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
+        "Subject Screening Summary"
+    )
 
 
 def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(
@@ -242,13 +222,12 @@ def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(
     a screening subject record can be opened
     """
 
-<<<<<<< HEAD
-    # Test Data
-    report_start_date = "18/03/2023"  # This date is specific to this test only
-=======
-    nhs_number_link = page.locator("#listReportDataTable > tbody > tr.oddTableRow > td:nth-child(1) > a")
-    report_timestamp_element = page.locator("#displayGenerateDate > tbody > tr > td > b")
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
+    nhs_number_link = page.locator(
+        "#listReportDataTable > tbody > tr.oddTableRow > td:nth-child(1) > a"
+    )
+    report_timestamp_element = page.locator(
+        "#displayGenerateDate > tbody > tr > td > b"
+    )
 
     # Go to failsafe reports page
     ReportsPage(page).go_to_failsafe_reports_page()
@@ -257,13 +236,9 @@ def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(
     ReportsPage(page).go_to_subjects_ceased_due_to_date_of_birth_changes_page()
 
     # Select a "report start date" from the calendar
-<<<<<<< HEAD
-    ReportsPage(page).report_start_date_field.fill(report_start_date)
-=======
-    click(page, page.get_by_role("button", name="Calendar"))
-    click(page, page.get_by_text("«"))
-    click(page, page.get_by_role("cell", name="18", exact=True))
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
+    page.get_by_role("button", name="Calendar").click()
+    page.get_by_text("«").click()
+    page.get_by_role("cell", name="18", exact=True).click()
 
     # Click "Generate Report"
     ReportsPage(page).click_generate_report_button()
@@ -292,13 +267,13 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
     nhs_number_link.click()
 
     # Verify page title is "Subject Demographic"
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Subject Demographic")
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
+        "Subject Demographic"
+    )
 
 
 def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundaries(
-    page: Page,
-    tests_properties: dict
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
+    page: Page, tests_properties: dict
 ) -> None:
     """
     Confirms 'allocate_sc_for_patient_movements_within_hub_boundaries' page loads,
@@ -324,12 +299,8 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
 
     # Verify page title is "Allocate SC for Patient Movements within Hub Boundaries"
     failsafe_report_page.bowel_cancer_screening_ntsh_page_title_contains_text(
-<<<<<<< HEAD
         "Allocate SC for Patient Movements within Hub Boundaries"
     )
-=======
-        "Allocate SC for Patient Movements within Hub Boundaries")
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
 
     # Click "Generate Report"
     failsafe_report_page.click_generate_report_button()
@@ -361,23 +332,22 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
     nhs_number_link.click()
 
     # Verify page title is "Set Patient's Screening Centre"
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Set Patient's Screening Centre")
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
+        "Set Patient's Screening Centre"
+    )
 
     # Select another screening centre
-    set_patients_screening_centre_dropdown.select_option(tests_properties["coventry_and_warwickshire_bcs_centre"])
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
+    set_patients_screening_centre_dropdown.select_option(
+        tests_properties["coventry_and_warwickshire_bcs_centre"]
+    )
 
     # Click update
     failsafe_report_page.click_reports_pages_update_button()
 
     # Verify new screening centre has saved
     expect(ReportsPage(page).set_patients_screening_centre_dropdown).to_have_value(
-<<<<<<< HEAD
         tests_properties["coventry_and_warwickshire_bcs_centre"]
     )
-=======
-        tests_properties["coventry_and_warwickshire_bcs_centre"])
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
 
 
 def test_failsafe_reports_allocate_sc_for_patient_movements_into_your_hub(
@@ -402,12 +372,8 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_into_your_hub(
 
     # Verify page title is "Date Report Last Requested"
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
-<<<<<<< HEAD
         "Allocate SC for Patient Movements into your Hub"
     )
-=======
-        "Allocate SC for Patient Movements into your Hub")
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
 
     # Click "Generate Report" button
     ReportsPage(page).click_generate_report_button()
@@ -445,9 +411,9 @@ def test_failsafe_reports_identify_and_link_new_gp(page: Page) -> None:
     can be opened from here
     """
 
-<<<<<<< HEAD
-=======
-    nhs_number_cell_link = page.locator("//*[@id='listReportDataTable']/tbody/tr[3]/td[2]")
+    nhs_number_cell_link = page.locator(
+        "//*[@id='listReportDataTable']/tbody/tr[3]/td[2]"
+    )
     report_timestamp_element = page.locator("b")
 
 >>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
@@ -458,13 +424,9 @@ def test_failsafe_reports_identify_and_link_new_gp(page: Page) -> None:
     ReportsPage(page).go_to_identify_and_link_new_gp_page()
 
     # Verify page title is "Identify and link new GP practices"
-<<<<<<< HEAD
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
         "Identify and link new GP practices"
     )
-=======
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Identify and link new GP practices")
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
 
     # Click on "Generate Report"
     ReportsPage(page).click_generate_report_button()
@@ -509,12 +471,15 @@ def test_operational_reports_appointment_attendance_not_updated(
     nhs_number_cell_link.click()
 
     # Verify page title is "Link GP practice to Screening Centre"
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Link GP practice to Screening Centre")
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
+        "Link GP practice to Screening Centre"
+    )
 
 
 # Operational Reports
-def test_operational_reports_appointment_attendance_not_updated(page: Page, tests_properties: dict) -> None:
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
+def test_operational_reports_appointment_attendance_not_updated(
+    page: Page, tests_properties: dict
+) -> None:
     """
     Confirms 'appointment_attendance_not_updated' page loads,
     a SC can be selected from the dropdown
@@ -523,9 +488,9 @@ def test_operational_reports_appointment_attendance_not_updated(page: Page, test
     an appointment record can be opened from here
     """
 
-<<<<<<< HEAD
-=======
-    nhs_number_link = page.locator("#listReportDataTable > tbody > tr:nth-child(3) > td:nth-child(1) > a")
+    nhs_number_link = page.locator(
+        "#listReportDataTable > tbody > tr:nth-child(3) > td:nth-child(1) > a"
+    )
     report_timestamp_element = page.locator("b")
     set_patients_screening_centre_dropdown = page.get_by_label("Screening Centre")
 
@@ -552,8 +517,9 @@ def test_operational_reports_appointment_attendance_not_updated(page: Page, test
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Appointment Attendance Not Updated")
 
     # Select a screening centre from the drop-down options
-    set_patients_screening_centre_dropdown.select_option(tests_properties["coventry_and_warwickshire_bcs_centre"])
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
+    set_patients_screening_centre_dropdown.select_option(
+        tests_properties["coventry_and_warwickshire_bcs_centre"]
+    )
 
     # Click "Generate Report" button
     ReportsPage(page).click_generate_report_button()
@@ -579,8 +545,9 @@ def test_operational_reports_appointment_attendance_not_updated(page: Page, test
     nhs_number_link.click()
 
     # Verify the page title is "Appointment Detail"
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Appointment Detail")
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
+        "Appointment Detail"
+    )
 
 
 def test_operational_reports_fobt_kits_logged_but_not_read(page: Page) -> None:
@@ -602,29 +569,20 @@ def test_operational_reports_fobt_kits_logged_but_not_read(page: Page) -> None:
     ReportsPage(page).go_to_fobt_kits_logged_but_not_read_page()
 
     # Verify page title is "FOBT Kits Logged but Not Read - Summary View"
-<<<<<<< HEAD
     BasePage(page).bowel_cancer_screening_page_title_contains_text(
         "FOBT Kits Logged but Not Read - Summary View"
     )
-=======
-    BasePage(page).bowel_cancer_screening_page_title_contains_text("FOBT Kits Logged but Not Read - Summary View")
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
 
     # Click refresh button
     ReportsPage(page).click_refresh_button()
 
     # Verify timestamp has updated to current date and time
-<<<<<<< HEAD
     report_timestamp = (
         DateTimeUtils.fobt_kits_logged_but_not_read_report_timestamp_date_format()
     )
-    expect(
-        ReportsPage(page).fobt_logged_not_read_report_timestamp_element
-    ).to_contain_text(f"Report generated on {report_timestamp}.")
-=======
-    report_timestamp = DateTimeUtils.fobt_kits_logged_but_not_read_report_timestamp_date_format()
-    expect(report_generated_timestamp).to_contain_text(f"Report generated on {report_timestamp}.")
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
+    expect(report_generated_timestamp).to_contain_text(
+        f"Report generated on {report_timestamp}."
+    )
 
 
 def test_operational_reports_demographic_update_inconsistent_with_manual_update(
@@ -642,7 +600,6 @@ def test_operational_reports_demographic_update_inconsistent_with_manual_update(
     ReportsPage(page).go_to_demographic_update_inconsistent_with_manual_update_page()
 
     # Verify page title is "Demographic Update Inconsistent With Manual Update"
-<<<<<<< HEAD
     BasePage(page).bowel_cancer_screening_page_title_contains_text(
         "Demographic Update Inconsistent With Manual Update"
     )
@@ -651,13 +608,6 @@ def test_operational_reports_demographic_update_inconsistent_with_manual_update(
 def test_operational_reports_screening_practitioner_6_weeks_availability_not_set_up(
     page: Page, tests_properties: dict
 ) -> None:
-=======
-    BasePage(page).bowel_cancer_screening_page_title_contains_text("Demographic Update Inconsistent With Manual Update")
-
-
-def test_operational_reports_screening_practitioner_6_weeks_availability_not_set_up(page: Page,
-                                                                                    tests_properties: dict) -> None:
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
     """
     Confirms 'screening_practitioner_6_weeks_availability_not_set_up_report' page loads,
     a SC can be selected
@@ -696,11 +646,13 @@ def test_operational_reports_screening_practitioner_6_weeks_availability_not_set
 
     # Verify page title is "Screening Practitioner 6 Weeks Availability Not Set Up"
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
-        "Screening Practitioner 6 Weeks Availability Not Set Up")
+        "Screening Practitioner 6 Weeks Availability Not Set Up"
+    )
 
     # Select a screening centre
-    set_patients_screening_centre_dropdown.select_option(tests_properties["coventry_and_warwickshire_bcs_centre"])
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
+    set_patients_screening_centre_dropdown.select_option(
+        tests_properties["coventry_and_warwickshire_bcs_centre"]
+    )
 
     # Click "Generate Report"
     ReportsPage(page).click_generate_report_button()
@@ -738,8 +690,9 @@ def test_operational_reports_screening_practitioner_appointments(
 
 
 @pytest.mark.only
-def test_operational_reports_screening_practitioner_appointments(page: Page, tests_properties: dict) -> None:
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
+def test_operational_reports_screening_practitioner_appointments(
+    page: Page, tests_properties: dict
+) -> None:
     """
     Confirms 'screening_practitioner_appointments' page loads,
     a SC and Screening Practitioner can be selected
@@ -752,7 +705,8 @@ def test_operational_reports_screening_practitioner_appointments(page: Page, tes
     set_patients_screening_centre_dropdown = page.get_by_label("Screening Centre")
     screening_practitioner_dropdown = page.locator("#A_C_NURSE")
     generate_report_button = page.locator(
-        "#submitThisForm")  # The locator appears to be unique to this generate report button
+        "#submitThisForm"
+    )  # The locator appears to be unique to this generate report button
     report_timestamp_element = page.locator("b")
 
 >>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
@@ -794,15 +748,21 @@ def test_operational_reports_screening_practitioner_appointments(page: Page, tes
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Screening Practitioner Appointments")
 
     # Select a screening centre
-    set_patients_screening_centre_dropdown.select_option(tests_properties["coventry_and_warwickshire_bcs_centre"])
+    set_patients_screening_centre_dropdown.select_option(
+        tests_properties["coventry_and_warwickshire_bcs_centre"]
+    )
 
     # Select a screening practitioner
-    screening_practitioner_dropdown.select_option(tests_properties["screening_practitioner_named_another_stubble"])
+    screening_practitioner_dropdown.select_option(
+        tests_properties["screening_practitioner_named_another_stubble"]
+    )
 
     # Click "Generate Report"
     generate_report_button.click()
 
     # Verify timestamp has updated to current date and time
-    report_timestamp = DateTimeUtils.screening_practitioner_appointments_report_timestamp_date_format()
+    report_timestamp = (
+        DateTimeUtils.screening_practitioner_appointments_report_timestamp_date_format()
+    )
     expect(report_timestamp_element).to_contain_text(report_timestamp)
 >>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
