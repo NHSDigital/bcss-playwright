@@ -5,7 +5,7 @@ from playwright.sync_api import Page, expect
 from sys import platform
 >>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
 from pages.base_page import BasePage
-from pages.reports_page import ReportsPage
+from pages.reports.reports_page import ReportsPage
 from utils.date_time_utils import DateTimeUtils
 from utils.user_tools import UserTools
 from jproperties import Properties
