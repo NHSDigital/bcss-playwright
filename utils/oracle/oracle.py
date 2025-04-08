@@ -126,7 +126,7 @@ class OracleDB:
                 self.disconnect_from_db(conn)
 
     def execute_query(
-        self, query: str, parameters = None
+        self, query: str, parameters: list | None = None
     ) -> pd.DataFrame:  # To use when "select xxxx" (stored procedures)
         """
         This is used to execute any sql queries.

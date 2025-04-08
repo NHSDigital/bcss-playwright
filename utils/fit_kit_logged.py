@@ -48,7 +48,7 @@ def process_kit_data(smokescreen_properties: dict) -> list:
     return device_ids
 
 
-def split_fit_kits(kit_id_df, smokescreen_properties: dict) -> pd.DataFrame:
+def split_fit_kits(kit_id_df: pd.DataFrame, smokescreen_properties: dict) -> pd.DataFrame:
     """
     This method splits the dataframe into two, 1 normal and 1 abnormal
     """
