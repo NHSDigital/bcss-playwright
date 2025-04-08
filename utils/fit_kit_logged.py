@@ -5,7 +5,7 @@ import logging
 import pytest
 
 
-def process_kit_data(smokescreen_properties) -> list:
+def process_kit_data(smokescreen_properties: dict) -> list:
     """
     This method retrieved the test data needed for compartment 3 and then splits it into two data frames:
     - 1 normal
@@ -14,7 +14,7 @@ def process_kit_data(smokescreen_properties) -> list:
     Each list will either have true or false appended depending on if it is normal or abnormal
     """
     # Get test data for compartment 3
-    kit_id_df = get_kit_id_logged_from_db()
+    kit_id_df = get_kit_id_logged_from_db(smokescreen_properties)
 
     # Split dataframe into two different dataframes, normal and abnormal
     normal_fit_kit_df, abnormal_fit_kit_df = split_fit_kits(

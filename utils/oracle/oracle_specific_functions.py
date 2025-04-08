@@ -51,7 +51,7 @@ def get_nhs_no_from_batch_id(batch_id) -> pd.DataFrame:
     return nhs_number_df
 
 
-def get_kit_id_logged_from_db() -> pd.DataFrame:
+def get_kit_id_logged_from_db(smokescreen_properties: dict) -> pd.DataFrame:
     """
     This query is used to obtain test data used in compartment 3
     It searches for kits that have not been logged and meet the following criteria:
@@ -59,7 +59,7 @@ def get_kit_id_logged_from_db() -> pd.DataFrame:
     - tk.logged_in_at = 23159 (Hub ID that the compartments are running in)
     """
     kit_id_df = OracleDB().execute_query(
-        """SELECT tk.kitid,tk.device_id,tk.screening_subject_id
+        f"""SELECT tk.kitid,tk.device_id,tk.screening_subject_id
     FROM tk_items_t tk
     INNER JOIN kit_queue kq ON kq.device_id = tk.device_id
     INNER JOIN ep_subject_episode_t se ON se.screening_subject_id = tk.screening_subject_id
@@ -68,7 +68,7 @@ def get_kit_id_logged_from_db() -> pd.DataFrame:
     AND se.episode_status_id = 11352
     AND tk.tk_type_id = 2
     AND se.latest_event_status_id = 11223
-    AND tk.logged_in_at = 23159
+    AND tk.logged_in_at = {smokescreen_properties["c3_fit_kit_results_test_org_id"]}
     AND tk.reading_flag = 'N'
     AND tk.test_results IS NULL
     fetch first 9 rows only
@@ -78,12 +78,12 @@ def get_kit_id_logged_from_db() -> pd.DataFrame:
     return kit_id_df
 
 
-def get_service_management_by_device_id(deviceid) -> pd.DataFrame:
+def get_service_management_by_device_id(device_id: str) -> pd.DataFrame:
     """
     This SQL is similar to the one used in pkg_test_kit_queue.p_get_fit_monitor_details, but adapted to allow us to pick out sub-sets of records
     """
-    get_service_management_df = OracleDB().execute_query(
-        f"""SELECT kq.device_id, kq.test_kit_name, kq.test_kit_type, kq.test_kit_status,
+    
+    query = """SELECT kq.device_id, kq.test_kit_name, kq.test_kit_type, kq.test_kit_status,
     CASE WHEN tki.logged_in_flag = 'Y' THEN kq.logged_by_hub END AS logged_by_hub,
     CASE WHEN tki.logged_in_flag = 'Y' THEN kq.date_time_logged END AS date_time_logged,
     tki.logged_in_on AS tk_logged_date_time, kq.test_result, kq.calculated_result,
@@ -111,14 +111,17 @@ def get_service_management_by_device_id(deviceid) -> pd.DataFrame:
     LEFT OUTER JOIN valid_values mta ON mta.valid_value_id = mt.message_attribute_id AND mta.valid_value_id = 305482
     LEFT OUTER JOIN ORG o ON ep.start_hub_id = o.org_id
     LEFT OUTER JOIN ORG lo ON lo.org_code = kq.logged_by_hub
-    WHERE kq.test_kit_type = 'FIT' AND kq.device_id = '{deviceid}'
+    WHERE kq.test_kit_type = 'FIT' AND kq.device_id = :device_id
     """
-    )
+    params = {
+        "device_id": device_id
+    }
+    get_service_management_df = OracleDB().execute_query(query, params)
     return get_service_management_df
 
 
 def update_kit_service_management_entity(
-    device_id, normal, smokescreen_properties: dict
+    device_id: str, normal: bool, smokescreen_properties: dict
 ) -> str:
     """
     This method is used to update the KIT_QUEUE table on the DB
@@ -191,7 +194,7 @@ def update_kit_service_management_entity(
     return subject_nhs_number
 
 
-def execute_stored_procedures() -> None:
+def execute_fit_kit_stored_procedures() -> None:
     """
     This method executes two stored procedures:
     - PKG_TEST_KIT_QUEUE.p_validate_kit_queue

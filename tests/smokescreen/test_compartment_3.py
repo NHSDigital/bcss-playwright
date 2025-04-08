@@ -7,7 +7,7 @@ from utils.fit_kit_logged import process_kit_data
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
 from utils.oracle.oracle_specific_functions import (
     update_kit_service_management_entity,
-    execute_stored_procedures,
+    execute_fit_kit_stored_procedures,
 )
 from utils.user_tools import UserTools
 from jproperties import Properties
@@ -66,7 +66,7 @@ def test_compartment_3(page: Page, smokescreen_properties: dict) -> None:
 
     # Run two stored procedures to process any kit queue records at status BCSS_READY
     try:
-        execute_stored_procedures()
+        execute_fit_kit_stored_procedures()
         logging.info("Stored procedures executed successfully.")
     except Exception as e:
         logging.error(f"Error executing stored procedures: {str(e)}")
