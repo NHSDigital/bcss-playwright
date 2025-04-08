@@ -10,11 +10,34 @@ from utils.oracle.oracle_specific_functions import (
     execute_stored_procedures,
 )
 from utils.user_tools import UserTools
+from jproperties import Properties
+from sys import platform
+
+
+@pytest.fixture
+def smokescreen_properties() -> dict:
+    """
+    Reads the 'bcss_smokescreen_tests.properties' file and populates a 'Properties' object.
+    Returns a dictionary of properties for use in tests.
+
+    Returns:
+        dict: A dictionary containing the values loaded from the 'bcss_smokescreen_tests.properties' file.
+    """
+    configs = Properties()
+    if platform == "win32":  # File path from content root is required on Windows OS
+        with open(
+            "tests/smokescreen/bcss_smokescreen_tests.properties", "rb"
+        ) as read_prop:
+            configs.load(read_prop)
+    elif platform == "darwin":  # Only the filename is required on macOS
+        with open("bcss_smokescreen_tests.properties", "rb") as read_prop:
+            configs.load(read_prop)
+    return configs.properties
 
 
 @pytest.mark.smokescreen
 @pytest.mark.compartment3
-def test_compartment_3(page: Page) -> None:
+def test_compartment_3(page: Page, smokescreen_properties: dict) -> None:
     """
     This is the main compartment 3 method
     First it finds any relevant test data from the DB and stores it in a pandas dataframe
@@ -27,13 +50,15 @@ def test_compartment_3(page: Page) -> None:
 
     # Find data , separate it into normal and abnormal, Add results to the test records in the KIT_QUEUE table (i.e. mimic receiving results from the middleware)
     # and get device IDs and their flags
-    device_ids = process_kit_data()
+    device_ids = process_kit_data(smokescreen_properties)
     # Retrieve NHS numbers for each device_id and determine normal/abnormal status
     nhs_numbers = []
     normal_flags = []
 
     for device_id, is_normal in device_ids:
-        nhs_number = update_kit_service_management_entity(device_id, is_normal)
+        nhs_number = update_kit_service_management_entity(
+            device_id, is_normal, smokescreen_properties
+        )
         nhs_numbers.append(nhs_number)
         normal_flags.append(
             is_normal
@@ -66,7 +91,6 @@ def test_compartment_3(page: Page) -> None:
                 f"Verification failed for NHS number {nhs_number} with status {expected_status}: {str(e)}"
             )
             raise
-
     # Process S2 batch
     batch_processing(
         page,
@@ -75,7 +99,6 @@ def test_compartment_3(page: Page) -> None:
         "S158 - Subject Discharge Sent (Normal)",
         True,
     )
-
     # Process S158 batch
     batch_processing(
         page,
@@ -83,6 +106,5 @@ def test_compartment_3(page: Page) -> None:
         "GP Result (Normal)",
         "S159 - GP Discharge Sent (Normal)",
     )
-
     # Log out
     Logout(page).log_out()

@@ -117,7 +117,9 @@ def get_service_management_by_device_id(deviceid) -> pd.DataFrame:
     return get_service_management_df
 
 
-def update_kit_service_management_entity(device_id, normal) -> str:
+def update_kit_service_management_entity(
+    device_id, normal, smokescreen_properties: dict
+) -> str:
     """
     This method is used to update the KIT_QUEUE table on the DB
     This is done so that we can then run two stored procedures to update the subjects and kits status to either normal or abnormal
@@ -141,9 +143,9 @@ def update_kit_service_management_entity(device_id, normal) -> str:
         + f"{datetime.now().microsecond:06d}000"
     )
     if normal:
-        test_result = 75
+        test_result = int(smokescreen_properties["c3_fit_kit_normal_result"])
     else:
-        test_result = 150
+        test_result = int(smokescreen_properties["c3_fit_kit_abnormal_result"])
         # Parameterized query
     update_query = """
     UPDATE kit_queue kq

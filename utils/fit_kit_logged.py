@@ -5,7 +5,7 @@ import logging
 import pytest
 
 
-def process_kit_data() -> list:
+def process_kit_data(smokescreen_properties) -> list:
     """
     This method retrieved the test data needed for compartment 3 and then splits it into two data frames:
     - 1 normal
@@ -17,7 +17,9 @@ def process_kit_data() -> list:
     kit_id_df = get_kit_id_logged_from_db()
 
     # Split dataframe into two different dataframes, normal and abnormal
-    normal_fit_kit_df, abnormal_fit_kit_df = split_fit_kits(kit_id_df)
+    normal_fit_kit_df, abnormal_fit_kit_df = split_fit_kits(
+        kit_id_df, smokescreen_properties
+    )
 
     # Prepare a list to store device IDs and their respective flags
     device_ids = []
@@ -47,12 +49,14 @@ def process_kit_data() -> list:
 
 
 # Seperate kits into normal and abnormal
-def split_fit_kits(kit_id_df) -> pd.DataFrame:
+def split_fit_kits(kit_id_df, smokescreen_properties: dict) -> pd.DataFrame:
     """
     This method splits the dataframe into two, 1 normal and 1 abnormal
     """
-    number_of_normal = 1
-    number_of_abnormal = 9
+    number_of_normal = int(smokescreen_properties["c3_eng_number_of_normal_fit_kits"])
+    number_of_abnormal = int(
+        smokescreen_properties["c3_eng_number_of_abnormal_fit_kits"]
+    )
     # Split dataframe into two dataframes
     normal_fit_kit_df = kit_id_df.iloc[:number_of_normal]
     abnormal_fit_kit_df = kit_id_df.iloc[
