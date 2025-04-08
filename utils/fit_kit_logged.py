@@ -63,3 +63,4 @@ def split_fit_kits(kit_id_df, smokescreen_properties: dict) -> pd.DataFrame:
         number_of_normal : number_of_normal + number_of_abnormal
     ]
     return normal_fit_kit_df, abnormal_fit_kit_df
+    

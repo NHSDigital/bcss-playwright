@@ -112,3 +112,4 @@ def test_compartment_3(page: Page, smokescreen_properties: dict) -> None:
 
     # Log out
     Logout(page).log_out()
+    
