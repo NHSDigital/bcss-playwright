@@ -71,6 +71,7 @@ def test_compartment_3(page: Page, smokescreen_properties: dict) -> None:
     except Exception as e:
         logging.error(f"Error executing stored procedures: {str(e)}")
         raise
+
     # Check the results of the processed FIT kits have correctly updated the status of the associated subjects
     # Verify subject event status based on normal or abnormal classification
     for nhs_number, is_normal in zip(nhs_numbers, normal_flags):
@@ -91,6 +92,7 @@ def test_compartment_3(page: Page, smokescreen_properties: dict) -> None:
                 f"Verification failed for NHS number {nhs_number} with status {expected_status}: {str(e)}"
             )
             raise
+
     # Process S2 batch
     batch_processing(
         page,
@@ -99,6 +101,7 @@ def test_compartment_3(page: Page, smokescreen_properties: dict) -> None:
         "S158 - Subject Discharge Sent (Normal)",
         True,
     )
+
     # Process S158 batch
     batch_processing(
         page,
@@ -106,5 +109,6 @@ def test_compartment_3(page: Page, smokescreen_properties: dict) -> None:
         "GP Result (Normal)",
         "S159 - GP Discharge Sent (Normal)",
     )
+
     # Log out
     Logout(page).log_out()

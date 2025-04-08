@@ -48,7 +48,6 @@ def process_kit_data(smokescreen_properties) -> list:
     return device_ids
 
 
-# Seperate kits into normal and abnormal
 def split_fit_kits(kit_id_df, smokescreen_properties: dict) -> pd.DataFrame:
     """
     This method splits the dataframe into two, 1 normal and 1 abnormal
@@ -57,6 +56,7 @@ def split_fit_kits(kit_id_df, smokescreen_properties: dict) -> pd.DataFrame:
     number_of_abnormal = int(
         smokescreen_properties["c3_eng_number_of_abnormal_fit_kits"]
     )
+
     # Split dataframe into two dataframes
     normal_fit_kit_df = kit_id_df.iloc[:number_of_normal]
     abnormal_fit_kit_df = kit_id_df.iloc[
