@@ -185,7 +185,6 @@ def update_kit_service_management_entity(
     }
 
     # Execute query
-    logging.info("Parameters before execution:", params)
     rows_affected = OracleDB().update_or_insert_data_to_table(update_query, params)
     logging.info(f"Rows affected: {rows_affected}")
     # Return the subject NHS number
