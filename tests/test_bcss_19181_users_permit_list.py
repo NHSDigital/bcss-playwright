@@ -18,7 +18,7 @@ def before_test(page: Page):
     bcss_home.BasePage(page).click_log_out_link()
     logout.Logout(page).verify_log_out_page()
     # Log in to BCSS as bcss118 user, then log out
-    UserTools.user_login(page, "Screening Centre Manager")
+    UserTools.user_login(page, "Screening Centre Manager at BCS01")
     bcss_home.BasePage(page).bowel_cancer_screening_system_header_is_displayed()
     bcss_home.BasePage(page).click_log_out_link()
     logout.Logout(page).verify_log_out_page()
@@ -39,7 +39,7 @@ def test_only_users_on_approved_can_login_to_bcss(page: Page) -> None:
     logout.Logout(page).verify_log_out_page()
 
     # BCSS118 user fails to logs in to BCSS as they are not on the approved list
-    UserTools.user_login(page, "Screening Centre Manager")
+    UserTools.user_login(page, "Screening Centre Manager at BCS01")
     # Verify relevant error message is displayed
     login_failure.LoginFailureScreen(page).verify_login_failure_screen_is_displayed()
     page.close()
