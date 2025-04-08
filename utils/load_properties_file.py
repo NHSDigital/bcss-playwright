@@ -28,7 +28,7 @@ class PropertiesFile():
     def get_smokescreen_properties(self) -> dict:
         "This is used to get the `tests/smokescreen/bcss_smokescreen_tests.properties` file"
         return self.get_properties("smokescreen")
-    
+
 
     def get_general_properties(self) -> dict:
         "This is used to get the `tests/bcss_tests.properties` file"
