@@ -13,9 +13,8 @@ from utils.load_properties_file import PropertiesFile
 
 
 @pytest.fixture
-def smokescreen_properties() -> dict:
-    properties = PropertiesFile().smokescreen_properties("smoke")
-    return properties
+def general_properties() -> dict:
+    return PropertiesFile().get_general_properties()
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -65,7 +64,7 @@ def test_call_and_recall_page_navigation(page: Page) -> None:
     BasePage(page).main_menu_header_is_displayed()
 
 
-def test_view_an_invitation_plan(page: Page, smokescreen_properties: dict) -> None:
+def test_view_an_invitation_plan(page: Page, general_properties: dict) -> None:
     """
     Confirms that an invitation plan can be viewed via a screening centre from the planning ad monitoring page
     """
@@ -74,7 +73,7 @@ def test_view_an_invitation_plan(page: Page, smokescreen_properties: dict) -> No
 
     # Select a screening centre
     InvitationsMonitoring(page).go_to_invitation_plan_page(
-        smokescreen_properties["screening_centre_code"]
+        general_properties["screening_centre_code"]
     )
 
     # Select an invitation plan

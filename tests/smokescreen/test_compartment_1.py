@@ -15,8 +15,7 @@ from utils.load_properties_file import PropertiesFile
 
 @pytest.fixture
 def smokescreen_properties() -> dict:
-    properties = PropertiesFile().smokescreen_properties("compartment")
-    return properties
+    return PropertiesFile().get_smokescreen_properties()
 
 @pytest.mark.smoke
 @pytest.mark.compartment1

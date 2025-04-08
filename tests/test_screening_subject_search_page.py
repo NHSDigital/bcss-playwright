@@ -24,9 +24,8 @@ from utils.load_properties_file import PropertiesFile
 
 
 @pytest.fixture
-def smokescreen_properties() -> dict:
-    properties = PropertiesFile().smokescreen_properties("smoke")
-    return properties
+def general_properties() -> dict:
+    return PropertiesFile().get_general_properties()
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -44,7 +43,7 @@ def before_each(page: Page):
 
 @pytest.mark.smoke
 def test_search_screening_subject_by_nhs_number(
-    page: Page, smokescreen_properties: dict
+    page: Page, general_properties: dict
 ) -> None:
     """
     Confirms a screening subject can be searched for, using their nhs number by doing the following:
@@ -54,11 +53,11 @@ def test_search_screening_subject_by_nhs_number(
     - Click search button
     - Verify the Subject Screening Summary page is displayed
     """
-    search_subject_by_nhs_number(page, smokescreen_properties["nhs_number"])
+    search_subject_by_nhs_number(page, general_properties["nhs_number"])
 
 
 def test_search_screening_subject_by_surname(
-    page: Page, smokescreen_properties: dict
+    page: Page, general_properties: dict
 ) -> None:
     """
     Confirms a screening subject can be searched for, using their surname by doing the following:
@@ -68,11 +67,11 @@ def test_search_screening_subject_by_surname(
     - Click search button
     - Verify the subject summary page is displayed
     """
-    search_subject_by_surname(page, smokescreen_properties["surname"])
+    search_subject_by_surname(page, general_properties["surname"])
 
 
 def test_search_screening_subject_by_forename(
-    page: Page, smokescreen_properties: dict
+    page: Page, general_properties: dict
 ) -> None:
     """
     Confirms a screening subject can be searched for, using their forename by doing the following:
@@ -82,10 +81,10 @@ def test_search_screening_subject_by_forename(
     - Click search button
     - Verify the subject summary page is displayed
     """
-    search_subject_by_forename(page, smokescreen_properties["forename"])
+    search_subject_by_forename(page, general_properties["forename"])
 
 
-def test_search_screening_subject_by_dob(page: Page, smokescreen_properties: dict) -> None:
+def test_search_screening_subject_by_dob(page: Page, general_properties: dict) -> None:
     """
     Confirms a screening subject can be searched for, using their date of birth by doing the following:
     - Clear filters
@@ -94,7 +93,7 @@ def test_search_screening_subject_by_dob(page: Page, smokescreen_properties: dic
     - Click search button
     - Verify the subject search results page is displayed
     """
-    search_subject_by_dob(page, smokescreen_properties["subject_dob"])
+    search_subject_by_dob(page, general_properties["subject_dob"])
 
 
 def test_search_screening_subject_by_postcode(page: Page) -> None:
@@ -110,7 +109,7 @@ def test_search_screening_subject_by_postcode(page: Page) -> None:
 
 
 def test_search_screening_subject_by_episode_closed_date(
-    page: Page, smokescreen_properties: dict
+    page: Page, general_properties: dict
 ) -> None:
     """
     Confirms a screening subject can be searched for, using their episode closed date by doing the following:
@@ -121,18 +120,18 @@ def test_search_screening_subject_by_episode_closed_date(
     - Verify the subject search results page is displayed
     - Verify the results contain the date that was searched for
     """
-    search_subject_by_episode_closed_date(page, smokescreen_properties["episode_closed_date"])
+    search_subject_by_episode_closed_date(page, general_properties["episode_closed_date"])
 
 
 def test_search_criteria_clear_filters_button(
-    page: Page, smokescreen_properties: dict
+    page: Page, general_properties: dict
 ) -> None:
     """
     Confirms the 'clear filters' button on the search page works as expected by doing the following:
     - Enter number in NHS field and verify value
     - Click clear filters button and verify field is empty
     """
-    check_clear_filters_button_works(page, smokescreen_properties["nhs_number"])
+    check_clear_filters_button_works(page, general_properties["nhs_number"])
 
 
 # Tests searching via the "Screening Status" drop down list
@@ -345,7 +344,7 @@ def test_search_screening_subject_by_home_hub(page: Page) -> None:
 
 
 def test_search_screening_subject_by_gp_practice(
-    page: Page, smokescreen_properties: dict
+    page: Page, general_properties: dict
 ) -> None:
     """
     Confirms screening subjects can be searched for, using the search area (home hub) by doing the following:
@@ -361,12 +360,12 @@ def test_search_screening_subject_by_gp_practice(
         page,
         ScreeningStatusSearchOptions.CALL_STATUS.value,
         SearchAreaSearchOptions.SEARCH_AREA_GP_PRACTICE.value,
-        smokescreen_properties["gp_practice_code"],
+        general_properties["gp_practice_code"],
     )
     SubjectScreeningSummary(page).verify_result_contains_text("SPRINGS HEALTH CENTRE")
 
 
-def test_search_screening_subject_by_ccg(page: Page, smokescreen_properties: dict) -> None:
+def test_search_screening_subject_by_ccg(page: Page, general_properties: dict) -> None:
     """
     Confirms screening subjects can be searched for, using the search area (ccg) by doing the following:
     - Clear filters
@@ -381,13 +380,13 @@ def test_search_screening_subject_by_ccg(page: Page, smokescreen_properties: dic
         page,
         ScreeningStatusSearchOptions.CALL_STATUS.value,
         SearchAreaSearchOptions.SEARCH_AREA_CCG.value,
-        smokescreen_properties["ccg_code"],
-        smokescreen_properties["gp_practice_code"],
+        general_properties["ccg_code"],
+        general_properties["gp_practice_code"],
     )
 
 
 def test_search_screening_subject_by_screening_centre(
-    page: Page, smokescreen_properties: dict
+    page: Page, general_properties: dict
 ) -> None:
     """
     Confirms screening subjects can be searched for, using the search area (screening centre) by doing the following:
@@ -402,7 +401,7 @@ def test_search_screening_subject_by_screening_centre(
         page,
         ScreeningStatusSearchOptions.CALL_STATUS.value,
         SearchAreaSearchOptions.SEARCH_AREA_CCG.value,
-        smokescreen_properties["screening_centre_code"],
+        general_properties["screening_centre_code"],
     )
 
 

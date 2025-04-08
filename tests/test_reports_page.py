@@ -8,9 +8,8 @@ from utils.load_properties_file import PropertiesFile
 
 
 @pytest.fixture
-def smokescreen_properties() -> dict:
-    properties = PropertiesFile().smokescreen_properties("smoke")
-    return properties
+def general_properties() -> dict:
+    return PropertiesFile().get_general_properties()
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -190,7 +189,7 @@ def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(
 
 
 def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundaries(
-    page: Page, smokescreen_properties: dict
+    page: Page, general_properties: dict
 ) -> None:
     """
     Confirms 'allocate_sc_for_patient_movements_within_hub_boundaries' page loads,
@@ -233,7 +232,7 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
 
     # Select another screening centre
     set_patients_screening_centre_dropdown.select_option(
-        smokescreen_properties["coventry_and_warwickshire_bcs_centre"]
+        general_properties["coventry_and_warwickshire_bcs_centre"]
     )
 
     # Click update
@@ -241,7 +240,7 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
 
     # Verify new screening centre has saved
     expect(ReportsPage(page).set_patients_screening_centre_dropdown).to_have_value(
-        smokescreen_properties["coventry_and_warwickshire_bcs_centre"]
+        general_properties["coventry_and_warwickshire_bcs_centre"]
     )
 
 
@@ -332,7 +331,7 @@ def test_failsafe_reports_identify_and_link_new_gp(page: Page) -> None:
 
 # Operational Reports
 def test_operational_reports_appointment_attendance_not_updated(
-    page: Page, smokescreen_properties: dict
+    page: Page, general_properties: dict
 ) -> None:
     """
     Confirms 'appointment_attendance_not_updated' page loads,
@@ -361,7 +360,7 @@ def test_operational_reports_appointment_attendance_not_updated(
 
     # Select a screening centre from the drop-down options
     set_patients_screening_centre_dropdown.select_option(
-        smokescreen_properties["coventry_and_warwickshire_bcs_centre"]
+        general_properties["coventry_and_warwickshire_bcs_centre"]
     )
 
     # Click "Generate Report" button
@@ -433,7 +432,7 @@ def test_operational_reports_demographic_update_inconsistent_with_manual_update(
 
 
 def test_operational_reports_screening_practitioner_6_weeks_availability_not_set_up(
-    page: Page, smokescreen_properties: dict
+    page: Page, general_properties: dict
 ) -> None:
     """
     Confirms 'screening_practitioner_6_weeks_availability_not_set_up_report' page loads,
@@ -460,7 +459,7 @@ def test_operational_reports_screening_practitioner_6_weeks_availability_not_set
 
     # Select a screening centre
     set_patients_screening_centre_dropdown.select_option(
-        smokescreen_properties["coventry_and_warwickshire_bcs_centre"]
+        general_properties["coventry_and_warwickshire_bcs_centre"]
     )
 
     # Click "Generate Report"
@@ -480,7 +479,7 @@ def test_operational_reports_screening_practitioner_6_weeks_availability_not_set
 
 @pytest.mark.only
 def test_operational_reports_screening_practitioner_appointments(
-    page: Page, smokescreen_properties: dict
+    page: Page, general_properties: dict
 ) -> None:
     """
     Confirms 'screening_practitioner_appointments' page loads,
@@ -509,12 +508,12 @@ def test_operational_reports_screening_practitioner_appointments(
 
     # Select a screening centre
     set_patients_screening_centre_dropdown.select_option(
-        smokescreen_properties["coventry_and_warwickshire_bcs_centre"]
+        general_properties["coventry_and_warwickshire_bcs_centre"]
     )
 
     # Select a screening practitioner
     screening_practitioner_dropdown.select_option(
-        smokescreen_properties["screening_practitioner_named_another_stubble"]
+        general_properties["screening_practitioner_named_another_stubble"]
     )
 
     # Click "Generate Report"
