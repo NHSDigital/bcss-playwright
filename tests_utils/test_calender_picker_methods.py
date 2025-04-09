@@ -12,7 +12,6 @@ from utils.user_tools import UserTools
 from datetime import datetime
 
 
-@pytest.mark.calendar_pickerv1
 @pytest.mark.smoke
 def test_calender_picker_v1(page: Page) -> None:
     """
