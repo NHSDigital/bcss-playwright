@@ -1,44 +1,15 @@
 import pytest
 from playwright.sync_api import Page, expect
-<<<<<<< HEAD
-=======
-from sys import platform
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
 from pages.base_page import BasePage
 from pages.reports.reports_page import ReportsPage
 from utils.date_time_utils import DateTimeUtils
 from utils.user_tools import UserTools
-from jproperties import Properties
-<<<<<<< HEAD
-import os
-=======
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
+from utils.load_properties_file import PropertiesFile
 
 
 @pytest.fixture
-def tests_properties() -> dict:
-    """
-    Reads the 'bcss_tests.properties' file and populates a 'Properties' object.
-    Returns a dictionary of properties for use in tests.
-
-    Returns:
-        dict: A dictionary containing the values loaded from the 'bcss_tests.properties' file.
-    """
-<<<<<<< HEAD
-    path = f"{os.getcwd()}/tests/bcss_tests.properties"
-    configs = Properties()
-    with open(path, "rb") as read_prop:
-        configs.load(read_prop)
-=======
-    configs = Properties()
-    if platform == "win32":  # File path from content root is required on Windows OS
-        with open("tests/bcss_tests.properties", "rb") as read_prop:
-            configs.load(read_prop)
-    elif platform == "darwin":  # Only the filename is required on macOS
-        with open("bcss_tests.properties", "rb") as read_prop:
-            configs.load(read_prop)
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
-    return configs.properties
+def general_properties() -> dict:
+    return PropertiesFile().get_general_properties()
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -273,7 +244,7 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
 
 
 def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundaries(
-    page: Page, tests_properties: dict
+    page: Page, general_properties: dict
 ) -> None:
     """
     Confirms 'allocate_sc_for_patient_movements_within_hub_boundaries' page loads,
@@ -338,7 +309,7 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
 
     # Select another screening centre
     set_patients_screening_centre_dropdown.select_option(
-        tests_properties["coventry_and_warwickshire_bcs_centre"]
+        general_properties["coventry_and_warwickshire_bcs_centre"]
     )
 
     # Click update
@@ -346,7 +317,7 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
 
     # Verify new screening centre has saved
     expect(ReportsPage(page).set_patients_screening_centre_dropdown).to_have_value(
-        tests_properties["coventry_and_warwickshire_bcs_centre"]
+        general_properties["coventry_and_warwickshire_bcs_centre"]
     )
 
 
@@ -478,7 +449,7 @@ def test_operational_reports_appointment_attendance_not_updated(
 
 # Operational Reports
 def test_operational_reports_appointment_attendance_not_updated(
-    page: Page, tests_properties: dict
+    page: Page, general_properties: dict
 ) -> None:
     """
     Confirms 'appointment_attendance_not_updated' page loads,
@@ -508,17 +479,15 @@ def test_operational_reports_appointment_attendance_not_updated(
     )
 
     # Select a screening centre from the drop-down options
-    ReportsPage(
-        page
-    ).attendance_not_updated_set_patients_screening_centre_dropdown.select_option(
-        tests_properties["coventry_and_warwickshire_bcs_centre"]
+    set_patients_screening_centre_dropdown.select_option(
+        general_properties["coventry_and_warwickshire_bcs_centre"]
     )
 =======
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Appointment Attendance Not Updated")
 
     # Select a screening centre from the drop-down options
     set_patients_screening_centre_dropdown.select_option(
-        tests_properties["coventry_and_warwickshire_bcs_centre"]
+        general_properties["coventry_and_warwickshire_bcs_centre"]
     )
 
     # Click "Generate Report" button
@@ -606,7 +575,7 @@ def test_operational_reports_demographic_update_inconsistent_with_manual_update(
 
 
 def test_operational_reports_screening_practitioner_6_weeks_availability_not_set_up(
-    page: Page, tests_properties: dict
+    page: Page, general_properties: dict
 ) -> None:
     """
     Confirms 'screening_practitioner_6_weeks_availability_not_set_up_report' page loads,
@@ -651,7 +620,19 @@ def test_operational_reports_screening_practitioner_6_weeks_availability_not_set
 
     # Select a screening centre
     set_patients_screening_centre_dropdown.select_option(
-        tests_properties["coventry_and_warwickshire_bcs_centre"]
+        general_properties["coventry_and_warwickshire_bcs_centre"]
+    )
+=======
+    ReportsPage(page).go_to_screening_practitioner_6_weeks_availability_not_set_up_report_page()
+
+    # Verify page title is "Screening Practitioner 6 Weeks Availability Not Set Up"
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
+        "Screening Practitioner 6 Weeks Availability Not Set Up"
+    )
+
+    # Select a screening centre
+    set_patients_screening_centre_dropdown.select_option(
+        general_properties["coventry_and_warwickshire_bcs_centre"]
     )
 
     # Click "Generate Report"
@@ -691,7 +672,7 @@ def test_operational_reports_screening_practitioner_appointments(
 
 @pytest.mark.only
 def test_operational_reports_screening_practitioner_appointments(
-    page: Page, tests_properties: dict
+    page: Page, general_properties: dict
 ) -> None:
     """
     Confirms 'screening_practitioner_appointments' page loads,
@@ -749,12 +730,35 @@ def test_operational_reports_screening_practitioner_appointments(
 
     # Select a screening centre
     set_patients_screening_centre_dropdown.select_option(
-        tests_properties["coventry_and_warwickshire_bcs_centre"]
+        general_properties["coventry_and_warwickshire_bcs_centre"]
+    )
+
+    # Select a screening practitioner
+    ReportsPage(page).screening_practitioner_dropdown.select_option(
+        general_properties["screening_practitioner_named_another_stubble"]
+    )
+
+    # Click "Generate Report"
+    ReportsPage(page).operational_reports_sp_appointments_generate_report_button.click()
+
+    # Verify timestamp has updated to current date and time
+    report_timestamp = (
+        DateTimeUtils.screening_practitioner_appointments_report_timestamp_date_format()
+    )
+    expect(ReportsPage(Page).common_report_timestamp_element).to_contain_text(
+        report_timestamp
+    )
+=======
+    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Screening Practitioner Appointments")
+
+    # Select a screening centre
+    set_patients_screening_centre_dropdown.select_option(
+        general_properties["coventry_and_warwickshire_bcs_centre"]
     )
 
     # Select a screening practitioner
     screening_practitioner_dropdown.select_option(
-        tests_properties["screening_practitioner_named_another_stubble"]
+        general_properties["screening_practitioner_named_another_stubble"]
     )
 
     # Click "Generate Report"
