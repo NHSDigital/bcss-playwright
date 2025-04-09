@@ -40,7 +40,7 @@ class CalendarPicker(BasePage):
         locator.fill(formatted_date)
         locator.press("Enter")
 
-    def calculate_years_and_months_to_traverse(self, date: datetime) -> int:
+    def calculate_years_and_months_to_traverse(self, date: datetime) -> tuple[int, int]:
         """
         This function is used when using the v1 calendar picker
         It calculates how many years and months it needs to traverse
@@ -104,7 +104,9 @@ class CalendarPicker(BasePage):
 
         self.select_day(date)
 
-    def calculate_v2_calendar_variables(self, date: datetime) -> str | int:
+    def calculate_v2_calendar_variables(
+        self, date: datetime
+    ) -> tuple[str, str, str, int, int, str, int, int, str, int, int]:
         """
         This function calculates all of the variables needed to traverse through the v2 calendar picker
         Args:
@@ -162,7 +164,7 @@ class CalendarPicker(BasePage):
         end_of_current_century: str,
         current_century: int,
         century: int,
-    ) -> bool:
+    ) -> tuple[bool, bool, bool, bool]:
         """
         This function is used to "go back in time" / "expand" on the v2 calendar picker
         By selecting the top locator we can increase the range of dates available to be clicked
