@@ -63,7 +63,7 @@ def test_reports_page_navigation(page: Page) -> None:
 
     # Dashboard opens as expected TODO - this step may be failing legitimately
     # ReportsPage(page).go_to_dashboard()
-    # BasePage(page).bowel_cancer_screening_page_header_contains_text("Dashboard")
+    # BasePage(page).bowel_cancer_screening_page_title_contains_text("Dashboard")
     # BasePage(page).click_back_button()
 
     # QA Report : Dataset Completion link is visible
