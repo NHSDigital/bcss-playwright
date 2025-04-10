@@ -133,8 +133,8 @@ def test_failsafe_reports_screening_subjects_with_inactive_open_episode(
     # Open a screening subject record
     ReportsPage(page).click_nhs_number_link(page)
 
-    # Verify the page title is "Subject Screening Summary"
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
+    # Verify "Subject Screening Summary" is the page title
+    BasePage(page).bowel_cancer_screening_page_title_contains_text(
         "Subject Screening Summary"
     )
 
