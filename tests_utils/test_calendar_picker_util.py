@@ -3,7 +3,7 @@ from utils.calendar_picker import CalendarPicker
 from datetime import datetime
 from playwright.sync_api import Page
 
-pytestmark = [pytest.mark.utils]
+pytestmark = [pytest.mark.utils_local]
 
 
 def test_calculate_v2_calendar_variables(page: Page):
