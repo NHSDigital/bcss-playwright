@@ -105,7 +105,7 @@ class CalendarPicker(BasePage):
         self.select_day(date)
 
     def calculate_v2_calendar_variables(
-        self, date: datetime
+        self, date: datetime, current_date: datetime
     ) -> tuple[str, str, str, int, int, str, int, int, str, int, int]:
         """
         This function calculates all of the variables needed to traverse through the v2 calendar picker
@@ -122,7 +122,6 @@ class CalendarPicker(BasePage):
             current_century: the current century in yyyy format (e.g. 2000/2100)
             century: the wanted century in yyyy format (e.g. 1900)
         """
-        current_date = datetime.today()
         current_month_long = str(current_date.strftime("%B"))
         current_year = int(current_date.strftime("%Y"))
         current_century = (current_year // 100) * 100
@@ -227,7 +226,7 @@ class CalendarPicker(BasePage):
         This is the main method to navigate the v2 calendar picker (like the one on the Active Batch List page)
         This calls all the relevant functions in order to know how to traverse the picker
         """
-
+        current_date = datetime.today()
         (
             current_month_long,
             month_long,
@@ -240,7 +239,7 @@ class CalendarPicker(BasePage):
             end_of_current_century,
             current_century,
             century,
-        ) = self.calculate_v2_calendar_variables(date)
+        ) = self.calculate_v2_calendar_variables(date, current_date)
 
         click_month, click_year, click_decade, click_century = (
             self.v2_calendar_picker_traverse_back(
