@@ -31,22 +31,9 @@ def test_reports_page_navigation(page: Page) -> None:
     Confirms all menu items are displayed on the reports page, and that the relevant pages
     are loaded when the links are clicked
     """
-<<<<<<< HEAD
 
     # Bureau reports link is visible
     expect(ReportsPage(page).bureau_reports_link).to_be_visible()
-
-    # Failsafe reports page opens as expected
-    ReportsPage(page).go_to_failsafe_reports_page()
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
-        "Failsafe Reports"
-    )
-=======
-    bureau_reports_link = page.get_by_text("Bureau Reports")
-    qa_report_data_completion_link = page.get_by_text("QA Report : Dataset Completion")
-
-    # Bureau reports link is visible
-    expect(bureau_reports_link).to_be_visible()
 
     # Failsafe reports page opens as expected
     ReportsPage(page).go_to_failsafe_reports_page()
@@ -82,11 +69,7 @@ def test_reports_page_navigation(page: Page) -> None:
     # BasePage(page).click_back_button()
 
     # QA Report : Dataset Completion link is visible
-<<<<<<< HEAD
     expect(ReportsPage(page).qa_report_dataset_completion_link).to_be_visible()
-=======
-    expect(qa_report_data_completion_link).to_be_visible()
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
 
     # Return to main menu
     BasePage(page).click_main_menu_link()
@@ -99,10 +82,6 @@ def test_failsafe_reports_date_report_last_requested(page: Page) -> None:
     Confirms 'date_report_last_requested' page loads, 'generate report' and 'refresh' buttons work as expected
     and the timestamp updates to current date and time when refreshed
     """
-<<<<<<< HEAD
-=======
-    report_timestamp_element = page.locator("b")
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
 
     # Go to failsafe reports page
     ReportsPage(page).go_to_failsafe_reports_page()
@@ -119,26 +98,18 @@ def test_failsafe_reports_date_report_last_requested(page: Page) -> None:
     ReportsPage(page).click_generate_report_button()
     # Verify timestamp has updated (equals current date and time)
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-<<<<<<< HEAD
     expect(ReportsPage(page).common_report_timestamp_element).to_contain_text(
         report_timestamp
     )
-=======
-    expect(report_timestamp_element).to_contain_text(report_timestamp)
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
 
     # Click 'refresh' button
     ReportsPage(page).click_refresh_button()
 
     # Verify timestamp has updated (equals current date and time)
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-<<<<<<< HEAD
     expect(ReportsPage(page).common_report_timestamp_element).to_contain_text(
         report_timestamp
     )
-=======
-    expect(report_timestamp_element).to_contain_text(report_timestamp)
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
 
 
 def test_failsafe_reports_screening_subjects_with_inactive_open_episode(
@@ -148,9 +119,6 @@ def test_failsafe_reports_screening_subjects_with_inactive_open_episode(
     Confirms 'screening_subjects_with_inactive_open_episode' page loads, 'generate report' button works as expected
     and that a screening subject record can be opened
     """
-    nhs_number_link = page.get_by_role(
-        "cell", name="7652"
-    )  # This value is specific to this test only
 
     # Go to failsafe reports page
     ReportsPage(page).go_to_failsafe_reports_page()
@@ -167,17 +135,9 @@ def test_failsafe_reports_screening_subjects_with_inactive_open_episode(
     ReportsPage(page).click_generate_report_button()
 
     # Open a screening subject record
-<<<<<<< HEAD
     ReportsPage(page).click_nhs_number_link(page)
 
     # Verify the page title is "Subject Screening Summary"
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
-        "Subject Screening Summary"
-    )
-=======
-    nhs_number_link.click()
-
-    # Verify "Subject Screening Summary" is the page title
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
         "Subject Screening Summary"
     )
@@ -193,12 +153,8 @@ def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(
     a screening subject record can be opened
     """
 
-    nhs_number_link = page.locator(
-        "#listReportDataTable > tbody > tr.oddTableRow > td:nth-child(1) > a"
-    )
-    report_timestamp_element = page.locator(
-        "#displayGenerateDate > tbody > tr > td > b"
-    )
+    # Test Data
+    report_start_date = "18/03/2023"  # This date is specific to this test only
 
     # Go to failsafe reports page
     ReportsPage(page).go_to_failsafe_reports_page()
@@ -207,15 +163,12 @@ def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(
     ReportsPage(page).go_to_subjects_ceased_due_to_date_of_birth_changes_page()
 
     # Select a "report start date" from the calendar
-    page.get_by_role("button", name="Calendar").click()
-    page.get_by_text("«").click()
-    page.get_by_role("cell", name="18", exact=True).click()
+    ReportsPage(page).report_start_date_field.fill(report_start_date)
 
     # Click "Generate Report"
     ReportsPage(page).click_generate_report_button()
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-<<<<<<< HEAD
     expect(ReportsPage(page).subject_ceased_report_timestamp_element).to_contain_text(
         report_timestamp
     )
@@ -231,20 +184,6 @@ def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(
 
 def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundaries(
     page: Page, tests_properties: dict
-=======
-    expect(report_timestamp_element).to_contain_text(report_timestamp)
-
-    # Open a screening subject record from the search results
-    nhs_number_link.click()
-
-    # Verify page title is "Subject Demographic"
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
-        "Subject Demographic"
-    )
-
-
-def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundaries(
-    page: Page, general_properties: dict
 ) -> None:
     """
     Confirms 'allocate_sc_for_patient_movements_within_hub_boundaries' page loads,
@@ -254,13 +193,6 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
     a different SC can be allocated to a patient record
     """
 
-<<<<<<< HEAD
-=======
-    report_timestamp_element = page.locator("b")
-    nhs_number_link = page.locator("//*[@id='listReportDataTable']/tbody/tr[3]/td[1]")
-    set_patients_screening_centre_dropdown = page.locator("#cboScreeningCentre")
-
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
     # Go to failsafe reports page
     failsafe_report_page = ReportsPage(page)
     failsafe_report_page.go_to_failsafe_reports_page()
@@ -277,7 +209,6 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
     failsafe_report_page.click_generate_report_button()
 
     # Verify timestamp has updated to current date and time
-<<<<<<< HEAD
     # report_timestamp = DateTimeUtils.report_timestamp_date_format()
     # expect(ReportsPage(page).common_report_timestamp_element).to_contain_text(
     #     report_timestamp
@@ -295,29 +226,13 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
     ReportsPage(page).set_patients_screening_centre_dropdown.select_option(
         tests_properties["coventry_and_warwickshire_bcs_centre"]
     )
-=======
-    report_timestamp = DateTimeUtils.report_timestamp_date_format()
-    expect(report_timestamp_element).to_contain_text(report_timestamp)
-
-    # Open a screening subject record from the first row/first cell of the table
-    nhs_number_link.click()
-
-    # Verify page title is "Set Patient's Screening Centre"
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
-        "Set Patient's Screening Centre"
-    )
-
-    # Select another screening centre
-    set_patients_screening_centre_dropdown.select_option(
-        general_properties["coventry_and_warwickshire_bcs_centre"]
-    )
 
     # Click update
     failsafe_report_page.click_reports_pages_update_button()
 
     # Verify new screening centre has saved
     expect(ReportsPage(page).set_patients_screening_centre_dropdown).to_have_value(
-        general_properties["coventry_and_warwickshire_bcs_centre"]
+        tests_properties["coventry_and_warwickshire_bcs_centre"]
     )
 
 
@@ -330,11 +245,6 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_into_your_hub(
     the timestamp updates to current date and time when refreshed
     """
 
-<<<<<<< HEAD
-=======
-    report_timestamp_element = page.locator("b")
-
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
     # Go to failsafe reports page
     ReportsPage(page).go_to_failsafe_reports_page()
 
@@ -351,26 +261,18 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_into_your_hub(
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-<<<<<<< HEAD
     expect(ReportsPage(page).common_report_timestamp_element).to_contain_text(
         report_timestamp
     )
-=======
-    expect(report_timestamp_element).to_contain_text(report_timestamp)
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
 
     # Click "Refresh" button
     ReportsPage(page).click_refresh_button()
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-<<<<<<< HEAD
     expect(ReportsPage(page).common_report_timestamp_element).to_contain_text(
         report_timestamp
     )
-=======
-    expect(report_timestamp_element).to_contain_text(report_timestamp)
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
 
 
 def test_failsafe_reports_identify_and_link_new_gp(page: Page) -> None:
@@ -382,12 +284,6 @@ def test_failsafe_reports_identify_and_link_new_gp(page: Page) -> None:
     can be opened from here
     """
 
-    nhs_number_cell_link = page.locator(
-        "//*[@id='listReportDataTable']/tbody/tr[3]/td[2]"
-    )
-    report_timestamp_element = page.locator("b")
-
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
     # Go to failsafe reports page
     ReportsPage(page).go_to_failsafe_reports_page()
 
@@ -404,20 +300,15 @@ def test_failsafe_reports_identify_and_link_new_gp(page: Page) -> None:
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-<<<<<<< HEAD
     expect(ReportsPage(page).common_report_timestamp_element).to_contain_text(
         report_timestamp
     )
-=======
-    expect(report_timestamp_element).to_contain_text(report_timestamp)
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
 
     # Click "Refresh" button
     ReportsPage(page).click_refresh_button()
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-<<<<<<< HEAD
     expect(ReportsPage(page).common_report_timestamp_element).to_contain_text(
         report_timestamp
     )
@@ -435,22 +326,6 @@ def test_failsafe_reports_identify_and_link_new_gp(page: Page) -> None:
 def test_operational_reports_appointment_attendance_not_updated(
     page: Page, tests_properties: dict
 ) -> None:
-=======
-    expect(report_timestamp_element).to_contain_text(report_timestamp)
-
-    # Open a screening subject record from the first row/second cell of the table
-    nhs_number_cell_link.click()
-
-    # Verify page title is "Link GP practice to Screening Centre"
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
-        "Link GP practice to Screening Centre"
-    )
-
-
-# Operational Reports
-def test_operational_reports_appointment_attendance_not_updated(
-    page: Page, general_properties: dict
-) -> None:
     """
     Confirms 'appointment_attendance_not_updated' page loads,
     a SC can be selected from the dropdown
@@ -459,13 +334,6 @@ def test_operational_reports_appointment_attendance_not_updated(
     an appointment record can be opened from here
     """
 
-    nhs_number_link = page.locator(
-        "#listReportDataTable > tbody > tr:nth-child(3) > td:nth-child(1) > a"
-    )
-    report_timestamp_element = page.locator("b")
-    set_patients_screening_centre_dropdown = page.get_by_label("Screening Centre")
-
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
     # Go to operational reports page
     ReportsPage(page).go_to_operational_reports_page()
 
@@ -473,21 +341,15 @@ def test_operational_reports_appointment_attendance_not_updated(
     ReportsPage(page).go_to_appointment_attendance_not_updated_page()
 
     # Verify page title is "Appointment Attendance Not Updated"
-<<<<<<< HEAD
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
         "Appointment Attendance Not Updated"
     )
 
     # Select a screening centre from the drop-down options
-    set_patients_screening_centre_dropdown.select_option(
-        general_properties["coventry_and_warwickshire_bcs_centre"]
-    )
-=======
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Appointment Attendance Not Updated")
-
-    # Select a screening centre from the drop-down options
-    set_patients_screening_centre_dropdown.select_option(
-        general_properties["coventry_and_warwickshire_bcs_centre"]
+    ReportsPage(
+        page
+    ).attendance_not_updated_set_patients_screening_centre_dropdown.select_option(
+        tests_properties["coventry_and_warwickshire_bcs_centre"]
     )
 
     # Click "Generate Report" button
@@ -495,23 +357,12 @@ def test_operational_reports_appointment_attendance_not_updated(
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-<<<<<<< HEAD
     expect(ReportsPage(page).common_report_timestamp_element).to_contain_text(
         report_timestamp
     )
 
     # Open an appointment record from the report
     ReportsPage(page).click_nhs_number_link(page)
-
-    # Verify the page title is "Appointment Detail"
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
-        "Appointment Detail"
-    )
-=======
-    expect(report_timestamp_element).to_contain_text(report_timestamp)
-
-    # Open an appointment record from the report
-    nhs_number_link.click()
 
     # Verify the page title is "Appointment Detail"
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
@@ -526,11 +377,6 @@ def test_operational_reports_fobt_kits_logged_but_not_read(page: Page) -> None:
     the timestamp updates to current date and time when refreshed
     """
 
-<<<<<<< HEAD
-=======
-    report_generated_timestamp = page.locator("#report-generated")
-
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
     # Go to operational reports page
     ReportsPage(page).go_to_operational_reports_page()
 
@@ -549,9 +395,9 @@ def test_operational_reports_fobt_kits_logged_but_not_read(page: Page) -> None:
     report_timestamp = (
         DateTimeUtils.fobt_kits_logged_but_not_read_report_timestamp_date_format()
     )
-    expect(report_generated_timestamp).to_contain_text(
-        f"Report generated on {report_timestamp}."
-    )
+    expect(
+        ReportsPage(page).fobt_logged_not_read_report_timestamp_element
+    ).to_contain_text(f"Report generated on {report_timestamp}.")
 
 
 def test_operational_reports_demographic_update_inconsistent_with_manual_update(
@@ -575,7 +421,7 @@ def test_operational_reports_demographic_update_inconsistent_with_manual_update(
 
 
 def test_operational_reports_screening_practitioner_6_weeks_availability_not_set_up(
-    page: Page, general_properties: dict
+    page: Page, tests_properties: dict
 ) -> None:
     """
     Confirms 'screening_practitioner_6_weeks_availability_not_set_up_report' page loads,
@@ -584,17 +430,10 @@ def test_operational_reports_screening_practitioner_6_weeks_availability_not_set
     the timestamp updates to current date and time when refreshed
     """
 
-<<<<<<< HEAD
-=======
-    set_patients_screening_centre_dropdown = page.get_by_label("Screening Centre")
-    report_generated_timestamp_element = page.locator("#displayGenerateDate")
-
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
     # Go to operational reports page
     ReportsPage(page).go_to_operational_reports_page()
 
     # Go to "Screening Practitioner 6 Weeks Availability Not Set Up" page
-<<<<<<< HEAD
     ReportsPage(
         page
     ).go_to_screening_practitioner_6_weeks_availability_not_set_up_report_page()
@@ -610,52 +449,23 @@ def test_operational_reports_screening_practitioner_6_weeks_availability_not_set
     ).six_weeks_availability_not_set_up_set_patients_screening_centre_dropdown.select_option(
         tests_properties["coventry_and_warwickshire_bcs_centre"]
     )
-=======
-    ReportsPage(page).go_to_screening_practitioner_6_weeks_availability_not_set_up_report_page()
-
-    # Verify page title is "Screening Practitioner 6 Weeks Availability Not Set Up"
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
-        "Screening Practitioner 6 Weeks Availability Not Set Up"
-    )
-
-    # Select a screening centre
-    set_patients_screening_centre_dropdown.select_option(
-        general_properties["coventry_and_warwickshire_bcs_centre"]
-    )
-=======
-    ReportsPage(page).go_to_screening_practitioner_6_weeks_availability_not_set_up_report_page()
-
-    # Verify page title is "Screening Practitioner 6 Weeks Availability Not Set Up"
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
-        "Screening Practitioner 6 Weeks Availability Not Set Up"
-    )
-
-    # Select a screening centre
-    set_patients_screening_centre_dropdown.select_option(
-        general_properties["coventry_and_warwickshire_bcs_centre"]
-    )
 
     # Click "Generate Report"
     ReportsPage(page).click_generate_report_button()
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-<<<<<<< HEAD
     ReportsPage(
         page
     ).six_weeks_availability_not_set_up_report_timestamp_element.to_contain_text(
         report_timestamp
     )
-=======
-    expect(report_generated_timestamp_element).to_contain_text(report_timestamp)
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
 
     # Click "Refresh" button
     ReportsPage(page).click_refresh_button()
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-<<<<<<< HEAD
     ReportsPage(
         page
     ).six_weeks_availability_not_set_up_report_timestamp_element.to_contain_text(
@@ -666,14 +476,6 @@ def test_operational_reports_screening_practitioner_6_weeks_availability_not_set
 def test_operational_reports_screening_practitioner_appointments(
     page: Page, tests_properties: dict
 ) -> None:
-=======
-    expect(report_generated_timestamp_element).to_contain_text(report_timestamp)
-
-
-@pytest.mark.only
-def test_operational_reports_screening_practitioner_appointments(
-    page: Page, general_properties: dict
-) -> None:
     """
     Confirms 'screening_practitioner_appointments' page loads,
     a SC and Screening Practitioner can be selected
@@ -681,16 +483,6 @@ def test_operational_reports_screening_practitioner_appointments(
     the timestamp updates to current date and time when refreshed
     """
 
-<<<<<<< HEAD
-=======
-    set_patients_screening_centre_dropdown = page.get_by_label("Screening Centre")
-    screening_practitioner_dropdown = page.locator("#A_C_NURSE")
-    generate_report_button = page.locator(
-        "#submitThisForm"
-    )  # The locator appears to be unique to this generate report button
-    report_timestamp_element = page.locator("b")
-
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
     # Go to operational reports page
     ReportsPage(page).go_to_operational_reports_page()
 
@@ -698,7 +490,6 @@ def test_operational_reports_screening_practitioner_appointments(
     ReportsPage(page).go_to_screening_practitioner_appointments_page()
 
     # Verify page title is "Screening Practitioner Appointments"
-<<<<<<< HEAD
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
         "Screening Practitioner Appointments"
     )
@@ -725,48 +516,3 @@ def test_operational_reports_screening_practitioner_appointments(
     expect(ReportsPage(Page).common_report_timestamp_element).to_contain_text(
         report_timestamp
     )
-=======
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Screening Practitioner Appointments")
-
-    # Select a screening centre
-    set_patients_screening_centre_dropdown.select_option(
-        general_properties["coventry_and_warwickshire_bcs_centre"]
-    )
-
-    # Select a screening practitioner
-    ReportsPage(page).screening_practitioner_dropdown.select_option(
-        general_properties["screening_practitioner_named_another_stubble"]
-    )
-
-    # Click "Generate Report"
-    ReportsPage(page).operational_reports_sp_appointments_generate_report_button.click()
-
-    # Verify timestamp has updated to current date and time
-    report_timestamp = (
-        DateTimeUtils.screening_practitioner_appointments_report_timestamp_date_format()
-    )
-    expect(ReportsPage(Page).common_report_timestamp_element).to_contain_text(
-        report_timestamp
-    )
-=======
-    BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text("Screening Practitioner Appointments")
-
-    # Select a screening centre
-    set_patients_screening_centre_dropdown.select_option(
-        general_properties["coventry_and_warwickshire_bcs_centre"]
-    )
-
-    # Select a screening practitioner
-    screening_practitioner_dropdown.select_option(
-        general_properties["screening_practitioner_named_another_stubble"]
-    )
-
-    # Click "Generate Report"
-    generate_report_button.click()
-
-    # Verify timestamp has updated to current date and time
-    report_timestamp = (
-        DateTimeUtils.screening_practitioner_appointments_report_timestamp_date_format()
-    )
-    expect(report_timestamp_element).to_contain_text(report_timestamp)
->>>>>>> 9311a0b (BCSS-20020: Compartment 1 Smokescreen Tests (#7))
