@@ -87,6 +87,9 @@ class BasePage:
         expect(self.bowel_cancer_screening_system_header).to_contain_text(
             "Bowel Cancer Screening System"
         )
+        expect(self.bowel_cancer_screening_system_header).to_contain_text(
+            "Bowel Cancer Screening System"
+        )
 
     def main_menu_header_is_displayed(self) -> None:
         expect(self.main_menu__header).to_contain_text("Main Menu")
