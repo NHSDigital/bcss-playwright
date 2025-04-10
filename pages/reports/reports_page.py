@@ -185,6 +185,11 @@ class ReportsPage(BasePage):
         """
         Clicks the first NHS number link present on the screen if any are found.
         """
+        # List of locators to check for NHS number links.
+        # This implementation is a workaround for the fact that the NHS number
+        # links are not using the same locators accross bcss
+        # This is a temporary solution until
+        # we have a table utility that will allow us to interact with tables across bcss.
         locators = [
             "#listReportDataTable > tbody > tr:nth-child(3) > td:nth-child(1) > a",
             "//*[@id='listReportDataTable']/tbody/tr[3]/td[1]",

@@ -209,10 +209,10 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
     failsafe_report_page.click_generate_report_button()
 
     # Verify timestamp has updated to current date and time
-    # report_timestamp = DateTimeUtils.report_timestamp_date_format()
-    # expect(ReportsPage(page).common_report_timestamp_element).to_contain_text(
-    #     report_timestamp
-    # )
+    report_timestamp = DateTimeUtils.report_timestamp_date_format()
+    expect(ReportsPage(page).common_report_timestamp_element).to_contain_text(
+        report_timestamp
+    )
 
     # Open a screening subject record from the first row/first cell of the table
     ReportsPage(page).click_nhs_number_link(page)
