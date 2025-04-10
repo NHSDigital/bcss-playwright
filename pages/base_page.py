@@ -1,4 +1,4 @@
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page, expect, Locator
 import logging
 
 
@@ -143,7 +143,7 @@ class BasePage:
     def go_to_screening_subject_search_page(self) -> None:
         self.click(self.screening_subject_search_page)
 
-    def click(self, locator) -> None:
+    def click(self, locator: Locator) -> None:
         """
         This is used to click on a locator
         The reason for this being used over the normal playwright click method is due to:
