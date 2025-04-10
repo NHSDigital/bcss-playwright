@@ -91,3 +91,30 @@ def test_calculate_v2_calendar_variables(page: Page):
     assert end_of_current_century == "2090"
     assert current_century == 2000
     assert century == 2300
+
+
+def test_calculate_years_and_months_to_traverse(page: Page):
+    calendar_picker = CalendarPicker(page)
+    years_to_traverse, months_to_traverse = (
+        calendar_picker.calculate_years_and_months_to_traverse(
+            datetime(2356, 12, 18), datetime(2020, 6, 9)
+        )
+    )
+    assert years_to_traverse == -336
+    assert months_to_traverse == -6
+
+    years_to_traverse, months_to_traverse = (
+        calendar_picker.calculate_years_and_months_to_traverse(
+            datetime(2020, 12, 1), datetime(2020, 6, 9)
+        )
+    )
+    assert years_to_traverse == 0
+    assert months_to_traverse == -6
+
+    years_to_traverse, months_to_traverse = (
+        calendar_picker.calculate_years_and_months_to_traverse(
+            datetime(1961, 1, 30), datetime(2020, 6, 9)
+        )
+    )
+    assert years_to_traverse == 59
+    assert months_to_traverse == 5

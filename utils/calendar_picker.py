@@ -40,12 +40,13 @@ class CalendarPicker(BasePage):
         locator.fill(formatted_date)
         locator.press("Enter")
 
-    def calculate_years_and_months_to_traverse(self, date: datetime) -> tuple[int, int]:
+    def calculate_years_and_months_to_traverse(
+        self, date: datetime, current_date: datetime
+    ) -> tuple[int, int]:
         """
         This function is used when using the v1 calendar picker
         It calculates how many years and months it needs to traverse
         """
-        current_date = datetime.today()
         years_to_traverse = int(current_date.strftime("%Y")) - int(date.strftime("%Y"))
         months_to_traverse = int(current_date.strftime("%m")) - int(date.strftime("%m"))
         return years_to_traverse, months_to_traverse
@@ -94,8 +95,9 @@ class CalendarPicker(BasePage):
         This is the main method used to traverse the v1 calendar picker (e.g. the one on the subject screening search page)
         You provide it with a date and it will call the necessary functions to calculate how to navigate to the specified date
         """
+        current_date = datetime.today()
         years_to_traverse, months_to_traverse = (
-            self.calculate_years_and_months_to_traverse(date)
+            self.calculate_years_and_months_to_traverse(date, current_date)
         )
 
         self.traverse_years_in_v1_calendar(years_to_traverse)
