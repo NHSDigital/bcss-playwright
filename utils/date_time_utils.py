@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import pytz
 
 
 class DateTimeUtils:
@@ -71,14 +72,26 @@ class DateTimeUtils:
     @staticmethod
     def report_timestamp_date_format() -> str:
         """Gets the current datetime in the timestamp format used on the report pages."""
-        return DateTimeUtils.format_date(datetime.now(), "%d/%m/%Y at %H:%M:%S")
+        # Use this option if bcss is displaying correct DST times
+        # return DateTimeUtils.format_date(datetime.now(), "%d/%m/%Y at %H:%M:%S")
+
+        # Use this option if bcss is displaying UTC times
+        return DateTimeUtils.format_date(datetime.now(pytz.utc), "%d/%m/%Y at %H:%M:%S")
 
     @staticmethod
     def fobt_kits_logged_but_not_read_report_timestamp_date_format() -> str:
         """Gets the current datetime in the format used for FOBT Kits Logged but Not Read report."""
+        # Use this option if bcss is displaying correct DST times
         return DateTimeUtils.format_date(datetime.now(), "%d %b %Y %H:%M:%S")
+
+        # Use this option if bcss is displaying UTC times
+        # return DateTimeUtils.format_date(datetime.now(pytz.utc), "%d %b %Y %H:%M:%S")
 
     @staticmethod
     def screening_practitioner_appointments_report_timestamp_date_format() -> str:
         """Gets the current datetime in the format used for Screening Practitioner Appointments report."""
-        return DateTimeUtils.format_date(datetime.now(), "%d.%m.%Y at %H:%M:%S")
+        # Use this option if bcss is displaying correct DST times
+        # return DateTimeUtils.format_date(datetime.now(), "%d.%m.%Y at %H:%M:%S")
+
+        # Use this option if bcss is displaying UTC times
+        return DateTimeUtils.format_date(datetime.now(pytz.utc), "%d.%m.%Y at %H:%M:%S")
