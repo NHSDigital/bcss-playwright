@@ -107,7 +107,7 @@ def test_failsafe_reports_date_report_last_requested(page: Page) -> None:
         report_timestamp
     )
 
-
+@pytest.mark.only
 def test_failsafe_reports_screening_subjects_with_inactive_open_episode(
     page: Page,
 ) -> None:
@@ -449,22 +449,18 @@ def test_operational_reports_screening_practitioner_6_weeks_availability_not_set
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-    ReportsPage(
-        page
-    ).six_weeks_availability_not_set_up_report_timestamp_element.to_contain_text(
-        report_timestamp
-    )
+    expect(
+        ReportsPage(page).six_weeks_availability_not_set_up_report_timestamp_element
+    ).to_contain_text(report_timestamp)
 
     # Click "Refresh" button
     ReportsPage(page).click_refresh_button()
 
     # Verify timestamp has updated to current date and time
     report_timestamp = DateTimeUtils.report_timestamp_date_format()
-    ReportsPage(
-        page
-    ).six_weeks_availability_not_set_up_report_timestamp_element.to_contain_text(
-        report_timestamp
-    )
+    expect(
+        ReportsPage(page).six_weeks_availability_not_set_up_report_timestamp_element
+    ).to_contain_text(report_timestamp)
 
 
 def test_operational_reports_screening_practitioner_appointments(
@@ -507,6 +503,6 @@ def test_operational_reports_screening_practitioner_appointments(
     report_timestamp = (
         DateTimeUtils.screening_practitioner_appointments_report_timestamp_date_format()
     )
-    expect(ReportsPage(Page).common_report_timestamp_element).to_contain_text(
+    expect(ReportsPage(page).common_report_timestamp_element).to_contain_text(
         report_timestamp
     )
