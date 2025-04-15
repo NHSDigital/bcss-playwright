@@ -197,3 +197,9 @@ class ReportsPage(BasePage):
         Clicks the first NHS number link from the primary report table.
         """
         self.fail_safe_reports_screening_subjects_with_inactive_open_episodes_table.click_first_link_in_column("NHS Number")
+
+    def click_fail_safe_reports_identify_and_link_new_gp_practices_link(self):
+        """
+        Clicks the first Practice Code link from the primary report table.
+        """
+        self.failsafe_reports_sub_links_table.click_first_link_in_column("Practice Code")   

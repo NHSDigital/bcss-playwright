@@ -137,7 +137,7 @@ def test_failsafe_reports_screening_subjects_with_inactive_open_episode(
     BasePage(page).bowel_cancer_screening_ntsh_page_title_contains_text(
         "Subject Screening Summary"
     )
-@pytest.mark.wip
+
 def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(
     page: Page,
 ) -> None:
@@ -176,7 +176,6 @@ def test_failsafe_reports_subjects_ceased_due_to_date_of_birth_changes(
     BasePage(page).bowel_cancer_screening_page_title_contains_text(
         "Subject Demographic"
     )
-
 
 def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundaries(
     page: Page, general_properties: dict
@@ -310,9 +309,8 @@ def test_failsafe_reports_identify_and_link_new_gp(page: Page) -> None:
         report_timestamp
     )
 
-    # Open a screening subject record from the first row/second cell of the table
-    # nhs_number_cell_link.click()
-    ReportsPage(page).click_failsafe_reports_sub_links()
+    # Open a practice code from the first row/second cell of the table
+    ReportsPage(page).click_fail_safe_reports_identify_and_link_new_gp_practices_link()
 
     # Verify page title is "Link GP practice to Screening Centre"
     BasePage(page).bowel_cancer_screening_page_title_contains_text(

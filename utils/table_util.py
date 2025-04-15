@@ -38,6 +38,7 @@ class TableUtils:
 
         headers = header_row.locator("th")
         header_texts = headers.evaluate_all("ths => ths.map(th => th.innerText.trim())")
+
         for index, header in enumerate(header_texts):
             if column_name.lower() in header.lower():
                 return index + 1  # Convert to 1-based index
@@ -52,7 +53,7 @@ class TableUtils:
         if column_index == -1:
             raise ValueError(f"Column '{column_name}' not found in table")
 
-        # Create a dynamic locator for the column with NHS Number
+        # Create a dynamic locator for the esired column
         link_locator = f"{self.table_id} tbody tr td:nth-child({column_index}) a"
         links = self.page.locator(link_locator)
 
