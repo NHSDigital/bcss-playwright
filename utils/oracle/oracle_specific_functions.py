@@ -2,14 +2,14 @@ from oracle.oracle import OracleDB
 import logging
 import pandas as pd
 from datetime import datetime
-from enum import Enum
+from enum import IntEnum
 
 
-class sql_query_values(Enum):
-    s10_event_status = 11198
-    s19_event_status = 11213
-    s43_event_status = 11223
-    open_episode_status_id = 11352
+class SqlQueryValues(IntEnum):
+    S10_EVENT_STATUS = 11198
+    S19_EVENT_STATUS = 11213
+    S43_EVENT_STATUS = 11223
+    OPEN_EPISODE_STATUS_ID = 11352
 
 
 def get_kit_id_from_db(
@@ -34,7 +34,7 @@ def get_kit_id_from_db(
     and sdc.hub_id = {hub_id}
     and device_id is null
     and tk.invalidated_date is null
-    and se.latest_event_status_id in ({sql_query_values.s10_event_status.value}, {sql_query_values.s19_event_status.value})
+    and se.latest_event_status_id in ({SqlQueryValues.S10_EVENT_STATUS}, {SqlQueryValues.S19_EVENT_STATUS})
     order by tk.kitid DESC
     fetch first {no_of_kits_to_retrieve} rows only"""
     )
@@ -75,9 +75,9 @@ def get_kit_id_logged_from_db(smokescreen_properties: dict) -> pd.DataFrame:
     INNER JOIN ep_subject_episode_t se ON se.screening_subject_id = tk.screening_subject_id
     WHERE tk.logged_in_flag = 'Y'
     AND kq.test_kit_status IN ('LOGGED', 'POSTED')
-    AND se.episode_status_id = {sql_query_values.open_episode_status_id.value}
+    AND se.episode_status_id = {SqlQueryValues.OPEN_EPISODE_STATUS_ID}
     AND tk.tk_type_id = 2
-    AND se.latest_event_status_id = {sql_query_values.s43_event_status.value}
+    AND se.latest_event_status_id = {SqlQueryValues.S43_EVENT_STATUS}
     AND tk.logged_in_at = {smokescreen_properties["c3_fit_kit_results_test_org_id"]}
     AND tk.reading_flag = 'N'
     AND tk.test_results IS NULL
