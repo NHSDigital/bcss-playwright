@@ -1,11 +1,17 @@
 from playwright.sync_api import Page
 from pages.base_page import BasePage
+from utils.table_util import TableUtils
 
 
 class ReportsPage(BasePage):
     def __init__(self, page):
         super().__init__(page)
         self.page = page
+
+        # Initialize TableUtils for different tables
+        self.failsafe_reports_sub_links_table = TableUtils(page, "#listReportDataTable")
+        self.fail_safe_reports_screening_subjects_with_inactive_open_episodes_table = TableUtils(page, "#subjInactiveOpenEpisodes")
+
         # Reports page main menu links
         self.bureau_reports_page = self.page.get_by_role("link", name="Bureau Reports")
         self.failsafe_reports_page = self.page.get_by_role(
@@ -141,3 +147,15 @@ class ReportsPage(BasePage):
 
     def go_to_screening_practitioner_appointments_page(self) -> None:
         self.click(self.screening_practitioner_appointments_page)
+
+    def click_failsafe_reports_sub_links(self):
+        """
+        Clicks the first NHS number link from the primary report table.
+        """
+        self.failsafe_reports_sub_links_table.click_first_link_in_column("NHS Number")
+
+    def click_fail_safe_reports_screening_subjects_with_inactive_open_episodes_link(self):
+        """
+        Clicks the first NHS number link from the primary report table.
+        """
+        self.fail_safe_reports_screening_subjects_with_inactive_open_episodes_table.click_first_link_in_column("NHS Number")
