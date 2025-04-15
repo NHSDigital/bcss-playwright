@@ -1,7 +1,7 @@
-from playwright.sync_api import Page, Locator,expect
+from playwright.sync_api import Page, Locator, expect
 from pages.base_page import BasePage
 import logging
-from random import randrange
+from random import secrets
 
 
 class TableUtils:
@@ -21,8 +21,10 @@ class TableUtils:
             A TableUtils object ready to use.
         """
         self.page = page
-        self.table_id = table_locator# Store the table locator as a string
-        self.table = page.locator(table_locator)  # Create a locator object for the table
+        self.table_id = table_locator  # Store the table locator as a string
+        self.table = page.locator(
+            table_locator
+        )  # Create a locator object for the table
 
     def get_column_index(self, column_name: str) -> int:
         """
@@ -32,9 +34,9 @@ class TableUtils:
         :param column_name: Name of the column (e.g., 'NHS Number')
         :return: 1-based column index or -1 if not found
         """
-        header_row = self.table.locator("tbody tr").filter(
-            has=self.page.locator("th")
-        ).first
+        header_row = (
+            self.table.locator("tbody tr").filter(has=self.page.locator("th")).first
+        )
 
         headers = header_row.locator("th")
         header_texts = headers.evaluate_all("ths => ths.map(th => th.innerText.trim())")
@@ -118,16 +120,18 @@ class TableUtils:
         Returns:
             A playwright.sync_api.Locator with the row object.
         """
-        return self.page.locator(f"{self.table_id} > tbody tr").nth(randrange(0, self.get_row_count()))
+        return self.page.locator(f"{self.table_id} > tbody tr").nth(
+            secrets.randbelow(self.get_row_count())
+        )
 
     def pick_random_row_number(self) -> int:
         """
-        This picks a random row from the table in BS-Select and returns its position
+        This picks a random row from the table in BCSS and returns its position
 
         Returns:
             An int representing a random row on the table.
         """
-        return randrange(0, self.get_row_count())
+        return secrets.randbelow(self.get_row_count())
 
     def get_row_data_with_headers(self, row_number: int) -> dict:
         """
@@ -141,7 +145,10 @@ class TableUtils:
         """
         headers = self.get_table_headers()
         row_data = self._format_inner_text(
-            self.page.locator(f"{self.table_id} > tbody tr").nth(row_number).inner_text())
+            self.page.locator(f"{self.table_id} > tbody tr")
+            .nth(row_number)
+            .inner_text()
+        )
         results = {}
 
         for key in headers:
@@ -161,12 +168,3 @@ class TableUtils:
         for row in range(self.get_row_count()):
             full_results[row + 1] = self.get_row_data_with_headers(row)
         return full_results
-
-    def wait_for_table_to_populate(self) -> None:
-        """
-        This checks that the following phrases are no longer present in the body of the table:
-        - "Waiting for typing to finish..."
-        - "Searching..."
-        """
-        expect(self.page.locator(self.table_id)).not_to_contain_text("Waiting for typing to finish...")
-        expect(self.page.locator(self.table_id)).not_to_contain_text("Searching...", timeout=10000)
