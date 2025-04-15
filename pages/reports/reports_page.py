@@ -197,8 +197,6 @@ class ReportsPage(BasePage):
             "//*[@id='listReportDataTable']/tbody/tr[3]/td[2]",
             "#listReportDataTable > tbody > tr:nth-child(3) > td:nth-child(1) > a",
             "#subjInactiveOpenEpisodes > tbody > tr:nth-child(1) > td.NHS_NUMBER.dt-type-numeric > a",
-            "# subjInactiveOpenEpisodes > tbody > tr:nth-child(1) > td.NHS_NUMBER.dt-type-numeric > a",
-            "//*[@id=\"subjInactiveOpenEpisodes\"]/tbody/tr[1]/td[1]/a",
         ]
 
         for locator_string in locators:
