@@ -20,9 +20,14 @@ def smokescreen_properties() -> dict:
 def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
     """
     This is the main compartment 4 method
+    First it obtains the necessary test data from the DB
+    Then it logs on as a Screening Centre Manager and sets the availablity of a practitioner from 09:00 to 17:15 from todays date for the next 6 weeks
+    After It logs out an logs back in as a Hub Manager
+    Once logging back in it books appointments for the subjects retrieved earlier
+    Finally it processes the necessary batches to send out the letters and checks the subjects satus has been updated to what is expected
     """
 
-    # Add method of getting test data
+    # Add method of getting test data using the query below. To remove once subject retrieval logic is created
     """select tk.kitid, ss.subject_nhs_number, se.screening_subject_id
     from tk_items_t tk
     inner join ep_subject_episode_t se on se.screening_subject_id = tk.screening_subject_id
