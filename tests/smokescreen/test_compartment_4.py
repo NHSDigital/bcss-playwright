@@ -16,8 +16,8 @@ def smokescreen_properties() -> dict:
 
 
 @pytest.mark.smokescreen
-@pytest.mark.compartment3
-def test_compartment_3(page: Page, smokescreen_properties: dict) -> None:
+@pytest.mark.compartment4
+def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
     """
     This is the main compartment 4 method
     """
