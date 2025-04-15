@@ -26,8 +26,9 @@ class TableUtils:
 
     def get_column_index(self, column_name: str) -> int:
         """
-         Finds the column index dynamically based on column name.
-         Works even if <thead> is missing and header is inside <tbody>.
+        Finds the column index dynamically based on column name.
+        Works even if <thead> is missing and header is inside <tbody>.
+
         :param column_name: Name of the column (e.g., 'NHS Number')
         :return: 1-based column index or -1 if not found
         """
