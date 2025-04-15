@@ -202,4 +202,4 @@ class ReportsPage(BasePage):
         """
         Clicks the first Practice Code link from the primary report table.
         """
-        self.failsafe_reports_sub_links_table.click_first_link_in_column("Practice Code")   
+        self.failsafe_reports_sub_links_table.click_first_link_in_column("Practice Code")
