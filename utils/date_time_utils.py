@@ -3,6 +3,8 @@ from zoneinfo import ZoneInfo
 
 
 class DateTimeUtils:
+    UTC_TIMEZONE = "UTC"
+    DST_TIMEZONE = "Europe/London"
     """
     A utility class for doing common actions with datetimes.
     """
@@ -70,55 +72,63 @@ class DateTimeUtils:
         return date.strftime("%A")
 
     @staticmethod
-    def report_timestamp_date_format() -> str:
-        # If the bcss timestamp is displaying in UTC, set this to True
-        # If the bcss timestamp is displaying in DST, set this to False
-        USE_UTC = True
+    def report_timestamp_date_format(use_utc: bool = True) -> str:
+        """Gets the current datetime in the timestamp format used on the report pages.
+        Based on the value of `use_utc`, it chooses the appropriate timezone.
+        """
 
         """Gets the current datetime in the timestamp format used on the report pages.
         Based on the value of `USE_UTC`, it chooses the appropriate timezone.
         """
-        if USE_UTC:
+        if use_utc:
             return DateTimeUtils.format_date(
-                datetime.now(ZoneInfo("UTC")), "%d/%m/%Y at %H:%M:%S"
+                datetime.now(ZoneInfo(DateTimeUtils.UTC_TIMEZONE)),
+                "%d/%m/%Y at %H:%M:%S",
             )
         else:
             return DateTimeUtils.format_date(
-                datetime.now(ZoneInfo("Europe/London")), "%d/%m/%Y at %H:%M:%S"
+                datetime.now(ZoneInfo(DateTimeUtils.DST_TIMEZONE)),
+                "%d/%m/%Y at %H:%M:%S",
             )
 
     @staticmethod
-    def fobt_kits_logged_but_not_read_report_timestamp_date_format() -> str:
-        # If the bcss timestamp is displaying in UTC, set this to True
-        # If the bcss timestamp is displaying in DST, set this to False
-        USE_UTC = False
+    def fobt_kits_logged_but_not_read_report_timestamp_date_format(
+        use_utc: bool = False,
+    ) -> str:
+        """Gets the current datetime in the format used for FOBT Kits Logged but Not Read report.
+        Based on the value of `use_utc`, it chooses the appropriate timezone.
+        """
 
         """Gets the current datetime in the format used for FOBT Kits Logged but Not Read report.
         Based on the value of `USE_UTC`, it chooses the appropriate timezone.
         """
-        if USE_UTC:
+        if use_utc:
             return DateTimeUtils.format_date(
-                datetime.now(ZoneInfo("UTC")), "%d %b %Y %H:%M:%S"
+                datetime.now(ZoneInfo(DateTimeUtils.UTC_TIMEZONE)), "%d %b %Y %H:%M:%S"
             )
         else:
             return DateTimeUtils.format_date(
-                datetime.now(ZoneInfo("Europe/London")), "%d %b %Y %H:%M:%S"
+                datetime.now(ZoneInfo(DateTimeUtils.DST_TIMEZONE)), "%d %b %Y %H:%M:%S"
             )
 
     @staticmethod
-    def screening_practitioner_appointments_report_timestamp_date_format() -> str:
-        # If the bcss timestamp is displaying in UTC, set this to True
-        # If the bcss timestamp is displaying in DST, set this to False
-        USE_UTC = True
+    def screening_practitioner_appointments_report_timestamp_date_format(
+        use_utc: bool = True,
+    ) -> str:
+        """Gets the current datetime in the format used for Screening Practitioner Appointments report.
+        Based on the value of `use_utc`, it chooses the appropriate timezone.
+        """
 
         """Gets the current datetime in the format used for Screening Practitioner Appointments report.
         Based on the value of `USE_UTC`, it chooses the appropriate timezone.
         """
-        if USE_UTC:
+        if use_utc:
             return DateTimeUtils.format_date(
-                datetime.now(ZoneInfo("UTC")), "%d.%m.%Y at %H:%M:%S"
+                datetime.now(ZoneInfo(DateTimeUtils.UTC_TIMEZONE)),
+                "%d.%m.%Y at %H:%M:%S",
             )
         else:
             return DateTimeUtils.format_date(
-                datetime.now(ZoneInfo("Europe/London")), "%d.%m.%Y at %H:%M:%S"
+                datetime.now(ZoneInfo(DateTimeUtils.DST_TIMEZONE)),
+                "%d.%m.%Y at %H:%M:%S",
             )
