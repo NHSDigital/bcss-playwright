@@ -219,7 +219,7 @@ def test_failsafe_reports_allocate_sc_for_patient_movements_within_hub_boundarie
     )
 
     # Select another screening centre
-    (ReportsPage(page).set_patients_screening_centre_dropdown).select_option(
+    ReportsPage(page).set_patients_screening_centre_dropdown.select_option(
         general_properties["coventry_and_warwickshire_bcs_centre"]
     )
 
