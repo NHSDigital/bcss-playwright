@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta
-import pytz
+from datetime import datetime, timedelta, tzinfo
+from zoneinfo import ZoneInfo
 
 
 class DateTimeUtils:
@@ -71,27 +71,54 @@ class DateTimeUtils:
 
     @staticmethod
     def report_timestamp_date_format() -> str:
-        """Gets the current datetime in the timestamp format used on the report pages."""
-        # Use this option if bcss is displaying correct DST times
-        # return DateTimeUtils.format_date(datetime.now(), "%d/%m/%Y at %H:%M:%S")
+        # If the bcss timestamp is displaying in UTC, set this to True
+        # If the bcss timestamp is displaying in DST, set this to False
+        USE_UTC = True
 
-        # Use this option if bcss is displaying UTC times
-        return DateTimeUtils.format_date(datetime.now(pytz.utc), "%d/%m/%Y at %H:%M:%S")
+        """Gets the current datetime in the timestamp format used on the report pages.
+        Based on the value of `USE_UTC`, it chooses the appropriate timezone.
+        """
+        if USE_UTC:
+            return DateTimeUtils.format_date(
+                datetime.now(ZoneInfo("UTC")), "%d/%m/%Y at %H:%M:%S"
+            )
+        else:
+            return DateTimeUtils.format_date(
+                datetime.now(ZoneInfo("Europe/London")), "%d/%m/%Y at %H:%M:%S"
+            )
 
     @staticmethod
     def fobt_kits_logged_but_not_read_report_timestamp_date_format() -> str:
-        """Gets the current datetime in the format used for FOBT Kits Logged but Not Read report."""
-        # Use this option if bcss is displaying correct DST times
-        return DateTimeUtils.format_date(datetime.now(), "%d %b %Y %H:%M:%S")
+        # If the bcss timestamp is displaying in UTC, set this to True
+        # If the bcss timestamp is displaying in DST, set this to False
+        USE_UTC = False
 
-        # Use this option if bcss is displaying UTC times
-        # return DateTimeUtils.format_date(datetime.now(pytz.utc), "%d %b %Y %H:%M:%S")
+        """Gets the current datetime in the format used for FOBT Kits Logged but Not Read report.
+        Based on the value of `USE_UTC`, it chooses the appropriate timezone.
+        """
+        if USE_UTC:
+            return DateTimeUtils.format_date(
+                datetime.now(ZoneInfo("UTC")), "%d %b %Y %H:%M:%S"
+            )
+        else:
+            return DateTimeUtils.format_date(
+                datetime.now(ZoneInfo("Europe/London")), "%d %b %Y %H:%M:%S"
+            )
 
     @staticmethod
     def screening_practitioner_appointments_report_timestamp_date_format() -> str:
-        """Gets the current datetime in the format used for Screening Practitioner Appointments report."""
-        # Use this option if bcss is displaying correct DST times
-        # return DateTimeUtils.format_date(datetime.now(), "%d.%m.%Y at %H:%M:%S")
+        # If the bcss timestamp is displaying in UTC, set this to True
+        # If the bcss timestamp is displaying in DST, set this to False
+        USE_UTC = True
 
-        # Use this option if bcss is displaying UTC times
-        return DateTimeUtils.format_date(datetime.now(pytz.utc), "%d.%m.%Y at %H:%M:%S")
+        """Gets the current datetime in the format used for Screening Practitioner Appointments report.
+        Based on the value of `USE_UTC`, it chooses the appropriate timezone.
+        """
+        if USE_UTC:
+            return DateTimeUtils.format_date(
+                datetime.now(ZoneInfo("UTC")), "%d.%m.%Y at %H:%M:%S"
+            )
+        else:
+            return DateTimeUtils.format_date(
+                datetime.now(ZoneInfo("Europe/London")), "%d.%m.%Y at %H:%M:%S"
+            )

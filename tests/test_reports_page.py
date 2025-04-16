@@ -107,7 +107,7 @@ def test_failsafe_reports_date_report_last_requested(page: Page) -> None:
         report_timestamp
     )
 
-@pytest.mark.only
+
 def test_failsafe_reports_screening_subjects_with_inactive_open_episode(
     page: Page,
 ) -> None:
