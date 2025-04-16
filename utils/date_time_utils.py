@@ -77,9 +77,6 @@ class DateTimeUtils:
         Based on the value of `use_utc`, it chooses the appropriate timezone.
         """
 
-        """Gets the current datetime in the timestamp format used on the report pages.
-        Based on the value of `USE_UTC`, it chooses the appropriate timezone.
-        """
         if use_utc:
             return DateTimeUtils.format_date(
                 datetime.now(ZoneInfo(DateTimeUtils.UTC_TIMEZONE)),
@@ -99,9 +96,6 @@ class DateTimeUtils:
         Based on the value of `use_utc`, it chooses the appropriate timezone.
         """
 
-        """Gets the current datetime in the format used for FOBT Kits Logged but Not Read report.
-        Based on the value of `USE_UTC`, it chooses the appropriate timezone.
-        """
         if use_utc:
             return DateTimeUtils.format_date(
                 datetime.now(ZoneInfo(DateTimeUtils.UTC_TIMEZONE)), "%d %b %Y %H:%M:%S"
@@ -119,9 +113,6 @@ class DateTimeUtils:
         Based on the value of `use_utc`, it chooses the appropriate timezone.
         """
 
-        """Gets the current datetime in the format used for Screening Practitioner Appointments report.
-        Based on the value of `USE_UTC`, it chooses the appropriate timezone.
-        """
         if use_utc:
             return DateTimeUtils.format_date(
                 datetime.now(ZoneInfo(DateTimeUtils.UTC_TIMEZONE)),
