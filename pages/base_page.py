@@ -37,7 +37,7 @@ class BasePage:
         self.organisations_page = self.page.get_by_role("link", name="Organisations")
         self.reports_page = self.page.get_by_role("link", name="Reports")
         self.screening_practitioner_appointments_page = self.page.get_by_role(
-            "link", name="Screening Practitioner"
+            "link", name="Screening Practitioner Appointments"
         )
         self.screening_subject_search_page = self.page.get_by_role(
             "link", name="Screening Subject Search"
@@ -156,17 +156,16 @@ class BasePage:
         if alerts_table.is_visible():
             alerts_table.wait_for(state="attached")
             alerts_table.wait_for(state="visible")
-        else:
-            try:
-                self.page.wait_for_load_state("load")
-                self.page.wait_for_load_state("domcontentloaded")
-                self.page.wait_for_load_state("networkidle")
-                locator.wait_for(state="attached")
-                locator.wait_for(state="visible")
-                locator.click()
+        try:
+            self.page.wait_for_load_state("load")
+            self.page.wait_for_load_state("domcontentloaded")
+            self.page.wait_for_load_state("networkidle")
+            locator.wait_for(state="attached")
+            locator.wait_for(state="visible")
+            locator.click()
 
-            except Exception as locatorClickError:
-                logging.warning(
-                    f"Failed to click element with error: {locatorClickError}, trying again..."
-                )
-                locator.click()
+        except Exception as locatorClickError:
+            logging.warning(
+                f"Failed to click element with error: {locatorClickError}, trying again..."
+            )
+            locator.click()
