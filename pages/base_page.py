@@ -145,7 +145,7 @@ class BasePage:
         self.click(self.screening_subject_search_page)
 
     def click(self, locator: Locator) -> None:
-        #Alerts table locator
+        # Alerts table locator
         alerts_table = locator.get_by_role("table", name="cockpitalertbox")
         """
         This is used to click on a locator
