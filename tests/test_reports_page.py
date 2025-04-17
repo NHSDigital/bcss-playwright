@@ -119,7 +119,7 @@ def test_failsafe_reports_screening_subjects_with_inactive_open_episode(
     ReportsPage(page).go_to_failsafe_reports_page()
 
     # Click screening subjects with inactive open episode link
-    ReportsPage(page).go_to_screening_subjects_with_inactive_open_episode_link_page()
+    ReportsPage(page).go_to_screening_subjects_with_inactive_open_episode_page()
 
     # Verify "Screening Subjects With Inactive Open Episode" is the page title
     BasePage(page).bowel_cancer_screening_page_title_contains_text(
