@@ -508,6 +508,6 @@ def test_operational_reports_screening_practitioner_appointments(
     report_timestamp = (
         DateTimeUtils.screening_practitioner_appointments_report_timestamp_date_format()
     )
-    expect(ReportsPage(Page).common_report_timestamp_element).to_contain_text(
+    expect(ReportsPage(page).common_report_timestamp_element).to_contain_text(
         report_timestamp
     )
