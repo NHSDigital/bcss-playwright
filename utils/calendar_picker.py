@@ -78,7 +78,7 @@ class CalendarPicker(BasePage):
         This function is used by both the v1 and v2 calendar picker
         It extracts the day from the date and then selects that value in the calendar picker
         """
-        day_to_select = str(date.strftime("%#d"))
+        day_to_select = str(date.day)
         number_of_cells_with_day = self.page.get_by_role(
             "cell", name=day_to_select
         ).count()

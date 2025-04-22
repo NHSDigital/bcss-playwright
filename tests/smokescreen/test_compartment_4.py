@@ -50,8 +50,8 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
     BasePage(page).go_to_screening_practitioner_appointments_page()
     ScreeningPractitionerAppointmentsPage(page).go_to_set_availability_page()
     SetAvailabilityPage(page).go_to_practitioner_availability_page()
-    PractitionerAvailabilityPage(page).select_royal_hospital_wolverhampton_dropdown_option()
-    PractitionerAvailabilityPage(page).select_astonish_ethanol_practitioner_dropdown_option()
+    PractitionerAvailabilityPage(page).select_site_dropdown_option("THE ROYAL HOSPITAL (WOLVERHAMPTON)")
+    PractitionerAvailabilityPage(page).select_practitioner_dropdown_option("Astonish, Ethanol")
     PractitionerAvailabilityPage(page).click_calendar_button()
     CalendarPicker(page).select_day(
         datetime.today()

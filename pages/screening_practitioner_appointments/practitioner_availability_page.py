@@ -12,11 +12,11 @@ class PractitionerAvailabilityPage(BasePage):
         self.screening_practitioner_dropdown = page.locator("#UI_PRACTITIONER_ID")
         self.calendar_button = page.get_by_role("button", name="Calendar")
 
-    def select_royal_hospital_wolverhampton_dropdown_option(self) -> None:
-        self.site_id_dropdown.select_option(label="THE ROYAL HOSPITAL (WOLVERHAMPTON)")
+    def select_site_dropdown_option(self, site_to_use: str) -> None:
+        self.site_id_dropdown.select_option(label=site_to_use)
 
-    def select_astonish_ethanol_practitioner_dropdown_option(self) -> None:
-        self.screening_practitioner_dropdown.select_option(label="Astonish, Ethanol")
+    def select_practitioner_dropdown_option(self, practitioner: str) -> None:
+        self.screening_practitioner_dropdown.select_option(label=practitioner)
 
     def click_calendar_button(self) -> None:
         self.click(self.calendar_button)
