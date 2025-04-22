@@ -3,9 +3,15 @@ import pytest
 from playwright.sync_api import Page, expect
 from pages.logout.log_out_page import Logout
 from pages.base_page import BasePage
-from pages.screening_practitioner_appointments.screening_practitioner_appointments import ScreeningPractitionerAppointmentsPage
-from pages.screening_practitioner_appointments.set_availability_page import SetAvailabilityPage
-from pages.screening_practitioner_appointments.practitioner_availability_page import PractitionerAvailabilityPage
+from pages.screening_practitioner_appointments.screening_practitioner_appointments import (
+    ScreeningPractitionerAppointmentsPage,
+)
+from pages.screening_practitioner_appointments.set_availability_page import (
+    SetAvailabilityPage,
+)
+from pages.screening_practitioner_appointments.practitioner_availability_page import (
+    PractitionerAvailabilityPage,
+)
 from utils.user_tools import UserTools
 from utils.load_properties_file import PropertiesFile
 from utils.calendar_picker import CalendarPicker
@@ -50,8 +56,12 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
     BasePage(page).go_to_screening_practitioner_appointments_page()
     ScreeningPractitionerAppointmentsPage(page).go_to_set_availability_page()
     SetAvailabilityPage(page).go_to_practitioner_availability_page()
-    PractitionerAvailabilityPage(page).select_site_dropdown_option("THE ROYAL HOSPITAL (WOLVERHAMPTON)")
-    PractitionerAvailabilityPage(page).select_practitioner_dropdown_option("Astonish, Ethanol")
+    PractitionerAvailabilityPage(page).select_site_dropdown_option(
+        "THE ROYAL HOSPITAL (WOLVERHAMPTON)"
+    )
+    PractitionerAvailabilityPage(page).select_practitioner_dropdown_option(
+        "Astonish, Ethanol"
+    )
     PractitionerAvailabilityPage(page).click_calendar_button()
     CalendarPicker(page).select_day(
         datetime.today()
@@ -67,7 +77,7 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
     page.locator("#FOR_WEEKS").press("Enter")
     page.get_by_role("button", name="Save").click()
     expect(page.get_by_text("Slots Updated for 6 Weeks")).to_be_visible()
-    Logout(page).log_out()
+    Logout(page).log_out(close_page=False)
 
     page.get_by_role("button", name="Log in").click()
     UserTools.user_login(page, "Hub Manager State Registered at BCS01")
