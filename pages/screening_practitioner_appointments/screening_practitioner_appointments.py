@@ -14,6 +14,10 @@ class ScreeningPractitionerAppointmentsPage(BasePage):
         self.patients_that_require_page = self.page.get_by_role(
             "link", name="Patients that Require"
         )
+        self.active_set_availability_link = self.page.get_by_role(
+            "link", name="Set Availability"
+        )
+
         # Greyed out links (not clickable due to user role permissions)
         self.patients_that_require_colonoscopy_assessment_appointments_bowel_scope_link = self.page.get_by_text(
             "Patients that Require Colonoscopy Assessment Appointments - Bowel Scope"
@@ -34,3 +38,6 @@ class ScreeningPractitionerAppointmentsPage(BasePage):
 
     def go_to_patients_that_require_page(self) -> None:
         self.click(self.patients_that_require_page)
+
+    def go_to_set_availability_page(self) -> None:
+        self.click(self.active_set_availability_link)    

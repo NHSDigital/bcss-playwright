@@ -3,6 +3,9 @@ import pytest
 from playwright.sync_api import Page, expect
 from pages.logout.log_out_page import Logout
 from pages.base_page import BasePage
+from pages.screening_practitioner_appointments.screening_practitioner_appointments import ScreeningPractitionerAppointmentsPage
+from pages.screening_practitioner_appointments.set_availability_page import SetAvailabilityPage
+from pages.screening_practitioner_appointments.practitioner_availability_page import PractitionerAvailabilityPage
 from utils.user_tools import UserTools
 from utils.load_properties_file import PropertiesFile
 from utils.calendar_picker import CalendarPicker
@@ -45,11 +48,11 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
 
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
     BasePage(page).go_to_screening_practitioner_appointments_page()
-    page.get_by_role("link", name="Set Availability").click()
-    page.get_by_role("link", name="Practitioner Availability -").click()
-    page.locator("#UI_SITE_ID").select_option(index=1)
-    page.locator("#UI_PRACTITIONER_ID").select_option(index=1)
-    page.get_by_role("button", name="Calendar").click()
+    ScreeningPractitionerAppointmentsPage(page).go_to_set_availability_page()
+    SetAvailabilityPage(page).go_to_practitioner_availability_page()
+    PractitionerAvailabilityPage(page).select_royal_hospital_wolverhampton_dropdown_option()
+    PractitionerAvailabilityPage(page).select_astonish_ethanol_practitioner_dropdown_option()
+    PractitionerAvailabilityPage(page).click_calendar_button()
     CalendarPicker(page).select_day(
         datetime.today()
     )  # This will make it so that we can only run this test once a day, or we need to restore the DB back to the snapshot
