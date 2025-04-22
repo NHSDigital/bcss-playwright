@@ -8,6 +8,8 @@ from utils.load_properties_file import PropertiesFile
 from utils.calendar_picker import CalendarPicker
 from utils.batch_processing import batch_processing
 from datetime import datetime
+from utils.oracle.oracle_specific_functions import get_subjects_for_appointments
+from utils.nhs_number_tools import NHSNumberTools
 
 
 @pytest.fixture
@@ -27,21 +29,9 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
     Finally it processes the necessary batches to send out the letters and checks the subjects satus has been updated to what is expected
     """
 
-    # Add method of getting test data using the query below. To remove once subject retrieval logic is created
-    """select tk.kitid, ss.subject_nhs_number, se.screening_subject_id
-    from tk_items_t tk
-    inner join ep_subject_episode_t se on se.screening_subject_id = tk.screening_subject_id
-    inner join screening_subject_t ss on ss.screening_subject_id = se.screening_subject_id
-    inner join sd_contact_t c on c.nhs_number = ss.subject_nhs_number
-    where se.latest_event_status_id = 11132
-    and tk.logged_in_flag = 'Y'
-    and se.episode_status_id = 11352
-    and ss.screening_status_id != 4008
-    and tk.logged_in_at = 23159
-    and c.hub_id = 23159
-    and tk.tk_type_id = 2
-    and tk.datestamp > add_months(sysdate,-24)
-    order by ss.subject_nhs_number desc"""
+    subjects_df = get_subjects_for_appointments(
+        smokescreen_properties["c4_eng_number_of_appointments_to_book"]
+    )
 
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
     BasePage(page).go_to_screening_practitioner_appointments_page()
@@ -71,10 +61,12 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
     BasePage(page).go_to_screening_practitioner_appointments_page()
     page.get_by_role("link", name="Patients that Require").click()
     # Add for loop to loop x times (depends on how many we want to run it for) 70 - 79
+    nhs_number = subjects_df["subject_nhs_number"].iloc[0]
+    nhs_number_spaced = NHSNumberTools().spaced_nhs_number(nhs_number)
     page.locator("#nhsNumberFilter").click()
-    page.locator("#nhsNumberFilter").fill("9991406131")
+    page.locator("#nhsNumberFilter").fill(nhs_number)
     page.locator("#nhsNumberFilter").press("Enter")
-    page.get_by_role("link", name="999 140 6131").click()
+    page.get_by_role("link", name=nhs_number_spaced).click()
     page.get_by_label("Screening Centre ( All)").select_option("23162")
     page.locator("#UI_NEW_SITE").select_option("42808")
     page.locator('input[name="fri2"]').click()  # Todays date if available
