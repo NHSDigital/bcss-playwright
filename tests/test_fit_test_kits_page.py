@@ -36,7 +36,6 @@ def before_each(page: Page):
     BasePage(page).go_to_fit_test_kits_page()
 
 
-@pytest.mark.only
 @pytest.mark.smoke
 def test_fit_test_kits_page_navigation(page: Page, general_properties: dict) -> None:
     """
