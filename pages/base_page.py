@@ -156,6 +156,7 @@ class BasePage:
         if alerts_table.is_visible():
             alerts_table.wait_for(state="attached")
             alerts_table.wait_for(state="visible")
+
         try:
             self.page.wait_for_load_state("load")
             self.page.wait_for_load_state("domcontentloaded")
