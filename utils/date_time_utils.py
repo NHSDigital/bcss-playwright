@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, tzinfo
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 
