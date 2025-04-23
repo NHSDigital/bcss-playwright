@@ -1,6 +1,7 @@
 from playwright.sync_api import Page, expect, Locator
 from pages.base_page import BasePage
 from enum import Enum
+import pytest
 
 
 class SubjectScreeningSummary(BasePage):
@@ -56,6 +57,23 @@ class SubjectScreeningSummary(BasePage):
         expect(self.subject_search_results_title).to_contain_text(
             "Subject Search Results"
         )
+
+    def verify_subject_search_results_title_both(self) -> None:
+        try:
+            self.verify_subject_search_results_title_subject_screening_summary()
+        except Exception as e1:
+            try:
+                self.verify_subject_search_results_title_subject_search_results()
+            except Exception as e2:
+                if (
+                    self.subject_search_results_title.inner_text()
+                    == "Subject Search Criteria"
+                ):
+                    pytest.fail(
+                        f"No subjects matching criteria were found: \n{e1}\n{e2}"
+                    )
+                else:
+                    pytest.fail("No matching title found")
 
     def get_latest_event_status_cell(self, latest_event_status: str) -> Locator:
         return self.page.get_by_role("cell", name=latest_event_status, exact=True)

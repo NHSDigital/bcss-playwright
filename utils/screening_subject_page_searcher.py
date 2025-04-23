@@ -80,7 +80,7 @@ def search_subject_by_dob(page: Page, dob) -> None:
     SubjectScreeningPage(page).click_search_button()
     SubjectScreeningSummary(
         page
-    ).verify_subject_search_results_title_subject_screening_summary()
+    ).verify_subject_search_results_title_subject_search_results()
 
 
 def search_subject_by_postcode(page: Page, postcode) -> None:
@@ -118,9 +118,7 @@ def search_subject_by_status(page: Page, status) -> None:
     SubjectScreeningPage(page).select_screening_status_options(status)
     SubjectScreeningPage(page).select_screening_status.press("Tab")
     SubjectScreeningPage(page).click_search_button()
-    SubjectScreeningSummary(
-        page
-    ).verify_subject_search_results_title_subject_search_results()
+    SubjectScreeningSummary(page).verify_subject_search_results_title_both()
 
 
 def search_subject_by_latest_event_status(page: Page, status) -> None:

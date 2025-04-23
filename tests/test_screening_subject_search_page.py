@@ -6,7 +6,9 @@ from pages.screening_subject_search.subject_screening_search_page import (
     LatestEpisodeStatusSearchOptions,
     SearchAreaSearchOptions,
 )
-from pages.screening_subject_search.subject_screening_summary import SubjectScreeningSummary
+from pages.screening_subject_search.subject_screening_summary import (
+    SubjectScreeningSummary,
+)
 from utils.screening_subject_page_searcher import (
     search_subject_by_nhs_number,
     search_subject_by_surname,
@@ -120,7 +122,9 @@ def test_search_screening_subject_by_episode_closed_date(
     - Verify the subject search results page is displayed
     - Verify the results contain the date that was searched for
     """
-    search_subject_by_episode_closed_date(page, general_properties["episode_closed_date"])
+    search_subject_by_episode_closed_date(
+        page, general_properties["episode_closed_date"]
+    )
 
 
 def test_search_criteria_clear_filters_button(
@@ -400,7 +404,7 @@ def test_search_screening_subject_by_screening_centre(
     search_subject_by_search_area(
         page,
         ScreeningStatusSearchOptions.CALL_STATUS.value,
-        SearchAreaSearchOptions.SEARCH_AREA_CCG.value,
+        SearchAreaSearchOptions.SEARCH_AREA_SCREENING_CENTRE.value,
         general_properties["screening_centre_code"],
     )
 
