@@ -1,4 +1,3 @@
-from math import e
 from playwright.sync_api import Page, expect, Locator
 import logging
 
