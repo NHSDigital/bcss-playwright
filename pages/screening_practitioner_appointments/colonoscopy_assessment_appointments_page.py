@@ -16,6 +16,7 @@ class ColonoscopyAssessmentAppointments(BasePage):
         )
 
     def filter_by_nhs_number(self, nhs_number: str) -> None:
+        self.click(self.nhs_number_filter_text_field)
         self.nhs_number_filter_text_field.fill(nhs_number)
         self.nhs_number_filter_text_field.press("Enter")
 

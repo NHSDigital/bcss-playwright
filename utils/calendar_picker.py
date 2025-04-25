@@ -3,6 +3,8 @@ from utils.date_time_utils import DateTimeUtils
 from playwright.sync_api import Page, Locator
 from pages.base_page import BasePage
 from sys import platform
+import logging
+import pytest
 
 
 class CalendarPicker(BasePage):
@@ -14,6 +16,13 @@ class CalendarPicker(BasePage):
         self.v1_prev_month = self.page.get_by_role("cell", name="‹").locator("div")
         self.v1_next_month = self.page.get_by_role("cell", name="›").locator("div")
         self.v1_next_year = self.page.get_by_role("cell", name="»").locator("div")
+        # Book Appointment picker locators
+        self.appointments_prev_month = self.page.get_by_role(
+            "link", name="<-", exact=True
+        )
+        self.appointments_next_month = self.page.get_by_role(
+            "link", name="->", exact=True
+        )
 
     # Calendar Methods
     def calendar_picker_ddmmyyyy(self, date: datetime, locator: Locator) -> None:
@@ -276,3 +285,83 @@ class CalendarPicker(BasePage):
         )
 
         self.select_day(date)
+
+    def month_string_to_number(self, string: str) -> None:
+        """
+        This is used to convert a month from a string to an integer.
+        It accepts the full month or the short version and is not case sensitive
+        """
+        months = {
+            "jan": 1,
+            "feb": 2,
+            "mar": 3,
+            "apr": 4,
+            "may": 5,
+            "jun": 6,
+            "jul": 7,
+            "aug": 8,
+            "sep": 9,
+            "oct": 10,
+            "nov": 11,
+            "dec": 12,
+        }
+        month_short = string.strip()[:3].lower()
+
+        try:
+            out = months[month_short]
+            return out
+        except Exception:
+            raise ValueError("Not a month")
+
+    def select_first_eligble_appointment(
+        self,
+        current_month_displayed: str,
+        avialble_locator: Locator,
+        some_available_locator: Locator,
+    ) -> None:
+        """
+        This is used to select the first eligible appointment date
+        It first gets all available dates, and then clicks on the first one starting from today's date
+        """
+        current_month_displayed_int = self.month_string_to_number(
+            current_month_displayed
+        )
+        if platform == "win32":  # Windows
+            current_month_int = int(datetime.now().strftime("%#d"))
+        else:  # Linux or Mac
+            current_month_int = int(datetime.now().strftime("%-d"))
+
+        if current_month_displayed_int != current_month_int:
+            self.click(self.appointments_prev_month)
+
+        months_looped = 0
+        appointment_clicked = False
+        while (
+            months_looped < 3 and not appointment_clicked
+        ):  # This loops through this month + next two months to find available appointments. If none found it has failed
+            appointment_clicked = self.check_for_eligible_appointment_dates(
+                avialble_locator
+            )
+
+            if not appointment_clicked:
+                appointment_clicked = self.check_for_eligible_appointment_dates(
+                    some_available_locator
+                )
+
+            if not appointment_clicked:
+                self.click(self.appointments_next_month)
+                months_looped += 1
+
+        if not appointment_clicked:
+            pytest.fail("No available appointments found for the current month")
+
+    def check_for_eligible_appointment_dates(self, locator: Locator) -> bool:
+
+        locator_count = locator.count()
+
+        for i in range(locator_count):
+            locator_number = locator_count - i - 1
+            value = locator.nth(locator_number).get_attribute("name")
+            if len(value) < 5:
+                self.click(locator.nth(locator_number))
+                return True

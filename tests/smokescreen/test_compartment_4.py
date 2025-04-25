@@ -30,6 +30,7 @@ from utils.batch_processing import batch_processing
 from datetime import datetime
 from utils.oracle.oracle_specific_functions import get_subjects_for_appointments
 from utils.nhs_number_tools import NHSNumberTools
+import logging
 
 
 @pytest.fixture
@@ -54,6 +55,7 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
         smokescreen_properties["c4_eng_number_of_appointments_to_book"]
     )
 
+    logging.info("Setting up appointments")
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
     BasePage(page).go_to_screening_practitioner_appointments_page()
     ScreeningPractitionerAppointmentsPage(page).go_to_set_availability_page()
@@ -65,9 +67,7 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
         "Astonish, Ethanol"
     )
     PractitionerAvailabilityPage(page).click_calendar_button()
-    CalendarPicker(page).select_day(
-        datetime.today()
-    )  # This will make it so that we can only run this test once a day, or we need to restore the DB back to the snapshot
+    CalendarPicker(page).select_day(datetime.today())
     PractitionerAvailabilityPage(page).click_show_button()
     PractitionerAvailabilityPage(page).enter_start_time("09:00")
     PractitionerAvailabilityPage(page).enter_end_time("17:15")
@@ -81,25 +81,43 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
 
     ScreeningPractitionerAppointmentsPage(page).go_to_log_in_page()
     UserTools.user_login(page, "Hub Manager State Registered at BCS01")
+
     BasePage(page).go_to_screening_practitioner_appointments_page()
     ScreeningPractitionerAppointmentsPage(page).go_to_patients_that_require_page()
-    # Add for loop to loop x times (depends on how many we want to run it for) 70 - 79
-    nhs_number = subjects_df["subject_nhs_number"].iloc[0]
-    nhs_number_spaced = NHSNumberTools().spaced_nhs_number(nhs_number)
-    ColonoscopyAssessmentAppointments(page).filter_by_nhs_number(nhs_number)
-    ColonoscopyAssessmentAppointments(page).click_nhs_number_link(nhs_number_spaced)
-    BookAppointmentPage(page).select_screening_centre_dropdown_option(
-        "BCS001 - Wolverhampton Bowel Cancer Screening Centre"
-    )
-    BookAppointmentPage(page).select_site_dropdown_option("Holly Hall Clinic (? km)")
-    BookAppointmentPage(page).choose_day_with_available_slots()
-    BookAppointmentPage(page).appointments_table.click_first_input_in_column(
-        "Appt/Slot Time"
-    )
-    BookAppointmentPage(page).click_save_button()
-    BookAppointmentPage(page).appointment_booked_confirmation_is_displayed(
-        "Appointment booked"
-    )
+
+    for subject_num in range(
+        int(smokescreen_properties["c4_eng_number_of_appointments_to_book"])
+    ):
+        nhs_number = subjects_df["subject_nhs_number"].iloc[subject_num]
+        logging.info(f"Booking appointment for: {nhs_number}")
+
+        nhs_number_spaced = NHSNumberTools().spaced_nhs_number(nhs_number)
+        ColonoscopyAssessmentAppointments(page).filter_by_nhs_number(nhs_number)
+        ColonoscopyAssessmentAppointments(page).click_nhs_number_link(nhs_number_spaced)
+        BookAppointmentPage(page).select_screening_centre_dropdown_option(
+            "BCS001 - Wolverhampton Bowel Cancer Screening Centre"
+        )
+        BookAppointmentPage(page).select_site_dropdown_option(
+            "The Royal Hospital (Wolverhampton) (? km)"
+        )
+        current_month_displayed = BookAppointmentPage(
+            page
+        ).get_current_month_displayed()
+        CalendarPicker(page).select_first_eligble_appointment(
+            current_month_displayed,
+            BookAppointmentPage(page).day_with_available_slots,
+            BookAppointmentPage(page).day_with_some_available_slots,
+        )
+        BookAppointmentPage(page).appointments_table.click_first_input_in_column(
+            "Appt/Slot Time"
+        )
+        BookAppointmentPage(page).accept_dialog()
+        BookAppointmentPage(page).click_save_button()
+        BookAppointmentPage(page).appointment_booked_confirmation_is_displayed(
+            "Appointment booked"
+        )
+        BasePage(page).click_back_button()
+    BasePage(page).click_main_menu_link()
 
     batch_processing(
         page,

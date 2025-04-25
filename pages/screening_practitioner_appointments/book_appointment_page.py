@@ -12,12 +12,16 @@ class BookAppointmentPage(BasePage):
         self.site_dropdown = page.locator("#UI_NEW_SITE")
         self.day_with_available_slots = page.locator(
             'input.twoColumnCalendar[style*="background-color: rgb(102, 255, 153);"]'
-        ).last
+        )
+        self.day_with_some_available_slots = page.locator(
+            'input.twoColumnCalendar[style*="background-color: rgb(255, 220, 144);"]'
+        )
         self.appointment_time_radio_button = page.locator(
             page.get_by_role("radio", name="UI_NEW_SLOT_SELECTION_ID")
         )
         self.save_button = page.get_by_role("button", name="Save")
         self.appointments_table = TableUtils(self.page, "#displayRS")
+        self.current_month_displayed = self.page.locator("#MONTH_AND_YEAR")
 
     def select_screening_centre_dropdown_option(self, screening_centre: str) -> None:
         self.screening_center_dropdown.select_option(label=screening_centre)
@@ -37,3 +41,9 @@ class BookAppointmentPage(BasePage):
 
     def appointment_booked_confirmation_is_displayed(self, message: str) -> None:
         expect(self.page.get_by_text(message)).to_be_visible()
+
+    def accept_dialog(self) -> None:
+        self.page.once("dialog", lambda dialog: dialog.accept())
+
+    def get_current_month_displayed(self) -> str:
+        return self.current_month_displayed.text_content()
