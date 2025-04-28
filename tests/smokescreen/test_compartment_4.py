@@ -55,7 +55,8 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
         smokescreen_properties["c4_eng_number_of_appointments_to_book"]
     )
 
-    logging.info("Setting up appointments")
+    logging.info("Compartment 4 - Setting up appointments")
+    logging.info("Logging in as Screening Centre Manager at BCS001")
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
     BasePage(page).go_to_screening_practitioner_appointments_page()
     ScreeningPractitionerAppointmentsPage(page).go_to_set_availability_page()
@@ -72,14 +73,18 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
     PractitionerAvailabilityPage(page).enter_start_time("09:00")
     PractitionerAvailabilityPage(page).enter_end_time("17:15")
     PractitionerAvailabilityPage(page).click_calculate_slots_button()
-    PractitionerAvailabilityPage(page).enter_number_of_weeks("6")
+    PractitionerAvailabilityPage(page).enter_number_of_weeks(
+        smokescreen_properties["c4_eng_weeks_to_make_available"]
+    )
     PractitionerAvailabilityPage(page).click_save_button()
     PractitionerAvailabilityPage(page).slots_updated_message_is_displayed(
-        "Slots Updated for 6 Weeks"
+        f"Slots Updated for {smokescreen_properties["c4_eng_weeks_to_make_available"]} Weeks"
     )
     Logout(page).log_out(close_page=False)
 
+    logging.info("Compartment 4 - Booking subjects to appointments")
     ScreeningPractitionerAppointmentsPage(page).go_to_log_in_page()
+    logging.info("Logging in as Hub Manager State Registered at BCS01")
     UserTools.user_login(page, "Hub Manager State Registered at BCS01")
 
     BasePage(page).go_to_screening_practitioner_appointments_page()
@@ -103,22 +108,29 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
         current_month_displayed = BookAppointmentPage(
             page
         ).get_current_month_displayed()
-        CalendarPicker(page).select_first_eligble_appointment(
+        CalendarPicker(page).book_first_eligble_appointment(
             current_month_displayed,
-            BookAppointmentPage(page).day_with_available_slots,
-            BookAppointmentPage(page).day_with_some_available_slots,
+            BookAppointmentPage(page).appointment_cell_locators,
+            [
+                BookAppointmentPage(page).available_background_colour,
+                BookAppointmentPage(page).some_available_background_colour,
+            ],
         )
         BookAppointmentPage(page).appointments_table.click_first_input_in_column(
             "Appt/Slot Time"
         )
-        BookAppointmentPage(page).accept_dialog()
-        BookAppointmentPage(page).click_save_button()
-        BookAppointmentPage(page).appointment_booked_confirmation_is_displayed(
-            "Appointment booked"
-        )
+        BasePage(page).safe_accept_dialog(BookAppointmentPage(page).save_button)
+        try:
+            BookAppointmentPage(page).appointment_booked_confirmation_is_displayed(
+                "Appointment booked"
+            )
+            logging.info(f"Appointment successfully booked for: {nhs_number}")
+        except Exception as e:
+            pytest.fail(f"Appointment not booked successfully: {e}")
         BasePage(page).click_back_button()
-    BasePage(page).click_main_menu_link()
+    ColonoscopyAssessmentAppointments(page).wait_for_page_header()
 
+    logging.info("Compartment 4 - Sending out appointment invitations")
     batch_processing(
         page,
         "A183",

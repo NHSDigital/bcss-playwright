@@ -286,53 +286,30 @@ class CalendarPicker(BasePage):
 
         self.select_day(date)
 
-    def month_string_to_number(self, string: str) -> None:
-        """
-        This is used to convert a month from a string to an integer.
-        It accepts the full month or the short version and is not case sensitive
-        """
-        months = {
-            "jan": 1,
-            "feb": 2,
-            "mar": 3,
-            "apr": 4,
-            "may": 5,
-            "jun": 6,
-            "jul": 7,
-            "aug": 8,
-            "sep": 9,
-            "oct": 10,
-            "nov": 11,
-            "dec": 12,
-        }
-        month_short = string.strip()[:3].lower()
-
-        try:
-            out = months[month_short]
-            return out
-        except Exception:
-            raise ValueError("Not a month")
-
-    def select_first_eligble_appointment(
+    def book_first_eligble_appointment(
         self,
         current_month_displayed: str,
-        avialble_locator: Locator,
-        some_available_locator: Locator,
+        locator: Locator,
+        bg_colours: list,
     ) -> None:
         """
         This is used to select the first eligible appointment date
-        It first gets all available dates, and then clicks on the first one starting from today's date
+        It first sets the calendar to the current month
+        Then gets all available dates, and then clicks on the first one starting from today's date
+        If no available dates are found it moves onto the next month and repeats this 2 more times
+        If in the end no available dates are found the test will fail.
         """
-        current_month_displayed_int = self.month_string_to_number(
+        current_month_displayed_int = DateTimeUtils().month_string_to_number(
             current_month_displayed
         )
         if platform == "win32":  # Windows
-            current_month_int = int(datetime.now().strftime("%#d"))
+            current_month_int = int(datetime.now().strftime("%#m"))
         else:  # Linux or Mac
-            current_month_int = int(datetime.now().strftime("%-d"))
+            current_month_int = int(datetime.now().strftime("%-m"))
 
-        if current_month_displayed_int != current_month_int:
-            self.click(self.appointments_prev_month)
+        self.book_appointments_go_to_month(
+            current_month_displayed_int, current_month_int
+        )
 
         months_looped = 0
         appointment_clicked = False
@@ -340,13 +317,8 @@ class CalendarPicker(BasePage):
             months_looped < 3 and not appointment_clicked
         ):  # This loops through this month + next two months to find available appointments. If none found it has failed
             appointment_clicked = self.check_for_eligible_appointment_dates(
-                avialble_locator
+                locator, bg_colours
             )
-
-            if not appointment_clicked:
-                appointment_clicked = self.check_for_eligible_appointment_dates(
-                    some_available_locator
-                )
 
             if not appointment_clicked:
                 self.click(self.appointments_next_month)
@@ -355,13 +327,40 @@ class CalendarPicker(BasePage):
         if not appointment_clicked:
             pytest.fail("No available appointments found for the current month")
 
-    def check_for_eligible_appointment_dates(self, locator: Locator) -> bool:
+    def book_appointments_go_to_month(
+        self, current_displayed_month: int, wanted_month: int
+    ):
+        """
+        This is used to move the calendar on the appointments page to the wanted month
+        """
+        month_difference = current_displayed_month - wanted_month
+        if month_difference > 0:
+            for _ in range(month_difference):
+                self.click(self.appointments_prev_month)
+        elif month_difference < 0:
+            for _ in range(month_difference * -1):
+                self.click(self.appointments_next_month)
+
+    def check_for_eligible_appointment_dates(
+        self, locator: Locator, bg_colours: list
+    ) -> bool:
+        """
+        This function loops through all of the appointment date cells and if the bacground colour matches
+        It then checks that the length of the name is less than 5.
+        This is done the name length is the only differentiating factor between the two calendar tables on the page
+        - 1st table has a length of 4 (e.g. wed2, fri5) and the 2nd table has a length of 5 (e.g. wed11, fri14)
+        """
 
         locator_count = locator.count()
 
         for i in range(locator_count):
-            locator_number = locator_count - i - 1
-            value = locator.nth(locator_number).get_attribute("name")
-            if len(value) < 5:
-                self.click(locator.nth(locator_number))
-                return True
+            locator_element = locator.nth(i)
+            background_colour = locator_element.evaluate(
+                "el => window.getComputedStyle(el).backgroundColor"
+            )
+
+            if background_colour in bg_colours:
+                value = locator_element.get_attribute("name")
+                if len(value) < 5:
+                    self.click(locator.nth(i))
+                    return True

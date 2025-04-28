@@ -1,4 +1,4 @@
-from playwright.sync_api import Page, expect, Locator
+from playwright.sync_api import Page, expect, Locator, Dialog
 import logging
 
 
@@ -167,3 +167,24 @@ class BasePage:
                 f"Failed to click element with error: {locatorClickError}, trying again..."
             )
             locator.click()
+
+    def _accept_dialog(self, dialog: Dialog) -> None:
+        """
+        This method is used to accept dialogs
+        If it has already been accepted then it is ignored
+        """
+        try:
+            dialog.accept()
+        except Exception:
+            logging.info("Dialog already accepted")
+
+    def safe_accept_dialog(self, locator: Locator) -> None:
+        """
+        This is used to accept dialogs multiple times without getting the error:
+        playwright._impl._errors.Error: Dialog.accept: Cannot accept dialog which is already handled!
+        """
+        self.page.once("dialog", self._accept_dialog)
+        try:
+            self.click(locator)
+        except Exception as e:
+            logging.error(f"Click failed: {e}")
