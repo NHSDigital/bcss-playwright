@@ -24,7 +24,7 @@ class BookAppointmentPage(BasePage):
     def select_screening_centre_dropdown_option(self, screening_centre: str) -> None:
         self.screening_center_dropdown.select_option(label=screening_centre)
 
-    def select_site_dropdown_option(self, screening_site: str) -> None:
+    def select_site_dropdown_option(self, screening_site: str | list) -> None:
         self.site_dropdown.select_option(label=screening_site)
         self.site_dropdown.press("Enter")
 
