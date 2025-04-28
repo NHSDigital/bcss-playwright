@@ -98,7 +98,7 @@ def prepare_and_print_batch(page: Page, link_text) -> None:
     page.wait_for_timeout(
         1000
     )  # This one second timeout does not affect the time to execute, as it is just used to ensure the reprepare batch button is clicked and does not instantly advance to the next step
-    ManageActiveBatch(page).reprepare_batch_text.wait_for(timeout=100000)
+    ManageActiveBatch(page).reprepare_batch_text.wait_for(timeout=60000)
 
     # This loops through each Retrieve button and clicks each one
     retrieve_button_count = 0
@@ -124,7 +124,7 @@ def prepare_and_print_batch(page: Page, link_text) -> None:
             logging.info(
                 f"Clicking confirm printed button {confirm_printed_button + 1}"
             )
-            BasePage(page).safe_accept_dialog(
+            ManageActiveBatch(page).safe_accept_dialog(
                 ManageActiveBatch(page).confirm_button.nth(0)
             )
     except Exception as e:

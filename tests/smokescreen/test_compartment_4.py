@@ -55,17 +55,18 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
         smokescreen_properties["c4_eng_number_of_appointments_to_book"]
     )
 
-    logging.info("Compartment 4 - Setting up appointments")
-    logging.info("Logging in as Screening Centre Manager at BCS001")
+    logging.info(
+        f"Compartment 4 - Setting up appointments for {smokescreen_properties["c4_eng_weeks_to_make_available"]} Weeks"
+    )
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
     BasePage(page).go_to_screening_practitioner_appointments_page()
     ScreeningPractitionerAppointmentsPage(page).go_to_set_availability_page()
     SetAvailabilityPage(page).go_to_practitioner_availability_page()
     PractitionerAvailabilityPage(page).select_site_dropdown_option(
-        "THE ROYAL HOSPITAL (WOLVERHAMPTON)"
+        smokescreen_properties["c4_eng_site_name1"]
     )
     PractitionerAvailabilityPage(page).select_practitioner_dropdown_option(
-        "Astonish, Ethanol"
+        smokescreen_properties["c4_eng_practitioner_name"]
     )
     PractitionerAvailabilityPage(page).click_calendar_button()
     CalendarPicker(page).select_day(datetime.today())
@@ -82,9 +83,10 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
     )
     Logout(page).log_out(close_page=False)
 
-    logging.info("Compartment 4 - Booking subjects to appointments")
+    logging.info(
+        f"Compartment 4 - Booking {smokescreen_properties["c4_eng_number_of_appointments_to_book"]} subjects to appointments"
+    )
     ScreeningPractitionerAppointmentsPage(page).go_to_log_in_page()
-    logging.info("Logging in as Hub Manager State Registered at BCS01")
     UserTools.user_login(page, "Hub Manager State Registered at BCS01")
 
     BasePage(page).go_to_screening_practitioner_appointments_page()
@@ -100,12 +102,12 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
         ColonoscopyAssessmentAppointments(page).filter_by_nhs_number(nhs_number)
         ColonoscopyAssessmentAppointments(page).click_nhs_number_link(nhs_number_spaced)
         BookAppointmentPage(page).select_screening_centre_dropdown_option(
-            "BCS001 - Wolverhampton Bowel Cancer Screening Centre"
+            smokescreen_properties["c4_eng_centre_name"]
         )
         BookAppointmentPage(page).select_site_dropdown_option(
             [
-                "The Royal Hospital (Wolverhampton) (? km)",
-                "The Royal Hospital (Wolverhampton) (? km) (attended)",
+                f"{smokescreen_properties["c4_eng_site_name2"]} (? km)",
+                f"{smokescreen_properties["c4_eng_site_name2"]} (? km) (attended)",
             ]
         )
 

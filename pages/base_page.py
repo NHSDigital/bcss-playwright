@@ -176,12 +176,13 @@ class BasePage:
         try:
             dialog.accept()
         except Exception:
-            logging.info("Dialog already accepted")
+            logging.warning("Dialog already handled")
 
     def safe_accept_dialog(self, locator: Locator) -> None:
         """
-        This is used to accept dialogs multiple times without getting the error:
+        Safely accepts a dialog triggered by a click, avoiding the error:
         playwright._impl._errors.Error: Dialog.accept: Cannot accept dialog which is already handled!
+        If no dialog appears, continues without error.
         """
         self.page.once("dialog", self._accept_dialog)
         try:
