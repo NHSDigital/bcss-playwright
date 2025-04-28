@@ -102,9 +102,15 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
         BookAppointmentPage(page).select_screening_centre_dropdown_option(
             "BCS001 - Wolverhampton Bowel Cancer Screening Centre"
         )
-        BookAppointmentPage(page).select_site_dropdown_option(
-            "The Royal Hospital (Wolverhampton) (? km)"
-        )
+        try:
+            BookAppointmentPage(page).select_site_dropdown_option(
+                "The Royal Hospital (Wolverhampton) (? km)"
+            )
+        except Exception:
+            logging.warning("Subject already attended")
+            BookAppointmentPage(page).select_site_dropdown_option(
+                "The Royal Hospital (Wolverhampton) (? km) (attended)"
+            )
         current_month_displayed = BookAppointmentPage(
             page
         ).get_current_month_displayed()
