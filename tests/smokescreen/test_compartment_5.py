@@ -26,6 +26,9 @@ def smokescreen_properties() -> dict:
 def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     """
     This is the main compartment 5 method
+    It involves marking the attendance of subjects to their screening practitioner appointments
+    Then it invites them for colonoscopy
+    Then it marks post investigation appointment as not required
     """
 
     # --------------
