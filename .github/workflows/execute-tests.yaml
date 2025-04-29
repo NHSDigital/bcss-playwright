@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
-      - name: "Run Util Tests"
+      - name: "Run Tests"
         uses: ./.github/actions/run-playwright-tests
         with:
           bcss_cloud_environment: "${{ inputs.bcss_cloud_environment }}"
