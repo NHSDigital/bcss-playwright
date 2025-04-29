@@ -159,7 +159,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     page.locator("#UI_DIRECTION").select_option(label="To patient")
     page.locator("#UI_CALLER_ID").select_option(index=0)
     page.get_by_role("button", name="Calendar").click()
-    page.get_by_role("cell", name="29", exact=True).click()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
     page.locator("#UI_START_TIME").click()
     page.locator("#UI_START_TIME").fill("11:00")
     page.locator("#UI_END_TIME").click()
