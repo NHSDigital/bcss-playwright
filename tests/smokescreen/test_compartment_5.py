@@ -52,7 +52,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
 
     page.get_by_role("button", name="View appointments on this day").click()
     page.get_by_role("button", name="Calendar").click()
-    date_from_util = datetime(2025 / 4 / 25)
+    date_from_util = datetime(2025, 4, 25)
     CalendarPicker(page).v1_calender_picker(date_from_util)
 
     # Select subject from inital test data util
