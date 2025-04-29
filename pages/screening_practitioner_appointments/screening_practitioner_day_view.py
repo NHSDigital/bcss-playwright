@@ -1,7 +1,5 @@
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 from pages.base_page import BasePage
-from utils.table_util import TableUtils
-
 
 class ScreeningPractitionerDayView(BasePage):
     def __init__(self, page: Page):
