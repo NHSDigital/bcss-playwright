@@ -50,7 +50,10 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     )
     page.locator("#UI_SITE").select_option(label="The Royal Hospital (Wolverhampton)")
 
-    # Add calender util method for selecting date retrieved from inital test data util
+    page.get_by_role("button", name="View appointments on this day").click()
+    page.get_by_role("button", name="Calendar").click()
+    date_from_util = datetime(2025 / 4 / 25)
+    CalendarPicker(page).v1_calender_picker(date_from_util)
 
     # Select subject from inital test data util
     page.get_by_role("link", name="SCALDING COD").click()
