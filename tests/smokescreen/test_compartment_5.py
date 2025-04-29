@@ -174,13 +174,9 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     )
     page.get_by_role("button", name="Save").click()
 
-    # Click 'Back' link
-    BasePage(page).click_back_button()
     verify_subject_event_status_by_nhs_no(
         page, nhs_no, "A361 - Other Post-investigation Contact Required"
     )
-    BasePage(page).click_back_button()
-    # This brings you back to the subject search criteria page
 
     # Repeat above for x subjects
 
