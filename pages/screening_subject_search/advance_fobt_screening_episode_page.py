@@ -7,7 +7,7 @@ class AdvanceFOBTScreeningEpisode(BasePage):
         super().__init__(page)
         self.page = page
         # Advance FOBT Screening Episode - page locators
-        self.suitable_for_escopic_test_button = self.page.get_by_role(
+        self.suitable_for_endoscopic_test_button = self.page.get_by_role(
             "button", name="Suitable for Endoscopic Test"
         )
         self.calendar_button = self.page.get_by_role("button", name="Calendar")
@@ -25,9 +25,9 @@ class AdvanceFOBTScreeningEpisode(BasePage):
             "button", name="Record other post-"
         )
 
-    def click_suitable_for_escopic_test_button(self) -> None:
+    def click_suitable_for_endoscopic_test_button(self) -> None:
         AdvanceFOBTScreeningEpisode(self.page).safe_accept_dialog(
-            self.suitable_for_escopic_test_button
+            self.suitable_for_endoscopic_test_button
         )
 
     def click_calendar_button(self) -> None:

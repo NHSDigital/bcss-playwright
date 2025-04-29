@@ -107,7 +107,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     # On the Subject Screening Summary click on the 'Advance FOBT Screening Episode' button and then click on the 'Suitable for Endoscopic Test' button
     # Click OK after message
     SubjectScreeningSummary(page).click_advance_fobt_screening_episode_button()
-    AdvanceFOBTScreeningEpisode(page).click_suitable_for_escopic_test_button()
+    AdvanceFOBTScreeningEpisode(page).click_suitable_for_endoscopic_test_button()
 
     # Enter a 'First Offered Appointment Date' (enter a date after the attended appt)
     AdvanceFOBTScreeningEpisode(page).click_calendar_button()
