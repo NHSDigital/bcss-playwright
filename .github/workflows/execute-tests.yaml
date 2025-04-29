@@ -28,8 +28,8 @@ jobs:
           bcss_cloud_environment: "${{ inputs.bcss_cloud_environment }}"
           marker_to_use: "${{ inputs.marker_to_use }}"
         env:
-          BCSS_PASS: "${{ secrets.BCSS_PASS }}"
-          ORACLE_DB: ${ ${{ secrets.ORACLE_DB }}/<REPLACE>/${{ inputs.bcss_cloud_environment }} }
+          BCSS_PASS: ${{ secrets.BCSS_PASS }}
+          ORACLE_DB_DEFAULT: ${{ secrets.ORACLE_DB }}
           ORACLE_USERNAME: ${{ secrets.ORACLE_USERNAME }}
           ORACLE_PASS: ${{ secrets.ORACLE_PASS }}
-          URL_TO_USE: ${ ${{ vars.CLOUD_ENV_URL }}/<REPLACE>/${{ inputs.bcss_cloud_environment }} }
+          URL_TO_USE_DEFAULT: ${{ vars.CLOUD_ENV_URL }}
