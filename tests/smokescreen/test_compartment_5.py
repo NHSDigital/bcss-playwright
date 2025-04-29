@@ -1,5 +1,3 @@
-import logging
-from math import exp
 import pytest
 from playwright.sync_api import Page, expect
 from pages.logout.log_out_page import Logout
@@ -7,30 +5,14 @@ from pages.base_page import BasePage
 from pages.screening_practitioner_appointments.screening_practitioner_appointments import (
     ScreeningPractitionerAppointmentsPage,
 )
-from pages.screening_practitioner_appointments.set_availability_page import (
-    SetAvailabilityPage,
-)
-from pages.screening_practitioner_appointments.practitioner_availability_page import (
-    PractitionerAvailabilityPage,
-)
-from pages.screening_practitioner_appointments.colonoscopy_assessment_appointments_page import (
-    ColonoscopyAssessmentAppointments,
-)
-from pages.screening_practitioner_appointments.book_appointment_page import (
-    BookAppointmentPage,
-)
 from pages.screening_subject_search.subject_screening_summary import (
     SubjectScreeningSummary,
 )
-from pages.screening_subject_search.episode_events_and_notes_page import (
-    EpisodeEventsAndNotesPage,
-)
 from utils.user_tools import UserTools
 from utils.load_properties_file import PropertiesFile
+from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
 from utils.calendar_picker import CalendarPicker
-from utils.batch_processing import batch_processing
-from datetime import datetime
-from sqlalchemy.orm import Session
+from datetime import datetime, timedelta
 
 
 @pytest.fixture
@@ -38,74 +20,13 @@ def smokescreen_properties() -> dict:
     return PropertiesFile().get_smokescreen_properties()
 
 
-# --------------
-# DATA SETUP
-# --------------
-
-# The data setup steps below have been translated directly from the selenium tests and need to be refactored
-
-
-# Get required test data from the DB
-def find_test_data(session: Session, region):
-    all_data_found = True
-    error_message = ""
-
-    required_number_of_kits = get_properties().get_c5_number_of_appointments_to_attend(
-        region
-    )
-    if required_number_of_kits == 0:
-        print("application properties specifies Zero appointments")
-    else:
-        print("Finding recent appointments")
-        appointments = (
-            session.query(Appointment)
-            .filter(
-                Appointment.org_id
-                == get_properties().get_appointments_test_org_id(region),
-                Appointment.kit_type == KitType.Any,
-            )
-            .order_by(Appointment.date_created.desc())
-            .limit(required_number_of_kits)
-            .all()
-        )
-
-        if not appointments or len(appointments) < required_number_of_kits:
-            all_data_found = False
-            error_message = f"{required_number_of_kits} appointments could not be found that had an abnormal result ({region}). Instead found {len(appointments)}"
-            print(
-                f"{required_number_of_kits} appointments could not be found that had an abnormal result ({region})"
-            )
-        else:
-            print(f"{len(appointments)} appointments found with abnormal results")
-
-    print(
-        f"Appointments found: {', '.join([str(appointment.screening_subject.name_and_nhs_number) for appointment in appointments])}"
-    )
-
-    return all_data_found, error_message, appointments
-
-
-# Find subjects requiring screening outcomes
-def test_find_subjects_requiring_screening_outcomes(setup_browser, region, page: Page):
-    browser, _ = setup_browser
-    # Assume testData is initialized somewhere in your test setup.
-
-    # Use SQLAlchemy session to fetch data
-    session = get_session(region)  # Replace with actual session setup
-    all_data_found, error_message, appointments = find_test_data(session, region)
-
-    assert all_data_found, error_message
-
-    logging.trace("exit: findSubjectsRequiringScreeningOutcomes(region={})", region)
-
-    # --------------
-    # TEST STEPS
-    # --------------
-    @pytest.mark.vpn_required
-    @pytest.mark.smokescreen
-    @pytest.mark.compartment5
-    def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
-        """This is the main compartment 5 method"""
+@pytest.mark.vpn_required
+@pytest.mark.smokescreen
+@pytest.mark.compartment5
+def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
+    """
+    This is the main compartment 5 method
+    """
 
     # --------------
     # Attendance of Screening
@@ -114,117 +35,144 @@ def test_find_subjects_requiring_screening_outcomes(setup_browser, region, page:
 
     # Log in as a Screening Centre user
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).go_to_screening_practitioner_appointments_page()
 
     # From the Main Menu, choose the 'Screening Practitioner Appointments' and then 'View Appointments' option
+    BasePage(page).go_to_screening_practitioner_appointments_page()
     ScreeningPractitionerAppointmentsPage(page).go_to_view_appointments_page()
 
-    # Select the Appointment Type, Site, and Screening Practitioner
-    ScreeningPractitionerAppointmentsPage(page).select_appointment_type(
-        "Any Practitioner Appointment"
+    # Select the Appointment Type, Site, Screening Practitioner and required date of the appointment and click 'View appointments on this day' button
+    page.locator("#UI_APPOINTMENT_TYPE").select_option(label="Colonoscopy Assessment")
+    page.locator("#UI_SCREENING_CENTRE").select_option(
+        label="BCS001 - Wolverhampton Bowel Cancer Screening Centre"
     )
-    ScreeningPractitionerAppointmentsPage(page).select_site_dropdown_option(
-        "BCS001 - Wolverhampton Bowel Cancer Screening Centre"
-    )
-    ScreeningPractitionerAppointmentsPage(page).select_practitioner_dropdown_option(
-        "Astonish, Ethanol"
-    )
-    # Select the required date of the appointment
-    # TODO: Add logic to select the date of the appointmentonce the C4 calendar picker is implemented
+    page.locator("#UI_SITE").select_option(label="The Royal Hospital (Wolverhampton)")
 
-    # Click 'View appointments on this day' button
-    ScreeningPractitionerAppointmentsPage(
-        page
-    ).click_view_appointments_on_this_day_button()
-    # 'View Appointments' screen displayed
-    BasePage.bowel_cancer_screening_page_title_contains_text(
-        "Screening Practitioner Day View"
-    )
+    # Add calender util method for selecting date retrieved from inital test data util
 
-    # Select the first positive (abnormal ) patient
+    # Select subject from inital test data util
     page.get_by_role("link", name="SCALDING COD").click()
 
+    # Select Attendance radio button, tick Attended checkbox, set Attended Date to yesterday's (system) date and then press Save
+    page.get_by_role("radio", name="Attendance").check()
+    page.locator("#UI_ATTENDED").check()
+    page.get_by_role("button", name="Calendar").click()
+    CalendarPicker(page).v1_calender_picker(datetime.today() - timedelta(1))
+    page.get_by_role("button", name="Save").click()
+    expect(page.get_by_text("Record updated")).to_be_visible()
 
-# Select Attendance radio button, tick Attended checkbox,
-# set Attended Date to yesterday's (system) date and then press Save
-# Appointment attendance details saved Status set to J10
+    # Repeat for x Abnormal  patients
 
-# Repeat for the 2nd and 3rd Abnormal patients
-# Appointment attendance details saved Status set to J10
+    # Navigate to the 'Subject Screening Summary' screen for the 1st Abnormal patient
+    nhs_no = "9934032236"  # Test NHS NO for Scaliding Cod
+    verify_subject_event_status_by_nhs_no(
+        page, nhs_no, "J10 - Attended Colonoscopy Assessment Appointment"
+    )
 
-# --------------
-# Invite for colonoscopy
-# --------------
-# Navigate to the 'Subject Screening Summary' screen for the 1st Abnormal patient
-# ''Subject Screening Summary' screen of the 1st Abnormal patient is displayed
+    # Click on 'Datasets' link
+    page.get_by_role("link", name="Datasets").click()
 
-# Click on 'Datasets' link
-# 'There should be a '1 dataset' for Colonoscopy Assessment
+    # Click on 'Show Dataset' next to the Colonoscopy Assessment
 
-# Click on 'Show Dataset' next to the Colonoscopy Assessment
-# Populate Colonoscopy Assessment Details fields
-# ASA Grade  - I - Fit
-# Fit for Colonoscopy (SSP) - Yes
-# Click 'Yes' for Dataset Complete?
-# Click Save Dataset button
-# Click Back
-# Data set marked as **Completed**. The subject event status stays at J10.
+    # Populate Colonoscopy Assessment Details fields
 
-# On the Subject Screening Summary click on the 'Advance FOBT Screening Episode' button and then click on the 'Suitable for Endoscopic Test' button
-# Click OK after message
-# Pop up message states
-# This will change the status to:
-# A99 - Suitable for Endoscopic Test.
-# No other pop up message should be displayed
+    # ASA Grade  - I - Fit
+    # Fit for Colonoscopy (SSP) - Yes
 
-# Enter a 'First Offered Appointment Date' (enter a date after the attended appt)
+    # Click 'Yes' for Dataset Complete?
+    # Click Save Dataset button
+    # Click Back
+    page.get_by_role("link", name="Show Dataset").click()
+    page.get_by_label("ASA Grade").select_option("17009")
+    page.get_by_label("Fit for Colonoscopy (SSP)").select_option("17058")
+    page.get_by_role("radio", name="Yes").check()
+    page.locator("#UI_DIV_BUTTON_SAVE1").get_by_role(
+        "button", name="Save Dataset"
+    ).click()
+    BasePage(page).click_back_button()
+    BasePage(page).click_back_button()
+    # This brings you back to the subject screening summary page
 
-# Select 'Colonoscopy' from the 'Type of Test' from the drop down list
+    # On the Subject Screening Summary click on the 'Advance FOBT Screening Episode' button and then click on the 'Suitable for Endoscopic Test' button
+    # Click OK after message
+    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.once("dialog", lambda dialog: dialog.dismiss())
+    page.get_by_role("button", name="Suitable for Endoscopic Test").click()
 
-# Click the 'Invite for Diagnostic Test >>' button
-# Pop-up box displayed informing user that the patient will be set to A59 - Invited for Diagnostic Test
+    # Enter a 'First Offered Appointment Date' (enter a date after the attended appt)
+    page.get_by_role("button", name="Calendar").click()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
 
-# Click 'OK'
-# Pop-box removed from screen
-# 'Advance Screening Episode' redisplayed
-# Status set to A59 - Invited for Diagnostic Test
+    # Select 'Colonoscopy' from the 'Type of Test' from the drop down list
+    page.locator("#UI_EXT_TEST_TYPE_2233").select_option(label="Colonoscopy")
 
-# Click 'Attend Diagnostic Test' button
+    # Click the 'Invite for Diagnostic Test >>' button
+    # Click 'OK'
+    page.once("dialog", lambda dialog: dialog.dismiss())
+    page.get_by_role("button", name="Invite for Diagnostic Test >>").click()
+    SubjectScreeningSummary(page).verify_latest_event_status_value(
+        "A59 - Invited for Diagnostic Test"
+    )
 
-# Select Colonoscopy from drop down list. Enter the actual appointment date as today's date and select 'Save'
-# Status set to A259 - Attended Diagnostic Test
+    # Click 'Attend Diagnostic Test' button
+    page.get_by_role("button", name="Attend Diagnostic Test").click()
 
-# Repeat for the 2nd & 3rd Abnormal patients
-# Status set to A259 - Attended Diagnostic Test
+    # Select Colonoscopy from drop down list. Enter the actual appointment date as today's date and select 'Save'
+    page.locator("#UI_CONFIRMED_TYPE_OF_TEST").select_option(label="Colonoscopy")
+    page.get_by_role("button", name="Calendar").click()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+    page.get_by_role("button", name="Save").click()
+    SubjectScreeningSummary(page).verify_latest_event_status_value(
+        "A259 - Attended Diagnostic Test"
+    )
+    # Repeat above for x number of subjects
 
-# --------------
-# Advance the screening episode
-# --------------
+    # Click on 'Advance FOBT Screening Episode' button for the 1st Abnormal patient
+    verify_subject_event_status_by_nhs_no(
+        page, nhs_no, "A259 - Attended Diagnostic Test"
+    )
+    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
 
-# Click on 'Advance FOBT Screening Episode' button for the 1st Abnormal patient
+    # Click 'Other Post-investigation Contact Required' button
+    # Click 'OK'
+    page.once("dialog", lambda dialog: dialog.dismiss())
+    page.get_by_role("button", name="Other Post-investigation").click()
+    expect(
+        page.get_by_role(
+            "cell", name="A361 - Other Post-investigation Contact Required", exact=True
+        )
+    ).to_be_visible()
 
-# Click 'Other Post-investigation Contact Required' button
-# Confirmation pop-up box displayed
+    # Select 'Record other post-investigation contact' button
+    page.get_by_role("button", name="Record other post-").click()
 
-# Click 'OK'
-# Status set to A361 - Other Post-investigation Contact Required'Advance FOBT Screening Episode' screen re-displayed
+    # Complete 'Contact Direction',   To patient
+    # 'Contact made between patient and',  Selects the top option in the dropdown
+    # 'Date of Patient Contact',  Today
+    # 'Duration',  01:00
+    # 'Start Time',  11:00
+    # 'End Time',  12:00
+    # 'Discussion Record'   TEST AUTOMATION
+    # select 'Outcome' - 'Post-investigation Appointment Not Required' and click 'Save'
+    page.locator("#UI_DIRECTION").select_option(label="To patient")
+    page.locator("#UI_CALLER_ID").select_option(index=0)
+    page.get_by_role("button", name="Calendar").click()
+    page.get_by_role("cell", name="29", exact=True).click()
+    page.locator("#UI_START_TIME").click()
+    page.locator("#UI_START_TIME").fill("11:00")
+    page.locator("#UI_END_TIME").click()
+    page.locator("#UI_END_TIME").fill("12:00")
+    page.locator("#UI_COMMENT_ID").click()
+    page.locator("#UI_COMMENT_ID").fill("Test Automation")
+    page.locator("#UI_OUTCOME").select_option(
+        label="Post-investigation Appointment Not Required"
+    )
+    page.get_by_role("button", name="Save").click()
 
-# Select 'Record other post-investigation contact' button
-# 'Contact with Patient' screen displayed
+    # Click 'Back' link
+    BasePage(page).click_back_button()
+    BasePage(page).click_back_button()
+    # This brings you back to the subject search criteria page
 
-# Complete 'Contact Direction',
-# 'Contact made between patient and',
-# 'Date of Patient Contact',
-# 'Start Time', 'End Time',
-# 'Discussion Record' and
-# select 'Outcome' - 'Post-investigation Appointment Not Required'
-# and click 'Save'
-# ''Contact with Patient' screen re-displayed readonly
+    # Repeat above for x subjects
 
-# Click 'Back' button
-# ''Subject Screening Summary' screen displayed
-# Status set to A323 - Post-investigation Appointment NOT Required
-
-# Repeat for the 2nd & 3rd Abnormal patients
-# ''Subject Screening Summary' screen displayed
-# Status set to A323 - Post-investigation Appointment NOT Required
+    Logout(page).log_out()
