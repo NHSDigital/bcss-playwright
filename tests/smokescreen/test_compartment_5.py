@@ -2,7 +2,7 @@ import pytest
 from playwright.sync_api import Page, expect
 from pages.logout.log_out_page import Logout
 from pages.base_page import BasePage
-from pages.screening_practitioner_appointments.screening_practitioner_appointments import (
+from pages.screening_practitioner_appointments import (
     ScreeningPractitionerAppointmentsPage,
     subject_datasets,
 )
