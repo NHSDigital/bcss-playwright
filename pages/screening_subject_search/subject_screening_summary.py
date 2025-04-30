@@ -1,6 +1,7 @@
 from playwright.sync_api import Page, expect, Locator
 from pages.base_page import BasePage
 from enum import Enum
+import logging
 import pytest
 
 
@@ -76,10 +77,15 @@ class SubjectScreeningSummary(BasePage):
         expect(self.latest_event_status).to_be_visible()
 
     def verify_latest_event_status_value(self, latest_event_status: str) -> None:
+        logging.info(f"Verifying subject has the status: {latest_event_status}")
         latest_event_status_cell = self.get_latest_event_status_cell(
             latest_event_status
         )
-        expect(latest_event_status_cell).to_be_visible()
+        try:
+            expect(latest_event_status_cell).to_be_visible()
+            logging.info(f"Subject has the status: {latest_event_status}")
+        except Exception:
+            pytest.fail(f"Subject does not have the status: {latest_event_status}")
 
     def click_subjects_events_notes(self) -> None:
         self.click(self.subjects_events_notes)
@@ -130,7 +136,12 @@ class SubjectScreeningSummary(BasePage):
         self.click(self.datasets_link)
 
     def click_advance_fobt_screening_episode_button(self) -> None:
-        self.click(self.advance_fobt_screening_episode_button)
+        logging.info("Advancing the episode")
+        try:
+            self.click(self.advance_fobt_screening_episode_button)
+            logging.info("Episode successfully advanced")
+        except Exception as e:
+            pytest.fail(f"Unable to advance the episode: {e}")
 
 
 class ChangeScreeningStatusOptions(Enum):

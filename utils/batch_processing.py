@@ -77,13 +77,7 @@ def batch_processing(
     check_batch_in_archived_batch_list(page, link_text)
 
     first_nhs_no = nhs_no_df["subject_nhs_number"].iloc[0]
-    try:
-        verify_subject_event_status_by_nhs_no(page, first_nhs_no, latest_event_status)
-        logging.info(
-            f"Successfully verified NHS number {first_nhs_no} with status {latest_event_status}"
-        )
-    except Exception as e:
-        pytest.fail(f"Verification failed for NHS number {first_nhs_no}: {str(e)}")
+    verify_subject_event_status_by_nhs_no(page, first_nhs_no, latest_event_status)
 
     if run_timed_events:
         OracleDB().exec_bcss_timed_events(nhs_no_df)
