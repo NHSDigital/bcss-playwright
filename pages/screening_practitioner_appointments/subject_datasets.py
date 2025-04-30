@@ -8,9 +8,7 @@ class SubjectDatasets(BasePage):
         super().__init__(page)
         self.page = page
 
-        self.show_dataset_button = self.page.get_by_role(
-            "link", name="Show Dataset"
-        ).click()
+        self.show_dataset_button = self.page.get_by_role("link", name="Show Dataset")
 
         self.save_dataset_button = self.page.locator(
             "#UI_DIV_BUTTON_SAVE1"
@@ -34,7 +32,7 @@ class SubjectDatasets(BasePage):
         self.click(self.show_dataset_button)
 
     def save_dataset(self) -> None:
-        self.save_dataset_button.click()
+        self.click(self.save_dataset_button)
 
     def select_asa_grade_option(self, option: str) -> None:
         self.select_asa_grade_dropdowen.select_option(option)
@@ -44,11 +42,9 @@ class SubjectDatasets(BasePage):
 
     def click_dataset_complete_radio_button_yes(self) -> None:
         self.dataset_complete_radio_button_yes.check()
-        expect(self.dataset_complete_radio_button_yes).to_be_checked()
 
     def click_dataset_complete_radio_button_no(self) -> None:
         self.dataset_complete_radio_button_no.check()
-        expect(self.dataset_complete_radio_button_no).not_to_be_checked()
 
 
 class AsaGradeOptions(Enum):

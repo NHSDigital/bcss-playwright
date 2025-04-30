@@ -6,6 +6,7 @@ from pages.screening_practitioner_appointments.screening_practitioner_appointmen
     ScreeningPractitionerAppointmentsPage,
     subject_datasets,
 )
+from pages.screening_subject_search import FitForColonoscopySspOptions, AsaGradeOptions
 from pages.screening_subject_search.subject_screening_summary import (
     SubjectScreeningSummary,
 )
@@ -96,13 +97,15 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     subject_datasets(page).select_asa_grade_option(AsaGradeOptions.FIT.value)
 
     # Fit for Colonoscopy (SSP) - Yes
-    subject_datasets(page).select_fit_for_colonoscopy_option(FitForColonoscopySspOptions.YES.value)
+    subject_datasets(page).select_fit_for_colonoscopy_option(
+        FitForColonoscopySspOptions.YES.value
+    )
 
     # Click 'Yes' for Dataset Complete?
     subject_datasets(page).click_dataset_complete_radio_button_yes()
 
     # Click Save Dataset button
-    subject_datasets(page).save_dataset().click()
+    subject_datasets(page).save_dataset()
 
     # Click Back
     BasePage(page).click_back_button()
