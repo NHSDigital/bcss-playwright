@@ -31,7 +31,7 @@ class SubjectDatasets(BasePage):
         )
 
     def click_show_datasets(self) -> None:
-        self.show_dataset_button.click()
+        self.click(self.show_dataset_button)
 
     def save_dataset(self) -> None:
         self.save_dataset_button.click()
