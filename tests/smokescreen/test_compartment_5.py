@@ -20,6 +20,9 @@ from pages.screening_practitioner_appointments.appointment_detail_page import (
 from pages.screening_practitioner_appointments.appointment_calendar_page import (
     AppointmentCalendar,
 )
+from pages.screening_subject_search.attend_diagnostic_test_page import (
+    AttendDiagnosticTest,
+)
 from utils.user_tools import UserTools
 from utils.load_properties_file import PropertiesFile
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
@@ -137,10 +140,10 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     AdvanceFOBTScreeningEpisode(page).click_attend_diagnostic_test_button()
 
     # Select Colonoscopy from drop down list. Enter the actual appointment date as today's date and select 'Save'
-    page.locator("#UI_CONFIRMED_TYPE_OF_TEST").select_option(label="Colonoscopy")
-    page.get_by_role("button", name="Calendar").click()
+    AttendDiagnosticTest.select_actual_type_of_test_dropdown_option("Colonoscopy")
+    AttendDiagnosticTest.click_calendar_button()
     CalendarPicker(page).v1_calender_picker(datetime.today())
-    page.get_by_role("button", name="Save").click()
+    AttendDiagnosticTest.click_save_button
     SubjectScreeningSummary(page).verify_latest_event_status_value(
         "A259 - Attended Diagnostic Test"
     )
