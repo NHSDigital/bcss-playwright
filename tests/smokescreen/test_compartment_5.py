@@ -8,6 +8,11 @@ from pages.screening_practitioner_appointments.screening_practitioner_appointmen
 from pages.screening_subject_search.subject_screening_summary import (
     SubjectScreeningSummary,
 )
+
+from pages.screening_subject_search.contact_with_patient_page import (
+    ContactWithPatientPage,
+)
+
 from utils.user_tools import UserTools
 from utils.load_properties_file import PropertiesFile
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
@@ -159,20 +164,37 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     # 'End Time',  12:00
     # 'Discussion Record'   TEST AUTOMATION
     # select 'Outcome' - 'Post-investigation Appointment Not Required' and click 'Save'
-    page.locator("#UI_DIRECTION").select_option(label="To patient")
-    page.locator("#UI_CALLER_ID").select_option(index=0)
-    page.get_by_role("button", name="Calendar").click()
-    CalendarPicker(page).v1_calender_picker(datetime.today())
-    page.locator("#UI_START_TIME").click()
-    page.locator("#UI_START_TIME").fill("11:00")
-    page.locator("#UI_END_TIME").click()
-    page.locator("#UI_END_TIME").fill("12:00")
-    page.locator("#UI_COMMENT_ID").click()
-    page.locator("#UI_COMMENT_ID").fill("Test Automation")
-    page.locator("#UI_OUTCOME").select_option(
-        label="Post-investigation Appointment Not Required"
+
+    ContactWithPatientPage(page).select_direction_dropdown_option(
+        smokescreen_properties["c5_eng_direction1","c5_eng_direction2"]
     )
-    page.get_by_role("button", name="Save").click()
+    ContactWithPatientPage(page).select_callerid_dropdown_option(
+        smokescreen_properties["c5_eng_callerid"]
+    )
+    ContactWithPatientPage(page).click_calendar_button()
+    CalendarPicker(page).select_day(datetime.today())
+    ContactWithPatientPage(page).enter_start_time("11:00")
+    ContactWithPatientPage(page).enter_end_time("12:00")
+    ContactWithPatientPage(page).enter_discussion_record_text("Test Automation")
+    ContactWithPatientPage(page).select_outcome_dropdown_option(
+        smokescreen_properties["c5_eng_outcome1","c5_eng_outcome2"]
+    )
+    ContactWithPatientPage(page).click_save_button()
+
+    #page.locator("#UI_DIRECTION").select_option(label="To patient")
+    #page.locator("#UI_CALLER_ID").select_option(index=0)
+    #page.get_by_role("button", name="Calendar").click()
+    #CalendarPicker(page).v1_calender_picker(datetime.today())
+    #page.locator("#UI_START_TIME").click()
+    #page.locator("#UI_START_TIME").fill("11:00")
+    #page.locator("#UI_END_TIME").click()
+    #page.locator("#UI_END_TIME").fill("12:00")
+    #page.locator("#UI_COMMENT_ID").click()
+    #page.locator("#UI_COMMENT_ID").fill("Test Automation")
+    #page.locator("#UI_OUTCOME").select_option(
+        #label="Post-investigation Appointment Not Required"
+    #)
+    #page.get_by_role("button", name="Save").click()
 
     verify_subject_event_status_by_nhs_no(
         page, nhs_no, "A361 - Other Post-investigation Contact Required"
