@@ -33,6 +33,7 @@ def batch_processing(
     - batch_description: This is the description of the batch. E.g. Pre-invitation (FIT)
     - latest_event_status: This is the status the subject will get updated to after the batch has been processed.
     - run_timed_events: This is an optional input that executes bcss_timed_events if set to True
+    - get_subjects_from_pdf: This is an optial input to change the method of retrieving subjects from the batch from the Db to the PDF file.
     """
     logging.info(f"Processing {batch_type} - {batch_description} batch")
     BasePage(page).click_main_menu_link()
