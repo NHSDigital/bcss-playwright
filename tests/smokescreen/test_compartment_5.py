@@ -96,7 +96,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     subject_datasets(page).select_asa_grade_option(AsaGradeOptions.FIT.value)
 
     # Fit for Colonoscopy (SSP) - Yes
-    subject_datasets(page).select_fit_for_colonoscopy_option("YES")
+    subject_datasets(page).select_fit_for_colonoscopy_option(FitForColonoscopySspOptions.YES.value)
 
     # Click 'Yes' for Dataset Complete?
     subject_datasets(page).click_dataset_complete_radio_button_yes()
