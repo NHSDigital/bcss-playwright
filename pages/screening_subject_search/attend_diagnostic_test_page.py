@@ -7,9 +7,9 @@ class AttendDiagnosticTest(BasePage):
         super().__init__(page)
         self.page = page
         # Advance Diagnostic Test - page locators
-        self.actual_type_of_test_dropdown = page.locator("#UI_CONFIRMED_TYPE_OF_TEST")
-        self.calendar_button = page.get_by_role("button", name="Calendar")
-        self.save_button = page.get_by_role("button", name="Save")
+        self.actual_type_of_test_dropdown = self.page.locator("#UI_CONFIRMED_TYPE_OF_TEST")
+        self.calendar_button = self.page.get_by_role("button", name="Calendar")
+        self.save_button =self.page.get_by_role("button", name="Save")
 
     def select_actual_type_of_test_dropdown_option(self, text: str) -> None:
         self.actual_type_of_test_dropdown.select_option(label=text)
