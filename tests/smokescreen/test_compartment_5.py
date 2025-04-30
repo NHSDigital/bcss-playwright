@@ -93,7 +93,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     # Populate Colonoscopy Assessment Details fields
 
     # ASA Grade  - I - Fit
-    subject_datasets(page).select_asa_grade_option("FIT")
+    subject_datasets(page).select_asa_grade_option(AsaGradeOptions.FIT.value)
 
     # Fit for Colonoscopy (SSP) - Yes
     subject_datasets(page).select_fit_for_colonoscopy_option("YES")
