@@ -56,11 +56,15 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     ScreeningPractitionerAppointmentsPage(page).go_to_view_appointments_page()
 
     # Select the Appointment Type, Site, Screening Practitioner and required date of the appointment and click 'View appointments on this day' button
-    AppointmentCalendar(page).select_appointment_type_dropdown("Colonoscopy Assessment")
-    AppointmentCalendar(page).select_screening_centre_dropdown(
-        "BCS001 - Wolverhampton Bowel Cancer Screening Centre"
+    AppointmentCalendar(page).select_appointment_type_dropdown(
+        smokescreen_properties["c5_eng_appointment_type"]
     )
-    AppointmentCalendar(page).select_site_dropdown("(all)")
+    AppointmentCalendar(page).select_screening_centre_dropdown(
+        smokescreen_properties["c5_eng_screening_centre"]
+    )
+    AppointmentCalendar(page).select_site_dropdown(
+        smokescreen_properties["c5_eng_site"]
+    )
 
     AppointmentCalendar(page).click_view_appointments_on_this_day_button()
     ScreeningPractitionerDayView(page).click_calendar_button()
