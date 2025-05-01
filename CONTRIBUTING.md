@@ -1,13 +1,13 @@
 # Contributing To This Project
 
 This document outlines the general guidance that should be applied when contributing new code to this project,
-to ensure that coding standards and principals remain consistent throughout the project.
+to ensure that coding standards and principles remain consistent throughout the project.
 
 ## Table of Contents
 
 - [Contributing To This Project](#contributing-to-this-project)
   - [Table of Contents](#table-of-contents)
-  - [General Principals](#general-principals)
+  - [General Principles](#general-principles)
     - [Use Playwright and pytest documentation as our standard](#use-playwright-and-pytest-documentation-as-our-standard)
     - [Proving tests work before raising a pull request](#proving-tests-work-before-raising-a-pull-request)
     - [Evidencing tests](#evidencing-tests)
@@ -26,11 +26,11 @@ to ensure that coding standards and principals remain consistent throughout the 
     - [Package management](#package-management)
   - [Last Reviewed](#last-reviewed)
 
-## General Principals
+## General Principles
 
 ### Use Playwright and pytest documentation as our standard
 
-When contributing to this project, we should by default following the guidance outlined in the
+When contributing to this project, we should be following the guidance outlined in the
 [Playwright](https://playwright.dev/python/docs/api/class-playwright) and
 [pytest](https://docs.pytest.org/en/stable/)
 documentation in the first instance to ensure our code remains as close to the recommended standard as possible.
@@ -50,27 +50,28 @@ not work as intended). This can either be done locally or via a pipeline/workflo
 
 When we create new tests, or significantly change the functionality of a test, we should demonstrate these tests work
 by [recording the trace using Playwright](https://playwright.dev/python/docs/trace-viewer-intro) and attaching the
-generated trace file to the associated ticket within Jira.
+generated trace file to the associated ticket within <!-- vale off -->Jira<!-- vale on -->.
 
-> NOTE: If the trace file exceeds the maximum file attachment size for Jira, we should upload the file to a Confluence page
-> instead and link this back to the ticket.
+> NOTE: If the trace file exceeds the maximum file attachment size for <!-- vale off -->Jira<!-- vale on -->, we should
+> upload the file to a Confluence page instead and link this back to the ticket.
 
 When we modify existing tests (including any page objects or utilities used by these tests) but the behaviour of the test
-has not fundamentally changed, we should upload the generated HTML report from the Playwright execution to the Jira ticket.
+has not fundamentally changed, we should upload the generated HTML report from the Playwright execution to the
+<!-- vale off -->Jira<!-- vale on --> ticket.
 
 #### Example
 
-We introduce a new test that covers the send a kit functionality for a single subject using codegen in the first instance.
+We introduce a new test that covers the send a kit functionality for a single subject using `codegen` in the first instance.
 To demonstrate this test has worked as intended, we should turn tracing on and generate a trace file from Playwright and
-attach this to the ticket in Jira.
+attach this to the ticket in <!-- vale off -->Jira<!-- vale on -->.
 
 We then decide to refactor the test so that it uses a page object model for the send a kit page, but this does not change
 the behaviour of the test in any way (just makes the elements reusable). In this instance, we should upload the HTML report
-to the Jira ticket showing the test passing as the logic of the test has not changed in any way.
+to the <!-- vale off -->Jira<!-- vale on --> ticket showing the test passing as the logic of the test has not changed in any way.
 
 We then decide to create a utility that loops through several subjects at once and apply this to the previously created send
 a kit test. In this instance, we should turn tracing on again and generate a trace file from Playwright and attach this to the
-ticket in Jira, because the logic of the test has fundamentally changed.
+ticket in <!-- vale off -->Jira<!-- vale on -->, because the logic of the test has fundamentally changed.
 
 ## Coding Practices
 
@@ -112,8 +113,8 @@ The following guidance applies to any files in the /pages directory.
 
 For any newly created page objects, we should apply the following logic:
 
-- The filename should end with _page (Example: send_a_kit_page.py)
-- The class name should end with Page (Example: SendAKitPage)
+- The filename should end with `_page` (Example: `send_a_kit_page.py`)
+- The class name should end with `Page` (Example: `SendAKitPage`)
 
 #### Docstring
 
@@ -124,7 +125,7 @@ where possible.
 
 ##### Example
 
-    def ExamplePage:
+    class ExamplePage:
 
         def __init__(page: Page) -> None:
             self.page = page
@@ -171,4 +172,4 @@ appropriate testing, we need to have critically reviewed the package and ensure 
 
 ## Last Reviewed
 
-This document was last reviewed on 01/05/2023.
+This document was last reviewed on 01/05/2025.
