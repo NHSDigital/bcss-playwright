@@ -10,20 +10,20 @@ class ContactWithPatientPage(BasePage):
         self.page = page
 
         # Contact With Patient - Page Locators
-        self.contact_direction_dropdown = page.locator("#UI_DIRECTION")
-        self.contact_made_between_Patient_and_dropdown = page.locator("#UI_CALLER_ID")
-        self.calendar_button = page.get_by_role("button", name="Calendar")
-        self.time_from_text_field = page.get_by_role("textbox", name="Start Time")
-        self.time_to_text_field = page.get_by_role("textbox", name="End Time")
-        self.discussion_record_text_field = page.get_by_role("textbox", name="Discussion Record")
-        self.outcome_dropdown = page.locator("##UI_OUTCOME")
-        self.save_button = page.get_by_role("button", name="Save")
+        self.contact_direction_dropdown = self.page.locator("#UI_DIRECTION")
+        self.contact_made_between_patient_and_dropdown = self.page.locator("#UI_CALLER_ID")
+        self.calendar_button = self.page.get_by_role("button", name="Calendar")
+        self.time_from_text_field = self.page.get_by_role("textbox", name="Start Time")
+        self.time_to_text_field = self.page.get_by_role("textbox", name="End Time")
+        self.discussion_record_text_field = self.page.get_by_role("textbox", name="Discussion Record")
+        self.outcome_dropdown = self.page.locator("##UI_OUTCOME")
+        self.save_button = self.page.get_by_role("button", name="Save")
 
     def select_direction_dropdown_option(self, direction: str) -> None:
         self.contact_direction_dropdown.select_option(label=direction)
 
-    def select_callerid_dropdown_option(self, callerid: str) -> None:
-        self.contact_made_between_Patient_and_dropdown.select_option(label=callerid)
+    def select_caller_id_dropdown_index_option(self, index_value: int) -> None:
+        self.contact_made_between_patient_and_dropdown.select_option(index=index_value)
 
     def click_calendar_button(self) -> None:
         self.click(self.calendar_button)
