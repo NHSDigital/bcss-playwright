@@ -11,9 +11,7 @@ class SubjectDatasetsPage(BasePage):
         super().__init__(page)
         self.page = page
         # Subject datasets page locators
-        self.colonoscopy_show_dataset_button = self.page.locator(
-            "body > table > tbody > tr > td > div:nth-child(13) > div.DatasetLink > p > a"
-        )  # Using a more specific selector because we will have multiple buttons on the page with the same role and name
+        self.colonoscopy_show_dataset_button = self.page.get_by_role(role="link", name="Show Dataset")
 
     def click_colonoscopy_show_datasets(self) -> None:
         self.click(self.colonoscopy_show_dataset_button)

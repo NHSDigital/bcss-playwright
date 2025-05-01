@@ -43,7 +43,7 @@ class ColonoscopyDatasetsPage(BasePage):
         Returns:
         None
         """
-        self.select_asa_grade_dropdowen.select_option(option)
+        self.select_asa_grade_dropdown.select_option(option)
 
     def select_fit_for_colonoscopy_option(self, option: str) -> None:
         """

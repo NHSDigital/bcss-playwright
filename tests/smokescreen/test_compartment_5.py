@@ -76,11 +76,11 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
 
     AppointmentCalendar(page).click_view_appointments_on_this_day_button()
     ScreeningPractitionerDayView(page).click_calendar_button()
-    date_from_util = datetime(2025, 5, 1)
+    date_from_util = datetime(2025, 4, 30)
     CalendarPicker(page).v1_calender_picker(date_from_util)
 
     # Select subject from inital test data util
-    ScreeningPractitionerDayView(page).click_patient_link("CRUMBLE REFUSE")
+    ScreeningPractitionerDayView(page).click_patient_link("HELPER BACKBONED")
 
     # Select Attendance radio button, tick Attended checkbox, set Attended Date to yesterday's (system) date and then press Save
     AppointmentDetail(page).check_attendance_radio()
@@ -93,7 +93,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     # Repeat for x Abnormal  patients
 
     # Navigate to the 'Subject Screening Summary' screen for the 1st Abnormal patient
-    nhs_no = "9724560430"  # Test NHS NO for CRUMBLE REFUSE
+    nhs_no = "9840589105"  # Test NHS NO for CRUMBLE REFUSE
     verify_subject_event_status_by_nhs_no(
         page, nhs_no, "J10 - Attended Colonoscopy Assessment Appointment"
     )
