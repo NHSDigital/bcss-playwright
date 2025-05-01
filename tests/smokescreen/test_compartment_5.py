@@ -5,6 +5,11 @@ from pages.base_page import BasePage
 from pages.screening_practitioner_appointments.screening_practitioner_appointments import (
     ScreeningPractitionerAppointmentsPage,
 )
+from pages.screening_practitioner_appointments.subject_datasets import (
+    SubjectDatasets,
+    FitForColonoscopySspOptions,
+    AsaGradeOptions,
+)
 from pages.screening_subject_search.subject_screening_summary import (
     SubjectScreeningSummary,
 )
@@ -19,6 +24,9 @@ from pages.screening_practitioner_appointments.appointment_detail_page import (
 )
 from pages.screening_practitioner_appointments.appointment_calendar_page import (
     AppointmentCalendar,
+)
+from pages.screening_subject_search.attend_diagnostic_test_page import (
+    AttendDiagnosticTest,
 )
 from utils.user_tools import UserTools
 from utils.load_properties_file import PropertiesFile
@@ -91,7 +99,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
             pytest.fail(f"Unable to find {name_from_util}: {e}")
 
         AppointmentDetail(page).check_attendance_radio()
-        AppointmentDetail(page).check_attendented_check_box()
+        AppointmentDetail(page).check_attended_check_box()
         AppointmentDetail(page).click_calendar_button()
         CalendarPicker(page).v1_calender_picker(datetime.today() - timedelta(1))
         AppointmentDetail(page).click_save_button()
@@ -120,14 +128,14 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
         )
 
         SubjectScreeningSummary(page).click_datasets_link()
+        SubjectDatasets(page).click_show_datasets()
 
-        page.get_by_role("link", name="Show Dataset").click()
-        page.get_by_label("ASA Grade").select_option("17009")
-        page.get_by_label("Fit for Colonoscopy (SSP)").select_option("17058")
-        page.get_by_role("radio", name="Yes").check()
-        page.locator("#UI_DIV_BUTTON_SAVE1").get_by_role(
-            "button", name="Save Dataset"
-        ).click()
+        SubjectDatasets(page).select_asa_grade_option(AsaGradeOptions.FIT.value)
+        SubjectDatasets(page).select_fit_for_colonoscopy_option(
+            FitForColonoscopySspOptions.YES.value
+        )
+        SubjectDatasets(page).click_dataset_complete_radio_button_yes()
+        SubjectDatasets(page).save_dataset()
         BasePage(page).click_back_button()
         BasePage(page).click_back_button()
 
@@ -150,17 +158,15 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
         logging.info(f"{name_from_util} attended diagnostic test")
         AdvanceFOBTScreeningEpisode(page).click_attend_diagnostic_test_button()
 
-        page.locator("#UI_CONFIRMED_TYPE_OF_TEST").select_option(label="Colonoscopy")
-        page.get_by_role("button", name="Calendar").click()
+        AttendDiagnosticTest(page).select_actual_type_of_test_dropdown_option(
+            "Colonoscopy"
+        )
+        AttendDiagnosticTest(page).click_calendar_button()
         CalendarPicker(page).v1_calender_picker(datetime.today())
-        page.get_by_role("button", name="Save").click()
+        AttendDiagnosticTest(page).click_save_button()
         SubjectScreeningSummary(page).verify_latest_event_status_value(
             "A259 - Attended Diagnostic Test"
         )
-
-        # verify_subject_event_status_by_nhs_no(
-        #     page, nhs_no, "A259 - Attended Diagnostic Test"
-        # )
 
         SubjectScreeningSummary(page).click_advance_fobt_screening_episode_button()
 
