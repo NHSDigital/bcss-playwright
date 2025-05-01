@@ -1,15 +1,16 @@
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 from pages.logout.log_out_page import Logout
 from pages.base_page import BasePage
 from pages.screening_practitioner_appointments.screening_practitioner_appointments import (
     ScreeningPractitionerAppointmentsPage,
 )
-from pages.screening_practitioner_appointments.subject_datasets import (
-    SubjectDatasets,
+from pages.datasets.subject_datasets_page import (
+    SubjectDatasetsPage,
     FitForColonoscopySspOptions,
     AsaGradeOptions,
 )
+from pages.datasets.colonoscopy_dataset_page import ColonoscopyDatasetsPage
 from pages.screening_subject_search.subject_screening_summary import (
     SubjectScreeningSummary,
 )
@@ -99,23 +100,23 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     SubjectScreeningSummary(page).click_datasets_link()
 
     # Click on 'Show Dataset' next to the Colonoscopy Assessment
-    SubjectDatasets(page).click_show_datasets()
+    SubjectDatasetsPage(page).click_colonoscopy_show_datasets()
 
     # Populate Colonoscopy Assessment Details fields
 
     # ASA Grade  - I - Fit
-    SubjectDatasets(page).select_asa_grade_option(AsaGradeOptions.FIT.value)
+    ColonoscopyDatasetsPage(page).select_asa_grade_option(AsaGradeOptions.FIT.value)
 
     # Fit for Colonoscopy (SSP) - Yes
-    SubjectDatasets(page).select_fit_for_colonoscopy_option(
+    ColonoscopyDatasetsPage(page).select_fit_for_colonoscopy_option(
         FitForColonoscopySspOptions.YES.value
     )
 
     # Click 'Yes' for Dataset Complete?
-    SubjectDatasets(page).click_dataset_complete_radio_button_yes()
+    ColonoscopyDatasetsPage(page).click_dataset_complete_radio_button_yes()
 
     # Click Save Dataset button
-    SubjectDatasets(page).save_dataset()
+    ColonoscopyDatasetsPage(page).save_dataset()
 
     # Click Back
     BasePage(page).click_back_button()

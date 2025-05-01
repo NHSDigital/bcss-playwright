@@ -1,13 +1,14 @@
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 from pages.base_page import BasePage
 from enum import Enum
 
 
-class SubjectDatasets(BasePage):
+class ColonoscopyDatasetsPage(BasePage):
     def __init__(self, page: Page):
         super().__init__(page)
         self.page = page
 
+        # Colonoscopy datasets page locators
         self.show_dataset_button = self.page.get_by_role("link", name="Show Dataset")
 
         self.save_dataset_button = self.page.locator(
@@ -49,7 +50,15 @@ class SubjectDatasets(BasePage):
 
 class AsaGradeOptions(Enum):
     FIT = "17009"
+    RELEVANT_DISEASE = "17010"
+    RESTRICTIVE_DISEASE = "17011"
+    LIFE_THREATENING_DISEASE = "17012"
+    MORIBUND = "17013"
+    NOT_APPLICABLE = "17014"
+    NOT_KNOWN = "17015"
 
 
 class FitForColonoscopySspOptions(Enum):
     YES = "17058"
+    NO = "17059"
+    UNABLE_TO_ASSESS = "17954"
