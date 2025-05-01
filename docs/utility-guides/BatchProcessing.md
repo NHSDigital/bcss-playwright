@@ -67,7 +67,7 @@ This will call the other two functions in order to successfully process a batch.
 7. From Here it calls the `prepare_and_print_batch` function.
    1. If `get_subjects_from_pdf` was set to False it calls `get_nhs_no_from_batch_id`, which is imported from *utils.oracle.oracle_specific_functions*, to get the subjects from the batch and stores them as a pandas dataframe - **nhs_no_df**
 8. Once this is complete it calls the `check_batch_in_archived_batch_list` function
-9.  Finally, once that function is complete it calls `verify_subject_event_status_by_nhs_no` which is imported from *utils/screening_subject_page_searcher*
+9. Finally, once that function is complete it calls `verify_subject_event_status_by_nhs_no` which is imported from *utils/screening_subject_page_searcher*
 
 ### Prepare And Print Batch
 
