@@ -166,7 +166,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     # select 'Outcome' - 'Post-investigation Appointment Not Required' and click 'Save'
 
     ContactWithPatientPage(page).select_direction_dropdown_option("To patient")
-    ContactWithPatientPage(page).select_callerid_dropdown_option(index=0)
+    ContactWithPatientPage(page).select_callerid_dropdown_option("Amid, Snoring (FS Screening Coordinator)")
     ContactWithPatientPage(page).click_calendar_button()
     CalendarPicker(page).select_day(datetime.today())
     ContactWithPatientPage(page).enter_start_time("11:00")
