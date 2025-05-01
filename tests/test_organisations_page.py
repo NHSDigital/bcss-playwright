@@ -24,7 +24,6 @@ def before_each(page: Page):
     BasePage(page).go_to_organisations_page()
 
 
-@pytest.mark.only
 @pytest.mark.smoke
 def test_organisations_page_navigation(page: Page) -> None:
     upload_nacs_data_bureau_link = page.get_by_text(
