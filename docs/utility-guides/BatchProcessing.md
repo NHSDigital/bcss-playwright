@@ -60,14 +60,14 @@ This will call the other two functions in order to successfully process a batch.
 1. It starts off by navigating to the main menu if not already on this page. This is done to ensure that this can be called from any page
 2. Once on the main menu it navigates to the active batch list
 3. From here it fills in the search filters to narrow down the list of active batches to only those which match the arguments provided
-4. Once only the expected batches are shown it checks the status colun of the records
-5. If *Prepared* is found then it ignores it, otherwise if *Open* is found then it carries on
-6. Now it extracts the ID of the batch and stores it in the local variable `link_text`, this is used later on to extracts the subjects in the batch from the DB
-7. After the ID is stored, it clicks on the ID to get to the Manage Active Batch page
-8. From Here it calls the `prepare_and_print_batch` function.
+4. Once only the expected batches are shown it checks the status column of the records
+   1. If *Prepared* is found then it ignores it, otherwise if *Open* is found then it carries on
+5. Now it extracts the ID of the batch and stores it in the local variable `link_text`, this is used later on to extracts the subjects in the batch from the DB
+6. After the ID is stored, it clicks on the ID to get to the Manage Active Batch page
+7. From Here it calls the `prepare_and_print_batch` function.
    1. If `get_subjects_from_pdf` was set to False it calls `get_nhs_no_from_batch_id`, which is imported from *utils.oracle.oracle_specific_functions*, to get the subjects from the batch and stores them as a pandas dataframe - **nhs_no_df**
-9. Once this is complete it calls the `check_batch_in_archived_batch_list` function
-10. Finally, once that function is complete it calls `verify_subject_event_status_by_nhs_no` which is imported from *utils/screening_subject_page_searcher*
+8. Once this is complete it calls the `check_batch_in_archived_batch_list` function
+9.  Finally, once that function is complete it calls `verify_subject_event_status_by_nhs_no` which is imported from *utils/screening_subject_page_searcher*
 
 ### Prepare And Print Batch
 
