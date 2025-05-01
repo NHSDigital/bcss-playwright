@@ -50,7 +50,9 @@ not work as intended). This can either be done locally or via a pipeline/workflo
 
 When we create new tests, or significantly change the functionality of a test, we should demonstrate these tests work
 by [recording the trace using Playwright](https://playwright.dev/python/docs/trace-viewer-intro) and attaching the
-generated trace file to the associated ticket within <!-- vale off -->Jira<!-- vale on -->.
+<!-- vale off -->
+generated trace file to the associated ticket within Jira.
+<!-- vale on -->
 
 > NOTE: If the trace file exceeds the maximum file attachment size for <!-- vale off -->Jira<!-- vale on -->, we should
 > upload the file to a Confluence page instead and link this back to the ticket.
@@ -67,7 +69,9 @@ attach this to the ticket in <!-- vale off -->Jira<!-- vale on -->.
 
 We then decide to refactor the test so that it uses a page object model for the send a kit page, but this does not change
 the behaviour of the test in any way (just makes the elements reusable). In this instance, we should upload the HTML report
-to the <!-- vale off -->Jira<!-- vale on --> ticket showing the test passing as the logic of the test has not changed in any way.
+<!-- vale off -->
+to the Jira ticket showing the test passing as the logic of the test has not changed in any way.
+<!-- vale on -->
 
 We then decide to create a utility that loops through several subjects at once and apply this to the previously created send
 a kit test. In this instance, we should turn tracing on again and generate a trace file from Playwright and attach this to the
