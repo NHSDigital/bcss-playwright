@@ -60,18 +60,18 @@ def batch_processing(
             logging.info(
                 f"Successfully found open '{batch_type} - {batch_description}' batch"
             )
-            if not get_subjects_from_pdf:
-                logging.info(f"Getting NHS Numbers for batch {link_text} from the DB")
-                nhs_no_df = get_nhs_no_from_batch_id(link_text)
             link.click()
             break
         elif (i + 1) == batch_description_cells.count():
             pytest.fail(f"No open '{batch_type} - {batch_description}' batch found")
 
     if get_subjects_from_pdf:
+        logging.info(f"Getting NHS Numbers for batch {link_text} from the PDF File")
         nhs_no_df = prepare_and_print_batch(page, link_text, get_subjects_from_pdf)
     else:
+        logging.info(f"Getting NHS Numbers for batch {link_text} from the DB")
         prepare_and_print_batch(page, link_text, get_subjects_from_pdf)
+        nhs_no_df = get_nhs_no_from_batch_id(link_text)
 
     check_batch_in_archived_batch_list(page, link_text)
 
@@ -109,8 +109,11 @@ def prepare_and_print_batch(
             file = download_file.suggested_filename
             # Wait for the download process to complete and save the downloaded file in a temp folder
             download_file.save_as(file)
-            if file.endswith(".pdf") and get_subjects_from_pdf:
-                nhs_no_df = extract_nhs_no_from_pdf(file)
+            nhs_no_df = (
+                extract_nhs_no_from_pdf(file)
+                if file.endswith(".pdf") and get_subjects_from_pdf
+                else None
+            )
             os.remove(file)  # Deletes the file after extracting the necessary data
     except Exception as e:
         pytest.fail(f"No retrieve button available to click: {str(e)}")
