@@ -3,6 +3,10 @@ from pages.base_page import BasePage
 
 
 class SubjectDatasetsPage(BasePage):
+    """
+    This class contains locators and methods to interact with the Subject Datasets page.
+    """
+
     def __init__(self, page: Page):
         super().__init__(page)
         self.page = page
