@@ -7,10 +7,12 @@ from pages.screening_practitioner_appointments.screening_practitioner_appointmen
 )
 from pages.datasets.subject_datasets_page import (
     SubjectDatasetsPage,
+)
+from pages.datasets.colonoscopy_dataset_page import (
+    ColonoscopyDatasetsPage,
     FitForColonoscopySspOptions,
     AsaGradeOptions,
 )
-from pages.datasets.colonoscopy_dataset_page import ColonoscopyDatasetsPage
 from pages.screening_subject_search.subject_screening_summary import (
     SubjectScreeningSummary,
 )
@@ -78,7 +80,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     CalendarPicker(page).v1_calender_picker(date_from_util)
 
     # Select subject from inital test data util
-    ScreeningPractitionerDayView(page).click_patient_link("STARLESS BLUSH")
+    ScreeningPractitionerDayView(page).click_patient_link("REFUSE CRUMBLE")
 
     # Select Attendance radio button, tick Attended checkbox, set Attended Date to yesterday's (system) date and then press Save
     AppointmentDetail(page).check_attendance_radio()
@@ -91,7 +93,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     # Repeat for x Abnormal  patients
 
     # Navigate to the 'Subject Screening Summary' screen for the 1st Abnormal patient
-    nhs_no = "9937265193"  # Test NHS NO for Scaliding Cod
+    nhs_no = "9724560430"  # Test NHS NO for Scaliding Cod
     verify_subject_event_status_by_nhs_no(
         page, nhs_no, "J10 - Attended Colonoscopy Assessment Appointment"
     )
