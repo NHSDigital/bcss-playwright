@@ -137,7 +137,7 @@ def prepare_and_print_batch(
     except Exception as e:
         pytest.fail(f"Batch successfully archived message is not shown: {str(e)}")
 
-    return nhs_no_df if "nhs_no_df" in locals() else None
+    return nhs_no_df
 
 
 def check_batch_in_archived_batch_list(page: Page, link_text) -> None:
