@@ -143,7 +143,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     AttendDiagnosticTest.select_actual_type_of_test_dropdown_option("Colonoscopy")
     AttendDiagnosticTest.click_calendar_button()
     CalendarPicker(page).v1_calender_picker(datetime.today())
-    AttendDiagnosticTest.click_save_button
+    AttendDiagnosticTest.click_save_button()
     SubjectScreeningSummary(page).verify_latest_event_status_value(
         "A259 - Attended Diagnostic Test"
     )
