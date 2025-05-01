@@ -52,20 +52,24 @@ When we create new tests, or significantly change the functionality of a test, w
 by [recording the trace using Playwright](https://playwright.dev/python/docs/trace-viewer-intro) and attaching the
 <!-- vale off -->
 generated trace file to the associated ticket within Jira.
-<!-- vale on -->
 
-> NOTE: If the trace file exceeds the maximum file attachment size for <!-- vale off -->Jira<!-- vale on -->, we should
+> NOTE: If the trace file exceeds the maximum file attachment size for Jira, we should
 > upload the file to a Confluence page instead and link this back to the ticket.
+<!-- vale on -->
 
 When we modify existing tests (including any page objects or utilities used by these tests) but the behaviour of the test
 has not fundamentally changed, we should upload the generated HTML report from the Playwright execution to the
-<!-- vale off -->Jira<!-- vale on --> ticket.
+<!-- vale off -->
+Jira ticket.
+<!-- vale on -->
 
 #### Example
 
 We introduce a new test that covers the send a kit functionality for a single subject using `codegen` in the first instance.
 To demonstrate this test has worked as intended, we should turn tracing on and generate a trace file from Playwright and
-attach this to the ticket in <!-- vale off -->Jira<!-- vale on -->.
+<!-- vale off -->
+attach this to the ticket in Jira.
+<!-- vale on -->
 
 We then decide to refactor the test so that it uses a page object model for the send a kit page, but this does not change
 the behaviour of the test in any way (just makes the elements reusable). In this instance, we should upload the HTML report
@@ -75,7 +79,9 @@ to the Jira ticket showing the test passing as the logic of the test has not cha
 
 We then decide to create a utility that loops through several subjects at once and apply this to the previously created send
 a kit test. In this instance, we should turn tracing on again and generate a trace file from Playwright and attach this to the
-ticket in <!-- vale off -->Jira<!-- vale on -->, because the logic of the test has fundamentally changed.
+<!-- vale off -->
+ticket in Jira, because the logic of the test has fundamentally changed.
+<!-- vale on -->
 
 ## Coding Practices
 
