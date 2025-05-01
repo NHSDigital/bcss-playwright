@@ -28,7 +28,7 @@ For this utility we have the following functions/methods:
 
 ### Batch Processing
 
-This is the main function that is called in order to precess a batch.
+This is the main function that is called in order to process a batch.
 This will call the other two functions in order to successfully process a batch.
 
 #### Required Arguments
@@ -65,7 +65,7 @@ This will call the other two functions in order to successfully process a batch.
 5. Now it extracts the ID of the batch and stores it in the local variable `link_text`, this is used later on to extracts the subjects in the batch from the DB
 6. After the ID is stored, it clicks on the ID to get to the Manage Active Batch page
 7. From Here it calls the `prepare_and_print_batch` function.
-   1. If `get_subjects_from_pdf` was set to False it calls `get_nhs_no_from_batch_id`, which is imported from *utils.oracle.oracle_specific_functions*, to get the subjects from the batch and stores them as a pandas dataframe - **nhs_no_df**
+   1. If `get_subjects_from_pdf` was set to False it calls `get_nhs_no_from_batch_id`, which is imported from *utils.oracle.oracle_specific_functions*, to get the subjects from the batch and stores them as a pandas DataFrame - **nhs_no_df**
 8. Once this is complete it calls the `check_batch_in_archived_batch_list` function
 9. Finally, once that function is complete it calls `verify_subject_event_status_by_nhs_no` which is imported from *utils/screening_subject_page_searcher*
 
@@ -91,7 +91,7 @@ It is in charge of pressing on the following button: **Prepare Batch**, **Retrie
 1. It starts off by clicking on the **Prepare Batch** button.
 2. After this it waits for the button to turn into **Re-Prepare Batch**. Once this happens it means that the batch is ready to be printed.
 3. Now It clicks on each **Retrieve** button visible.
-   1. If `get_subjects_from_pdf` was set to True and the file is a **.pdf**, then it calls `extract_nhs_no_from_pdf`, which is imported from *utils/pdf_reader*, to get the subjects from the batch and stores them as a pandas dataframe - **nhs_no_df**
+   1. If `get_subjects_from_pdf` was set to True and the file is a **.pdf**, then it calls `extract_nhs_no_from_pdf`, which is imported from *utils/pdf_reader*, to get the subjects from the batch and stores them as a pandas DataFrame - **nhs_no_df**
    2. After a file is downloaded, it gets deleted.
 4. Then it clicks on each **Confirm Printed** button ensuring to handle the dialog that appears.
 5. Finally it checks for the message: *Batch Successfully Archived and Printed*
