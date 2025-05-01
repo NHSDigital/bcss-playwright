@@ -5,8 +5,25 @@ from pages.base_page import BasePage
 from pages.screening_practitioner_appointments.screening_practitioner_appointments import (
     ScreeningPractitionerAppointmentsPage,
 )
+from pages.screening_practitioner_appointments.subject_datasets import (
+    SubjectDatasets,
+    FitForColonoscopySspOptions,
+    AsaGradeOptions,
+)
 from pages.screening_subject_search.subject_screening_summary import (
     SubjectScreeningSummary,
+)
+from pages.screening_subject_search.advance_fobt_screening_episode_page import (
+    AdvanceFOBTScreeningEpisode,
+)
+from pages.screening_practitioner_appointments.screening_practitioner_day_view import (
+    ScreeningPractitionerDayView,
+)
+from pages.screening_practitioner_appointments.appointment_detail_page import (
+    AppointmentDetail,
+)
+from pages.screening_practitioner_appointments.appointment_calendar_page import (
+    AppointmentCalendar,
 )
 from utils.user_tools import UserTools
 from utils.load_properties_file import PropertiesFile
@@ -44,83 +61,88 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     ScreeningPractitionerAppointmentsPage(page).go_to_view_appointments_page()
 
     # Select the Appointment Type, Site, Screening Practitioner and required date of the appointment and click 'View appointments on this day' button
-    page.locator("#UI_APPOINTMENT_TYPE").select_option(label="Colonoscopy Assessment")
-    page.locator("#UI_SCREENING_CENTRE").select_option(
-        label="BCS001 - Wolverhampton Bowel Cancer Screening Centre"
+    AppointmentCalendar(page).select_appointment_type_dropdown(
+        smokescreen_properties["c5_eng_appointment_type"]
     )
-    page.locator("#UI_SITE").select_option(label="The Royal Hospital (Wolverhampton)")
+    AppointmentCalendar(page).select_screening_centre_dropdown(
+        smokescreen_properties["c5_eng_screening_centre"]
+    )
+    AppointmentCalendar(page).select_site_dropdown(
+        smokescreen_properties["c5_eng_site"]
+    )
 
-    page.get_by_role("button", name="View appointments on this day").click()
-    page.get_by_role("button", name="Calendar").click()
-    date_from_util = datetime(2025, 4, 28)
+    AppointmentCalendar(page).click_view_appointments_on_this_day_button()
+    ScreeningPractitionerDayView(page).click_calendar_button()
+    date_from_util = datetime(2025, 4, 29)
     CalendarPicker(page).v1_calender_picker(date_from_util)
 
     # Select subject from inital test data util
-    page.get_by_role("link", name="HAT-PIN UNTRUTH").click()
+    ScreeningPractitionerDayView(page).click_patient_link("STARLESS BLUSH")
 
     # Select Attendance radio button, tick Attended checkbox, set Attended Date to yesterday's (system) date and then press Save
-    page.get_by_role("radio", name="Attendance").check()
-    page.locator("#UI_ATTENDED").check()
-    page.get_by_role("button", name="Calendar").click()
+    AppointmentDetail(page).check_attendance_radio()
+    AppointmentDetail(page).check_attendented_check_box()
+    AppointmentDetail(page).click_calendar_button()
     CalendarPicker(page).v1_calender_picker(datetime.today() - timedelta(1))
-    page.get_by_role("button", name="Save").click()
-    expect(page.get_by_text("Record updated")).to_be_visible()
+    AppointmentDetail(page).click_save_button()
+    AppointmentDetail(page).verify_text_visible("Record updated")
 
     # Repeat for x Abnormal  patients
 
     # Navigate to the 'Subject Screening Summary' screen for the 1st Abnormal patient
-    nhs_no = "9543076472"  # Test NHS NO for Scaliding Cod
+    nhs_no = "9937265193"  # Test NHS NO for Scaliding Cod
     verify_subject_event_status_by_nhs_no(
         page, nhs_no, "J10 - Attended Colonoscopy Assessment Appointment"
     )
 
     # Click on 'Datasets' link
-    page.get_by_role("link", name="Datasets").click()
+    SubjectScreeningSummary(page).click_datasets_link()
 
     # Click on 'Show Dataset' next to the Colonoscopy Assessment
+    SubjectDatasets(page).click_show_datasets()
 
     # Populate Colonoscopy Assessment Details fields
 
     # ASA Grade  - I - Fit
+    SubjectDatasets(page).select_asa_grade_option(AsaGradeOptions.FIT.value)
+
     # Fit for Colonoscopy (SSP) - Yes
+    SubjectDatasets(page).select_fit_for_colonoscopy_option(
+        FitForColonoscopySspOptions.YES.value
+    )
 
     # Click 'Yes' for Dataset Complete?
+    SubjectDatasets(page).click_dataset_complete_radio_button_yes()
+
     # Click Save Dataset button
+    SubjectDatasets(page).save_dataset()
+
     # Click Back
-    page.get_by_role("link", name="Show Dataset").click()
-    page.get_by_label("ASA Grade").select_option("17009")
-    page.get_by_label("Fit for Colonoscopy (SSP)").select_option("17058")
-    page.get_by_role("radio", name="Yes").check()
-    page.locator("#UI_DIV_BUTTON_SAVE1").get_by_role(
-        "button", name="Save Dataset"
-    ).click()
     BasePage(page).click_back_button()
     BasePage(page).click_back_button()
     # This brings you back to the subject screening summary page
 
     # On the Subject Screening Summary click on the 'Advance FOBT Screening Episode' button and then click on the 'Suitable for Endoscopic Test' button
     # Click OK after message
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
-    page.once("dialog", lambda dialog: dialog.accept())
-    page.get_by_role("button", name="Suitable for Endoscopic Test").click()
+    SubjectScreeningSummary(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisode(page).click_suitable_for_endoscopic_test_button()
 
     # Enter a 'First Offered Appointment Date' (enter a date after the attended appt)
-    page.get_by_role("button", name="Calendar").click()
+    AdvanceFOBTScreeningEpisode(page).click_calendar_button()
     CalendarPicker(page).v1_calender_picker(datetime.today())
 
     # Select 'Colonoscopy' from the 'Type of Test' from the drop down list
-    page.locator("#UI_EXT_TEST_TYPE_2233").select_option(label="Colonoscopy")
+    AdvanceFOBTScreeningEpisode(page).select_test_type_dropdown_option("Colonoscopy")
 
     # Click the 'Invite for Diagnostic Test >>' button
     # Click 'OK'
-    page.once("dialog", lambda dialog: dialog.accept())
-    page.get_by_role("button", name="Invite for Diagnostic Test >>").click()
+    AdvanceFOBTScreeningEpisode(page).click_invite_for_diagnostic_test_button()
     SubjectScreeningSummary(page).verify_latest_event_status_value(
         "A59 - Invited for Diagnostic Test"
     )
 
     # Click 'Attend Diagnostic Test' button
-    page.get_by_role("button", name="Attend Diagnostic Test").click()
+    AdvanceFOBTScreeningEpisode(page).click_attend_diagnostic_test_button()
 
     # Select Colonoscopy from drop down list. Enter the actual appointment date as today's date and select 'Save'
     page.locator("#UI_CONFIRMED_TYPE_OF_TEST").select_option(label="Colonoscopy")
@@ -136,20 +158,19 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     verify_subject_event_status_by_nhs_no(
         page, nhs_no, "A259 - Attended Diagnostic Test"
     )
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    SubjectScreeningSummary(page).click_advance_fobt_screening_episode_button()
 
     # Click 'Other Post-investigation Contact Required' button
     # Click 'OK'
-    page.once("dialog", lambda dialog: dialog.accept())
-    page.get_by_role("button", name="Other Post-investigation").click()
-    expect(
-        page.get_by_role(
-            "cell", name="A361 - Other Post-investigation Contact Required", exact=True
-        )
-    ).to_be_visible()
+    AdvanceFOBTScreeningEpisode(page).click_other_post_investigation_button()
+    AdvanceFOBTScreeningEpisode(page).verify_latest_event_status_value(
+        "A361 - Other Post-investigation Contact Required"
+    )
 
     # Select 'Record other post-investigation contact' button
-    page.get_by_role("button", name="Record other post-").click()
+    AdvanceFOBTScreeningEpisode(
+        page
+    ).click_record_other_post_investigation_contact_button()
 
     # Complete 'Contact Direction',   To patient
     # 'Contact made between patient and',  Selects the top option in the dropdown
