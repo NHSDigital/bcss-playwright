@@ -57,7 +57,7 @@ This will call the other two functions in order to successfully process a batch.
 
 #### How This Function Works
 
-1. It starts off by navigating the the main menu if not already on this page. This is done to ensure that this can be called from any page
+1. It starts off by navigating to the main menu if not already on this page. This is done to ensure that this can be called from any page
 2. Once on the main menu it navigates to the active batch list
 3. From here it fills in the search filters to narrow down the list of active batches to only those which match the arguments provided
 4. Once only the expected batches are shown it checks the status colun of the records
@@ -98,7 +98,7 @@ It is in charge of pressing on the following button: **Prepare Batch**, **Retrie
 
 ### Check Batch In Archived Batch List
 
-This function checks the the batch that was just prepared and printed is now visible in the archived batch list
+This function checks that the batch that was just prepared and printed is now visible in the archived batch list
 
 #### Arguments
 
