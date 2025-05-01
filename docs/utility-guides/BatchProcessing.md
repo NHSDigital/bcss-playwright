@@ -20,7 +20,7 @@ The Batch Processing utility allows for the processing of batches on the active 
 
 ## Functions Overview
 
-For this utility we have the following functions/methods:
+For this utility we have the following functions:
 
 - `batch_processing`
 - `prepare_and_print_batch`
@@ -34,25 +34,25 @@ This will call the other two functions in order to successfully process a batch.
 #### Required Arguments
 
 - `page`:
-  - Type: **Page**
+  - Type: `Page`
   - This is the playwright page object which is used to tell playwright what page the test is currently on.
 - `batch_type`:
-  - Type: **str**
+  - Type: `str`
   - This is the event code for the batch. For example: **S1** or **A323**
 - `batch_description`:
-  - Type: **str**
+  - Type: `str`
   - This is the description of the batch. For example: **Pre-invitation (FIT)** or **Post-investigation Appointment NOT Required**
 - `latest_event_status`:
-  - Type: **str**
+  - Type: `str`
   - This is the status the subject will get updated to after the batch has been processed. It is used to check that the subject has been updated to the correct status after a batch has been printed
 
 #### Optional Arguments
 
 - `run_timed_events`:
-  - Type: **bool**
+  - Type: `bool`
   - If this is set to **True**, then bcss_timed_events will be executed against all the subjects found in the batch
 - `get_subjects_from_pdf`:
-  - Type: **bool**
+  - Type: `bool`
   - If this is set to **True**, then the subjects will be retrieved from the downloaded PDF file instead of from the DB
 
 #### How This Function Works
@@ -66,6 +66,7 @@ This will call the other two functions in order to successfully process a batch.
 6. After the ID is stored, it clicks on the ID to get to the Manage Active Batch page
 7. From Here it calls the `prepare_and_print_batch` function.
    1. If `get_subjects_from_pdf` was set to False it calls `get_nhs_no_from_batch_id`, which is imported from *utils.oracle.oracle_specific_functions*, to get the subjects from the batch and stores them as a pandas DataFrame - **nhs_no_df**
+   2. For more Info on `get_nhs_no_from_batch_id` please look at: [PDFReader](PDFReader.md)
 8. Once this is complete it calls the `check_batch_in_archived_batch_list` function
 9. Finally, once that function is complete it calls `verify_subject_event_status_by_nhs_no` which is imported from *utils/screening_subject_page_searcher*
 
@@ -77,13 +78,13 @@ It is in charge of pressing on the following button: **Prepare Batch**, **Retrie
 #### Arguments
 
 - `page`:
-  - Type: **Page**
+  - Type: `Page`
   - This is the playwright page object which is used to tell playwright what page the test is currently on.
 - `link_text`:
-  - Type: **str**
+  - Type: `str`
   - This is the batch ID of the batch currently being processed
 - `get_subjects_from_pdf`:
-  - Type: **bool**
+  - Type: `bool`
   - This is an optional argument and if this is set to **True**, then the subjects will be retrieved from the downloaded PDF file instead of from the DB
 
 #### How This Function Works
@@ -103,10 +104,10 @@ This function checks that the batch that was just prepared and printed is now vi
 #### Arguments
 
 - `page`:
-  - Type: **Page**
+  - Type: `Page`
   - This is the playwright page object which is used to tell playwright what page the test is currently on.
 - `link_text`:
-  - Type: **str**
+  - Type: `str`
   - This is the batch ID of the batch currently being processed
 
 #### How This Function Works
