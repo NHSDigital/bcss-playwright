@@ -2,8 +2,17 @@ import pytest
 from playwright.sync_api import Page
 from pages.logout.log_out_page import LogoutPage
 from pages.base_page import BasePage
+from pages.screening_practitioner_appointments.appointment_calendar_page import (
+    AppointmentCalendarPage,
+)
+from pages.screening_practitioner_appointments.appointment_detail_page import (
+    AppointmentDetailPage,
+)
 from pages.screening_practitioner_appointments.screening_practitioner_appointments_page import (
     ScreeningPractitionerAppointmentsPage,
+)
+from pages.screening_practitioner_appointments.screening_practitioner_day_view_page import (
+    ScreeningPractitionerDayViewPage,
 )
 from pages.datasets.subject_datasets_page import (
     SubjectDatasetsPage,
@@ -31,6 +40,14 @@ from pages.screening_practitioner_appointments.appointment_calendar_page import 
 from pages.screening_subject_search.attend_diagnostic_test_page import (
     AttendDiagnosticTestPage,
 )
+from pages.screening_subject_search.subject_screening_summary_page import (
+    SubjectScreeningSummaryPage,
+)
+
+from pages.screening_subject_search.contact_with_patient_page import (
+    ContactWithPatientPage,
+)
+
 from utils.user_tools import UserTools
 from utils.load_properties_file import PropertiesFile
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
@@ -76,11 +93,13 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     AppointmentCalendarPage(page).select_site_dropdown(
         smokescreen_properties["c5_eng_site"]
     )
+    # page.get_by_role("link", name="Screening Practitioner").select_option("")
 
     AppointmentCalendarPage(page).click_view_appointments_on_this_day_button()
     ScreeningPractitionerDayViewPage(page).click_calendar_button()
     date_from_util = datetime(2025, 4, 30)
     CalendarPicker(page).v1_calender_picker(date_from_util)
+    # page.locator("#UI_PRACTITIONER_NDV").select_option("")
 
     # Select subject from inital test data util
     ScreeningPractitionerDayViewPage(page).click_patient_link("DIVIDEND MUZZLE")
@@ -96,7 +115,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     # Repeat for x Abnormal  patients
 
     # Navigate to the 'Subject Screening Summary' screen for the 1st Abnormal patient
-    nhs_no = "9852356488"  # Test NHS NO for DIVIDEND MUZZLE
+    nhs_no = "9645516129"  # Test NHS NO for DIVIDEND MUZZLE
     verify_subject_event_status_by_nhs_no(
         page, nhs_no, "J10 - Attended Colonoscopy Assessment Appointment"
     )
@@ -180,31 +199,20 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
         page
     ).click_record_other_post_investigation_contact_button()
 
-    # Complete 'Contact Direction',   To patient
-    # 'Contact made between patient and',  Selects the top option in the dropdown
-    # 'Date of Patient Contact',  Today
-    # 'Duration',  01:00
-    # 'Start Time',  11:00
-    # 'End Time',  12:00
-    # 'Discussion Record'   TEST AUTOMATION
-    # select 'Outcome' - 'Post-investigation Appointment Not Required' and click 'Save'
-    page.locator("#UI_DIRECTION").select_option(label="To patient")
-    page.locator("#UI_CALLER_ID").select_option(index=0)
-    page.get_by_role("button", name="Calendar").click()
+    ContactWithPatientPage(page).select_direction_dropdown_option("To patient")
+    ContactWithPatientPage(page).select_caller_id_dropdown_index_option(1)
+    ContactWithPatientPage(page).click_calendar_button()
     CalendarPicker(page).v1_calender_picker(datetime.today())
-    page.locator("#UI_START_TIME").click()
-    page.locator("#UI_START_TIME").fill("11:00")
-    page.locator("#UI_END_TIME").click()
-    page.locator("#UI_END_TIME").fill("12:00")
-    page.locator("#UI_COMMENT_ID").click()
-    page.locator("#UI_COMMENT_ID").fill("Test Automation")
-    page.locator("#UI_OUTCOME").select_option(
-        label="Post-investigation Appointment Not Required"
+    ContactWithPatientPage(page).enter_start_time("11:00")
+    ContactWithPatientPage(page).enter_end_time("12:00")
+    ContactWithPatientPage(page).enter_discussion_record_text("Test Automation")
+    ContactWithPatientPage(page).select_outcome_dropdown_option(
+        "Post-investigation Appointment Not Required"
     )
-    page.get_by_role("button", name="Save").click()
+    ContactWithPatientPage(page).click_save_button()
 
     verify_subject_event_status_by_nhs_no(
-        page, nhs_no, "A361 - Other Post-investigation Contact Required"
+        page, nhs_no, "A323 - Post-investigation Appointment NOT Required"
     )
 
     # Repeat above for x subjects
