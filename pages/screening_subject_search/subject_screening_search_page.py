@@ -1,4 +1,4 @@
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 from enum import Enum
 from utils.calendar_picker import CalendarPicker
@@ -122,6 +122,9 @@ class SubjectScreeningPage(BasePage):
     def select_dob_using_calendar_picker(self, date) -> None:
         self.click(self.dob_calendar_picker)
         CalendarPicker(self.page).v1_calender_picker(date)
+
+    def verify_date_of_birth_filter_input(self, expected_text: str) -> None:
+        expect(self.date_of_birth_filter).to_have_value(expected_text)
 
 
 class ScreeningStatusSearchOptions(Enum):

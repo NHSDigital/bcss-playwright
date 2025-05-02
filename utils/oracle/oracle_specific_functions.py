@@ -289,7 +289,7 @@ def get_subjects_with_booked_appointments(subjects_to_retrieve: int) -> pd.DataF
     and a.cancel_dna_reason_id is null
     and a.appointment_date <= sysdate
     and tk.tk_type_id = 2
-    and tk.datestamp > add_months(sysdate,-24)
+    --and tk.datestamp > add_months(sysdate,-24)
     order by a.appointment_date desc
     fetch first {subjects_to_retrieve} rows only
     """

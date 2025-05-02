@@ -3,7 +3,6 @@ from utils.date_time_utils import DateTimeUtils
 from playwright.sync_api import Page, Locator
 from pages.base_page import BasePage
 from sys import platform
-import logging
 import pytest
 
 
@@ -16,6 +15,13 @@ class CalendarPicker(BasePage):
         self.v1_prev_month = self.page.get_by_role("cell", name="‹").locator("div")
         self.v1_next_month = self.page.get_by_role("cell", name="›").locator("div")
         self.v1_next_year = self.page.get_by_role("cell", name="»").locator("div")
+        self.v1_calendar_current_date = self.page.locator(
+            'td.title[colspan="5"][style="cursor: move;"]'
+        )
+        # V2 Calendar picker locators
+        self.v2date_picker_switch = self.page.locator(
+            'th.datepicker-switch[colspan="5"]:visible'
+        )
         # Book Appointment picker locators
         self.appointments_prev_month = self.page.get_by_role(
             "link", name="<-", exact=True
@@ -98,23 +104,32 @@ class CalendarPicker(BasePage):
             "cell", name=day_to_select
         ).count()
 
+        all_days = self.page.locator(".day").all()
+
+        matching_days = [
+            day
+            for day in all_days
+            if day.evaluate("el => el.textContent.trim()") == day_to_select
+        ]
+
         if int(day_to_select) < 15 and number_of_cells_with_day > 1:
-            self.click(self.page.locator(".day", has_text=day_to_select).first)
+            self.click(matching_days[0].first)
         elif int(day_to_select) > 15 and number_of_cells_with_day > 1:
-            self.click(self.page.locator(".day", has_text=day_to_select).last)
+            self.click(matching_days[0].last)
         else:
-            self.click(self.page.locator(".day", has_text=day_to_select))
+            self.click(matching_days[0])
 
     def v1_calender_picker(self, date: datetime) -> None:
         """
         This is the main method used to traverse the v1 calendar picker (e.g. the one on the subject screening search page)
         You provide it with a date and it will call the necessary functions to calculate how to navigate to the specified date
         """
-        current_date = datetime.today()
+        current_date = datetime.strptime(
+            self.v1_calendar_current_date.inner_text(), "%B, %Y"
+        )
         years_to_traverse, months_to_traverse = (
             self.calculate_years_and_months_to_traverse(date, current_date)
         )
-
         self.traverse_years_in_v1_calendar(years_to_traverse)
 
         self.traverse_months_in_v1_calendar(months_to_traverse)
@@ -132,21 +147,17 @@ class CalendarPicker(BasePage):
             month_short: the wanted month is short format (e.g. Jun)
             current_year: the current year in yyyy format (e.g. 2025)
             year: the wanted year in yyyy format (e.g. 1983)
-            end_of_current_decade: the end of the current decade in yyyy format (e.g. 2029)
             current_decade: the current decade in yyyy format (e.g. 2020)
             decade: the wanted decade in yyyy format (e.g. 1980)
-            end_of_current_century: 10 years before the end of the current century in yyyy format (e.g. 2090)
             current_century: the current century in yyyy format (e.g. 2000/2100)
             century: the wanted century in yyyy format (e.g. 1900)
         """
         current_month_long = str(current_date.strftime("%B"))
         current_year = int(current_date.strftime("%Y"))
         current_century = (current_year // 100) * 100
-        end_of_current_century = str(current_century + 90)
         current_decade = (
             ((current_year - current_century) // 10) * 10
         ) + current_century
-        end_of_current_decade = str(current_decade + 9)
 
         year = int(date.strftime("%Y"))
         century = (year // 100) * 100
@@ -160,10 +171,8 @@ class CalendarPicker(BasePage):
             month_short,
             current_year,
             year,
-            end_of_current_decade,
             current_decade,
             decade,
-            end_of_current_century,
             current_century,
             century,
         )
@@ -174,10 +183,8 @@ class CalendarPicker(BasePage):
         month_long: str,
         current_year: int,
         year: int,
-        end_of_current_decade: str,
         current_decade: int,
         decade: int,
-        end_of_current_century: str,
         current_century: int,
         century: int,
     ) -> tuple[bool, bool, bool, bool]:
@@ -193,22 +200,16 @@ class CalendarPicker(BasePage):
         click_century = False
 
         if current_month_long != month_long:
-            self.click(self.page.get_by_role("cell", name=current_month_long))
+            self.click(self.v2date_picker_switch)
             click_month = True
         if current_year != year:
-            self.click(
-                self.page.get_by_role("cell", name=str(current_year), exact=True)
-            )
+            self.click(self.v2date_picker_switch)
             click_year = True
         if current_decade != decade:
-            self.click(
-                self.page.get_by_role("cell", name=("-" + str(end_of_current_decade)))
-            )
+            self.click(self.v2date_picker_switch)
             click_decade = True
         if current_century != century:
-            self.click(
-                self.page.get_by_role("cell", name=("-" + str(end_of_current_century)))
-            )
+            self.click(self.v2date_picker_switch)
             click_century = True
 
         return click_month, click_year, click_decade, click_century
@@ -250,10 +251,8 @@ class CalendarPicker(BasePage):
             month_short,
             current_year,
             year,
-            end_of_current_decade,
             current_decade,
             decade,
-            end_of_current_century,
             current_century,
             century,
         ) = self.calculate_v2_calendar_variables(date, current_date)
@@ -264,10 +263,8 @@ class CalendarPicker(BasePage):
                 month_long,
                 current_year,
                 year,
-                end_of_current_decade,
                 current_decade,
                 decade,
-                end_of_current_century,
                 current_century,
                 century,
             )
