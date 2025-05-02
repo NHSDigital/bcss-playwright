@@ -5,8 +5,11 @@ from pages.base_page import BasePage
 from pages.screening_practitioner_appointments.screening_practitioner_appointments import (
     ScreeningPractitionerAppointmentsPage,
 )
-from pages.screening_practitioner_appointments.subject_datasets import (
-    SubjectDatasets,
+from pages.datasets.subject_datasets_page import (
+    SubjectDatasetsPage,
+)
+from pages.datasets.colonoscopy_dataset_page import (
+    ColonoscopyDatasetsPage,
     FitForColonoscopySspOptions,
     AsaGradeOptions,
 )
@@ -128,14 +131,14 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
         )
 
         SubjectScreeningSummary(page).click_datasets_link()
-        SubjectDatasets(page).click_show_datasets()
+        SubjectDatasetsPage(page).click_colonoscopy_show_datasets()
 
-        SubjectDatasets(page).select_asa_grade_option(AsaGradeOptions.FIT.value)
-        SubjectDatasets(page).select_fit_for_colonoscopy_option(
+        ColonoscopyDatasetsPage(page).select_asa_grade_option(AsaGradeOptions.FIT.value)
+        ColonoscopyDatasetsPage(page).select_fit_for_colonoscopy_option(
             FitForColonoscopySspOptions.YES.value
         )
-        SubjectDatasets(page).click_dataset_complete_radio_button_yes()
-        SubjectDatasets(page).save_dataset()
+        ColonoscopyDatasetsPage(page).click_dataset_complete_radio_button_yes()
+        ColonoscopyDatasetsPage(page).save_dataset()
         BasePage(page).click_back_button()
         BasePage(page).click_back_button()
 
