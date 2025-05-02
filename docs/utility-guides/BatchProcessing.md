@@ -66,7 +66,6 @@ This will call the other two functions in order to successfully process a batch.
 6. After the ID is stored, it clicks on the ID to get to the Manage Active Batch page
 7. From Here it calls the `prepare_and_print_batch` function.
    1. If `get_subjects_from_pdf` was set to False it calls `get_nhs_no_from_batch_id`, which is imported from *utils.oracle.oracle_specific_functions*, to get the subjects from the batch and stores them as a pandas DataFrame - **nhs_no_df**
-   2. For more Info on `get_nhs_no_from_batch_id` please look at: <!-- vale off -->[PDFReader](PDFReader.md) <!-- vale on -->
 8. Once this is complete it calls the `check_batch_in_archived_batch_list` function
 9. Finally, once that function is complete it calls `verify_subject_event_status_by_nhs_no` which is imported from *utils/screening_subject_page_searcher*
 
