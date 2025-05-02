@@ -2,8 +2,17 @@ import pytest
 from playwright.sync_api import Page
 from pages.logout.log_out_page import Logout
 from pages.base_page import BasePage
+from pages.screening_practitioner_appointments.appointment_calendar_page import (
+    AppointmentCalendar,
+)
+from pages.screening_practitioner_appointments.appointment_detail_page import (
+    AppointmentDetail,
+)
 from pages.screening_practitioner_appointments.screening_practitioner_appointments import (
     ScreeningPractitionerAppointmentsPage,
+)
+from pages.screening_practitioner_appointments.screening_practitioner_day_view import (
+    ScreeningPractitionerDayView,
 )
 from pages.datasets.subject_datasets_page import (
     SubjectDatasetsPage,
@@ -13,24 +22,20 @@ from pages.datasets.colonoscopy_dataset_page import (
     FitForColonoscopySspOptions,
     AsaGradeOptions,
 )
-from pages.screening_subject_search.subject_screening_summary import (
-    SubjectScreeningSummary,
-)
 from pages.screening_subject_search.advance_fobt_screening_episode_page import (
     AdvanceFOBTScreeningEpisode,
-)
-from pages.screening_practitioner_appointments.screening_practitioner_day_view import (
-    ScreeningPractitionerDayView,
-)
-from pages.screening_practitioner_appointments.appointment_detail_page import (
-    AppointmentDetail,
-)
-from pages.screening_practitioner_appointments.appointment_calendar_page import (
-    AppointmentCalendar,
 )
 from pages.screening_subject_search.attend_diagnostic_test_page import (
     AttendDiagnosticTest,
 )
+from pages.screening_subject_search.subject_screening_summary import (
+    SubjectScreeningSummary,
+)
+
+from pages.screening_subject_search.contact_with_patient_page import (
+    ContactWithPatientPage,
+)
+
 from utils.user_tools import UserTools
 from utils.load_properties_file import PropertiesFile
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
@@ -182,20 +187,17 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
             page
         ).click_record_other_post_investigation_contact_button()
 
-        page.locator("#UI_DIRECTION").select_option(label="To patient")
-        page.locator("#UI_CALLER_ID").select_option(index=1)
-        page.get_by_role("button", name="Calendar").click()
+        ContactWithPatientPage(page).select_direction_dropdown_option("To patient")
+        ContactWithPatientPage(page).select_caller_id_dropdown_index_option(1)
+        ContactWithPatientPage(page).click_calendar_button()
         CalendarPicker(page).v1_calender_picker(datetime.today())
-        page.locator("#UI_START_TIME").click()
-        page.locator("#UI_START_TIME").fill("11:00")
-        page.locator("#UI_END_TIME").click()
-        page.locator("#UI_END_TIME").fill("12:00")
-        page.locator("#UI_COMMENT_ID").click()
-        page.locator("#UI_COMMENT_ID").fill("Test Automation")
-        page.locator("#UI_OUTCOME").select_option(
-            label="Post-investigation Appointment Not Required"
+        ContactWithPatientPage(page).enter_start_time("11:00")
+        ContactWithPatientPage(page).enter_end_time("12:00")
+        ContactWithPatientPage(page).enter_discussion_record_text("Test Automation")
+        ContactWithPatientPage(page).select_outcome_dropdown_option(
+            "Post-investigation Appointment Not Required"
         )
-        page.get_by_role("button", name="Save").click()
+        ContactWithPatientPage(page).click_save_button()
 
         verify_subject_event_status_by_nhs_no(
             page, nhs_no, "A323 - Post-investigation Appointment NOT Required"
