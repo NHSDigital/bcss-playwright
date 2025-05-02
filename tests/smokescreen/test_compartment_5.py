@@ -2,10 +2,15 @@ import pytest
 from playwright.sync_api import Page
 from pages.logout.log_out_page import Logout
 from pages.base_page import BasePage
-from pages.screening_practitioner_appointments.appointment_calendar_page import AppointmentCalendar
-from pages.screening_practitioner_appointments.appointment_detail_page import AppointmentDetail
+from pages.screening_practitioner_appointments.appointment_calendar_page import (
+    AppointmentCalendar,
+)
+from pages.screening_practitioner_appointments.appointment_detail_page import (
+    AppointmentDetail,
+)
 from pages.screening_practitioner_appointments.screening_practitioner_appointments import (
     ScreeningPractitionerAppointmentsPage,
+    ScreeningPractitionerDayView,
 )
 from pages.datasets.subject_datasets_page import (
     SubjectDatasetsPage,
@@ -15,8 +20,12 @@ from pages.datasets.colonoscopy_dataset_page import (
     FitForColonoscopySspOptions,
     AsaGradeOptions,
 )
-from pages.screening_subject_search.advance_fobt_screening_episode_page import AdvanceFOBTScreeningEpisode
-from pages.screening_subject_search.attend_diagnostic_test_page import AttendDiagnosticTest
+from pages.screening_subject_search.advance_fobt_screening_episode_page import (
+    AdvanceFOBTScreeningEpisode,
+)
+from pages.screening_subject_search.attend_diagnostic_test_page import (
+    AttendDiagnosticTest,
+)
 from pages.screening_subject_search.subject_screening_summary import (
     SubjectScreeningSummary,
 )
@@ -190,7 +199,9 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     ContactWithPatientPage(page).enter_start_time("11:00")
     ContactWithPatientPage(page).enter_end_time("12:00")
     ContactWithPatientPage(page).enter_discussion_record_text("Test Automation")
-    ContactWithPatientPage(page).select_outcome_dropdown_option("Post-investigation Appointment Not Required")
+    ContactWithPatientPage(page).select_outcome_dropdown_option(
+        "Post-investigation Appointment Not Required"
+    )
     ContactWithPatientPage(page).click_save_button()
 
     verify_subject_event_status_by_nhs_no(
