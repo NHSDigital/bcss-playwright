@@ -19,12 +19,11 @@ class ContactWithPatientPage(BasePage):
             "#UI_CALLER_ID"
         )
         self.calendar_button = self.page.get_by_role("button", name="Calendar")
-        self.time_from_text_field = self.page.get_by_role("textbox", name="Start Time")
-        self.time_to_text_field = self.page.get_by_role("textbox", name="End Time")
-        self.discussion_record_text_field = self.page.get_by_role(
-            "textbox", name="Discussion Record"
-        )
-        self.outcome_dropdown = self.page.locator("##UI_OUTCOME")
+        self.start_time_field = self.page.locator("#UI_START_TIME")
+        self.end_time_field = self.page.locator("#UI_END_TIME")
+        self.discussion_record_text_field =  page.locator("#UI_COMMENT_ID")
+        
+        self.outcome_dropdown = self.page.locator("#UI_OUTCOME")
         self.save_button = self.page.get_by_role("button", name="Save")
 
     def select_direction_dropdown_option(self, direction: str) -> None:
@@ -37,10 +36,10 @@ class ContactWithPatientPage(BasePage):
         self.click(self.calendar_button)
 
     def enter_start_time(self, start_time: str) -> None:
-        self.time_from_text_field.fill(start_time)
+        self.start_time_field.fill(start_time)
 
     def enter_end_time(self, end_time: str) -> None:
-        self.time_to_text_field.fill(end_time)
+        self.end_time_field.fill(end_time)
 
     def enter_discussion_record_text(self, value: str) -> None:
         self.discussion_record_text_field.fill(value)

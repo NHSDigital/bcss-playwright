@@ -81,14 +81,16 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     AppointmentCalendar(page).select_site_dropdown(
         smokescreen_properties["c5_eng_site"]
     )
+    # page.get_by_role("link", name="Screening Practitioner").select_option("")
 
     AppointmentCalendar(page).click_view_appointments_on_this_day_button()
     ScreeningPractitionerDayView(page).click_calendar_button()
     date_from_util = datetime(2025, 5, 2)
     CalendarPicker(page).v1_calender_picker(date_from_util)
+    # page.locator("#UI_PRACTITIONER_NDV").select_option("")
 
     # Select subject from inital test data util
-    ScreeningPractitionerDayView(page).click_patient_link("ENDLESS MUMBO-JUMBO")
+    ScreeningPractitionerDayView(page).click_patient_link("REGALLY DRAGONISH")
 
     # Select Attendance radio button, tick Attended checkbox, set Attended Date to yesterday's (system) date and then press Save
     AppointmentDetail(page).check_attendance_radio()
@@ -101,7 +103,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     # Repeat for x Abnormal  patients
 
     # Navigate to the 'Subject Screening Summary' screen for the 1st Abnormal patient
-    nhs_no = "9687900415"  # Test NHS NO for DIVIDEND MUZZLE
+    nhs_no = "9645516129"  # Test NHS NO for DIVIDEND MUZZLE
     verify_subject_event_status_by_nhs_no(
         page, nhs_no, "J10 - Attended Colonoscopy Assessment Appointment"
     )
@@ -207,7 +209,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     ContactWithPatientPage(page).click_save_button()
 
     verify_subject_event_status_by_nhs_no(
-        page, nhs_no, "A361 - Other Post-investigation Contact Required"
+        page, nhs_no, "A323 - Post-investigation Appointment NOT Required"
     )
 
     # Repeat above for x subjects
