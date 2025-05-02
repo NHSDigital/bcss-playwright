@@ -10,6 +10,8 @@ from pages.screening_practitioner_appointments.appointment_detail_page import (
 )
 from pages.screening_practitioner_appointments.screening_practitioner_appointments import (
     ScreeningPractitionerAppointmentsPage,
+)
+from pages.screening_practitioner_appointments.screening_practitioner_day_view import (
     ScreeningPractitionerDayView,
 )
 from pages.datasets.subject_datasets_page import (
