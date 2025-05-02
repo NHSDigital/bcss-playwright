@@ -192,7 +192,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     # 'Start Time',  11:00
     # 'End Time',  12:00
     # 'Discussion Record'   TEST AUTOMATION
-    # select 'Outcome' - 'Post-investigation Appointment Not Required' and click 'Save'
+    #  select 'Outcome' - 'Post-investigation Appointment Not Required' and click 'Save'
 
     ContactWithPatientPage(page).select_direction_dropdown_option("To patient")
     ContactWithPatientPage(page).select_caller_id_dropdown_index_option(1)

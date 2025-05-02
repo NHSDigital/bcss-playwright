@@ -5,17 +5,25 @@ from utils.calendar_picker import CalendarPicker
 
 
 class ContactWithPatientPage(BasePage):
+    """
+    ContactWithPatientPage class for interacting with 'Contact With Patient' page elements.
+    """
+
     def __init__(self, page: Page):
         super().__init__(page)
         self.page = page
 
         # Contact With Patient - Page Locators
         self.contact_direction_dropdown = self.page.locator("#UI_DIRECTION")
-        self.contact_made_between_patient_and_dropdown = self.page.locator("#UI_CALLER_ID")
+        self.contact_made_between_patient_and_dropdown = self.page.locator(
+            "#UI_CALLER_ID"
+        )
         self.calendar_button = self.page.get_by_role("button", name="Calendar")
         self.time_from_text_field = self.page.get_by_role("textbox", name="Start Time")
         self.time_to_text_field = self.page.get_by_role("textbox", name="End Time")
-        self.discussion_record_text_field = self.page.get_by_role("textbox", name="Discussion Record")
+        self.discussion_record_text_field = self.page.get_by_role(
+            "textbox", name="Discussion Record"
+        )
         self.outcome_dropdown = self.page.locator("##UI_OUTCOME")
         self.save_button = self.page.get_by_role("button", name="Save")
 
@@ -42,5 +50,3 @@ class ContactWithPatientPage(BasePage):
 
     def click_save_button(self) -> None:
         self.click(self.save_button)
-
-
