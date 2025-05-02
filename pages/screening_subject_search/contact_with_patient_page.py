@@ -1,7 +1,5 @@
-from playwright.sync_api import Page, expect, Locator
+from playwright.sync_api import Page
 from pages.base_page import BasePage
-from enum import Enum
-from utils.calendar_picker import CalendarPicker
 
 
 class ContactWithPatientPage(BasePage):
@@ -21,8 +19,7 @@ class ContactWithPatientPage(BasePage):
         self.calendar_button = self.page.get_by_role("button", name="Calendar")
         self.start_time_field = self.page.locator("#UI_START_TIME")
         self.end_time_field = self.page.locator("#UI_END_TIME")
-        self.discussion_record_text_field =  page.locator("#UI_COMMENT_ID")
-        
+        self.discussion_record_text_field = page.locator("#UI_COMMENT_ID")
         self.outcome_dropdown = self.page.locator("#UI_OUTCOME")
         self.save_button = self.page.get_by_role("button", name="Save")
 
