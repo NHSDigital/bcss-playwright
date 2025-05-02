@@ -9,6 +9,7 @@ import pytest
 from playwright.sync_api import Page
 from pages.base_page import BasePage
 from utils.user_tools import UserTools
+from utils.date_time_utils import DateTimeUtils
 from datetime import datetime
 from sys import platform
 
@@ -57,9 +58,9 @@ def test_calender_picker_v2(page: Page) -> None:
     ActiveBatchList(page).enter_deadline_date_filter(datetime.today())
     if platform == "win32":  # Windows
         ActiveBatchList(page).verify_deadline_date_filter_input(
-            str(datetime.today().strftime("%#d %b %Y"))
+            str(DateTimeUtils.format_date(datetime.today(), "%#d %b %Y"))
         )
     else:  # Linux or Mac
         ActiveBatchList(page).verify_deadline_date_filter_input(
-            str(datetime.today().strftime("%-d %b %Y"))
+            str(DateTimeUtils.format_date(datetime.today(), "%-d %b %Y"))
         )

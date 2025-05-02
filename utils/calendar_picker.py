@@ -65,8 +65,12 @@ class CalendarPicker(BasePage):
         This function is used when using the v1 calendar picker
         It calculates how many years and months it needs to traverse
         """
-        years_to_traverse = int(current_date.strftime("%Y")) - int(date.strftime("%Y"))
-        months_to_traverse = int(current_date.strftime("%m")) - int(date.strftime("%m"))
+        years_to_traverse = int(DateTimeUtils.format_date(current_date, "%Y")) - int(
+            DateTimeUtils.format_date(date, "%Y")
+        )
+        months_to_traverse = int(DateTimeUtils.format_date(current_date, "%m")) - int(
+            DateTimeUtils.format_date(date, "%m")
+        )
         return years_to_traverse, months_to_traverse
 
     def traverse_years_in_v1_calendar(self, years_to_traverse: int) -> None:
@@ -97,9 +101,9 @@ class CalendarPicker(BasePage):
         It extracts the day from the date and then selects that value in the calendar picker
         """
         if platform == "win32":  # Windows
-            day_to_select = str(date.strftime("%#d"))
+            day_to_select = DateTimeUtils.format_date(date, "%#d")
         else:  # Linux or Mac
-            day_to_select = str(date.strftime("%-d"))
+            day_to_select = DateTimeUtils.format_date(date, "%-d")
         number_of_cells_with_day = self.page.get_by_role(
             "cell", name=day_to_select
         ).count()
@@ -152,18 +156,18 @@ class CalendarPicker(BasePage):
             current_century: the current century in yyyy format (e.g. 2000/2100)
             century: the wanted century in yyyy format (e.g. 1900)
         """
-        current_month_long = str(current_date.strftime("%B"))
-        current_year = int(current_date.strftime("%Y"))
+        current_month_long = DateTimeUtils.format_date(current_date, "%B")
+        current_year = int(DateTimeUtils.format_date(current_date, "%Y"))
         current_century = (current_year // 100) * 100
         current_decade = (
             ((current_year - current_century) // 10) * 10
         ) + current_century
 
-        year = int(date.strftime("%Y"))
+        year = int(DateTimeUtils.format_date(date, "%Y"))
         century = (year // 100) * 100
         decade = (((year - century) // 10) * 10) + century
-        month_short = str(date.strftime("%b"))
-        month_long = str(date.strftime("%B"))
+        month_short = DateTimeUtils.format_date(date, "%b")
+        month_long = DateTimeUtils.format_date(date, "%B")
 
         return (
             current_month_long,
@@ -300,9 +304,9 @@ class CalendarPicker(BasePage):
             current_month_displayed
         )
         if platform == "win32":  # Windows
-            current_month_int = int(datetime.now().strftime("%#m"))
+            current_month_int = int(DateTimeUtils.format_date(datetime.now(), "%#m"))
         else:  # Linux or Mac
-            current_month_int = int(datetime.now().strftime("%-m"))
+            current_month_int = int(DateTimeUtils.format_date(datetime.now(), "%-m"))
 
         self.book_appointments_go_to_month(
             current_month_displayed_int, current_month_int
