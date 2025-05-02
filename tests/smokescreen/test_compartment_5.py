@@ -84,11 +84,11 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
 
     AppointmentCalendar(page).click_view_appointments_on_this_day_button()
     ScreeningPractitionerDayView(page).click_calendar_button()
-    date_from_util = datetime(2025, 4, 30)
+    date_from_util = datetime(2025, 5, 2)
     CalendarPicker(page).v1_calender_picker(date_from_util)
 
     # Select subject from inital test data util
-    ScreeningPractitionerDayView(page).click_patient_link("DIVIDEND MUZZLE")
+    ScreeningPractitionerDayView(page).click_patient_link("ENDLESS MUMBO-JUMBO")
 
     # Select Attendance radio button, tick Attended checkbox, set Attended Date to yesterday's (system) date and then press Save
     AppointmentDetail(page).check_attendance_radio()
@@ -101,7 +101,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     # Repeat for x Abnormal  patients
 
     # Navigate to the 'Subject Screening Summary' screen for the 1st Abnormal patient
-    nhs_no = "9852356488"  # Test NHS NO for DIVIDEND MUZZLE
+    nhs_no = "9687900415"  # Test NHS NO for DIVIDEND MUZZLE
     verify_subject_event_status_by_nhs_no(
         page, nhs_no, "J10 - Attended Colonoscopy Assessment Appointment"
     )
@@ -156,10 +156,10 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     AdvanceFOBTScreeningEpisode(page).click_attend_diagnostic_test_button()
 
     # Select Colonoscopy from drop down list. Enter the actual appointment date as today's date and select 'Save'
-    AttendDiagnosticTest.select_actual_type_of_test_dropdown_option("Colonoscopy")
-    AttendDiagnosticTest.click_calendar_button()
+    AttendDiagnosticTest(page).select_actual_type_of_test_dropdown_option("Colonoscopy")
+    AttendDiagnosticTest(page).click_calendar_button()
     CalendarPicker(page).v1_calender_picker(datetime.today())
-    AttendDiagnosticTest.click_save_button()
+    AttendDiagnosticTest(page).click_save_button()
     SubjectScreeningSummary(page).verify_latest_event_status_value(
         "A259 - Attended Diagnostic Test"
     )
