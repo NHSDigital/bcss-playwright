@@ -35,7 +35,7 @@ def batch_processing(
         batch_description (str): The description of the batch. E.g. Pre-invitation (FIT)
         latest_event_status (str): The status the subject will get updated to after the batch has been processed.
         run_timed_events (bool): An optional input that executes bcss_timed_events if set to True
-        get_subjects_from_pdf (bool): An optial input to change the method of retrieving subjects from the batch from the DB to the PDF file.
+        get_subjects_from_pdf (bool): An optional input to change the method of retrieving subjects from the batch from the DB to the PDF file.
     """
     logging.info(f"Processing {batch_type} - {batch_description} batch")
     BasePage(page).click_main_menu_link()
@@ -94,7 +94,7 @@ def prepare_and_print_batch(
     Args:
         page (Page): This is the playwright page object
         link_text (str): The batch ID
-        get_subjects_from_pdf (bool): An optial input to change the method of retrieving subjects from the batch from the DB to the PDF file.
+        get_subjects_from_pdf (bool): An optional input to change the method of retrieving subjects from the batch from the DB to the PDF file.
 
     Returns:
         nhs_no_df (pd.DataFrame | None): if get_subjects_from_pdf is True, this is a DataFrame with the column 'subject_nhs_number' and each NHS number being a record, otherwise it is None
