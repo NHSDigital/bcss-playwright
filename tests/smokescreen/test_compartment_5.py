@@ -185,17 +185,6 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
         page
     ).click_record_other_post_investigation_contact_button()
 
-    #  Complete 'Contact Direction',   To patient
-    # 'Contact made between patient and',  Selects the top option in the dropdown
-    #  Complete 'Contact Direction', To patient
-    # 'Contact made between patient and', Selects the top option in the dropdown
-    # 'Date of Patient Contact',  Today
-    # 'Duration',  01:00
-    # 'Start Time',  11:00
-    # 'End Time',  12:00
-    # 'Discussion Record'   TEST AUTOMATION
-    #  select 'Outcome' - 'Post-investigation Appointment Not Required' and click 'Save'
-
     ContactWithPatientPage(page).select_direction_dropdown_option("To patient")
     ContactWithPatientPage(page).select_caller_id_dropdown_index_option(1)
     ContactWithPatientPage(page).click_calendar_button()
