@@ -7,7 +7,7 @@ The PDF Reader utility allows for reading of PDF files and performing specific t
 - [Utility Guide: PDF Reader](#utility-guide-pdf-reader)
   - [Table of Contents](#table-of-contents)
   - [Functions Overview](#functions-overview)
-    - [Ectract NHS No From PDF](#ectract-nhs-no-from-pdf)
+    - [Extract NHS No From PDF](#extract-nhs-no-from-pdf)
       - [Required Arguments](#required-arguments)
       - [How This Function Works](#how-this-function-works)
 
@@ -17,7 +17,7 @@ For this utility we have the following functions/methods:
 
 - `extract_nhs_no_from_pdf`
 
-### Ectract NHS No From PDF
+### Extract NHS No From PDF
 
 This is the main function that is called in order to process a batch.
 This will call the other two functions in order to successfully process a batch.
@@ -31,5 +31,5 @@ This will call the other two functions in order to successfully process a batch.
 #### How This Function Works
 
 1. It starts off by storing the PDF file as a PdfReader object, this is from the `pypdf` package.
-2. Then it loops thrpugh each page.
+2. Then it loops through each page.
 3. If it finds the string *"NHS No"* in the page, it extracts it and removes any whitespaces, then adds it to a pandas DataFrame - `nhs_no_df`
