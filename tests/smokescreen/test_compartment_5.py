@@ -1,18 +1,18 @@
 import pytest
 from playwright.sync_api import Page
-from pages.logout.log_out_page import Logout
+from pages.logout.log_out_page import LogoutPage
 from pages.base_page import BasePage
 from pages.screening_practitioner_appointments.appointment_calendar_page import (
-    AppointmentCalendar,
+    AppointmentCalendarPage,
 )
 from pages.screening_practitioner_appointments.appointment_detail_page import (
-    AppointmentDetail,
+    AppointmentDetailPage,
 )
-from pages.screening_practitioner_appointments.screening_practitioner_appointments import (
+from pages.screening_practitioner_appointments.screening_practitioner_appointments_page import (
     ScreeningPractitionerAppointmentsPage,
 )
-from pages.screening_practitioner_appointments.screening_practitioner_day_view import (
-    ScreeningPractitionerDayView,
+from pages.screening_practitioner_appointments.screening_practitioner_day_view_page import (
+    ScreeningPractitionerDayViewPage,
 )
 from pages.datasets.subject_datasets_page import (
     SubjectDatasetsPage,
@@ -22,14 +22,26 @@ from pages.datasets.colonoscopy_dataset_page import (
     FitForColonoscopySspOptions,
     AsaGradeOptions,
 )
+from pages.screening_subject_search.subject_screening_summary_page import (
+    SubjectScreeningSummaryPage,
+)
 from pages.screening_subject_search.advance_fobt_screening_episode_page import (
-    AdvanceFOBTScreeningEpisode,
+    AdvanceFOBTScreeningEpisodePage,
+)
+from pages.screening_practitioner_appointments.screening_practitioner_day_view_page import (
+    ScreeningPractitionerDayViewPage,
+)
+from pages.screening_practitioner_appointments.appointment_detail_page import (
+    AppointmentDetailPage,
+)
+from pages.screening_practitioner_appointments.appointment_calendar_page import (
+    AppointmentCalendarPage,
 )
 from pages.screening_subject_search.attend_diagnostic_test_page import (
-    AttendDiagnosticTest,
+    AttendDiagnosticTestPage,
 )
-from pages.screening_subject_search.subject_screening_summary import (
-    SubjectScreeningSummary,
+from pages.screening_subject_search.subject_screening_summary_page import (
+    SubjectScreeningSummaryPage,
 )
 
 from pages.screening_subject_search.contact_with_patient_page import (
@@ -81,38 +93,38 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
 
         BasePage(page).go_to_screening_practitioner_appointments_page()
         ScreeningPractitionerAppointmentsPage(page).go_to_view_appointments_page()
-        AppointmentCalendar(page).select_appointment_type_dropdown(
+        AppointmentCalendarPage(page).select_appointment_type_dropdown(
             smokescreen_properties["c5_eng_appointment_type"]
         )
-        AppointmentCalendar(page).select_screening_centre_dropdown(
+        AppointmentCalendarPage(page).select_screening_centre_dropdown(
             smokescreen_properties["c5_eng_screening_centre"]
         )
-        AppointmentCalendar(page).select_site_dropdown(
+        AppointmentCalendarPage(page).select_site_dropdown(
             smokescreen_properties["c5_eng_site"]
         )
 
-        AppointmentCalendar(page).click_view_appointments_on_this_day_button()
+        AppointmentCalendarPage(page).click_view_appointments_on_this_day_button()
 
-        ScreeningPractitionerDayView(page).select_practitioner_dropdown_option(
+        ScreeningPractitionerDayViewPage(page).select_practitioner_dropdown_option(
             ["(all)", "(all having slots)"]
         )
-        ScreeningPractitionerDayView(page).click_calendar_button()
+        ScreeningPractitionerDayViewPage(page).click_calendar_button()
         CalendarPicker(page).v1_calender_picker(date_from_util)
 
         logging.info(f"Looking for {name_from_util}")
         try:
-            ScreeningPractitionerDayView(page).click_patient_link(name_from_util)
+            ScreeningPractitionerDayViewPage(page).click_patient_link(name_from_util)
             logging.info(f"Found and clicked {name_from_util}")
         except Exception as e:
             pytest.fail(f"Unable to find {name_from_util}: {e}")
 
-        AppointmentDetail(page).check_attendance_radio()
-        AppointmentDetail(page).check_attended_check_box()
-        AppointmentDetail(page).click_calendar_button()
+        AppointmentDetailPage(page).check_attendance_radio()
+        AppointmentDetailPage(page).check_attended_check_box()
+        AppointmentDetailPage(page).click_calendar_button()
         CalendarPicker(page).v1_calender_picker(datetime.today() - timedelta(1))
-        AppointmentDetail(page).click_save_button()
+        AppointmentDetailPage(page).click_save_button()
         try:
-            AppointmentDetail(page).verify_text_visible("Record updated")
+            AppointmentDetailPage(page).verify_text_visible("Record updated")
             logging.info(
                 f"Subject attended appointment - Record successfully updated for: {name_from_util}"
             )
@@ -125,17 +137,12 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     for subject_num in range(subjects_df.shape[0]):
 
         nhs_no = subjects_df["subject_nhs_number"].iloc[subject_num]
-        name_from_util = f"{str(subjects_df["person_given_name"].iloc[subject_num]).upper()} {str(subjects_df["person_family_name"].iloc[subject_num]).upper()}"
-
-        logging.info(
-            f"\nUpdating dataset for:\nSubject Name: {name_from_util}\nSubject NHS no: {nhs_no}"
-        )
 
         verify_subject_event_status_by_nhs_no(
             page, nhs_no, "J10 - Attended Colonoscopy Assessment Appointment"
         )
 
-        SubjectScreeningSummary(page).click_datasets_link()
+        SubjectScreeningSummaryPage(page).click_datasets_link()
         SubjectDatasetsPage(page).click_colonoscopy_show_datasets()
 
         ColonoscopyDatasetsPage(page).select_asa_grade_option(AsaGradeOptions.FIT.value)
@@ -147,43 +154,45 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
         BasePage(page).click_back_button()
         BasePage(page).click_back_button()
 
-        SubjectScreeningSummary(page).click_advance_fobt_screening_episode_button()
-        AdvanceFOBTScreeningEpisode(page).click_suitable_for_endoscopic_test_button()
+        SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+        AdvanceFOBTScreeningEpisodePage(
+            page
+        ).click_suitable_for_endoscopic_test_button()
 
-        AdvanceFOBTScreeningEpisode(page).click_calendar_button()
+        AdvanceFOBTScreeningEpisodePage(page).click_calendar_button()
         CalendarPicker(page).v1_calender_picker(datetime.today())
 
-        AdvanceFOBTScreeningEpisode(page).select_test_type_dropdown_option(
+        AdvanceFOBTScreeningEpisodePage(page).select_test_type_dropdown_option(
             "Colonoscopy"
         )
 
         logging.info(f"Inviting {name_from_util} to diagnostic test")
-        AdvanceFOBTScreeningEpisode(page).click_invite_for_diagnostic_test_button()
-        SubjectScreeningSummary(page).verify_latest_event_status_value(
+        AdvanceFOBTScreeningEpisodePage(page).click_invite_for_diagnostic_test_button()
+        SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
             "A59 - Invited for Diagnostic Test"
         )
 
         logging.info(f"{name_from_util} attended diagnostic test")
-        AdvanceFOBTScreeningEpisode(page).click_attend_diagnostic_test_button()
+        AdvanceFOBTScreeningEpisodePage(page).click_attend_diagnostic_test_button()
 
-        AttendDiagnosticTest(page).select_actual_type_of_test_dropdown_option(
+        AttendDiagnosticTestPage(page).select_actual_type_of_test_dropdown_option(
             "Colonoscopy"
         )
-        AttendDiagnosticTest(page).click_calendar_button()
+        AttendDiagnosticTestPage(page).click_calendar_button()
         CalendarPicker(page).v1_calender_picker(datetime.today())
-        AttendDiagnosticTest(page).click_save_button()
-        SubjectScreeningSummary(page).verify_latest_event_status_value(
+        AttendDiagnosticTestPage(page).click_save_button()
+        SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
             "A259 - Attended Diagnostic Test"
         )
 
-        SubjectScreeningSummary(page).click_advance_fobt_screening_episode_button()
+        SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
 
-        AdvanceFOBTScreeningEpisode(page).click_other_post_investigation_button()
-        AdvanceFOBTScreeningEpisode(page).verify_latest_event_status_value(
+        AdvanceFOBTScreeningEpisodePage(page).click_other_post_investigation_button()
+        AdvanceFOBTScreeningEpisodePage(page).verify_latest_event_status_value(
             "A361 - Other Post-investigation Contact Required"
         )
 
-        AdvanceFOBTScreeningEpisode(
+        AdvanceFOBTScreeningEpisodePage(
             page
         ).click_record_other_post_investigation_contact_button()
 
@@ -203,4 +212,4 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
             page, nhs_no, "A323 - Post-investigation Appointment NOT Required"
         )
 
-    Logout(page).log_out()
+    LogoutPage(page).log_out()
