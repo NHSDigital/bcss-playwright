@@ -108,7 +108,7 @@ You provide a date and a playwright locator and it will enter the date in the fo
 #### How This Function Works
 
 1. This calls the `format_date` method from DateTimeUtils to get the date in the correct format.
-   1. As the formatting for the `datetime` function differes between operating systems, there is a check first to see what OS is in use.
+   1. As the formatting for the `datetime` function differs between operating systems, there is a check first to see what OS is in use.
    2. From here it calls the correct formatting option.
 2. Once the date is formatted correctly it enters it into the provided locator.
 
@@ -169,7 +169,7 @@ This is called to move the V1 calendar picker to the correct year
 
 #### How This Function Works
 
-1. If `years_to_traverse` is negative, it mutplies it by -1 and runs a `FOR` loop for the value of this variable.
+1. If `years_to_traverse` is negative, it multiplies it by -1 and runs a `FOR` loop for the value of this variable.
    1. For each iteration of the loop it clicks on the previous year button: `«`
 2. If `years_to_traverse` is positive, it runs a `FOR` loop for the value of this variable.
    1. For each iteration of the loop it clicks on the next year button: `»`
@@ -186,7 +186,7 @@ This is called to move the V1 calendar picker to the correct month.
 
 #### How This Function Works
 
-1. If `months_to_traverse` is negative, it mutplies it by -1 and runs a `FOR` loop for the value of this variable.
+1. If `months_to_traverse` is negative, it multiplies it by -1 and runs a `FOR` loop for the value of this variable.
    1. For each iteration of the loop it clicks on the previous month button: `‹`
 2. If `months_to_traverse` is positive, it runs a `FOR` loop for the value of this variable.
    1. For each iteration of the loop it clicks on the next month button: `›`
@@ -391,7 +391,7 @@ This is called to select the day of the date we want the calendar picker to go t
    1. If Windows is found then it calls the `format_date` method from DateTimeUtils and passes the formatting string `"%#d"`.
    2. Otherwise it calls the `format_date` method from DateTimeUtils and passes the formatting string `"%-d"`.
    3. This is done to get the day without any leading zeros. E.g. *05 11 1996* will turn into *5*.
-2. Then it calcualtes how many cells contain the date we are looking for and stores it in the variable `number_of_cells_with_day`.
+2. Then it calculates how many cells contain the date we are looking for and stores it in the variable `number_of_cells_with_day`.
    1. This is done as if we were to select the 1st of April,  the 1st of May may also show up on the same screen. The same goes for other low or high dates.
 3. Then we store all of the cells with a date in a variable `all_days`.
 4. After we check how many of the cells in `all_days` match the date we want to select and store them as a list in the variable `matching_days`.
@@ -444,7 +444,7 @@ This is called to move the book appointments calendar to the month we desire.
 
 #### How This Function Works
 
-1. Firstly it caclulates the difference between `current_displayed_month` and `wanted_month` and stores the result in `month_difference`.
+1. Firstly it calculates the difference between `current_displayed_month` and `wanted_month` and stores the result in `month_difference`.
 2. Then if `month_difference` is greater than 0, it runs a for loop for the value of `month_difference` clicking on the previous month button once per loop.
 3. If `month_difference` is less than 0, it runs a for loop for the value of `month_difference` clicking on the next month button once per loop.
 

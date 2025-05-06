@@ -68,7 +68,7 @@ class CalendarPicker(BasePage):
         It calculates how many years and months it needs to traverse
 
         Args:
-            date (datetime): The date wewant to go to
+            date (datetime): The date we want to go to
             current_date (datetime): The current date
 
         Returns:
@@ -411,7 +411,7 @@ class CalendarPicker(BasePage):
         self, locator: Locator, bg_colours: list
     ) -> bool:
         """
-        This function loops through all of the appointment date cells and if the bacground colour matches
+        This function loops through all of the appointment date cells and if the background colour matches
         It then checks that the length of the name is less than 5.
         This is done the name length is the only differentiating factor between the two calendar tables on the page
         - 1st table has a length of 4 (e.g. wed2, fri5) and the 2nd table has a length of 5 (e.g. wed11, fri14)
