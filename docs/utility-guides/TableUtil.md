@@ -1,10 +1,10 @@
-# Utility Guide: Table Util
+# Utility Guide: Table Utility
 
 The Table Utilities module provides helper functions to interact with and validate HTML tables in Playwright-based UI tests.
 
 ## Table of Contents
 
-- [Utility Guide: Table Util](#utility-guide-table-util)
+- [Utility Guide: Table Utility](#utility-guide-table-utility)
   - [Table of Contents](#table-of-contents)
   - [Functions Overview](#functions-overview)
     - [Get Column Index](#get-column-index)
@@ -25,8 +25,8 @@ This function returns the index (1-based) of a specified column name.
 
 #### Required Arguments
 
--'column_name':
- -Type: 'str'
+-`column_name`:
+ -Type: `str`
  -The visible header text of the column to locate.
 
 #### How This Function Works
