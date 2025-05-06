@@ -88,7 +88,7 @@ class CalendarPicker(BasePage):
         This function traverses the years on the v1 calendar picker by the number specified in years_to_traverse
 
         Args:
-            years_to_traverse (int): The number of tears we need to traverse
+            years_to_traverse (int): The number of years we need to traverse
         """
         if years_to_traverse > 0:
             for _ in range(years_to_traverse):

@@ -206,7 +206,7 @@ This is called to select a date using the V2 calendar picker, which can be seen 
 1. Firstly it stores the current date in a variable: `current_date`.
 2. Then `current_date` and `date` are passed onto the `calculate_v2_calendar_variables` method to calculate the necessary variables to traverse this calendar.
 3. Once these variable have been calculated we call the `v2_calendar_picker_traverse_back` method to "go back in time" an expand the view of available years.
-4. After we have traversed far back enough to be able to select the years we want, we call the `v2_calendar_picker_traverse_forward` methos which will take us to the year and month we want to go to.
+4. After we have traversed far back enough to be able to select the years we want, we call the `v2_calendar_picker_traverse_forward` method which will take us to the year and month we want to go to.
 5. Finally we call the `select_day` method to select the correct day from the calendar picker.
 
 ### Calculate V2 Calendar Variables
@@ -268,7 +268,7 @@ This is called to calculate all, of the variables needed to traverse the V2 cale
    3. 25 // 10 = 2
    4. 2 * 10 = 20
    5. 20 + 2000 = 2020
-5. Next we calculate `year`, `century`, `decade`, `month_short` and `month_long` in similar methos to above.
+5. Next we calculate `year`, `century`, `decade`, `month_short` and `month_long` in similar methods to above.
 6. Once all of these have been calculated, we return these variables.
 
 ### V2 Calendar Picker Traverse Back
@@ -340,7 +340,7 @@ This is called to narrow down the scope of available years on the V2 calendar pi
 #### Required Arguments
 
 - `click_month`:
-  - Type: `bbol`
+  - Type: `bool`
   - This contains either `True` or `False` depending on the result from `v2_calendar_picker_traverse_back`.
 - `click_year`:
   - Type: `bool`
