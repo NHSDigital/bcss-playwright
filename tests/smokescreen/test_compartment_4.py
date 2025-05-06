@@ -116,7 +116,7 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
         current_month_displayed = BookAppointmentPage(
             page
         ).get_current_month_displayed()
-        CalendarPicker(page).book_first_eligble_appointment(
+        CalendarPicker(page).book_first_eligible_appointment(
             current_month_displayed,
             BookAppointmentPage(page).appointment_cell_locators,
             [
