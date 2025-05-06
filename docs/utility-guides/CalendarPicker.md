@@ -108,7 +108,7 @@ You provide a date and a playwright locator and it will enter the date in the fo
 #### How This Function Works
 
 1. This calls the `format_date` method from DateTimeUtils to get the date in the correct format.
-   1. As the formatting for the datetime function differes between operating systems, there is a check first to see what OS is in use.
+   1. As the formatting for the `datetime` function differes between operating systems, there is a check first to see what OS is in use.
    2. From here it calls the correct formatting option.
 2. Once the date is formatted correctly it enters it into the provided locator.
 
@@ -390,11 +390,11 @@ This is called to select the day of the date we want the calendar picker to go t
 1. First it checks what operating system is running.
    1. If Windows is found then it calls the `format_date` method from DateTimeUtils and passes the formatting string `"%#d"`.
    2. Otherwise it calls the `format_date` method from DateTimeUtils and passes the formatting string `"%-d"`.
-   3. This is done to get the day without any leading zeros. E.g. *05 11 1996* will trun into *5*.
+   3. This is done to get the day without any leading zeros. E.g. *05 11 1996* will turn into *5*.
 2. Then it calcualtes how many cells contain the date we are looking for and stores it in the variable `number_of_cells_with_day`.
    1. This is done as if we were to select the 1st of April,  the 1st of May may also show up on the same screen. The same goes for other low or high dates.
 3. Then we store all of the cells with a date in a variable `all_days`.
-4. After we check how many of the cells in `all_days` match the date we wnat to select and store them as a list in the variable `matching_days`.
+4. After we check how many of the cells in `all_days` match the date we want to select and store them as a list in the variable `matching_days`.
 5. Next we perform a few `IF` statements to see if we need to click the first, last or only cell stored in `matching_days`.
    1. If the date we want to select is less than 15, and `number_of_cells_with_day` is greater than 1, we select the first option in `all_days`.
    2. If the date we want to select is greater than 15 and `number_of_cells_with_day` is greater than 1, we select the last option in `all_days`.
@@ -423,10 +423,10 @@ This is called to select the first date with appointment slots available
    1. If it is windows then it calls the `format_date` method from DateTimeUtils and passes the formatting string: `"%#m"` and stores the result in `current_month_int`.
    2. Otherwise it calls the `format_date` method from DateTimeUtils and passes the formatting string: `"%-m"` and stores the result in `current_month_int`.
 3. Then it passes `current_month_displayed_int` and `current_month_int` into the `book_appointments_go_to_month` method.
-4. Next it runs a `while` loop to see if the calendar is showing any avaialbe appointments.
+4. Next it runs a `while` loop to see if the calendar is showing any available appointments.
    1. This is done by calling the `check_for_eligible_appointment_dates` method.
    2. If True is returned by the `check_for_eligible_appointment_dates` method then the `while` loop is broken.
-   3. Otherwise it carries on the loop 3 more times, advacing the month by 1 each time.
+   3. Otherwise it carries on the loop 3 more times, advancing the month by 1 each time.
    4. If at the end of the 3 loops it cannot find an appointment, it fails the test.
 
 ### Book Appointments Go To Month
@@ -440,7 +440,7 @@ This is called to move the book appointments calendar to the month we desire.
   - This is the current month shown on the calendar
 - `wanted_month`:
   - Type: `int`
-  - This is them onth we want the calendar to go to
+  - This is the month we want the calendar to go to
 
 #### How This Function Works
 
