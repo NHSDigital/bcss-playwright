@@ -19,8 +19,8 @@ For this utility we have the following functions/methods:
 
 ### Extract NHS No From PDF
 
-This is the main function that is called in order to process a batch.
-This will call the other two functions in order to successfully process a batch.
+This is called to extract all NHS numbers from a PDF file.
+The way it finds an NHS number is by looking for the string **"NHS No:"**
 
 #### Required Arguments
 
