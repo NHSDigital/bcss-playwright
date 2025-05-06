@@ -50,30 +50,28 @@ not work as intended). This can either be done locally or via a pipeline/workflo
 
 When we create new tests, or significantly change the functionality of a test, we should demonstrate these tests work
 by [recording the trace using Playwright](https://playwright.dev/python/docs/trace-viewer-intro) and attaching the
-<!-- vale off -->
-generated trace file to the associated ticket within Jira.
+generated trace file to the associated ticket within `Jira`.
 
-> NOTE: If the trace file exceeds the maximum file attachment size for Jira, we should
+> NOTE: If the trace file exceeds the maximum file attachment size for `Jira`, we should
 > upload the file to a Confluence page instead and link this back to the ticket.
-<!-- vale on -->
 
 When we modify existing tests (including any page objects or utilities used by these tests) but the behaviour of the test
 has not fundamentally changed, we should upload the generated HTML report from the Playwright execution to the
-<!-- vale off --> Jira ticket. <!-- vale on -->
+`Jira` ticket.
 
 #### Example
 
 We introduce a new test that covers the send a kit functionality for a single subject using `codegen` in the first instance.
 To demonstrate this test has worked as intended, we should turn tracing on and generate a trace file from Playwright and
-<!-- vale off --> attach this to the ticket in Jira. <!-- vale on -->
+attach this to the ticket in `Jira`.
 
 We then decide to refactor the test so that it uses a page object model for the send a kit page, but this does not change
 the behaviour of the test in any way (just makes the elements reusable). In this instance, we should upload the HTML report
-<!-- vale off --> to the Jira ticket showing the test passing as the logic of the test has not changed in any way. <!-- vale on -->
+to the `Jira` ticket showing the test passing as the logic of the test has not changed in any way.
 
 We then decide to create a utility that loops through several subjects at once and apply this to the previously created send
 a kit test. In this instance, we should turn tracing on again and generate a trace file from Playwright and attach this to the
-<!-- vale off --> ticket in Jira, because the logic of the test has fundamentally changed. <!-- vale on -->
+ticket in `Jira`, because the logic of the test has fundamentally changed.
 
 ## Coding Practices
 
