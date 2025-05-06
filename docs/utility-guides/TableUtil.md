@@ -7,22 +7,9 @@ The Table Utilities module provides helper functions to interact with and valida
 - [Utility Guide: Table Util](#utility-guide-table-util)
   - [Table of Contents](#table-of-contents)
   - [Functions Overview](#functions-overview)
-    - [Get Column Index](# get_column_index)
+    - [Get Column Index](#get-column-index)
       - [Required Arguments](#required-arguments)
       - [How This Function Works](#how-this-function-works)
-    - [click first link in column](# click_first_link_in_column)
-      - [Required Arguments](#required-arguments)
-      - [How This Function Works](#how-this-function-works) 
-    - [click first input in column](# click_first_input_in_column)
-      - [Required Arguments](#required-arguments)
-      - [How This Function Works](#how-this-function-works) 
-    - [format inner text](# _format_inner_text)
-      - [Required Arguments](#required-arguments)
-      - [How This Function Works](#how-this-function-works) 
-    - [get table headers](# get_table_headers)
-      - [Required Arguments](#required-arguments)
-      - [How This Function Works](#how-this-function-works)
-
 
 ## Functions Overview
 
@@ -32,7 +19,8 @@ For this utility we have the following functions:
 - `click_first_link_in_column`
 - `click_first_input_in_column`
 
-### get_column_index
+### Get Column Index
+
 This function returns the index (1-based) of a specified column name.
 
 #### Required Arguments
@@ -43,6 +31,6 @@ This function returns the index (1-based) of a specified column name.
 
 #### How This Function Works
 
-1.Attempts to identify table headers from <thead> or <tbody>.
-2.Iterates through header cells and matches text with column_name.
-3.Returns the index if found, otherwise raises an error.
+1. Attempts to identify table headers from <thead> or <tbody>.
+2. Iterates through header cells and matches text with column_name.
+3. Returns the index if found, otherwise raises an error.
