@@ -3,7 +3,7 @@
 The Calendar Picker utility allows us to use the different calendar pickers available on BCSS to select a date.
 
 ## Table of Contents
-
+<!-- vale off -->
 - [Utility Guide: Calendar Picker](#utility-guide-calendar-picker)
   - [Table of Contents](#table-of-contents)
   - [Functions Overview](#functions-overview)
@@ -43,7 +43,7 @@ The Calendar Picker utility allows us to use the different calendar pickers avai
     - [Select Day](#select-day)
       - [Required Arguments](#required-arguments-10)
       - [How This Function Works](#how-this-function-works-10)
-    - [Book First Eligbile Appointment](#book-first-eligbile-appointment)
+    - [Book First Eligible Appointment](#book-first-eligible-appointment)
       - [Required Arguments](#required-arguments-11)
       - [How This Function Works](#how-this-function-works-11)
     - [Book Appointments Go To Month](#book-appointments-go-to-month)
@@ -52,11 +52,11 @@ The Calendar Picker utility allows us to use the different calendar pickers avai
     - [Check For Eligible Appointment Dates](#check-for-eligible-appointment-dates)
       - [Required Arguments](#required-arguments-13)
       - [How This Function Works](#how-this-function-works-13)
-
+<!-- vale on -->
 ## Functions Overview
 
 For this utility we have the following methods:
-
+<!-- vale off -->
 - `calendar_picker_ddmmyyyy`
 - `calendar_picker_ddmonyy`
 - `v1_calender_picker`
@@ -73,9 +73,9 @@ For this utility we have the following methods:
   - `check_for_eligible_appointment_dates`
 
 ### Calendar Picker ddmmyyyy
-
+<!-- vale on -->
 This is called to enter a date in the correct format for the V1 calendar picker.
-You provide a date and a playwright locator and it will enter the date in the format dd/mm/yyyy (e.g. 16/01/2025).
+You provide a date and a playwright locator and it will enter the date in the format `dd/mm/yyyy` (e.g. 16/01/2025).
 
 #### Required Arguments
 
@@ -90,11 +90,11 @@ You provide a date and a playwright locator and it will enter the date in the fo
 
 1. This calls the `format_date` method from DateTimeUtils to get the date in the correct format.
 2. Once the date is formatted correctly it enters it into the provided locator.
-
+<!-- vale off -->
 ### Calendar Picker ddmonyy
-
+<!-- vale on -->
 This is called to enter a date in the correct format for the V2 calendar picker.
-You provide a date and a playwright locator and it will enter the date in the format dd month yy (e.g. 16 Jan 25).
+You provide a date and a playwright locator and it will enter the date in the format `dd month yy` (e.g. 16 Jan 25).
 
 #### Required Arguments
 
@@ -108,13 +108,13 @@ You provide a date and a playwright locator and it will enter the date in the fo
 #### How This Function Works
 
 1. This calls the `format_date` method from DateTimeUtils to get the date in the correct format.
-   1. As the formatting for the python datetime function differes between operating systems, there is a check first to see what OS is in use.
+   1. As the formatting for the datetime function differes between operating systems, there is a check first to see what OS is in use.
    2. From here it calls the correct formatting option.
 2. Once the date is formatted correctly it enters it into the provided locator.
 
 ### V1 Calendar Picker
 
-This is called to select a date from the V1 calender picker, which can be seen on the Subject Screening Search page.
+This is called to select a date from the V1 calendar picker, which can be seen on the Subject Screening Search page.
 
 #### Required Arguments
 
@@ -124,11 +124,11 @@ This is called to select a date from the V1 calender picker, which can be seen o
 
 #### How This Function Works
 
-1. This starts of by getting the current date the the calendar picker is on and storing it in a variable: `current_date`.
+1. This starts of by getting the current date that the calendar picker is on and storing it in a variable: `current_date`.
 2. Once that is done it calls the `calculate_years_and_months_to_traverse` method to know how many times to click each button to increase/decrease the years or months, and stores them in: `years_to_traverse` and `months_to_traverse`.
 3. Once we know how many times each button needs to be clicked we call the method: `traverse_years_in_v1_calendar`.
 4. After the correct year is selected we call the `traverse_months_in_v1_calendar` method to get to the correct month.
-5. Finally, after the correcft year and month is displayed we call the `select_day` method.
+5. Finally, after the correct year and month is displayed we call the `select_day` method.
 
 ### Calculate Years and Months to Traverse
 
@@ -193,7 +193,7 @@ This is called to move the V1 calendar picker to the correct month.
 
 ### V2 Calendar Picker
 
-This is called to select a date using the V2 calendar picker, which cna be seen on the Active Batch List page.
+This is called to select a date using the V2 calendar picker, which can be seen on the Active Batch List page.
 
 #### Required Arguments
 
@@ -206,7 +206,7 @@ This is called to select a date using the V2 calendar picker, which cna be seen 
 1. Firstly it stores the current date in a variable: `current_date`.
 2. Then `current_date` and `date` are passed onto the `calculate_v2_calendar_variables` method to calculate the necessary variables to traverse this calendar.
 3. Once these variable have been calculated we call the `v2_calendar_picker_traverse_back` method to "go back in time" an expand the view of available years.
-4. After we have traversed far back enough to be able to select the years we want, we call the `v2_calendar_picker_traverse_forward` methos which will take us the the year and month we want to go to.
+4. After we have traversed far back enough to be able to select the years we want, we call the `v2_calendar_picker_traverse_forward` methos which will take us to the year and month we want to go to.
 5. Finally we call the `select_day` method to select the correct day from the calendar picker.
 
 ### Calculate V2 Calendar Variables
@@ -235,10 +235,10 @@ This is called to calculate all, of the variables needed to traverse the V2 cale
   - This is the month we want to go to as a shorter string: *Jun* / *Apr*
 - `current_year`:
   - Type: `int`
-  - This is the current year as an integer in yyyy format: *2025*
+  - This is the current year as an integer in `yyyy` format: *2025*
 - `year`:
   - Type: `int`
-  - This is the year we want to go to as an integer in yyyy format: *1996*
+  - This is the year we want to go to as an integer in `yyyy` format: *1996*
 - `current_decade`:
   - Type: `int`
   - This is the current decade we are in: *2020*
@@ -263,7 +263,7 @@ This is called to calculate all, of the variables needed to traverse the V2 cale
    2. E.g. 2025 // 100 = 20
    3. 20 * 100 = 2000
 4. After we calculate `current_decade`.
-   1. This is achieved by subtrracting `current_century` from `current_year`, then dividing the result by 10 and multiplying that by 10. Finally we add this result back to `current_century`.
+   1. This is achieved by subtracting `current_century` from `current_year`, then dividing the result by 10 and multiplying that by 10. Finally we add this result back to `current_century`.
    2. E.g. 2025 - 2000 = 25
    3. 25 // 10 = 2
    4. 2 * 10 = 20
@@ -273,7 +273,7 @@ This is called to calculate all, of the variables needed to traverse the V2 cale
 
 ### V2 Calendar Picker Traverse Back
 
-This is called to "go back" in the V2 calendar picker. It expands the scope of avaialbe years to select which makes traversing this calendar quicker if we need to select a date manyh years in the future or past.
+This is called to "go back" in the V2 calendar picker. It expands the scope of available years to select which makes traversing this calendar quicker if we need to select a date many years in the future or past.
 
 #### Required Arguments
 
@@ -285,10 +285,10 @@ This is called to "go back" in the V2 calendar picker. It expands the scope of a
   - This is the month we want to select as a string: *June*
 - `current_year`:
   - Type: `int`
-  - This is the current year as an integer in yyyy format: *2025*
+  - This is the current year as an integer in `yyyy` format: *2025*
 - `year`:
   - Type: `int`
-  - This is the year of the date we want to select as an integer in yyyy format: *1996*
+  - This is the year of the date we want to select as an integer in `yyyy` format: *1996*
 - `current_decade`
   - Type: `int`
   - This is the current decade we are in: *2020*
@@ -377,7 +377,7 @@ This is called to narrow down the scope of available years on the V2 calendar pi
 
 ### Select Day
 
-This is called to select the day of the date we want othe calendar picker to go to.
+This is called to select the day of the date we want the calendar picker to go to.
 
 #### Required Arguments
 
@@ -400,7 +400,7 @@ This is called to select the day of the date we want othe calendar picker to go 
    2. If the date we want to select is greater than 15 and `number_of_cells_with_day` is greater than 1, we select the last option in `all_days`.
    3. Otherwise if `number_of_cells_with_day` is set to 1, we select that date.
 
-### Book First Eligbile Appointment
+### Book First Eligible Appointment
 
 This is called to select the first date with appointment slots available
 
@@ -444,13 +444,13 @@ This is called to move the book appointments calendar to the month we desire.
 
 #### How This Function Works
 
-1. Firstly it caclulates the difference between `current_displayed_month` and `wanted_month` anmd stores the result in `month_difference`.
+1. Firstly it caclulates the difference between `current_displayed_month` and `wanted_month` and stores the result in `month_difference`.
 2. Then if `month_difference` is greater than 0, it runs a for loop for the value of `month_difference` clicking on the previous month button once per loop.
 3. If `month_difference` is less than 0, it runs a for loop for the value of `month_difference` clicking on the next month button once per loop.
 
 ### Check For Eligible Appointment Dates
 
-This function loops through all of the appointment date cells to click on the first avaiable date.
+This function loops through all of the appointment date cells to click on the first available date.
 
 #### Required Arguments
 
@@ -459,13 +459,13 @@ This function loops through all of the appointment date cells to click on the fi
   - This is the locator for all of the appointment date cells
 - `bg_colours`:
   - Type: `list`
-  - This is a list contaning all of the background colours we want to click on
+  - This is a list containing all of the background colours we want to click on
 
 #### How This Function Works
 
 1. Firstly it gets the number of total cells and stores them in the variable `locator_count`.
 2. Then it runs a `FOR` loop for the value stored in `locator_count`.
-3. Here it loops through each locator checking if the background colout matches any provided in `bg_colours`.
-4. If it find a match then it checks the length on the "name" attribure of that cell.
+3. Here it loops through each locator checking if the background colour matches any provided in `bg_colours`.
+4. If it find a match then it checks the length on the "name" attribute of that cell.
    1. If it is less than 5 characters long, it belongs to the first calendar on the screen and is clicked.
    2. Otherwise it is ignored.
