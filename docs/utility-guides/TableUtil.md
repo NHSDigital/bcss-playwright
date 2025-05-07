@@ -9,34 +9,34 @@ The Table Utilities module provides helper functions to interact with and valida
     - [Get Column Index](#get-column-index)
       - [Required Arguments](#required-arguments)
       - [How This Function Works](#how-this-function-works)
-    - [Click first link in Column](#click-first-link-in-column)
+    - [Click First Link In Column](#click-first-link-in-column)
       - [Required Arguments](#required-arguments-1)
       - [How This Function Works](#how-this-function-works-1)
-    - [Click first input in Column](#click-first-input-in-column)
+    - [Click First Input In Column](#click-first-input-in-column)
       - [Required Arguments](#required-arguments-2)
       - [How This Function Works](#how-this-function-works-2)
-    - [\_format\_inner\_text](#_format_inner_text)
+    - [Format Inner Text](#format-inner-text)
       - [Required Arguments](#required-arguments-3)
       - [How This Function Works](#how-this-function-works-3)
-    - [get\_table\_headers](#get_table_headers)
+    - [Get Table Headers](#get-table-headers)
       - [Required Arguments](#required-arguments-4)
       - [How This Function Works](#how-this-function-works-4)
-    - [get\_row\_count](#get_row_count)
+    - [Get Row Count](#get-row-count)
       - [Required Arguments](#required-arguments-5)
       - [How This Function Works](#how-this-function-works-5)
-    - [pick\_row](#pick_row)
+    - [Pick Row](#pick-row)
       - [Required Arguments](#required-arguments-6)
       - [How This Function Works](#how-this-function-works-6)
-    - [pick\_random\_row](#pick_random_row)
+    - [Pick Random Row](#pick-random-row)
       - [Required Arguments](#required-arguments-7)
       - [How This Function Works](#how-this-function-works-7)
-    - [pick\_random\_row\_number](#pick_random_row_number)
+    - [Pick Random Row Number](#pick-random-row-number)
       - [Required Arguments](#required-arguments-8)
       - [How This Function Works](#how-this-function-works-8)
-    - [get\_row\_data\_with\_headers](#get_row_data_with_headers)
+    - [Get Row Data With Headers](#get-row-data-with-headers)
       - [Required Arguments](#required-arguments-9)
       - [How This Function Works](#how-this-function-works-9)
-    - [get\_full\_table\_with\_headers](#get_full_table_with_headers)
+    - [Get Full Table With Headers](#get-full-table-with-headers)
       - [Required Arguments](#required-arguments-10)
       - [How This Function Works](#how-this-function-works-10)
 
@@ -56,7 +56,7 @@ This function returns the index (1-based) of a specified column name.
 2. Iterates through header cells and matches text with `column_name`.
 3. Returns the index if found, otherwise raises an error.
 
-### Click first link in Column
+### Click First Link In Column
 
 Clicks on the first hyperlink present in a specified column.
 
@@ -72,7 +72,7 @@ Clicks on the first hyperlink present in a specified column.
 2. Searches the first visible row in the column for an <a> tag.
 3. Clicks the first available link found.
 
-### Click first input in Column
+### Click First Input In Column
 
 Clicks on the first input element (e.g., checkbox/radio) in a specific column.
 
@@ -88,7 +88,7 @@ Clicks on the first input element (e.g., checkbox/radio) in a specific column.
 2. Checks the first visible row for an <input> tag in that column.
 3. Clicks the first input found.
 
-### _format_inner_text
+### Format Inner Text
 
 Formats inner text of a row string into a dictionary.
 
@@ -104,7 +104,7 @@ Formats inner text of a row string into a dictionary.
 2. Enumerates the result and maps index to cell value.
 3. Returns a dictionary representing the row.
 
-### get_table_headers
+### Get Table Headers
 
 Extracts and returns table headers.
 
@@ -118,7 +118,7 @@ Extracts and returns table headers.
 2. Captures the visible text of each <th>.
 3. Returns a dictionary mapping index to header text.
 
-### get_row_count
+### Get Row Count
 
 Returns the count of visible rows in the table.
 
@@ -132,7 +132,7 @@ Returns the count of visible rows in the table.
 2. Filters to include only visible rows.
 3. Returns the total count.
 
-### pick_row
+### Pick Row
 
 Returns a locator for a specific row.
 
@@ -147,7 +147,7 @@ Returns a locator for a specific row.
 1. Builds a locator for the nth <tr> inside <tbody>.
 2. Returns the locator object.
 
-### pick_random_row
+### Pick Random Row
 
 Picks and returns a random row locator.
 
@@ -161,7 +161,7 @@ None
 2. Uses a secure random generator to pick one.
 3. Returns the locator for that row.
 
-### pick_random_row_number
+### Pick Random Row Number
 
 Returns the number of a randomly selected row.
 
@@ -175,7 +175,7 @@ None
 2. Randomly selects an index using secrets.choice.
 3. Returns the numeric index.
 
-### get_row_data_with_headers
+### Get Row Data With Headers
 
 Returns a dictionary of header-value pairs for a given row.
 
@@ -191,7 +191,7 @@ Returns a dictionary of header-value pairs for a given row.
 2. Retrieves headers using get_table_headers.
 3. Maps each cell to its respective header.
 
-### get_full_table_with_headers
+### Get Full Table With Headers
 
 Constructs a dictionary of the entire table content.
 
