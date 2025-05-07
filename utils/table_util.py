@@ -32,7 +32,7 @@ class TableUtils:
         Works even if <thead> is missing and header is inside <tbody>.
 
         Args:
-             column_name(str): Name of the column (e.g., 'NHS Number')
+            column_name(str): Name of the column (e.g., 'NHS Number')
 
         Return:
             An int (1-based column index or -1 if not found)
