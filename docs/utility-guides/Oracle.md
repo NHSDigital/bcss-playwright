@@ -14,8 +14,7 @@ The Oracle Utility can be used to run SQL queries or stored procedures on the Or
 
 ## Using the Oracle Utility
 
-To use the Oracle Utility, import the 'OracleDB' class into your test file and then call the DateTimeUtils
-methods from within your tests, as required.
+To use the Oracle Utility, import the 'OracleDB' class into your test file and then call the OracleDB methods from within your tests, as required.
 
 ## Required arguments
 
