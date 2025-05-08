@@ -9,7 +9,6 @@ The fit_kit_generation Utility provides methods to generate and manage FIT test 
   - [Using the fit\_kit\_generation Utility](#using-the-fit_kit_generation-utility)
   - [Required Arguments](#required-arguments)
   - [fit\_kit\_generation Specific Functions](#fit_kit_generation-specific-functions)
-  - [fit\_kit\_generation Specific Functions](#fit_kit_generation-specific-functions-1)
   - [Example Usage](#example-usage)
 
 ## Using the fit_kit_generation Utility
@@ -20,52 +19,30 @@ To use the fit_kit_generation Utility, import the `fit_kit_generation` module, f
 
 The methods in this utility require specific arguments. Below is a summary of the required arguments for key methods:
 - `generate_kit`: Requires `batch_id` (int) and `kit_type` (str).
+
 ## fit_kit_generation Specific Functions
 
 The fit_kit_generation Utility includes methods for generating, validating, and managing FIT test kits. These methods are designed to streamline the process of creating test kits for various scenarios. Below are some key functions:
 
-1. **`create_fit_id_df(tk_type_id: int, hub_id: int, no_of_kits: int) -> DataFrame`**  
-   Creates a DataFrame containing FIT kit IDs based on the provided parameters.  
+1. **`create_fit_id_df(tk_type_id: int, hub_id: int, no_of_kits: int) -> DataFrame`**
+   Creates a DataFrame containing FIT kit IDs based on the provided parameters.
    - **Arguments**:
      - `tk_type_id` (int): The type ID of the test kit.
      - `hub_id` (int): The hub ID associated with the kits.
      - `no_of_kits` (int): The number of kits to retrieve.
    - **Returns**: A pandas DataFrame with the FIT kit IDs.
 
-2. **`calculate_check_digit(kit_id: str) -> str`**  
-   Calculates and appends a check digit to the given kit ID.  
+2. **`calculate_check_digit(kit_id: str) -> str`**
+   Calculates and appends a check digit to the given kit ID.
    - **Arguments**:
      - `kit_id` (str): The kit ID to process.
    - **Returns**: The kit ID with the appended check digit.
 
-3. **`convert_kit_id_to_fit_device_id(kit_id: str) -> str`**  
-   Converts a kit ID into a FIT Device ID.  
+3. **`convert_kit_id_to_fit_device_id(kit_id: str) -> str`**
+   Converts a kit ID into a FIT Device ID.
    - **Arguments**:
      - `kit_id` (str): The kit ID to convert.
    - **Returns**: The corresponding FIT Device ID.
-
-## fit_kit_generation Specific Functions
-
-The fit_kit_generation Utility includes methods for generating, validating, and managing FIT test kits. These methods are designed to streamline the process of creating test kits for various scenarios. Below are some key functions:
-
-1. **`generate_kit(batch_id: int, kit_type: str) -> dict`**  
-   Generates a FIT test kit with the specified batch ID and kit type.  
-   - **Arguments**:
-     - `batch_id` (int): The ID of the batch to which the kit belongs.
-     - `kit_type` (str): The type of kit to generate (e.g., "Standard", "Advanced").
-   - **Returns**: A dictionary containing the details of the generated kit.
-
-2. **`validate_kit(kit_id: int) -> bool`**  
-   Validates a FIT test kit by its ID.  
-   - **Arguments**:
-     - `kit_id` (int): The ID of the kit to validate.
-   - **Returns**: `True` if the kit is valid, `False` otherwise.
-
-3. **`manage_kits(action: str, kit_ids: list[int]) -> None`**  
-   Performs bulk actions on a list of FIT test kits.  
-   - **Arguments**:
-     - `action` (str): The action to perform (e.g., "activate", "deactivate").
-     - `kit_ids` (list[int]): A list of kit IDs to apply the action to.
 
 ## Example Usage
 
