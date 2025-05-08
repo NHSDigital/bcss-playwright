@@ -3,7 +3,6 @@ import logging
 import pandas as pd
 from datetime import datetime
 from enum import IntEnum
-from utils.data_validation import DataValidation
 
 
 class SqlQueryValues(IntEnum):
@@ -52,7 +51,7 @@ def get_kit_id_from_db(
         "subjects_to_retrieve": no_of_kits_to_retrieve,
     }
 
-    kit_id_df = DataValidation().check_for_duplicate_records(query, params)
+    kit_id_df = OracleDB().execute_query(query, params)
 
     return kit_id_df
 
@@ -115,7 +114,7 @@ def get_kit_id_logged_from_db(smokescreen_properties: dict) -> pd.DataFrame:
         "subjects_to_retrieve": smokescreen_properties["c3_total_fit_kits_to_retrieve"],
     }
 
-    kit_id_df = DataValidation().check_for_duplicate_records(query, params)
+    kit_id_df = OracleDB().execute_query(query, params)
 
     return kit_id_df
 
@@ -303,7 +302,7 @@ def get_subjects_for_appointments(subjects_to_retrieve: int) -> pd.DataFrame:
         "subjects_to_retrieve": subjects_to_retrieve,
     }
 
-    subjects_df = DataValidation().check_for_duplicate_records(query, params)
+    subjects_df = OracleDB().execute_query(query, params)
 
     return subjects_df
 
@@ -321,7 +320,7 @@ def get_subjects_with_booked_appointments(subjects_to_retrieve: int) -> pd.DataF
         subjects_df (pd.DataFrame): A pandas DataFrame containing the result of the query
     """
 
-    query = """select a.appointment_date, s.subject_nhs_number, c.person_family_name, c.person_given_name
+    query = """select distinct(s.subject_nhs_number), a.appointment_date, c.person_family_name, c.person_given_name
     from
     (select count(*), ds.screening_subject_id
     from
@@ -362,6 +361,6 @@ def get_subjects_with_booked_appointments(subjects_to_retrieve: int) -> pd.DataF
         "subjects_to_retrieve": subjects_to_retrieve,
     }
 
-    subjects_df = DataValidation().check_for_duplicate_records(query, params)
+    subjects_df = OracleDB().execute_query(query, params)
 
     return subjects_df
