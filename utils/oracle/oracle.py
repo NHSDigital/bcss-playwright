@@ -29,7 +29,7 @@ class OracleDB:
             return conn
         except Exception as queryExecutionError:
             logging.error(
-                f"Failed to to extract subject ID with error: {queryExecutionError}"
+                f"Failed to extract subject ID with error: {queryExecutionError}"
             )
 
     def disconnect_from_db(self, conn: oracledb.Connection) -> None:
