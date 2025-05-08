@@ -13,7 +13,7 @@ The Fit Kit Generation Utility provides methods to generate and manage FIT test 
 
 ## Using the Fit Kit Generation Utility
 
-To use the Fit Kit Generation Utility, import the `fit_kit_generation` module, from the `utils` directory, into your test file and call its methods from within your tests, as required. To generate the fit kit IDs, the only method required is create_fit_id_df. This will return a dataframe with all the transformations already taking place.
+To use the Fit Kit Generation Utility, import the `fit_kit_generation` module, from the `utils` directory, into your test file and call its methods from within your tests, as required. To generate the fit kit IDs, the only method required is `create_fit_id_df`. This will return a `dataframe` with all the transformations already taking place.
 
 ## Required Arguments
 
