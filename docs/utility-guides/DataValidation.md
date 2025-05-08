@@ -20,7 +20,7 @@ If duplicate records are detected, then it will remove them and re-run the query
 To use this utility import the `DataValidation` class and then call the method `check_for_duplicate_records()`.<br>
 Here you will need to provide the SQL query as a multiple line string ensuring that the final line has: **fetch first :subjects_to_retrieve rows only**.<br>
 This is necessary as this line is later replaced with an offset if duplicates are found.<br>
-You will also need to prove any parameters used in the query as a dictionary
+You will also need to provide any parameters used in the query as a dictionary
 
 ## Example usage
 
