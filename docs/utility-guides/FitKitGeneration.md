@@ -1,28 +1,28 @@
-# Utility Guide: fit_kit_generation
+# Utility Guide: Fit Kit Generation
 
-The fit_kit_generation Utility provides methods to generate and manage FIT test kits for testing purposes.
+The Fit Kit Generation Utility provides methods to generate and manage FIT test kits for testing purposes.
 
 ## Table of Contents
 
-- [Utility Guide: fit\_kit\_generation](#utility-guide-fit_kit_generation)
+- [Utility Guide: Fit Kit Generation](#utility-guide-fit-kit-generation)
   - [Table of Contents](#table-of-contents)
-  - [Using the fit\_kit\_generation Utility](#using-the-fit_kit_generation-utility)
+  - [Using the Fit Kit Generation Utility](#using-the-fit-kit-generation-utility)
   - [Required Arguments](#required-arguments)
-  - [fit\_kit\_generation Specific Functions](#fit_kit_generation-specific-functions)
+  - [Fit Kit Generation Specific Functions](#fit-kit-generation-specific-functions)
   - [Example Usage](#example-usage)
 
-## Using the fit_kit_generation Utility
+## Using the Fit Kit Generation Utility
 
-To use the fit_kit_generation Utility, import the `fit_kit_generation` module, from the `utils` directory, into your test file and call its methods from within your tests, as required.
+To use the Fit Kit Generation Utility, import the `fit_kit_generation` module, from the `utils` directory, into your test file and call its methods from within your tests, as required.
 
 ## Required Arguments
 
 The methods in this utility require specific arguments. Below is a summary of the required arguments for key methods:
 - `generate_kit`: Requires `batch_id` (int) and `kit_type` (str).
 
-## fit_kit_generation Specific Functions
+## Fit Kit Generation Specific Functions
 
-The fit_kit_generation Utility includes methods for generating, validating, and managing FIT test kits. These methods are designed to streamline the process of creating test kits for various scenarios. Below are some key functions:
+The Fit Kit Generation Utility includes methods for generating, validating, and managing FIT test kits. These methods are designed to streamline the process of creating test kits for various scenarios. Below are some key functions:
 
 1. **`create_fit_id_df(tk_type_id: int, hub_id: int, no_of_kits: int) -> DataFrame`**
    Creates a DataFrame containing FIT kit IDs based on the provided parameters.
