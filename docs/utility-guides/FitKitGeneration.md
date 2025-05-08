@@ -13,7 +13,7 @@ The Fit Kit Generation Utility provides methods to generate and manage FIT test 
 
 ## Using the Fit Kit Generation Utility
 
-To use the Fit Kit Generation Utility, import the `fit_kit_generation` module, from the `utils` directory, into your test file and call its methods from within your tests, as required.
+To use the Fit Kit Generation Utility, import the `fit_kit_generation` module, from the `utils` directory, into your test file and call its methods from within your tests, as required. To generate the fit kit IDs, the only method required is create_fit_id_df. This will return a dataframe with all the transformations already taking place.
 
 ## Required Arguments
 
@@ -56,18 +56,13 @@ def example_usage() -> None:
     hub_id = 101
     no_of_kits_to_retrieve = 2
 
-    # Step 1: Retrieve and process FIT kit data
+    # Calling the fit_kit_df method will do the following:
+      # Step 1: Retrieve and process FIT kit data
+      # Step 2: Calculate a check digit for a single kit ID
+      # Step 3: Convert a kit ID to a FIT Device ID
+
     fit_kit_df = create_fit_id_df(tk_type_id, hub_id, no_of_kits_to_retrieve)
     print("Processed FIT Kit DataFrame:")
     print(fit_kit_df)
-
-    # Step 2: Calculate a check digit for a single kit ID
-    kit_id = "ABC123"
-    kit_with_check_digit = calculate_check_digit(kit_id)
-    print(f"Kit ID with Check Digit: {kit_with_check_digit}")
-
-    # Step 3: Convert a kit ID to a FIT Device ID
-    fit_device_id = convert_kit_id_to_fit_device_id(kit_with_check_digit)
-    print(f"FIT Device ID: {fit_device_id}")
 
 example_usage()
