@@ -18,6 +18,7 @@ To use the Fit Kit Generation Utility, import the `fit_kit_generation` module, f
 ## Required Arguments
 
 The methods in this utility require specific arguments. Below is a summary of the required arguments for key methods:
+
 - `generate_kit`: Requires `batch_id` (int) and `kit_type` (str).
 
 ## Fit Kit Generation Specific Functions
