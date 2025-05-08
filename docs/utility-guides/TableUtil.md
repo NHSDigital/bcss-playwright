@@ -42,13 +42,14 @@ The Table Utilities module provides helper functions to interact with and valida
 
 ### Get Column Index
 
-This function returns the index (1-based) of a specified column name.
+This function returns the index (1-based) of a specified column name.1-based indexing means the first column is considered index 1 (not 0 as in Python lists).
+If the column is not found, the function returns -1.
 
 #### Required Arguments
 
--`column_name`:
- -Type: `str`
- -The visible header text of the column to locate.
+- `column_name`:
+  - Type: `str`
+  - The visible header text of the column to locate.
 
 #### How This Function Works
 
@@ -62,14 +63,14 @@ Clicks on the first hyperlink present in a specified column.
 
 #### Required Arguments
 
--`column_name`:
- -Type: `str`
- -The column in which the link needs to be found.
+- `column_name`:
+  - Type: `str`
+  - The column in which the link needs to be found.
 
 #### How This Function Works
 
 1. Finds the index of the specified column.
-2. Searches the first visible row in the column for an <a> tag.
+2. Searches the first visible row in the column for an `<a>` tag.
 3. Clicks the first available link found.
 
 ### Click First Input In Column
@@ -78,14 +79,14 @@ Clicks on the first input element (e.g., checkbox/radio) in a specific column.
 
 #### Required Arguments
 
--`column_name`:
- -Type: `str`
- -The name of the column containing the input element.
+- `column_name`:
+  - Type: `str`
+  - The name of the column containing the input element.
 
 #### How This Function Works
 
 1. Locates the index of the specified column.
-2. Checks the first visible row for an <input> tag in that column.
+2. Checks the first visible row for an `<input>` tag in that column.
 3. Clicks the first input found.
 
 ### Format Inner Text
@@ -94,9 +95,9 @@ Formats inner text of a row string into a dictionary.
 
 #### Required Arguments
 
--data:
- -Type: `str`
- -Raw inner text of a table row (tab-delimited).
+- data:
+  - Type: `str`
+  - Raw inner text of a table row (tab-delimited).
 
 #### How This Function Works
 
@@ -110,7 +111,7 @@ Extracts and returns table headers.
 
 #### Required Arguments
 
--None
+- None
 
 #### How This Function Works
 
@@ -124,7 +125,7 @@ Returns the count of visible rows in the table.
 
 #### Required Arguments
 
--None
+- None
 
 #### How This Function Works
 
@@ -138,9 +139,9 @@ Returns a locator for a specific row.
 
 #### Required Arguments
 
--`row_number`:
- -Type: `int`
- -The row index to locate (1-based).
+- `row_number`:
+  - Type: `int`
+  - The row index to locate (1-based).
 
 #### How This Function Works
 
@@ -153,7 +154,7 @@ Picks and returns a random row locator.
 
 #### Required Arguments
 
-None
+- None
 
 #### How This Function Works
 
@@ -167,7 +168,7 @@ Returns the number of a randomly selected row.
 
 #### Required Arguments
 
-None
+- None
 
 #### How This Function Works
 
@@ -181,9 +182,9 @@ Returns a dictionary of header-value pairs for a given row.
 
 #### Required Arguments
 
--`row_number`:
- -Type:int
- -Index of the target row (1-based).
+- `row_number`:
+  - Type:int
+  - Index of the target row (1-based).
 
 #### How This Function Works
 
@@ -197,7 +198,7 @@ Constructs a dictionary of the entire table content.
 
 #### Required Arguments
 
--None
+- None
 
 #### How This Function Works
 

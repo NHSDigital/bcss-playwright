@@ -32,7 +32,7 @@ class TableUtils:
         Works even if <thead> is missing and header is inside <tbody>.
 
         Args:
-            column_name(str): Name of the column (e.g., 'NHS Number')
+            column_name (str): Name of the column (e.g., 'NHS Number')
 
         Return:
             An int (1-based column index or -1 if not found)
@@ -58,7 +58,7 @@ class TableUtils:
         Clicks the first link found in the given column.
 
         Args:
-            column_name: Name of the column containing links
+            column_name (str): Name of the column containing links
         """
         column_index = self.get_column_index(column_name)
         if column_index == -1:
@@ -78,7 +78,7 @@ class TableUtils:
         Clicks the first input found in the given column. E.g. Radios
 
         Args:
-            column_name: Name of the column containing inputs
+            column_name (str): Name of the column containing inputs
         """
         column_index = self.get_column_index(column_name)
         if column_index == -1:
