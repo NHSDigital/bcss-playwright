@@ -15,7 +15,7 @@ class PropertiesFile:
         Returns a dictionary of properties for use in tests.
 
         Args:
-            type_of_properties_file (str): the type of properties file you want to load. e.g. 'smokescreen' or 'general'
+            type_of_properties_file (str): The type of properties file you want to load. e.g. 'smokescreen' or 'general'
 
         Returns:
             dict: A dictionary containing the values loaded from the 'bcss_smokescreen_tests.properties' file.
