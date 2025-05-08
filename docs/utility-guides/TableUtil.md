@@ -6,6 +6,8 @@ The Table Utilities module provides helper functions to interact with and valida
 
 - [Utility Guide: Table Utility](#utility-guide-table-utility)
   - [Table of Contents](#table-of-contents)
+  - [Using the Table Utility](#using-the-table-utility)
+  - [Example usage](#example-usage)
     - [Get Column Index](#get-column-index)
       - [Required Arguments](#required-arguments)
       - [How This Function Works](#how-this-function-works)
@@ -39,6 +41,31 @@ The Table Utilities module provides helper functions to interact with and valida
     - [Get Full Table With Headers](#get-full-table-with-headers)
       - [Required Arguments](#required-arguments-10)
       - [How This Function Works](#how-this-function-works-10)
+
+## Using the Table Utility
+
+To use the Table Utility, import the `TableUtils` class into your POM file and then define the actions using the its methods as needed.
+
+## Example usage
+
+Below is an example of how the TableUtils used in reports_page.py
+
+    from utils.table_util import TableUtils
+    class ReportsPage(BasePage):
+    """Reports Page locators, and methods for interacting with the page."""
+
+      def __init__(self, page):
+        super().__init__(page)
+        self.page = page
+
+        # Initialize TableUtils for different tables
+        self.failsafe_reports_sub_links_table = TableUtils(page, "#listReportDataTable")
+        self.fail_safe_reports_screening_subjects_with_inactive_open_episodes_table = (
+            TableUtils(page, "#subjInactiveOpenEpisodes")
+        )
+      def click_failsafe_reports_sub_links(self):
+        """Clicks the first NHS number link from the primary report table."""
+        self.failsafe_reports_sub_links_table.click_first_link_in_column("NHS Number")
 
 ### Get Column Index
 
