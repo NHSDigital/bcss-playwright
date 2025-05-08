@@ -34,7 +34,7 @@ To add values to the properties file follow the format:
 
 ## Using the Load Properties Utility
 
-To use the this utility in a test reference the pytest fixture in `conftest.py`.<br>
+To use this utility in a test reference the pytest fixture in `conftest.py`.<br>
 There is no need to import anything as any fixtures in `conftest.py` will be automatically discovered by pytest.
 Here there are two fixtures:
 
