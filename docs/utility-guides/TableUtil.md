@@ -42,7 +42,7 @@ The Table Utilities module provides helper functions to interact with and valida
 
 ### Get Column Index
 
-This function returns the index (1-based) of a specified column name.1-based indexing means the first column is considered index 1 (not 0 as in Python lists).
+This function returns the index (1-based) of a specified column name. 1-based indexing means the first column is considered index 1 (not 0 as in Python lists).
 If the column is not found, the function returns -1.
 
 #### Required Arguments
