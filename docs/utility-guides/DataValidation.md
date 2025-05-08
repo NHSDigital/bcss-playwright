@@ -12,7 +12,7 @@ The Data Validation Utility can be used to check if there are any duplicate valu
 
 ## How This Works
 
-This utility first runs the sql query and then uses functionality from pandas to check if there are duplicate records.<br>
+This utility first runs the SQL query and then uses functionality from pandas to check if there are duplicate records.<br>
 If duplicate records are detected, then it will remove them and re-run the query to replace the dropped records.
 
 ## Using the Data Validation Utility
