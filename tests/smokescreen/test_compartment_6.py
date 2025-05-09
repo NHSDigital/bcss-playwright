@@ -8,6 +8,7 @@ from pages.screening_subject_search.subject_screening_summary_page import (
 )
 from utils.batch_processing import batch_processing
 from pages.logout.log_out_page import LogoutPage
+from pages.datasets.subject_datasets_page import SubjectDatasetsPage
 
 
 @pytest.mark.vpn_required
@@ -27,16 +28,15 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
 
     # This needs to be repeated for two subjects, one old and one not - High Risk Result
-    nhs_no = "9619187075"
+    nhs_no = "9619187075"  # Dummy NHS Number (will not work)
     verify_subject_event_status_by_nhs_no(
         page, nhs_no, "A323 - Post-investigation Appointment NOT Required"
     )
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_investigation_show_datasets()
 
-    page.locator("div").filter(
-        has_text="Investigation (1 Dataset) Show Dataset"
-    ).get_by_role("link").click()
+    # The following code is on the investigation datasets page
     page.locator("#UI_SITE_SELECT_LINK").click()
     page.locator("#UI_RESULTS_rljsjnkh").select_option("35317")
     page.locator("#UI_SSP_PIO_SELECT_LINK").click()
@@ -111,74 +111,75 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     ).click()
 
     expect(page.get_by_text("High-risk findings")).to_be_visible()
-    page.get_by_role("link", name="Back").click()
-    expect(page.get_by_text("** Completed **").nth(1)).to_be_visible()
-    page.get_by_role("link", name="Back").click()
+    BasePage(page).click_back_button()
 
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    # The following code is on the subject datasets page
+    expect(page.get_by_text("** Completed **").nth(1)).to_be_visible()
+    BasePage(page).click_back_button()
+
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    # The following code is on the advance fobt screening episode page
     page.get_by_role("button", name="Enter Diagnostic Test Outcome").click()
+    # The following code is on the diagnostic test outcome page
     expect(page.get_by_role("cell", name="High-risk findings").nth(1)).to_be_visible()
     page.get_by_label("Outcome of Diagnostic Test").select_option("20365")
     page.get_by_role("button", name="Save").click()
 
     # This is if the subject is too old
-    expect(
-        page.get_by_role(
-            "cell",
-            name="A394 - Handover into Symptomatic Care for Surveillance - Patient Age",
-            exact=True,
-        )
-    ).to_be_visible()
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+        "A394 - Handover into Symptomatic Care for Surveillance - Patient Age"
+    )
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+
+    # The following code is on the advance fobt screening episode page
     page.get_by_role("button", name="Handover into Symptomatic Care").click()
+
+    # The following code is on the handover into symptomatic care page
     page.get_by_label("Referral").select_option("20445")
     page.get_by_role("button", name="Calendar").click()
-    page.get_by_role("cell", name="9", exact=True).click()
+    page.get_by_role(
+        "cell", name="9", exact=True
+    ).click()  # Todays date (v1 calendar picker)
     page.locator("#UI_NS_CONSULTANT_PIO_SELECT_LINK").click()
     page.locator("#UI_RESULTS_usgwmbob").select_option("201")
     page.locator("#UI_NS_PRACTITIONER_PIO_SELECT_LINK").click()
     page.get_by_role("textbox", name="Notes").click()
     page.get_by_role("textbox", name="Notes").fill("Test Automation")
-    page.once("dialog", lambda dialog: dialog.dismiss())
+    page.once("dialog", lambda dialog: dialog.accept())
     page.get_by_role("button", name="Save").click()
-    expect(
-        page.get_by_role(
-            "cell", name="A385 - Handover into Symptomatic Care", exact=True
-        )
-    ).to_be_visible()
+
+    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+        "A385 - Handover into Symptomatic Care"
+    )
 
     # This is if the subject is not too old
-    expect(
-        page.get_by_role(
-            "cell",
-            name="A318 - Post-investigation Appointment NOT Required - Result Letter Created",
-            exact=True,
-        )
-    ).to_be_visible()
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+        "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
+    )
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+
+    # The following code is on the advance fobt screening episode page
     page.get_by_role("button", name="Record Diagnosis Date").click()
+
+    # The following code is on the record diagnosis date page
     page.locator("#diagnosisDate").click()
-    page.locator("#diagnosisDate").fill("09 May 2025")
+    page.locator("#diagnosisDate").fill("09 May 2025")  # Todays date
     page.get_by_role("button", name="Save").click()
-    expect(
-        page.get_by_role(
-            "cell",
-            name="A318 - Post-investigation Appointment NOT Required - Result Letter Created",
-            exact=True,
-        )
-    ).to_be_visible()  #
+
+    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+        "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
+    )
 
     # This needs to be repeated for two subjects, one old and one not - LBPCP Result
-    nhs_no = "9619187075"
+    nhs_no = "9619187075"  # Dummy NHS Number (will not work)
     verify_subject_event_status_by_nhs_no(
         page, nhs_no, "A323 - Post-investigation Appointment NOT Required"
     )
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_investigation_show_datasets()
 
-    page.locator("div").filter(
-        has_text="Investigation (1 Dataset) Show Dataset"
-    ).get_by_role("link").click()
+    # The following code is on the investigation datasets page
     page.locator("#UI_SITE_SELECT_LINK").click()
     page.locator("#UI_RESULTS_cwfoncwk").select_option("35317")
     page.locator("#UI_SSP_PIO_SELECT_LINK").click()
@@ -239,70 +240,77 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     ).click()
 
     expect(page.get_by_text("LNPCP")).to_be_visible()
-    page.get_by_role("link", name="Back").click()
+    BasePage(page).click_back_button()
+
+    # The following code is on the subject datasets page
     expect(page.get_by_text("** Completed **").nth(1)).to_be_visible()
-    page.get_by_role("link", name="Back").click()
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    BasePage(page).click_back_button()
+
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+
+    # The following code is on the advance fobt screening episode page
     page.get_by_role("button", name="Enter Diagnostic Test Outcome").click()
+
+    # The following code is on the diagnostic test outcome page
     expect(page.get_by_role("cell", name="LNPCP").nth(1)).to_be_visible()
     page.get_by_label("Outcome of Diagnostic Test").select_option("20365")
     page.get_by_role("button", name="Save").click()
 
     # If the subject is too old
-    expect(
-        page.get_by_role(
-            "cell",
-            name="A394 - Handover into Symptomatic Care for Surveillance - Patient Age",
-            exact=True,
-        )
-    ).to_be_visible()
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+        "A394 - Handover into Symptomatic Care for Surveillance - Patient Age"
+    )
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+
+    # The following code is on the advance fobt screening episode page
     page.get_by_role("button", name="Handover into Symptomatic Care").click()
+
+    # The following code is on the handover into symptomatic care page
     page.get_by_label("Referral").select_option("20445")
     page.get_by_role("button", name="Calendar").click()
-    page.get_by_role("cell", name="9", exact=True).click()
+    page.get_by_role(
+        "cell", name="9", exact=True
+    ).click()  # Todays date (v1 calendar picker)
     page.locator("#UI_NS_CONSULTANT_PIO_SELECT_LINK").click()
     page.locator("#UI_RESULTS_ktdtoepq").select_option("201")
     page.locator("#UI_NS_PRACTITIONER_PIO_SELECT_LINK").click()
     page.get_by_role("textbox", name="Notes").click()
     page.get_by_role("textbox", name="Notes").fill("Test Automation")
-    page.once("dialog", lambda dialog: dialog.dismiss())
+    page.once("dialog", lambda dialog: dialog.accept())
     page.get_by_role("button", name="Save").click()
-    expect(
-        page.get_by_role(
-            "cell", name="A385 - Handover into Symptomatic Care", exact=True
-        )
-    ).to_be_visible()
+
+    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+        "A385 - Handover into Symptomatic Care"
+    )
 
     # If the subject is not too old
-    expect(
-        page.get_by_role(
-            "cell",
-            name="A318 - Post-investigation Appointment NOT Required - Result Letter Created",
-            exact=True,
-        )
-    ).to_be_visible()
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+        "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
+    )
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+
+    # The following code is on the advance fobt screening episode page
     page.get_by_role("button", name="Record Diagnosis Date").click()
+
+    # The following code is on the record diagnosis date page
     page.locator("#diagnosisDate").click()
-    page.locator("#diagnosisDate").fill("09 May 2025")
+    page.locator("#diagnosisDate").fill("09 May 2025")  # Todays date
     page.get_by_role("button", name="Save").click()
-    expect(
-        page.get_by_role(
-            "cell",
-            name="A318 - Post-investigation Appointment NOT Required - Result Letter Created",
-            exact=True,
-        )
-    ).to_be_visible()
+
+    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+        "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
+    )
 
     # This needs to be repeated for 1 subject, age does not matter - Normal Result
-    nhs_no = "9619187075"
+    nhs_no = "9619187075"  # Dummy NHS Number (will not work)
     verify_subject_event_status_by_nhs_no(
         page, nhs_no, "A323 - Post-investigation Appointment NOT Required"
     )
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_investigation_show_datasets()
 
+    # The following code is on the investigation datasets page
     page.locator("#UI_SITE_SELECT_LINK").click()
     page.locator("#UI_RESULTS_mjbnjlos").select_option("35317")
     page.locator("#UI_SSP_PIO_SELECT_LINK").click()
@@ -352,28 +360,36 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
         "button", name="Save Dataset"
     ).click()
     expect(page.get_by_text("Normal (No Abnormalities")).to_be_visible()
-    page.get_by_role("link", name="Back").click()
+    BasePage(page).click_back_button()
+
+    # The following code is on the subject datasets page
     expect(page.get_by_text("** Completed **").nth(1)).to_be_visible()
-    page.get_by_role("link", name="Back").click()
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    BasePage(page).click_back_button()
+
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+
+    # The following code is on the advance fobt screening episode page
     page.get_by_role("button", name="Enter Diagnostic Test Outcome").click()
+
+    # The following code is on the diagnostic test outcome page
     expect(
         page.get_by_role("cell", name="Normal (No Abnormalities").nth(1)
     ).to_be_visible()
     page.get_by_label("Outcome of Diagnostic Test").select_option("")
     page.get_by_label("Outcome of Diagnostic Test").select_option("20360")
     page.get_by_role("button", name="Save").click()
-    expect(
-        page.get_by_role(
-            "cell",
-            name="A318 - Post-investigation Appointment NOT Required - Result Letter Created",
-            exact=True,
-        )
-    ).to_be_visible()
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+
+    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+        "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
+    )
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+
+    # The following code is on the advance fobt screening episode page
     page.get_by_role("button", name="Record Diagnosis Date").click()
+
+    # The following code is on the record diagnosis date page
     page.locator("#diagnosisDate").click()
-    page.locator("#diagnosisDate").fill("09 May 2025")
+    page.locator("#diagnosisDate").fill("09 May 2025")  # Todays date
     page.get_by_role("button", name="Save").click()
 
     # Modification needs to be done to accept this list. it should check if any of the values in this list are present. Something like the following:
@@ -386,6 +402,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     #         return locator
 
     batch_processing(
+        page,
         "A318",
         "Result Letters - No Post-investigation Appointment",
         [
@@ -396,12 +413,14 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     )
 
     batch_processing(
+        page,
         "A385",
         "Handover into Symptomatic Care Adenoma Surveillance, Age - GP Letter",
         "A382 - Handover into Symptomatic Care - GP Letter Printed",
     )
 
     batch_processing(
+        page,
         "A382",
         "Handover into Symptomatic Care Adenoma Surveillance - Patient Letter",
         "P202 - Waiting Completion of Outstanding Events",
