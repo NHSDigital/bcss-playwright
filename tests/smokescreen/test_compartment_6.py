@@ -21,7 +21,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     Printing the diagnostic test result letters.
     """
 
-    # For the following tests old referes to if they are over 75 at recall
+    # For the following tests old refers to if they are over 75 at recall
     # The recall period is 2 years from the last diagnostic test for a Normal or Abnormal diagnostic test result
     # or 3 years for someone who is going in to Surveillance (High-risk findings or LNPCP)
 
