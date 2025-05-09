@@ -35,7 +35,7 @@ Retrieves the test data needed for compartment 3 and then splits it into two dat
 - **Returns**:
   A list of tuples where each tuple contains a device ID (str) and a `boolean` flag (True for normal, False for abnormal).
 
-2. **`split_fit_kits(kit_id_df: pd.DataFrame, smokescreen_properties: dict) -> tuple`**
+1. **`split_fit_kits(kit_id_df: pd.DataFrame, smokescreen_properties: dict) -> tuple`**
 This method splits the `dataframe` into two dataframes, one normal and one abnormal.
 
 - **Arguments**:
