@@ -1,6 +1,6 @@
 # Utility Guide: Fit Kit Logged Utility
 
-The Fit Kit Logged Utility provides methods to retrieve test data (fit kit test results) used by the compartment 3 tests, and splits them into two dataframes (one 'normal' one 'abnormal'). 
+The Fit Kit Logged Utility provides methods to retrieve test data (fit kit test results) used by the compartment 3 tests, and splits them into two dataframes (one 'normal', one 'abnormal').
 
 ## Table of Contents
 
@@ -13,7 +13,7 @@ The Fit Kit Logged Utility provides methods to retrieve test data (fit kit test 
 
 ## Using the Fit Kit Logged Utility
 
-To use the Fit Kit Logged Utility, import the `fit_kit_logged.py` module, from the `utils` directory, into your test file and call its methods as required.
+To use the Fit Kit Logged Utility, import the `fit_kit_logged.py` module, from the `utils` directory, into your test file and call the `process_kit_data` method as required.
 
 ## Required Arguments
 
@@ -24,22 +24,22 @@ The methods in this utility require specific arguments. Below is a summary of th
 
 ## Fit Kit Logged Specific Functions
 
-The `fit_kit_logged` Utility includes methods for retrieving FIT test kits from the DB and splitting them into 'Normal' and 'Abnormal' results. Below are the key functions:
+The `fit_kit_logged` Utility includes methods for retrieving FIT test kits from the DB and splitting them into 'Normal' and 'Abnormal' results. Below are their key functions:
 
 1.  **`process_kit_data(smokescreen_properties: dict) -> list`**
-    Retrieves the test data needed for compartment 3 and then splits it into two data frames, using the `split_fit_kits` method. 
+    Retrieves the test data needed for compartment 3 and then splits it into two data frames, using the `split_fit_kits` method.
     - **Arguments**:
      - `smokescreen_properties` (dict): A dictionary containing properties required to retrieve and process kit data.
    - **Returns**: A list of tuples where each tuple contains a device ID (str) and a boolean flag (True for normal, False for abnormal).
   
 2. **`split_fit_kits(kit_id_df: pd.DataFrame, smokescreen_properties: dict) -> pd.DataFrame`**
-    This method splits the dataframe into two dataframes, 1 normal and 1 abnormal.
+    This method splits the `dataframe` into two dataframes, 1 normal and 1 abnormal.
     - **Arguments**:
-     -  `kit_id_df` (pd.DataFrame): A dataframe containing fit kit IDs.
+     -  `kit_id_df` (pd.DataFrame): A `dataframe` containing fit kit IDs.
      -  `smokescreen_properties` (dict): A dictionary containing the number of normal and abnormal fit kits to split.
    - **Returns**: A tuple containing two dataframes:
-            - normal_fit_kit_df (pd.DataFrame): Dataframe containing normal fit kits.
-            - abnormal_fit_kit_df (pd.DataFrame): Dataframe containing abnormal fit kits.
+            - normal_fit_kit_df (pd.DataFrame): `dataframe` containing normal fit kits.
+            - abnormal_fit_kit_df (pd.DataFrame): `dataframe` containing abnormal fit kits.
 
 ## Example Usage
 
@@ -47,8 +47,7 @@ The `fit_kit_logged` Utility includes methods for retrieving FIT test kits from 
 from utils.fit_kit_logged import process_kit_data
 
 def example_usage() -> None:
-    # Find data , separate it into normal and abnormal, Add results to the test records in the KIT_QUEUE table (i.e. mimic receiving results from the middleware)
-    # and get device IDs and their flags
+    # Find data, separate it into normal and abnormal, add results to the test records in the KIT_QUEUE table (i.e. mimic receiving results from the middleware) and get device IDs and their flags.
     device_ids = process_kit_data(smokescreen_properties)
     # Retrieve NHS numbers for each device_id and determine normal/abnormal status
     nhs_numbers = []
@@ -59,7 +58,7 @@ def example_usage() -> None:
             device_id, is_normal, smokescreen_properties
         )
         nhs_numbers.append(nhs_number)
-        normal_flags.append(is_normal)  # Store the flag (True for normal, False for abnormal)
+        normal_flags.append(is_normal)  # Store the flag (True for normal, False for abnormal).
 
 example_usage()
 ```
