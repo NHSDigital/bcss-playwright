@@ -27,25 +27,25 @@ The methods in this utility require specific arguments. Below is a summary of th
 The `fit_kit_logged` Utility includes methods for retrieving FIT test kits from the DB and splitting them into 'Normal' and 'Abnormal' results. Below are their key functions:
 
 1. **`process_kit_data(smokescreen_properties: dict) -> list`**
-  Retrieves the test data needed for compartment 3 and then splits it into two data frames, using the `split_fit_kits` method.
+Retrieves the test data needed for compartment 3 and then splits it into two data frames, using the `split_fit_kits` method.
 
-  - **Arguments**:
-    - `smokescreen_properties` (dict): A dictionary containing properties required to retrieve and process kit data.
+- **Arguments**:
+  - `smokescreen_properties` (dict): A dictionary containing properties required to retrieve and process kit data.
 
-  - **Returns**:
-    A list of tuples where each tuple contains a device ID (str) and a `boolean` flag (True for normal, False for abnormal).
+- **Returns**:
+  A list of tuples where each tuple contains a device ID (str) and a `boolean` flag (True for normal, False for abnormal).
 
 2. **`split_fit_kits(kit_id_df: pd.DataFrame, smokescreen_properties: dict) -> tuple`**
-  This method splits the `dataframe` into two dataframes, one normal and one abnormal.
+This method splits the `dataframe` into two dataframes, one normal and one abnormal.
 
-  - **Arguments**:
-    - `kit_id_df` (pd.DataFrame): A `dataframe` containing fit kit IDs.
-    - `smokescreen_properties` (dict): A dictionary containing the number of normal and abnormal fit kits to split.
+- **Arguments**:
+  - `kit_id_df` (pd.DataFrame): A `dataframe` containing fit kit IDs.
+  - `smokescreen_properties` (dict): A dictionary containing the number of normal and abnormal fit kits to split.
 
-  - **Returns**:
-    A tuple containing two dataframes:
-    - `normal_fit_kit_df` (pd.DataFrame): `dataframe` containing normal fit kits.
-    - `abnormal_fit_kit_df` (pd.DataFrame): `dataframe` containing abnormal fit kits.
+- **Returns**:
+  A tuple containing two dataframes:
+  - `normal_fit_kit_df` (pd.DataFrame): `dataframe` containing normal fit kits.
+  - `abnormal_fit_kit_df` (pd.DataFrame): `dataframe` containing abnormal fit kits.
 
 ## Example Usage
 
