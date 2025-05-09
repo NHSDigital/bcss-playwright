@@ -6,7 +6,7 @@ import pytest
 
 def process_kit_data(smokescreen_properties: dict) -> list:
     """
-    This method retrieves the test data needed for compartment 3 and then splits it into two data frames:
+    This method retrieves the test data needed for compartment 3 and then, by using the split_fit_kits method, it splits it into two data frames:
     - 1 normal
     - 1 abnormal
 

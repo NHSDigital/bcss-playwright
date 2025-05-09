@@ -36,7 +36,7 @@ Retrieves the test data needed for compartment 3 and then splits it into two dat
   A list of tuples where each tuple contains a device ID (str) and a `boolean` flag (True for normal, False for abnormal).
 
 1. **`split_fit_kits(kit_id_df: pd.DataFrame, smokescreen_properties: dict) -> tuple`**
-This method splits the `dataframe` into two dataframes, one normal and one abnormal.
+This method splits the `dataframe` into two dataframes, one normal and one abnormal. It determines the number of normal and abnormal kits by using the `c3_eng_number_of_normal_fit_kits` parameter from `smokescreen_properties` for the number of normal, and then the rest are marked as abnormal.
 
 - **Arguments**:
   - `kit_id_df` (pd.DataFrame): A `dataframe` containing fit kit IDs.
@@ -52,9 +52,10 @@ This method splits the `dataframe` into two dataframes, one normal and one abnor
 ```python
 from utils.fit_kit_logged import process_kit_data
 
-def example_usage() -> None:
+def test_example_usage(smokescreen_properties: dict) -> None:
     # Find data, separate it into normal and abnormal, add results to the test records in the KIT_QUEUE table (i.e. mimic receiving results from the middleware) and get device IDs and their flags.
     device_ids = process_kit_data(smokescreen_properties)
+    # Note: In this example, all of the code below this line is for context only and uses functions from other utilities.
     # Retrieve NHS numbers for each device_id and determine normal/abnormal status
     nhs_numbers = []
     normal_flags = []
@@ -66,5 +67,5 @@ def example_usage() -> None:
         nhs_numbers.append(nhs_number)
         normal_flags.append(is_normal)  # Store the flag (True for normal, False for abnormal).
 
-example_usage()
+test_example_usage()
 ```
