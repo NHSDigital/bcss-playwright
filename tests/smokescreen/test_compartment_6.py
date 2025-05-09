@@ -9,6 +9,16 @@ from pages.screening_subject_search.subject_screening_summary_page import (
 from utils.batch_processing import batch_processing
 from pages.logout.log_out_page import LogoutPage
 from pages.datasets.subject_datasets_page import SubjectDatasetsPage
+from pages.datasets.investigation_dataset_page import (
+    InvestigationDatasetsPage,
+    SiteLookupOptions,
+    PractitionerOptions,
+    TestingClinicianOptions,
+    AspirantEndoscopistOptions,
+    DrugTypeOptions,
+    BowelPreparationQualityOptions,
+    ComfortOptions,
+)
 
 
 # This should go into a util. Adding it here to avoid SonarQube duplication errors:
@@ -22,23 +32,38 @@ def go_to_investigation_datasets_page(page: Page, nhs_no) -> None:
 
 
 def investigation_dataset_forms(page: Page) -> None:
-    page.locator("#UI_SITE_SELECT_LINK").click()
-    page.locator("#UI_RESULTS_rljsjnkh").select_option("35317")
-    page.locator("#UI_SSP_PIO_SELECT_LINK").click()
-    page.locator("#UI_RESULTS_okdvpfko").select_option("1251")
-    page.locator("#UI_CONSULTANT_PIO_SELECT_LINK").click()
-    page.locator("#UI_RESULTS_sawaeghr").select_option("886")
-    page.locator("#UI_ASPIRANT_ENDOSCOPIST_PIO_SELECT_LINK").click()
-    page.locator("#anchorDrug").click()
-    page.locator("#UI_BOWEL_PREP_DRUG1").select_option("200537~Tablet(s)")
-    page.locator("#UI_BOWEL_PREP_DRUG_DOSE1").click()
-    page.locator("#UI_BOWEL_PREP_DRUG_DOSE1").fill("10")
-    page.get_by_role("link", name="Show details").click()
-    page.locator("#radScopeInsertedYes").check()
-    page.get_by_role("radio", name="Therapeutic").check()
-    page.get_by_label("Bowel preparation quality").select_option("17016")
-    page.get_by_label("Comfort during examination").select_option("18505")
-    page.get_by_label("Comfort during recovery").select_option("18505")
+    # Investigation Dataset
+    InvestigationDatasetsPage(page).select_site_lookup_option(
+        SiteLookupOptions.RL401.value
+    )
+    InvestigationDatasetsPage(page).select_practitioner_option(
+        PractitionerOptions.AMID_SNORING.value
+    )
+    InvestigationDatasetsPage(page).select_testing_clinician_option(
+        TestingClinicianOptions.BORROWING_PROPERTY.value
+    )
+    InvestigationDatasetsPage(page).select_aspirant_endoscopist_option(
+        AspirantEndoscopistOptions.ITALICISE_AMNESTY.value
+    )
+    # Drug Information
+    InvestigationDatasetsPage(page).click_show_drug_information()
+    InvestigationDatasetsPage(page).select_drug_type_option1(
+        DrugTypeOptions.BISACODYL.value
+    )
+    InvestigationDatasetsPage(page).fill_dtrug_type_dose1("10")
+    # Ensocopy Information
+    InvestigationDatasetsPage(page).click_show_enscopy_information()
+    InvestigationDatasetsPage(page).check_enscope_inserted_yes()
+    InvestigationDatasetsPage(page).select_theraputic_procedure_type()
+    InvestigationDatasetsPage(page).select_bowel_preparation_quality_option(
+        BowelPreparationQualityOptions.GOOD.value
+    )
+    InvestigationDatasetsPage(page).select_comfort_during_examination_option(
+        ComfortOptions.NO_DISCOMFORT.value
+    )
+    InvestigationDatasetsPage(page).select_comfort_during_recovery_option(
+        ComfortOptions.NO_DISCOMFORT.value
+    )
     page.get_by_label("Endoscopist defined extent").select_option(
         "17240~Colonoscopy Complete"
     )
