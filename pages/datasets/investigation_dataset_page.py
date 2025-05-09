@@ -173,7 +173,10 @@ class SiteLookupOptions(Enum):
 
 
 class PractitionerOptions(Enum):
-    """Enum for practitioner options"""
+    """
+    Enum for practitioner options
+    Only the first four options are present in this class
+    """
 
     AMID_SNORING = "1251"
     ASTONISH_ETHANOL = "82"
