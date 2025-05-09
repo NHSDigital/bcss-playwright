@@ -11,32 +11,8 @@ from pages.logout.log_out_page import LogoutPage
 from pages.datasets.subject_datasets_page import SubjectDatasetsPage
 
 
-@pytest.mark.vpn_required
-@pytest.mark.smokescreen
-@pytest.mark.compartment5
-def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
-    """
-    This is the main compartment 6 method
-    Filling out the investigation datasets for different subjects to get different results for a diagnostic test.
-    Printing the diagnostic test result letters.
-    """
-
-    # For the following tests old refers to if they are over 75 at recall
-    # The recall period is 2 years from the last diagnostic test for a Normal or Abnormal diagnostic test result
-    # or 3 years for someone who is going in to Surveillance (High-risk findings or LNPCP)
-
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-
-    # This needs to be repeated for two subjects, one old and one not - High Risk Result
-    nhs_no = "9619187075"  # Dummy NHS Number (will not work)
-    verify_subject_event_status_by_nhs_no(
-        page, nhs_no, "A323 - Post-investigation Appointment NOT Required"
-    )
-
-    SubjectScreeningSummaryPage(page).click_datasets_link()
-    SubjectDatasetsPage(page).click_investigation_show_datasets()
-
-    # The following code is on the investigation datasets page
+# This should go into a util. Adding it here to avoid SonarQube duplication errors:
+def investigation_dataset_forms(page: Page) -> None:
     page.locator("#UI_SITE_SELECT_LINK").click()
     page.locator("#UI_RESULTS_rljsjnkh").select_option("35317")
     page.locator("#UI_SSP_PIO_SELECT_LINK").click()
@@ -76,6 +52,35 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     )
     page.locator("#anchorCompletionProof").click()
     page.get_by_label("Proof Parameters").select_option("200575")
+
+
+@pytest.mark.vpn_required
+@pytest.mark.smokescreen
+@pytest.mark.compartment5
+def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
+    """
+    This is the main compartment 6 method
+    Filling out the investigation datasets for different subjects to get different results for a diagnostic test.
+    Printing the diagnostic test result letters.
+    """
+
+    # For the following tests old refers to if they are over 75 at recall
+    # The recall period is 2 years from the last diagnostic test for a Normal or Abnormal diagnostic test result
+    # or 3 years for someone who is going in to Surveillance (High-risk findings or LNPCP)
+
+    UserTools.user_login(page, "Screening Centre Manager at BCS001")
+
+    # This needs to be repeated for two subjects, one old and one not - High Risk Result
+    nhs_no = "9619187075"  # Dummy NHS Number (will not work)
+    verify_subject_event_status_by_nhs_no(
+        page, nhs_no, "A323 - Post-investigation Appointment NOT Required"
+    )
+
+    SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_investigation_show_datasets()
+
+    # The following code is on the investigation datasets page
+    investigation_dataset_forms(page)
     page.locator("#anchorFailure").click()
     page.get_by_label("Failure Reasons").select_option("205148")
     page.get_by_role("button", name="Add Polyp").click()
@@ -180,45 +185,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     SubjectDatasetsPage(page).click_investigation_show_datasets()
 
     # The following code is on the investigation datasets page
-    page.locator("#UI_SITE_SELECT_LINK").click()
-    page.locator("#UI_RESULTS_cwfoncwk").select_option("35317")
-    page.locator("#UI_SSP_PIO_SELECT_LINK").click()
-    page.locator("#UI_RESULTS_hpbvheab").select_option("1251")
-    page.locator("#UI_CONSULTANT_PIO_SELECT_LINK").click()
-    page.locator("#UI_RESULTS_ohrfhcdm").select_option("886")
-    page.locator("#UI_ASPIRANT_ENDOSCOPIST_PIO_SELECT_LINK").click()
-    page.locator("#anchorDrug").click()
-    page.locator("#UI_BOWEL_PREP_DRUG1").select_option("200537~Tablet(s)")
-    page.locator("#UI_BOWEL_PREP_DRUG_DOSE1").click()
-    page.locator("#UI_BOWEL_PREP_DRUG_DOSE1").fill("10")
-    page.get_by_role("link", name="Show details").click()
-    page.locator("#radScopeInsertedYes").check()
-    page.get_by_role("radio", name="Therapeutic").check()
-    page.get_by_label("Bowel preparation quality").select_option("17016")
-    page.get_by_label("Comfort during examination").select_option("18505")
-    page.get_by_label("Comfort during recovery").select_option("18505")
-    page.get_by_label("Endoscopist defined extent").select_option(
-        "17240~Colonoscopy Complete"
-    )
-    page.get_by_label("Scope imager used").select_option("17058")
-    page.get_by_label("Retroverted view").select_option("17059")
-    page.get_by_role("textbox", name="Start of intubation time").click()
-    page.get_by_role("textbox", name="Start of intubation time").fill("09:00")
-    page.get_by_role("textbox", name="Start of extubation time").click()
-    page.get_by_role("textbox", name="Start of extubation time").fill("09:15")
-    page.get_by_role("textbox", name="End time of procedure").click()
-    page.get_by_role("textbox", name="End time of procedure").fill("09:30")
-    page.get_by_role("textbox", name="Scope ID").click()
-    page.get_by_role("textbox", name="Scope ID").fill("A1")
-    page.get_by_label("Insufflation").select_option("200547")
-    page.get_by_label("Outcome at time of procedure").select_option(
-        "17148~Complications are optional"
-    )
-    page.get_by_label("Late outcome").select_option(
-        "17216~Complications are not required"
-    )
-    page.locator("#anchorCompletionProof").click()
-    page.get_by_label("Proof Parameters").select_option("200575")
+    investigation_dataset_forms(page)
     page.locator("#anchorFailure").click()
     page.get_by_label("Failure Reasons").select_option("205148")
     page.get_by_role("button", name="Add Polyp").click()
@@ -311,47 +278,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     SubjectDatasetsPage(page).click_investigation_show_datasets()
 
     # The following code is on the investigation datasets page
-    page.locator("#UI_SITE_SELECT_LINK").click()
-    page.locator("#UI_RESULTS_mjbnjlos").select_option("35317")
-    page.locator("#UI_SSP_PIO_SELECT_LINK").click()
-    page.locator("#UI_RESULTS_rquytpri").select_option("1251")
-    page.locator("#UI_SSP_PIO_SELECT_LINK").click()
-    page.locator("#UI_RESULTS_rquytpri").select_option("1251")
-    page.locator("#UI_CONSULTANT_PIO_SELECT_LINK").click()
-    page.locator("#UI_RESULTS_mkbtktgp").select_option("886")
-    page.locator("#UI_ASPIRANT_ENDOSCOPIST_PIO_SELECT_LINK").click()
-    page.locator("#anchorDrug").click()
-    page.locator("#UI_BOWEL_PREP_DRUG1").select_option("200537~Tablet(s)")
-    page.locator("#UI_BOWEL_PREP_DRUG_DOSE1").click()
-    page.locator("#UI_BOWEL_PREP_DRUG_DOSE1").fill("10")
-    page.get_by_role("link", name="Show details").click()
-    page.locator("#radScopeInsertedYes").check()
-    page.get_by_role("radio", name="Diagnostic").check()
-    page.get_by_label("Bowel preparation quality").select_option("17016")
-    page.get_by_label("Comfort during examination").select_option("18505")
-    page.get_by_label("Comfort during recovery").select_option("18505")
-    page.get_by_label("Endoscopist defined extent").select_option(
-        "17240~Colonoscopy Complete"
-    )
-    page.get_by_label("Scope imager used").select_option("17058")
-    page.get_by_label("Retroverted view").select_option("17059")
-    page.get_by_role("textbox", name="Start of intubation time").click()
-    page.get_by_role("textbox", name="Start of intubation time").fill("09:00")
-    page.get_by_role("textbox", name="Start of extubation time").click()
-    page.get_by_role("textbox", name="Start of extubation time").fill("09:15")
-    page.get_by_role("textbox", name="End time of procedure").click()
-    page.get_by_role("textbox", name="End time of procedure").fill("09:30")
-    page.get_by_role("textbox", name="Scope ID").click()
-    page.get_by_role("textbox", name="Scope ID").fill("A1")
-    page.get_by_label("Insufflation").select_option("200547")
-    page.get_by_label("Outcome at time of procedure").select_option(
-        "17148~Complications are optional"
-    )
-    page.get_by_label("Late outcome").select_option(
-        "17216~Complications are not required"
-    )
-    page.locator("#anchorCompletionProof").click()
-    page.get_by_label("Proof Parameters").select_option("200575")
+    investigation_dataset_forms(page)
     page.locator("#anchorFailure").click()
     page.get_by_label("Failure Reasons").select_option("18500")
     page.locator("#radDatasetCompleteYes").check()
