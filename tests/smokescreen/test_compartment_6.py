@@ -12,6 +12,15 @@ from pages.datasets.subject_datasets_page import SubjectDatasetsPage
 
 
 # This should go into a util. Adding it here to avoid SonarQube duplication errors:
+def go_to_investigation_datasets_page(page: Page, nhs_no) -> None:
+    verify_subject_event_status_by_nhs_no(
+        page, nhs_no, "A323 - Post-investigation Appointment NOT Required"
+    )
+
+    SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_investigation_show_datasets()
+
+
 def investigation_dataset_forms(page: Page) -> None:
     page.locator("#UI_SITE_SELECT_LINK").click()
     page.locator("#UI_RESULTS_rljsjnkh").select_option("35317")
@@ -54,6 +63,15 @@ def investigation_dataset_forms(page: Page) -> None:
     page.get_by_label("Proof Parameters").select_option("200575")
 
 
+def investigation_datasets_failure_reason_and_adding_initial_polyp(page: Page) -> None:
+    page.locator("#anchorFailure").click()
+    page.get_by_label("Failure Reasons").select_option("205148")
+    page.get_by_role("button", name="Add Polyp").click()
+    page.locator("#UI_POLYP_LOCATION1").select_option("17240~Colonoscopy Complete")
+    page.get_by_label("Classification ?").select_option("17295")
+    page.get_by_role("textbox", name="Estimate of whole polyp size").click()
+
+
 @pytest.mark.vpn_required
 @pytest.mark.smokescreen
 @pytest.mark.compartment5
@@ -72,21 +90,11 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
 
     # This needs to be repeated for two subjects, one old and one not - High Risk Result
     nhs_no = "9619187075"  # Dummy NHS Number (will not work)
-    verify_subject_event_status_by_nhs_no(
-        page, nhs_no, "A323 - Post-investigation Appointment NOT Required"
-    )
-
-    SubjectScreeningSummaryPage(page).click_datasets_link()
-    SubjectDatasetsPage(page).click_investigation_show_datasets()
+    go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
     investigation_dataset_forms(page)
-    page.locator("#anchorFailure").click()
-    page.get_by_label("Failure Reasons").select_option("205148")
-    page.get_by_role("button", name="Add Polyp").click()
-    page.locator("#UI_POLYP_LOCATION1").select_option("17240~Colonoscopy Complete")
-    page.get_by_label("Classification ?").select_option("17295")
-    page.get_by_role("textbox", name="Estimate of whole polyp size").click()
+    investigation_datasets_failure_reason_and_adding_initial_polyp(page)
     page.get_by_role("textbox", name="Estimate of whole polyp size").fill("15")
     page.get_by_label("Polyp Access").select_option("17060")
     page.get_by_role("link", name="Add Intervention").click()
@@ -176,22 +184,12 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     )
 
     # This needs to be repeated for two subjects, one old and one not - LBPCP Result
-    nhs_no = "9619187075"  # Dummy NHS Number (will not work)
-    verify_subject_event_status_by_nhs_no(
-        page, nhs_no, "A323 - Post-investigation Appointment NOT Required"
-    )
-
-    SubjectScreeningSummaryPage(page).click_datasets_link()
-    SubjectDatasetsPage(page).click_investigation_show_datasets()
+    nhs_no = "9619187076"  # Dummy NHS Number (will not work)
+    go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
     investigation_dataset_forms(page)
-    page.locator("#anchorFailure").click()
-    page.get_by_label("Failure Reasons").select_option("205148")
-    page.get_by_role("button", name="Add Polyp").click()
-    page.locator("#UI_POLYP_LOCATION1").select_option("17240~Colonoscopy Complete")
-    page.get_by_label("Classification ?").select_option("17295")
-    page.get_by_role("textbox", name="Estimate of whole polyp size").click()
+    investigation_datasets_failure_reason_and_adding_initial_polyp(page)
     page.get_by_role("textbox", name="Estimate of whole polyp size").fill("30")
     page.get_by_label("Polyp Access").select_option("17060")
     page.get_by_role("link", name="Add Intervention").click()
@@ -269,13 +267,8 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     )
 
     # This needs to be repeated for 1 subject, age does not matter - Normal Result
-    nhs_no = "9619187075"  # Dummy NHS Number (will not work)
-    verify_subject_event_status_by_nhs_no(
-        page, nhs_no, "A323 - Post-investigation Appointment NOT Required"
-    )
-
-    SubjectScreeningSummaryPage(page).click_datasets_link()
-    SubjectDatasetsPage(page).click_investigation_show_datasets()
+    nhs_no = "9619187077"  # Dummy NHS Number (will not work)
+    go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
     investigation_dataset_forms(page)
