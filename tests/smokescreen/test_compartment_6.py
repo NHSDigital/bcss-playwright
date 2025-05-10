@@ -9,6 +9,7 @@ from pages.screening_subject_search.subject_screening_summary_page import (
 from utils.batch_processing import batch_processing
 from pages.logout.log_out_page import LogoutPage
 from pages.datasets.subject_datasets_page import SubjectDatasetsPage
+from pages.screening_subject_search.advance_fobt_screening_episode_page import AdvanceFOBTScreeningEpisodePage
 
 
 # This should go into a util. Adding it here to avoid SonarQube duplication errors:
@@ -132,7 +133,8 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
 
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
     # The following code is on the advance fobt screening episode page
-    page.get_by_role("button", name="Enter Diagnostic Test Outcome").click()
+    AdvanceFOBTScreeningEpisodePage(page).click_enter_diagnostic_test_outcome_button()
+
     # The following code is on the diagnostic test outcome page
     expect(page.get_by_role("cell", name="High-risk findings").nth(1)).to_be_visible()
     page.get_by_label("Outcome of Diagnostic Test").select_option("20365")
@@ -145,7 +147,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
 
     # The following code is on the advance fobt screening episode page
-    page.get_by_role("button", name="Handover into Symptomatic Care").click()
+    AdvanceFOBTScreeningEpisodePage(page).click_handover_into_symptomatic_care_button()
 
     # The following code is on the handover into symptomatic care page
     page.get_by_label("Referral").select_option("20445")
@@ -172,7 +174,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
 
     # The following code is on the advance fobt screening episode page
-    page.get_by_role("button", name="Record Diagnosis Date").click()
+    AdvanceFOBTScreeningEpisodePage(page).click_record_diagnosis_date_button()
 
     # The following code is on the record diagnosis date page
     page.locator("#diagnosisDate").click()
@@ -214,7 +216,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
 
     # The following code is on the advance fobt screening episode page
-    page.get_by_role("button", name="Enter Diagnostic Test Outcome").click()
+    AdvanceFOBTScreeningEpisodePage(page).click_enter_diagnostic_test_outcome_button()
 
     # The following code is on the diagnostic test outcome page
     expect(page.get_by_role("cell", name="LNPCP").nth(1)).to_be_visible()
@@ -228,7 +230,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
 
     # The following code is on the advance fobt screening episode page
-    page.get_by_role("button", name="Handover into Symptomatic Care").click()
+    AdvanceFOBTScreeningEpisodePage(page).click_handover_into_symptomatic_care_button()
 
     # The following code is on the handover into symptomatic care page
     page.get_by_label("Referral").select_option("20445")
@@ -255,7 +257,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
 
     # The following code is on the advance fobt screening episode page
-    page.get_by_role("button", name="Record Diagnosis Date").click()
+    AdvanceFOBTScreeningEpisodePage(page).click_record_diagnosis_date_button()
 
     # The following code is on the record diagnosis date page
     page.locator("#diagnosisDate").click()
@@ -289,7 +291,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
 
     # The following code is on the advance fobt screening episode page
-    page.get_by_role("button", name="Enter Diagnostic Test Outcome").click()
+    AdvanceFOBTScreeningEpisodePage(page).click_enter_diagnostic_test_outcome_button()
 
     # The following code is on the diagnostic test outcome page
     expect(
@@ -305,7 +307,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
 
     # The following code is on the advance fobt screening episode page
-    page.get_by_role("button", name="Record Diagnosis Date").click()
+    AdvanceFOBTScreeningEpisodePage(page).click_record_diagnosis_date_button()
 
     # The following code is on the record diagnosis date page
     page.locator("#diagnosisDate").click()
