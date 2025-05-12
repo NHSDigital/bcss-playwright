@@ -31,10 +31,10 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         self.enter_diagnostic_test_outcome_button = self.page.get_by_role(
             "button", name="Enter Diagnostic Test Outcome"
         )
-        self.handover_into_symptomatic_care_button = page.get_by_role(
+        self.handover_into_symptomatic_care_button = self.page.get_by_role(
             "button", name="Handover into Symptomatic Care"
         )
-        self.record_diagnosis_date_button = page.get_by_role(
+        self.record_diagnosis_date_button = self.page.get_by_role(
             "button", name="Record Diagnosis Date"
         )
 
