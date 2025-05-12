@@ -1,6 +1,6 @@
 from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
-from enum import Enum
+from enum import StrEnum
 
 
 class InvestigationDatasetsPage(BasePage):
@@ -28,6 +28,9 @@ class InvestigationDatasetsPage(BasePage):
         self.endoscope_inserted_yes = self.page.locator("#radScopeInsertedYes")
         self.theraputic_procedure_type = self.page.get_by_role(
             "radio", name="Therapeutic"
+        )
+        self.diagnostic_procedure_type = self.page.get_by_role(
+            "radio", name="Diagnostic"
         )
         self.bowel_preparation_quality_option = self.page.get_by_label(
             "Bowel preparation quality"
@@ -209,6 +212,13 @@ class InvestigationDatasetsPage(BasePage):
         It selects the therapeutic procedure type.
         """
         self.theraputic_procedure_type.check()
+
+    def select_diagnostic_procedure_type(self) -> None:
+        """
+        This method is designed to select the diagnostic procedure type.
+        It selects the diagnostic procedure type.
+        """
+        self.diagnostic_procedure_type.check()
 
     def select_bowel_preparation_quality_option(self, option: str) -> None:
         """
@@ -607,7 +617,7 @@ class InvestigationDatasetsPage(BasePage):
         expect(self.page.get_by_text(text)).to_contain_text(text)
 
 
-class SiteLookupOptions(Enum):
+class SiteLookupOptions(StrEnum):
     """Enum for site lookup options"""
 
     RL401 = "35317"
@@ -617,7 +627,7 @@ class SiteLookupOptions(Enum):
     RL405 = "42808"
 
 
-class PractitionerOptions(Enum):
+class PractitionerOptions(StrEnum):
     """
     Enum for practitioner options
     Only the first four options are present in this class
@@ -629,7 +639,7 @@ class PractitionerOptions(Enum):
     DOORFRAME_THIRSTY = "2034"
 
 
-class TestingClinicianOptions(Enum):
+class TestingClinicianOptions(StrEnum):
     """Enum for testing clinician options"""
 
     BORROWING_PROPERTY = "886"
@@ -638,13 +648,13 @@ class TestingClinicianOptions(Enum):
     CONSONANT_TRACTOR = "101"
 
 
-class AspirantEndoscopistOptions(Enum):
+class AspirantEndoscopistOptions(StrEnum):
     """Enum for aspirant endoscopist options"""
 
     ITALICISE_AMNESTY = "1832"
 
 
-class DrugTypeOptions(Enum):
+class DrugTypeOptions(StrEnum):
     """Enum for drug type options"""
 
     BISACODYL = "200537~Tablet(s)"
@@ -665,7 +675,7 @@ class DrugTypeOptions(Enum):
     OTHER = "203066"
 
 
-class BowelPreparationQualityOptions(Enum):
+class BowelPreparationQualityOptions(StrEnum):
     """Enum for bowel preparation quality options"""
 
     EXCELLENT = "305579"
@@ -675,7 +685,7 @@ class BowelPreparationQualityOptions(Enum):
     INADEQUATE = "305581~~305582"
 
 
-class ComfortOptions(Enum):
+class ComfortOptions(StrEnum):
     """Enum for comfort during examination / recovery options"""
 
     NO_DISCOMFORT = "18505"
@@ -685,7 +695,7 @@ class ComfortOptions(Enum):
     SEVERE_DISCOMFORT = "17276"
 
 
-class EndoscopyLocationOptions(Enum):
+class EndoscopyLocationOptions(StrEnum):
     """Enum for endoscopy location options"""
 
     ANUS = "17231~Scope not inserted clinical reason~204342"
@@ -702,14 +712,14 @@ class EndoscopyLocationOptions(Enum):
     APPENDIX = "17242~Colonoscopy Complete"
 
 
-class YesNoOptions(Enum):
+class YesNoOptions(StrEnum):
     """Enum for scope imager used options"""
 
     YES = "17058"
     NO = "17059"
 
 
-class InsufflationOptions(Enum):
+class InsufflationOptions(StrEnum):
     """Enum for insufflation options"""
 
     AIR = "200547"
@@ -722,7 +732,7 @@ class InsufflationOptions(Enum):
     WATER_AIR_CO2 = "305729"
 
 
-class OutcomeAtTimeOfProcedureOptions(Enum):
+class OutcomeAtTimeOfProcedureOptions(StrEnum):
     """Enum for outcome at time of procedure options"""
 
     LEAVE_DEPARTMENT = "17148~Complications are optional"
@@ -730,7 +740,7 @@ class OutcomeAtTimeOfProcedureOptions(Enum):
     UNPLANNED_ADMISSION = "17147~Complications are mandatory"
 
 
-class LateOutcomeOptions(Enum):
+class LateOutcomeOptions(StrEnum):
     """Enum for late outcome options"""
 
     NO_COMPLICATIONS = "17216~Complications are not required"
@@ -740,7 +750,7 @@ class LateOutcomeOptions(Enum):
     HOSPITAL_ADMISSION = "17220~Complications are mandatory"
 
 
-class CompletionProofOptions(Enum):
+class CompletionProofOptions(StrEnum):
     """Enum for completion proof options"""
 
     PHOTO_ANASTOMOSIS = "200573"
@@ -754,7 +764,7 @@ class CompletionProofOptions(Enum):
     NOT_POSSIBLE = "203007"
 
 
-class FailureReasonsOptions(Enum):
+class FailureReasonsOptions(StrEnum):
     """Enum for failure reasons options"""
 
     NO_FAILURE_REASONS = "18500"
@@ -778,7 +788,7 @@ class FailureReasonsOptions(Enum):
     PERFORATION = "205153~AVI"
 
 
-class PolypClassificationOptions(Enum):
+class PolypClassificationOptions(StrEnum):
     """Enum for polyp classification options"""
 
     LP = "17296"
@@ -792,7 +802,7 @@ class PolypClassificationOptions(Enum):
     LLA_C = "200683"
 
 
-class PolypAccessOptions(Enum):
+class PolypAccessOptions(StrEnum):
     """Enum for polyp access options"""
 
     EASY = "305583"
@@ -800,7 +810,7 @@ class PolypAccessOptions(Enum):
     NOT_KNOWN = "17060"
 
 
-class PolypInterventionModalityOptions(Enum):
+class PolypInterventionModalityOptions(StrEnum):
     """Enum for polyp intervention modality options"""
 
     POLYPECTOMY = "17189~Resection"
@@ -808,7 +818,7 @@ class PolypInterventionModalityOptions(Enum):
     ESD = "17520~Resection"
 
 
-class PolypInterventionDeviceOptions(Enum):
+class PolypInterventionDeviceOptions(StrEnum):
     """Enum for polyp intervention device options"""
 
     HOT_SNARE = "17070"
@@ -817,7 +827,7 @@ class PolypInterventionDeviceOptions(Enum):
     COLD_BIOPSY = "17073~En-bloc"
 
 
-class PolypInterventionExcisionTechniqueOptions(Enum):
+class PolypInterventionExcisionTechniqueOptions(StrEnum):
     """Enum for polyp intervention excision technique options"""
 
     EN_BLOC = "17751"

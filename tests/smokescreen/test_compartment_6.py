@@ -45,63 +45,57 @@ def go_to_investigation_datasets_page(page: Page, nhs_no) -> None:
     SubjectDatasetsPage(page).click_investigation_show_datasets()
 
 
-def deafult_investigation_dataset_forms(page: Page) -> None:
+def default_investigation_dataset_forms(page: Page) -> None:
     # Investigation Dataset
-    InvestigationDatasetsPage(page).select_site_lookup_option(
-        SiteLookupOptions.RL401.value
-    )
+    InvestigationDatasetsPage(page).select_site_lookup_option(SiteLookupOptions.RL401)
     InvestigationDatasetsPage(page).select_practitioner_option(
-        PractitionerOptions.AMID_SNORING.value
+        PractitionerOptions.AMID_SNORING
     )
     InvestigationDatasetsPage(page).select_testing_clinician_option(
-        TestingClinicianOptions.BORROWING_PROPERTY.value
+        TestingClinicianOptions.BORROWING_PROPERTY
     )
     InvestigationDatasetsPage(page).select_aspirant_endoscopist_option(
-        AspirantEndoscopistOptions.ITALICISE_AMNESTY.value
+        AspirantEndoscopistOptions.ITALICISE_AMNESTY
     )
     # Drug Information
     InvestigationDatasetsPage(page).click_show_drug_information()
-    InvestigationDatasetsPage(page).select_drug_type_option1(
-        DrugTypeOptions.BISACODYL.value
-    )
+    InvestigationDatasetsPage(page).select_drug_type_option1(DrugTypeOptions.BISACODYL)
     InvestigationDatasetsPage(page).fill_drug_type_dose1("10")
     # Ensocopy Information
     InvestigationDatasetsPage(page).click_show_endoscopy_information()
     InvestigationDatasetsPage(page).check_endoscope_inserted_yes()
-    InvestigationDatasetsPage(page).select_theraputic_procedure_type()
+
+
+def default_investigation_dataset_forms_continuation(page: Page) -> None:
     InvestigationDatasetsPage(page).select_bowel_preparation_quality_option(
-        BowelPreparationQualityOptions.GOOD.value
+        BowelPreparationQualityOptions.GOOD
     )
     InvestigationDatasetsPage(page).select_comfort_during_examination_option(
-        ComfortOptions.NO_DISCOMFORT.value
+        ComfortOptions.NO_DISCOMFORT
     )
     InvestigationDatasetsPage(page).select_comfort_during_recovery_option(
-        ComfortOptions.NO_DISCOMFORT.value
+        ComfortOptions.NO_DISCOMFORT
     )
     InvestigationDatasetsPage(page).select_endoscopist_defined_extent_option(
-        EndoscopyLocationOptions.ILEUM.value
+        EndoscopyLocationOptions.ILEUM
     )
-    InvestigationDatasetsPage(page).select_scope_imager_used_option(
-        YesNoOptions.YES.value
-    )
-    InvestigationDatasetsPage(page).select_retorted_view_option(YesNoOptions.NO.value)
+    InvestigationDatasetsPage(page).select_scope_imager_used_option(YesNoOptions.YES)
+    InvestigationDatasetsPage(page).select_retorted_view_option(YesNoOptions.NO)
     InvestigationDatasetsPage(page).fill_start_of_intubation_time("09:00")
     InvestigationDatasetsPage(page).fill_start_of_extubation_time("09:15")
     InvestigationDatasetsPage(page).fill_end_time_of_procedure("09:30")
     InvestigationDatasetsPage(page).fill_scope_id("A1")
-    InvestigationDatasetsPage(page).select_insufflation_option(
-        InsufflationOptions.AIR.value
-    )
+    InvestigationDatasetsPage(page).select_insufflation_option(InsufflationOptions.AIR)
     InvestigationDatasetsPage(page).select_outcome_at_time_of_procedure_option(
-        OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT.value
+        OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT
     )
     InvestigationDatasetsPage(page).select_late_outcome_option(
-        LateOutcomeOptions.NO_COMPLICATIONS.value
+        LateOutcomeOptions.NO_COMPLICATIONS
     )
     InvestigationDatasetsPage(page).click_show_completion_proof_information()
     # Completion Proof Information
     InvestigationDatasetsPage(page).select_completion_proof_option(
-        CompletionProofOptions.PHOTO_ILEO.value
+        CompletionProofOptions.PHOTO_ILEO
     )
 
 
@@ -109,7 +103,7 @@ def investigation_datasets_failure_reason(page: Page) -> None:
     # Failure Information
     InvestigationDatasetsPage(page).click_show_failure_information()
     InvestigationDatasetsPage(page).select_failure_reasons_option(
-        FailureReasonsOptions.BLEEDING_INCIDENT.value
+        FailureReasonsOptions.BLEEDING_INCIDENT
     )
 
 
@@ -117,44 +111,44 @@ def polyps_for_high_risk_result(page: Page) -> None:
     # Polyp Information
     InvestigationDatasetsPage(page).click_add_polyp_button()
     InvestigationDatasetsPage(page).select_polyp1_location_option(
-        EndoscopyLocationOptions.ILEUM.value
+        EndoscopyLocationOptions.ILEUM
     )
     InvestigationDatasetsPage(page).select_polyp1_classification_option(
-        PolypClassificationOptions.LS.value
+        PolypClassificationOptions.LS
     )
     InvestigationDatasetsPage(page).fill_polyp1_size("15")
     InvestigationDatasetsPage(page).select_polyp1_access_option(
-        PolypAccessOptions.NOT_KNOWN.value
+        PolypAccessOptions.NOT_KNOWN
     )
     polyp1_intervention(page)
     InvestigationDatasetsPage(page).click_add_polyp_button()
     InvestigationDatasetsPage(page).select_polyp2_location_option(
-        EndoscopyLocationOptions.CAECUM.value
+        EndoscopyLocationOptions.CAECUM
     )
     InvestigationDatasetsPage(page).select_polyp2_classification_option(
-        PolypClassificationOptions.LS.value
+        PolypClassificationOptions.LS
     )
     InvestigationDatasetsPage(page).fill_polyp2_size("15")
     InvestigationDatasetsPage(page).select_polyp2_access_option(
-        PolypAccessOptions.NOT_KNOWN.value
+        PolypAccessOptions.NOT_KNOWN
     )
     InvestigationDatasetsPage(page).click_polyp2_add_intervention_button()
     InvestigationDatasetsPage(page).select_polyp2_intervention_modality_option(
-        PolypInterventionModalityOptions.EMR.value
+        PolypInterventionModalityOptions.EMR
     )
     InvestigationDatasetsPage(page).select_polyp2_intervention_device_option(
-        PolypInterventionDeviceOptions.HOT_SNARE.value
+        PolypInterventionDeviceOptions.HOT_SNARE
     )
     InvestigationDatasetsPage(page).select_polyp2_intervention_excised_option(
-        YesNoOptions.YES.value
+        YesNoOptions.YES
     )
     InvestigationDatasetsPage(page).select_polyp2_intervention_retrieved_option(
-        YesNoOptions.NO.value
+        YesNoOptions.NO
     )
     InvestigationDatasetsPage(
         page
     ).select_polyp2_intervention_excision_technique_option(
-        PolypInterventionExcisionTechniqueOptions.EN_BLOC.value
+        PolypInterventionExcisionTechniqueOptions.EN_BLOC
     )
 
 
@@ -162,14 +156,14 @@ def polyps_for_lnpcp_result(page: Page) -> None:
     # Polyp Information
     InvestigationDatasetsPage(page).click_add_polyp_button()
     InvestigationDatasetsPage(page).select_polyp1_location_option(
-        EndoscopyLocationOptions.ILEUM.value
+        EndoscopyLocationOptions.ILEUM
     )
     InvestigationDatasetsPage(page).select_polyp1_classification_option(
-        PolypClassificationOptions.LS.value
+        PolypClassificationOptions.LS
     )
     InvestigationDatasetsPage(page).fill_polyp1_size("30")
     InvestigationDatasetsPage(page).select_polyp1_access_option(
-        PolypAccessOptions.NOT_KNOWN.value
+        PolypAccessOptions.NOT_KNOWN
     )
     polyp1_intervention(page)
 
@@ -177,21 +171,21 @@ def polyps_for_lnpcp_result(page: Page) -> None:
 def polyp1_intervention(page: Page) -> None:
     InvestigationDatasetsPage(page).click_polyp1_add_intervention_button()
     InvestigationDatasetsPage(page).select_polyp1_intervention_modality_option(
-        PolypInterventionModalityOptions.POLYPECTOMY.value
+        PolypInterventionModalityOptions.POLYPECTOMY
     )
     InvestigationDatasetsPage(page).select_polyp1_intervention_device_option(
-        PolypInterventionDeviceOptions.HOT_SNARE.value
+        PolypInterventionDeviceOptions.HOT_SNARE
     )
     InvestigationDatasetsPage(page).select_polyp1_intervention_excised_option(
-        YesNoOptions.YES.value
+        YesNoOptions.YES
     )
     InvestigationDatasetsPage(page).select_polyp1_intervention_retrieved_option(
-        YesNoOptions.NO.value
+        YesNoOptions.NO
     )
     InvestigationDatasetsPage(
         page
     ).select_polyp1_intervention_excision_technique_option(
-        PolypInterventionExcisionTechniqueOptions.EN_BLOC.value
+        PolypInterventionExcisionTechniqueOptions.EN_BLOC
     )
 
 
@@ -254,11 +248,13 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # This needs to be repeated for two subjects, one old and one not - High Risk Result
     # Older patient
-    nhs_no = "9367991185"
+    nhs_no = "9056553305"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
-    deafult_investigation_dataset_forms(page)
+    default_investigation_dataset_forms(page)
+    InvestigationDatasetsPage(page).select_theraputic_procedure_type()
+    default_investigation_dataset_forms_continuation(page)
     investigation_datasets_failure_reason(page)
     polyps_for_high_risk_result(page)
     save_investigation_dataset(page)
@@ -277,6 +273,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     page.get_by_role("button", name="Calendar").click()
     CalendarPicker(page).v1_calender_picker(datetime.today())
     page.locator("#UI_NS_CONSULTANT_PIO_SELECT_LINK").click()
+    # Here value '201' is refering to Consultant B, Frame
     option_locator = page.locator('[value="201"]:visible')
     option_locator.wait_for(state="visible")
     option_locator.click()
@@ -290,11 +287,13 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     )
 
     # Younger patient
-    nhs_no = "9773554414"
+    nhs_no = "9867208471"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
-    deafult_investigation_dataset_forms(page)
+    default_investigation_dataset_forms(page)
+    InvestigationDatasetsPage(page).select_theraputic_procedure_type()
+    default_investigation_dataset_forms_continuation(page)
     investigation_datasets_failure_reason(page)
     polyps_for_high_risk_result(page)
     save_investigation_dataset(page)
@@ -319,11 +318,13 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # This needs to be repeated for two subjects, one old and one not - LNPCP Result
     # Older patient
-    nhs_no = "9898985798"
+    nhs_no = "9840013254"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
-    deafult_investigation_dataset_forms(page)
+    default_investigation_dataset_forms(page)
+    InvestigationDatasetsPage(page).select_theraputic_procedure_type()
+    default_investigation_dataset_forms_continuation(page)
     investigation_datasets_failure_reason(page)
     polyps_for_lnpcp_result(page)
     save_investigation_dataset(page)
@@ -342,6 +343,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     page.get_by_role("button", name="Calendar").click()
     CalendarPicker(page).v1_calender_picker(datetime.today())
     page.locator("#UI_NS_CONSULTANT_PIO_SELECT_LINK").click()
+    # Here value '201' is refering to Consultant B, Frame
     option_locator = page.locator('[value="201"]:visible')
     option_locator.wait_for(state="visible")
     option_locator.click()
@@ -359,7 +361,9 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
-    deafult_investigation_dataset_forms(page)
+    default_investigation_dataset_forms(page)
+    InvestigationDatasetsPage(page).select_theraputic_procedure_type()
+    default_investigation_dataset_forms_continuation(page)
     investigation_datasets_failure_reason(page)
     polyps_for_lnpcp_result(page)
     save_investigation_dataset(page)
@@ -383,14 +387,16 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     )
 
     # This needs to be repeated for 1 subject, age does not matter - Normal Result
-    nhs_no = "9035961803"
+    nhs_no = "9746210564"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
-    deafult_investigation_dataset_forms(page)
+    default_investigation_dataset_forms(page)
+    InvestigationDatasetsPage(page).select_diagnostic_procedure_type()
+    default_investigation_dataset_forms_continuation(page)
     InvestigationDatasetsPage(page).click_show_failure_information()
     InvestigationDatasetsPage(page).select_failure_reasons_option(
-        FailureReasonsOptions.NO_FAILURE_REASONS.value
+        FailureReasonsOptions.NO_FAILURE_REASONS
     )
     save_investigation_dataset(page)
     InvestigationDatasetsPage(page).expect_text_to_be_visible(
@@ -436,29 +442,29 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     #     if locator.is_visible():
     #         return locator
 
-    # batch_processing(
-    #     page,
-    #     "A318",
-    #     "Result Letters - No Post-investigation Appointment",
-    #     [
-    #         "S61 - Normal (No Abnormalities Found)",
-    #         "A158 - High-risk findings",
-    #         "A157 - LNPCP",
-    #     ],
-    # )
+    batch_processing(
+        page,
+        "A318",
+        "Result Letters - No Post-investigation Appointment",
+        [
+            "S61 - Normal (No Abnormalities Found)",
+            "A158 - High-risk findings",
+            "A157 - LNPCP",
+        ],
+    )
 
-    # batch_processing(
-    #     page,
-    #     "A385",
-    #     "Handover into Symptomatic Care Adenoma Surveillance, Age - GP Letter",
-    #     "A382 - Handover into Symptomatic Care - GP Letter Printed",
-    # )
+    batch_processing(
+        page,
+        "A385",
+        "Handover into Symptomatic Care Adenoma Surveillance, Age - GP Letter",
+        "A382 - Handover into Symptomatic Care - GP Letter Printed",
+    )
 
-    # batch_processing(
-    #     page,
-    #     "A382",
-    #     "Handover into Symptomatic Care Adenoma Surveillance - Patient Letter",
-    #     "P202 - Waiting Completion of Outstanding Events",
-    # )
+    batch_processing(
+        page,
+        "A382",
+        "Handover into Symptomatic Care Adenoma Surveillance - Patient Letter",
+        "P202 - Waiting Completion of Outstanding Events",
+    )
 
     LogoutPage(page).log_out()
