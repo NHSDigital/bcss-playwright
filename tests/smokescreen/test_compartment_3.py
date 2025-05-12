@@ -29,9 +29,7 @@ def test_compartment_3(page: Page, smokescreen_properties: dict) -> None:
 
     # Find data , separate it into normal and abnormal, Add results to the test records in the KIT_QUEUE table (i.e. mimic receiving results from the middleware)
     # and get device IDs and their flags
-    # Create an instance of the FitKitLogged class
-    fit_kit_logged = FitKitLogged()
-    device_ids = fit_kit_logged.process_kit_data(smokescreen_properties)
+    device_ids =FitKitLogged().process_kit_data(smokescreen_properties)
     # Retrieve NHS numbers for each device_id and determine normal/abnormal status
     nhs_numbers = []
     normal_flags = []
