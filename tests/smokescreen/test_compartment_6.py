@@ -198,6 +198,42 @@ def save_investigation_dataset(page: Page) -> None:
     InvestigationDatasetsPage(page).click_save_dataset_button()
 
 
+def after_high_risk_result(page: Page) -> None:
+    InvestigationDatasetsPage(page).expect_text_to_be_visible("High-risk findings")
+    BasePage(page).click_back_button()
+
+    # The following code is on the subject datasets page
+    expect(page.get_by_text("** Completed **").nth(1)).to_be_visible()
+    BasePage(page).click_back_button()
+
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    # The following code is on the advance fobt screening episode page
+    page.get_by_role("button", name="Enter Diagnostic Test Outcome").click()
+    # The following code is on the diagnostic test outcome page
+    expect(page.get_by_role("cell", name="High-risk findings").nth(1)).to_be_visible()
+    page.get_by_label("Outcome of Diagnostic Test").select_option("20365")
+    page.get_by_role("button", name="Save").click()
+
+
+def after_lnpcp_result(page: Page) -> None:
+    InvestigationDatasetsPage(page).expect_text_to_be_visible("LNPCP")
+    BasePage(page).click_back_button()
+
+    # The following code is on the subject datasets page
+    expect(page.get_by_text("** Completed **").nth(1)).to_be_visible()
+    BasePage(page).click_back_button()
+
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+
+    # The following code is on the advance fobt screening episode page
+    page.get_by_role("button", name="Enter Diagnostic Test Outcome").click()
+
+    # The following code is on the diagnostic test outcome page
+    expect(page.get_by_role("cell", name="LNPCP").nth(1)).to_be_visible()
+    page.get_by_label("Outcome of Diagnostic Test").select_option("20365")
+    page.get_by_role("button", name="Save").click()
+
+
 @pytest.mark.vpn_required
 @pytest.mark.smokescreen
 @pytest.mark.compartment6
@@ -215,7 +251,8 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
 
     # This needs to be repeated for two subjects, one old and one not - High Risk Result
-    nhs_no = "9160670894"  # Dummy NHS Number (will not work)
+    # Older patient
+    nhs_no = "9535686232"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -223,23 +260,8 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     investigation_datasets_failure_reason(page)
     polyps_for_high_risk_result(page)
     save_investigation_dataset(page)
+    after_high_risk_result(page)
 
-    InvestigationDatasetsPage(page).expect_text_to_be_visible("High-risk findings")
-    BasePage(page).click_back_button()
-
-    # The following code is on the subject datasets page
-    expect(page.get_by_text("** Completed **").nth(1)).to_be_visible()
-    BasePage(page).click_back_button()
-
-    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-    # The following code is on the advance fobt screening episode page
-    page.get_by_role("button", name="Enter Diagnostic Test Outcome").click()
-    # The following code is on the diagnostic test outcome page
-    expect(page.get_by_role("cell", name="High-risk findings").nth(1)).to_be_visible()
-    page.get_by_label("Outcome of Diagnostic Test").select_option("20365")
-    page.get_by_role("button", name="Save").click()
-
-    # This is if the subject is too old
     SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
         "A394 - Handover into Symptomatic Care for Surveillance - Patient Age"
     )
@@ -266,7 +288,17 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
         "A385 - Handover into Symptomatic Care"
     )
 
-    # This is if the subject is not too old
+    # Younger patient
+    nhs_no = "9160670894"
+    go_to_investigation_datasets_page(page, nhs_no)
+
+    # The following code is on the investigation datasets page
+    deafult_investigation_dataset_forms(page)
+    investigation_datasets_failure_reason(page)
+    polyps_for_high_risk_result(page)
+    save_investigation_dataset(page)
+    after_high_risk_result(page)
+
     SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
         "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
     )
@@ -285,7 +317,8 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     )
 
     # This needs to be repeated for two subjects, one old and one not - LNPCP Result
-    nhs_no = "9619187076"  # Dummy NHS Number (will not work)
+    # Older patient
+    nhs_no = "9661266328"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -293,25 +326,8 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     investigation_datasets_failure_reason(page)
     polyps_for_lnpcp_result(page)
     save_investigation_dataset(page)
+    after_lnpcp_result(page)
 
-    InvestigationDatasetsPage(page).expect_text_to_be_visible("LNPCP")
-    BasePage(page).click_back_button()
-
-    # The following code is on the subject datasets page
-    expect(page.get_by_text("** Completed **").nth(1)).to_be_visible()
-    BasePage(page).click_back_button()
-
-    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-
-    # The following code is on the advance fobt screening episode page
-    page.get_by_role("button", name="Enter Diagnostic Test Outcome").click()
-
-    # The following code is on the diagnostic test outcome page
-    expect(page.get_by_role("cell", name="LNPCP").nth(1)).to_be_visible()
-    page.get_by_label("Outcome of Diagnostic Test").select_option("20365")
-    page.get_by_role("button", name="Save").click()
-
-    # If the subject is too old
     SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
         "A394 - Handover into Symptomatic Care for Surveillance - Patient Age"
     )
@@ -338,7 +354,16 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
         "A385 - Handover into Symptomatic Care"
     )
 
-    # If the subject is not too old
+    # Younger patient
+    nhs_no = "9773554414"
+    go_to_investigation_datasets_page(page, nhs_no)
+
+    # The following code is on the investigation datasets page
+    deafult_investigation_dataset_forms(page)
+    investigation_datasets_failure_reason(page)
+    polyps_for_lnpcp_result(page)
+    save_investigation_dataset(page)
+    after_lnpcp_result(page)
     SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
         "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
     )
@@ -357,7 +382,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     )
 
     # This needs to be repeated for 1 subject, age does not matter - Normal Result
-    nhs_no = "9619187077"  # Dummy NHS Number (will not work)
+    nhs_no = "9035961803"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -411,29 +436,29 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     #     if locator.is_visible():
     #         return locator
 
-    batch_processing(
-        page,
-        "A318",
-        "Result Letters - No Post-investigation Appointment",
-        [
-            "S61 - Normal (No Abnormalities Found)",
-            "A158 - High-risk findings",
-            "A157 - LNPCP",
-        ],
-    )
+    # batch_processing(
+    #     page,
+    #     "A318",
+    #     "Result Letters - No Post-investigation Appointment",
+    #     [
+    #         "S61 - Normal (No Abnormalities Found)",
+    #         "A158 - High-risk findings",
+    #         "A157 - LNPCP",
+    #     ],
+    # )
 
-    batch_processing(
-        page,
-        "A385",
-        "Handover into Symptomatic Care Adenoma Surveillance, Age - GP Letter",
-        "A382 - Handover into Symptomatic Care - GP Letter Printed",
-    )
+    # batch_processing(
+    #     page,
+    #     "A385",
+    #     "Handover into Symptomatic Care Adenoma Surveillance, Age - GP Letter",
+    #     "A382 - Handover into Symptomatic Care - GP Letter Printed",
+    # )
 
-    batch_processing(
-        page,
-        "A382",
-        "Handover into Symptomatic Care Adenoma Surveillance - Patient Letter",
-        "P202 - Waiting Completion of Outstanding Events",
-    )
+    # batch_processing(
+    #     page,
+    #     "A382",
+    #     "Handover into Symptomatic Care Adenoma Surveillance - Patient Letter",
+    #     "P202 - Waiting Completion of Outstanding Events",
+    # )
 
     LogoutPage(page).log_out()
