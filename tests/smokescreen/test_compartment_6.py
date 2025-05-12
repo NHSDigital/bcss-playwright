@@ -387,7 +387,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     )
 
     # This needs to be repeated for 1 subject, age does not matter - Normal Result
-    nhs_no = "9746210564"
+    nhs_no = "9936724968"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -430,7 +430,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # The following code is on the record diagnosis date page
     page.locator("#diagnosisDate").click()
-    page.locator("#diagnosisDate").fill("09 May 2025")  # Todays date
+    CalendarPicker(page).v2_calendar_picker(datetime.today())
     page.get_by_role("button", name="Save").click()
 
     # Modification needs to be done to accept this list. it should check if any of the values in this list are present. Something like the following:
