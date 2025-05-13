@@ -90,6 +90,7 @@ class SubjectScreeningSummaryPage(BasePage):
 
     def verify_latest_event_status_value(self, latest_event_status: str | list) -> None:
         """Verify that the latest event status value is visible."""
+        self.wait_for_page_title()
         latest_event_status_locator = self.get_visible_status_from_list(
             latest_event_status
         )
