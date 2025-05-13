@@ -2,6 +2,8 @@ import pytest
 from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 from utils.user_tools import UserTools
+from utils.calendar_picker import CalendarPicker
+from datetime import datetime
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
@@ -9,6 +11,9 @@ from pages.screening_subject_search.subject_screening_summary_page import (
 from utils.batch_processing import batch_processing
 from pages.logout.log_out_page import LogoutPage
 from pages.datasets.subject_datasets_page import SubjectDatasetsPage
+from pages.screening_subject_search.handover_into_symptomatic_care_page import (
+    HandoverIntoSymptomaticCarePage
+)
 
 
 # This should go into a util. Adding it here to avoid SonarQube duplication errors:
@@ -148,18 +153,25 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     page.get_by_role("button", name="Handover into Symptomatic Care").click()
 
     # The following code is on the handover into symptomatic care page
-    page.get_by_label("Referral").select_option("20445")
-    page.get_by_role("button", name="Calendar").click()
-    page.get_by_role(
-        "cell", name="9", exact=True
-    ).click()  # Todays date (v1 calendar picker)
-    page.locator("#UI_NS_CONSULTANT_PIO_SELECT_LINK").click()
-    page.locator("#UI_RESULTS_usgwmbob").select_option("201")
-    page.locator("#UI_NS_PRACTITIONER_PIO_SELECT_LINK").click()
-    page.get_by_role("textbox", name="Notes").click()
-    page.get_by_role("textbox", name="Notes").fill("Test Automation")
-    page.once("dialog", lambda dialog: dialog.accept())
-    page.get_by_role("button", name="Save").click()
+    #page.get_by_label("Referral").select_option("20445")
+    #page.get_by_role("button", name="Calendar").click()
+    #CalendarPicker(page).v1_calender_picker(datetime.today())
+    #page.locator("#UI_NS_CONSULTANT_PIO_SELECT_LINK").click()
+    # Here value '201' is refering to Consultant B, Frame
+    #option_locator = page.locator('[value="201"]:visible')
+    #option_locator.wait_for(state="visible")
+    #option_locator.click()
+    #page.get_by_role("textbox", name="Notes").click()
+    #page.get_by_role("textbox", name="Notes").fill("Test Automation")
+    #page.once("dialog", lambda dialog: dialog.accept())
+    #page.get_by_role("button", name="Save").click()
+
+    HandoverIntoSymptomaticCarePage(page).select_referral_dropdown_option("20445")
+    HandoverIntoSymptomaticCarePage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+    HandoverIntoSymptomaticCarePage(page).select_consultant("201")
+    HandoverIntoSymptomaticCarePage(page).fill_notes("Test Automation")
+    HandoverIntoSymptomaticCarePage(page).click_save_button()
 
     SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
         "A385 - Handover into Symptomatic Care"
@@ -231,18 +243,25 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
     page.get_by_role("button", name="Handover into Symptomatic Care").click()
 
     # The following code is on the handover into symptomatic care page
-    page.get_by_label("Referral").select_option("20445")
-    page.get_by_role("button", name="Calendar").click()
-    page.get_by_role(
-        "cell", name="9", exact=True
-    ).click()  # Todays date (v1 calendar picker)
-    page.locator("#UI_NS_CONSULTANT_PIO_SELECT_LINK").click()
-    page.locator("#UI_RESULTS_ktdtoepq").select_option("201")
-    page.locator("#UI_NS_PRACTITIONER_PIO_SELECT_LINK").click()
-    page.get_by_role("textbox", name="Notes").click()
-    page.get_by_role("textbox", name="Notes").fill("Test Automation")
-    page.once("dialog", lambda dialog: dialog.accept())
-    page.get_by_role("button", name="Save").click()
+    #page.get_by_label("Referral").select_option("20445")
+    #page.get_by_role("button", name="Calendar").click()
+    #CalendarPicker(page).v1_calender_picker(datetime.today())
+    #page.locator("#UI_NS_CONSULTANT_PIO_SELECT_LINK").click()
+    # Here value '201' is refering to Consultant B, Frame
+    #option_locator = page.locator('[value="201"]:visible')
+    #option_locator.wait_for(state="visible")
+    #option_locator.click()
+    #page.get_by_role("textbox", name="Notes").click()
+    #page.get_by_role("textbox", name="Notes").fill("Test Automation")
+    #page.once("dialog", lambda dialog: dialog.accept())
+    #page.get_by_role("button", name="Save").click()
+
+    HandoverIntoSymptomaticCarePage(page).select_referral_dropdown_option("20445")
+    HandoverIntoSymptomaticCarePage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+    HandoverIntoSymptomaticCarePage(page).select_consultant("201")
+    HandoverIntoSymptomaticCarePage(page).fill_notes("Test Automation")
+    HandoverIntoSymptomaticCarePage(page).click_save_button()
 
     SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
         "A385 - Handover into Symptomatic Care"
