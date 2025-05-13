@@ -24,7 +24,7 @@ def batch_processing(
     page: Page,
     batch_type: str,
     batch_description: str,
-    latest_event_status: str,
+    latest_event_status: str | list,
     run_timed_events: bool = False,
     get_subjects_from_pdf: bool = False,
 ) -> None:
@@ -35,7 +35,7 @@ def batch_processing(
         page (Page): This is the playwright page object
         batch_type (str): The event code of the batch. E.g. S1 or S9
         batch_description (str): The description of the batch. E.g. Pre-invitation (FIT)
-        latest_event_status (str): The status the subject will get updated to after the batch has been processed.
+        latest_event_status (str | list): The status the subject will get updated to after the batch has been processed.
         run_timed_events (bool): An optional input that executes bcss_timed_events if set to True
         get_subjects_from_pdf (bool): An optional input to change the method of retrieving subjects from the batch from the DB to the PDF file.
     """
