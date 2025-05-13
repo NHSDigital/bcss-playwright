@@ -2,18 +2,19 @@
 
 The Screening Subject Search utility allows for
 
-- searching for relevant subjects using their NHS Number, forename, last name, DOB, post code, episode closed date, status or latest event status
-- verifying the subject's event status using their nhs number
+- searching for relevant subjects using their NHS Number, forename, last name, DOB, postcode, episode closed date, status or latest event status
+- verifying the subject's event status using their NHS number
 
 ## Table of Contents
 
 - [Utility Guide: Screening Subject Page Searcher](#utility-guide-screening-subject-page-searcher)
   - [Table of Contents](#table-of-contents)
   - [Functions Overview](#functions-overview)
-    - [Verify subject event status by nhs no](#verify-subject-event-status-by-nhs-no)
+    - [The page object parameter:](#the-page-object-parameter)
+    - [Verify subject event status by NHS no](#verify-subject-event-status-by-nhs-no)
       - [Arguments](#arguments)
       - [How This Function Works](#how-this-function-works)
-    - [Search subject by nhs number](#search-subject-by-nhs-number)
+    - [Search subject by NHS number](#search-subject-by-nhs-number)
       - [Arguments](#arguments-1)
       - [How This Function Works](#how-this-function-works-1)
     - [Search subject by surname](#search-subject-by-surname)
@@ -25,7 +26,7 @@ The Screening Subject Search utility allows for
     - [Search subject by date of birth](#search-subject-by-date-of-birth)
       - [Arguments](#arguments-4)
       - [How This Function Works](#how-this-function-works-4)
-    - [Search subject by post code](#search-subject-by-post-code)
+    - [Search subject by postcode](#search-subject-by-postcode)
       - [Arguments](#arguments-5)
       - [How This Function Works](#how-this-function-works-5)
     - [Search subject by episode closed date](#search-subject-by-episode-closed-date)
@@ -61,10 +62,13 @@ For this utility we have the following functions:
 - `search_subject_by_search_area`
 - `check_clear_filters_button_works`
 
-### Verify subject event status by nhs no
+### The page object parameter:
+- is required for all the listed functions above. It is listed as an arguement just once to avoid repetition
+
+### Verify subject event status by NHS no
 
 This is used to check that the latest event status of a subject has been updated to what is expected.
-The provided nhs no is used to search the whole database and then verifies the latest event status is as expected.
+The provided NHS no is used to search the whole database and then verifies the latest event status is as expected.
 
 #### Arguments
 
@@ -73,7 +77,7 @@ The provided nhs no is used to search the whole database and then verifies the l
   - This is the playwright page object which is used to tell playwright what page the test is currently on
 - `nhs_no`:
   - Type: `str`
-  - This is the subject's nhs number. For example: 123 456 7890
+  - This is the subject's NHS number. For example: 123 456 7890
 - `latest_event_status`:
   - Type: `str`
   - This is the expected status of the subject that is being verified
@@ -82,27 +86,24 @@ The provided nhs no is used to search the whole database and then verifies the l
 
 1. It starts off by navigating to the main menu if not already on this page. This is done to ensure that this can be called from any page
 2. Once on the main menu it navigates to the screening subject search page
-3. From here it fills in the nhs number filter field with the supplied nhs number and chooses the whole area database as the search area option
+3. From here it fills in the NHS number filter field with the supplied NHS number and chooses the whole area database as the search area option
 4. It then clicks the search button
 5. Once the subject is returned, it then verifies that the latest event status matches the supplied event status
 
-### Search subject by nhs number
+### Search subject by NHS number
 
 This searches for a subject by their NHS Number
 
 #### Arguments
 
-- `page`:
-  - Type: `Page`
-  - This is the playwright page object which is used to tell playwright what page the test is currently on
 - `nhs_no`:
   - Type: `str`
-  - This is the subject's nhs number. For example: 123 456 7890
+  - This is the subject's NHS number. For example: 123 456 7890
 
 #### How This Function Works
 
 1. It starts off by clicking on the **Clear filters** button to remove any persisting filters
-2. It then fills in the nhs number filter field with the supplied nhs number and clicks the search button
+2. It then fills in the NHS number filter field with the supplied NHS number and clicks the search button
 
 ### Search subject by surname
 
@@ -110,9 +111,6 @@ This searches for a subject by their surname
 
 #### Arguments
 
-- `page`:
-  - Type: `Page`
-  - This is the playwright page object which is used to tell playwright what page the test is currently on
 - `surname`:
   - Type: `str`
   - This is the subject's surname
@@ -128,9 +126,6 @@ This searches for a subject by their forename
 
 #### Arguments
 
-- `page`:
-  - Type: `Page`
-  - This is the playwright page object which is used to tell playwright what page the test is currently on
 - `forename`:
   - Type: `str`
   - This is the subject's forename
@@ -146,9 +141,6 @@ This searches for a subject by their date of birth
 
 #### Arguments
 
-- `page`:
-  - Type: `Page`
-  - This is the playwright page object which is used to tell playwright what page the test is currently on
 - `dob`:
   - Type: `str`
   - This is the subject's date of birth
@@ -158,23 +150,20 @@ This searches for a subject by their date of birth
 1. It starts off by clicking on the **Clear filters** button to remove any persisting filters
 2. It then fills in the date of birth filter field with the supplied DOB and clicks the search button
 
-### Search subject by post code
+### Search subject by postcode
 
-This searches for a subject by their post code
+This searches for a subject by their postcode
 
 #### Arguments
 
-- `page`:
-  - Type: `Page`
-  - This is the playwright page object which is used to tell playwright what page the test is currently on
 - `postcode`:
   - Type: `str`
-  - This is the subject's post code
+  - This is the subject's postcode
 
 #### How This Function Works
 
 1. It starts off by clicking on the **Clear filters** button to remove any persisting filters
-2. It then fills in the post code filter field with the supplied post code and clicks the search button
+2. It then fills in the postcode filter field with the supplied postcode and clicks the search button
 
 ### Search subject by episode closed date
 
@@ -182,9 +171,6 @@ This searches for a subject by their episode closed date
 
 #### Arguments
 
-- `page`:
-  - Type: `Page`
-  - This is the playwright page object which is used to tell playwright what page the test is currently on
 - `episode_closed_date`:
   - Type: `str`
   - This is the subject's episode closed date
@@ -200,9 +186,6 @@ This searches for a subject by their screening status
 
 #### Arguments
 
-- `page`:
-  - Type: `Page`
-  - This is the playwright page object which is used to tell playwright what page the test is currently on
 - `status`:
   - Type: `str`
   - This is the subject's screening status
@@ -218,9 +201,6 @@ This searches for a subject by their latest event status
 
 #### Arguments
 
-- `page`:
-  - Type: `Page`
-  - This is the playwright page object which is used to tell playwright what page the test is currently on
 - `status`:
   - Type: `str`
   - This is the subject's latest event status
@@ -236,9 +216,6 @@ This searches for a subject by search area
 
 #### Required Arguments
 
-- `page`:
-  - Type: `Page`
-  - This is the playwright page object which is used to tell playwright what page the test is currently on
 - `status`:
   - Type: `str`
   - This is the subject's screening status
@@ -267,14 +244,11 @@ This checks that the "clear filter" button works as intended
 
 #### Arguments
 
-- `page`:
-  - Type: `Page`
-  - This is the playwright page object which is used to tell playwright what page the test is currently on
 - `nhs_no`:
   - Type: `str`
-  - This is the subject's nhs number. For example: 123 456 7890
+  - This is the subject's NHS number. For example: 123 456 7890
 
 #### How This Function Works
 
-1. It fills in the nhs number filter field with the supplied nhs number and verifies that the nhs number filter field contains the entered value
-2. It then clicks the clear filters button and verifies that the nhs number filter field is now empty
+1. It fills in the NHS number filter field with the supplied NHS number and verifies that the NHS number filter field contains the entered value
+2. It then clicks the clear filters button and verifies that the NHS number filter field is now empty
