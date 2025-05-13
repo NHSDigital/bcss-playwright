@@ -1,8 +1,9 @@
 # Utility Guide: Screening Subject Page Searcher
 
 The Screening Subject Search utility allows for
+
 - searching for relevant subjects using their NHS Number, forename, last name, DOB, post code, episode closed date, status or latest event status
-- verifying the subject's event status using their nhs number 
+- verifying the subject's event status using their nhs number
 
 ## Table of Contents
 
@@ -244,7 +245,7 @@ This searches for a subject by search area
 - `search_area`:
   - Type: `str`
   - This is the search area option to use
-  
+
 #### Optional Arguments
 
 - `code`:
