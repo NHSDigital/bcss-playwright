@@ -1,6 +1,6 @@
 # Utility Guide: Screening Subject Page Searcher
 
-The Screening Subject Search utility allows for 
+The Screening Subject Search utility allows for
 - searching for relevant subjects using their NHS Number, forename, last name, DOB, post code, episode closed date, status or latest event status
 - verifying the subject's event status using their nhs number 
 
@@ -256,8 +256,8 @@ This searches for a subject by search area
 
 1. It starts off by clicking on the **Clear filters** button to remove any persisting filters
 2. It then selects the screening status option that matches the supplied status
-3. If provided, the code paremeter is used to fill the appropriate code filter field
-4. If provided, the gp practice code paremeter is used to fill the gp practice in ccg filter field
+3. If provided, the code parameter is used to fill the appropriate code filter field
+4. If provided, the GP practice code parameter is used to fill the GP Practice in CCG filter field
 5. It then clicks the search button
 
 ### Check clear filters button works
