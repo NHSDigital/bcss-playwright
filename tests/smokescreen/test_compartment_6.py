@@ -273,8 +273,9 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     page.get_by_role("button", name="Calendar").click()
     CalendarPicker(page).v1_calender_picker(datetime.today())
     page.locator("#UI_NS_CONSULTANT_PIO_SELECT_LINK").click()
-    # Here value '201' is refering to Consultant B, Frame
-    option_locator = page.locator('[value="201"]:visible')
+    option_locator = page.locator(
+        '[value="201"]:visible'
+    )  # Here value '201' is refering to Consultant B, Frame
     option_locator.wait_for(state="visible")
     option_locator.click()
     page.get_by_role("textbox", name="Notes").click()
@@ -343,8 +344,9 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     page.get_by_role("button", name="Calendar").click()
     CalendarPicker(page).v1_calender_picker(datetime.today())
     page.locator("#UI_NS_CONSULTANT_PIO_SELECT_LINK").click()
-    # Here value '201' is refering to Consultant B, Frame
-    option_locator = page.locator('[value="201"]:visible')
+    option_locator = page.locator(
+        '[value="201"]:visible'
+    )  # Here value '201' is refering to Consultant B, Frame
     option_locator.wait_for(state="visible")
     option_locator.click()
     page.get_by_role("textbox", name="Notes").click()
