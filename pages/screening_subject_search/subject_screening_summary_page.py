@@ -86,7 +86,9 @@ class SubjectScreeningSummaryPage(BasePage):
 
     def verify_latest_event_status_value(self, latest_event_status: str | list) -> None:
         """Verify that the latest event status value is visible."""
-        latest_event_status_locator = self.get_first_visible_status(latest_event_status)
+        latest_event_status_locator = self.get_visible_status_from_list(
+            latest_event_status
+        )
         status = latest_event_status_locator.inner_text()
         logging.info(f"Verifying subject has the status: {status}")
         try:
@@ -95,7 +97,7 @@ class SubjectScreeningSummaryPage(BasePage):
         except Exception:
             pytest.fail(f"Subject does not have the status: {status}")
 
-    def get_first_visible_status(self, latest_event_status) -> Locator:
+    def get_visible_status_from_list(self, latest_event_status) -> Locator:
         """
         Get the first visible status from the latest event status string or list.
 
