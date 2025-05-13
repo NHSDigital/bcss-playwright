@@ -11,6 +11,9 @@ from pages.logout.log_out_page import LogoutPage
 from pages.datasets.subject_datasets_page import SubjectDatasetsPage
 from utils.calendar_picker import CalendarPicker
 from datetime import datetime
+from pages.screening_subject_search.record_diagnosis_date_page import (
+    RecordDiagnosisDatePage,
+)
 from pages.datasets.investigation_dataset_page import (
     InvestigationDatasetsPage,
     SiteLookupOptions,
@@ -309,9 +312,8 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     page.get_by_role("button", name="Record Diagnosis Date").click()
 
     # The following code is on the record diagnosis date page
-    page.locator("#diagnosisDate").click()
-    CalendarPicker(page).v2_calendar_picker(datetime.today())
-    page.get_by_role("button", name="Save").click()
+    RecordDiagnosisDatePage(page).enter_date_in_diagnosis_date_field(datetime.today())
+    RecordDiagnosisDatePage(page).click_save_button()
 
     SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
         "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
@@ -379,10 +381,8 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     page.get_by_role("button", name="Record Diagnosis Date").click()
 
     # The following code is on the record diagnosis date page
-    page.locator("#diagnosisDate").click()
-    CalendarPicker(page).v2_calendar_picker(datetime.today())
-    page.locator("#diagnosisDate").press("Enter")
-    page.get_by_role("button", name="Save").click()
+    RecordDiagnosisDatePage(page).enter_date_in_diagnosis_date_field(datetime.today())
+    RecordDiagnosisDatePage(page).click_save_button()
 
     SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
         "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
@@ -431,18 +431,8 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     page.get_by_role("button", name="Record Diagnosis Date").click()
 
     # The following code is on the record diagnosis date page
-    page.locator("#diagnosisDate").click()
-    CalendarPicker(page).v2_calendar_picker(datetime.today())
-    page.get_by_role("button", name="Save").click()
-
-    # Modification needs to be done to accept this list. it should check if any of the values in this list are present. Something like the following:
-    # def get_first_visible_cell(page, values):
-    # if isinstance(values, str):
-    #     values = [values]
-    # for name in values:
-    #     locator = page.get_by_role("cell", name=name)
-    #     if locator.is_visible():
-    #         return locator
+    RecordDiagnosisDatePage(page).enter_date_in_diagnosis_date_field(datetime.today())
+    RecordDiagnosisDatePage(page).click_save_button()
 
     batch_processing(
         page,
