@@ -180,7 +180,7 @@ def search_subject_by_search_area(
 def check_clear_filters_button_works(page: Page, nhs_number: str) -> None:
     """
     This checks that the "clear filter" button works as intended
-    
+
     Args:
         page (Page): This is the playwright page object
         nhs_number (str): The screening subject's nhs number

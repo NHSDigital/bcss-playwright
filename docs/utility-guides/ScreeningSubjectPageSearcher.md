@@ -63,8 +63,8 @@ For this utility we have the following functions:
 - `check_clear_filters_button_works`
 
 ### The page object parameter
-- Is required for all the listed functions above.
-- It is listed as an argument just once to avoid repetition.
+1. Is required for all the listed functions above.
+2. It is listed as an argument just once to avoid repetition.
 
 ### Verify subject event status by NHS no
 
