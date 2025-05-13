@@ -79,8 +79,10 @@ def batch_processing(
 
     check_batch_in_archived_batch_list(page, link_text)
 
-    first_nhs_no = nhs_no_df["subject_nhs_number"].iloc[0]
-    verify_subject_event_status_by_nhs_no(page, first_nhs_no, latest_event_status)
+    for subject in range(len(nhs_no_df)):
+        nhs_no = nhs_no_df["subject_nhs_number"].iloc[subject]
+        logging.info(f"Verifying the event status for subject: {nhs_no}")
+        verify_subject_event_status_by_nhs_no(page, nhs_no, latest_event_status)
 
     if run_timed_events:
         OracleDB().exec_bcss_timed_events(nhs_no_df)
