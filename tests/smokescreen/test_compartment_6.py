@@ -233,6 +233,36 @@ def after_lnpcp_result(page: Page) -> None:
     page.get_by_role("button", name="Save").click()
 
 
+def handover_subject_to_symptomatic_care(page: Page) -> None:
+    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+        "A394 - Handover into Symptomatic Care for Surveillance - Patient Age"
+    )
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+
+    # The following code is on the advance fobt screening episode page
+    page.get_by_role("button", name="Handover into Symptomatic Care").click()
+
+    # The following code is on the handover into symptomatic care page
+    page.get_by_label("Referral").select_option("20445")
+    page.get_by_role("button", name="Calendar").click()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+    page.locator("#UI_NS_CONSULTANT_PIO_SELECT_LINK").click()
+    option_locator = page.locator(
+        '[value="201"]:visible'
+    )  # Here value '201' is referring to Consultant B, Frame
+    option_locator.wait_for(state="visible")
+    option_locator.click()
+    page.get_by_role("textbox", name="Notes").click()
+    page.get_by_role("textbox", name="Notes").fill("Test Automation")
+    page.once("dialog", lambda dialog: dialog.accept())
+    page.get_by_role("button", name="Save").click()
+
+    SubjectScreeningSummaryPage(page).wait_for_page_title()
+    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+        "A385 - Handover into Symptomatic Care"
+    )
+
+
 @pytest.mark.vpn_required
 @pytest.mark.smokescreen
 @pytest.mark.compartment6
@@ -263,33 +293,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     save_investigation_dataset(page)
     after_high_risk_result(page)
 
-    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
-        "A394 - Handover into Symptomatic Care for Surveillance - Patient Age"
-    )
-    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-
-    # The following code is on the advance fobt screening episode page
-    page.get_by_role("button", name="Handover into Symptomatic Care").click()
-
-    # The following code is on the handover into symptomatic care page
-    page.get_by_label("Referral").select_option("20445")
-    page.get_by_role("button", name="Calendar").click()
-    CalendarPicker(page).v1_calender_picker(datetime.today())
-    page.locator("#UI_NS_CONSULTANT_PIO_SELECT_LINK").click()
-    option_locator = page.locator(
-        '[value="201"]:visible'
-    )  # Here value '201' is referring to Consultant B, Frame
-    option_locator.wait_for(state="visible")
-    option_locator.click()
-    page.get_by_role("textbox", name="Notes").click()
-    page.get_by_role("textbox", name="Notes").fill("Test Automation")
-    page.once("dialog", lambda dialog: dialog.accept())
-    page.get_by_role("button", name="Save").click()
-
-    SubjectScreeningSummaryPage(page).wait_for_page_title()
-    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
-        "A385 - Handover into Symptomatic Care"
-    )
+    handover_subject_to_symptomatic_care(page)
 
     # Younger patient
     nhs_no = "9624131880"
@@ -334,33 +338,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     save_investigation_dataset(page)
     after_lnpcp_result(page)
 
-    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
-        "A394 - Handover into Symptomatic Care for Surveillance - Patient Age"
-    )
-    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-
-    # The following code is on the advance fobt screening episode page
-    page.get_by_role("button", name="Handover into Symptomatic Care").click()
-
-    # The following code is on the handover into symptomatic care page
-    page.get_by_label("Referral").select_option("20445")
-    page.get_by_role("button", name="Calendar").click()
-    CalendarPicker(page).v1_calender_picker(datetime.today())
-    page.locator("#UI_NS_CONSULTANT_PIO_SELECT_LINK").click()
-    option_locator = page.locator(
-        '[value="201"]:visible'
-    )  # Here value '201' is referring to Consultant B, Frame
-    option_locator.wait_for(state="visible")
-    option_locator.click()
-    page.get_by_role("textbox", name="Notes").click()
-    page.get_by_role("textbox", name="Notes").fill("Test Automation")
-    page.once("dialog", lambda dialog: dialog.accept())
-    page.get_by_role("button", name="Save").click()
-
-    SubjectScreeningSummaryPage(page).wait_for_page_title()
-    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
-        "A385 - Handover into Symptomatic Care"
-    )
+    handover_subject_to_symptomatic_care(page)
 
     # Younger patient
     nhs_no = "9627060208"
