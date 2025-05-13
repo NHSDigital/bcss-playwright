@@ -251,7 +251,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # This needs to be repeated for two subjects, one old and one not - High Risk Result
     # Older patient
-    nhs_no = "9056553305"
+    nhs_no = "9109877185"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -278,7 +278,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     page.locator("#UI_NS_CONSULTANT_PIO_SELECT_LINK").click()
     option_locator = page.locator(
         '[value="201"]:visible'
-    )  # Here value '201' is refering to Consultant B, Frame
+    )  # Here value '201' is referring to Consultant B, Frame
     option_locator.wait_for(state="visible")
     option_locator.click()
     page.get_by_role("textbox", name="Notes").click()
@@ -286,12 +286,13 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     page.once("dialog", lambda dialog: dialog.accept())
     page.get_by_role("button", name="Save").click()
 
+    SubjectScreeningSummaryPage(page).wait_for_page_title()
     SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
         "A385 - Handover into Symptomatic Care"
     )
 
     # Younger patient
-    nhs_no = "9867208471"
+    nhs_no = "9624131880"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -321,7 +322,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # This needs to be repeated for two subjects, one old and one not - LNPCP Result
     # Older patient
-    nhs_no = "9840013254"
+    nhs_no = "9648064792"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -348,7 +349,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     page.locator("#UI_NS_CONSULTANT_PIO_SELECT_LINK").click()
     option_locator = page.locator(
         '[value="201"]:visible'
-    )  # Here value '201' is refering to Consultant B, Frame
+    )  # Here value '201' is referring to Consultant B, Frame
     option_locator.wait_for(state="visible")
     option_locator.click()
     page.get_by_role("textbox", name="Notes").click()
@@ -356,12 +357,13 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     page.once("dialog", lambda dialog: dialog.accept())
     page.get_by_role("button", name="Save").click()
 
+    SubjectScreeningSummaryPage(page).wait_for_page_title()
     SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
         "A385 - Handover into Symptomatic Care"
     )
 
     # Younger patient
-    nhs_no = "9477527106"
+    nhs_no = "9627060208"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -389,8 +391,8 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     )
 
     # This needs to be repeated for 1 subject, age does not matter - Normal Result
-    nhs_no = "9936724968"
-    go_to_investigation_datasets_page(page, nhs_no)
+    nhs_no_normal = "9965184321"
+    go_to_investigation_datasets_page(page, nhs_no_normal)
 
     # The following code is on the investigation datasets page
     default_investigation_dataset_forms(page)
@@ -443,6 +445,11 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
             "A158 - High-risk findings",
             "A157 - LNPCP",
         ],
+    )
+
+    # This is to check for the status of a normal subject as this NHS Number cannot be retrieved from the DB
+    verify_subject_event_status_by_nhs_no(
+        page, nhs_no_normal, "S61 - Normal (No Abnormalities Found)"
     )
 
     batch_processing(

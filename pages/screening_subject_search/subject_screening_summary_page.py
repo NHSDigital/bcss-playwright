@@ -56,6 +56,10 @@ class SubjectScreeningSummaryPage(BasePage):
             "button", name="Advance FOBT Screening Episode"
         )
 
+    def wait_for_page_title(self) -> None:
+        """Waits for the page to be the Subject Screening Summary"""
+        self.subject_screening_summary.wait_for()
+
     def verify_result_contains_text(self, text) -> None:
         """Verify that the result contains the given text."""
         expect(self.display_rs).to_contain_text(text)
