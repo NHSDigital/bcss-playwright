@@ -10,7 +10,7 @@ The Screening Subject Search utility allows for
 - [Utility Guide: Screening Subject Page Searcher](#utility-guide-screening-subject-page-searcher)
   - [Table of Contents](#table-of-contents)
   - [Functions Overview](#functions-overview)
-    - [The page object parameter:](#the-page-object-parameter)
+    - [The page object parameter](#the-page-object-parameter)
     - [Verify subject event status by NHS no](#verify-subject-event-status-by-nhs-no)
       - [Arguments](#arguments)
       - [How This Function Works](#how-this-function-works)
@@ -62,8 +62,9 @@ For this utility we have the following functions:
 - `search_subject_by_search_area`
 - `check_clear_filters_button_works`
 
-### The page object parameter:
-- is required for all the listed functions above. It is listed as an arguement just once to avoid repetition
+### The page object parameter
+- Is required for all the listed functions above.
+- It is listed as an argument just once to avoid repetition.
 
 ### Verify subject event status by NHS no
 

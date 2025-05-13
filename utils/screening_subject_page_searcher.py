@@ -55,7 +55,7 @@ def search_subject_by_nhs_number(page: Page, nhs_number: str) -> None:
 def search_subject_by_surname(page: Page, surname: str) -> None:
     """
     This searches for a subject by their surname and checks the page has redirected accordingly
-    
+
     Args:
         page (Page): This is the playwright page object
         surname (str): The screening subject's surname
@@ -69,7 +69,7 @@ def search_subject_by_surname(page: Page, surname: str) -> None:
 def search_subject_by_forename(page: Page, forename: str) -> None:
     """
     This searches for a subject by their forename and checks the page has redirected accordingly
-    
+
     Args:
         page (Page): This is the playwright page object
         forename (str): The screening subject's forename
@@ -83,7 +83,7 @@ def search_subject_by_forename(page: Page, forename: str) -> None:
 def search_subject_by_dob(page: Page, dob: str) -> None:
     """
     This searches for a subject by their date of birth and checks the page has redirected accordingly
-    
+
     Args:
         page (Page): This is the playwright page object
         dob (str): The screening subject's date of birth
@@ -97,7 +97,7 @@ def search_subject_by_dob(page: Page, dob: str) -> None:
 def search_subject_by_postcode(page: Page, postcode: str) -> None:
     """
     This searches for a subject by their postcode and checks the page has redirected accordingly
-    
+
     Args:
         page (Page): This is the playwright page object
         postcode (str): The screening subject's postcode
@@ -111,7 +111,7 @@ def search_subject_by_postcode(page: Page, postcode: str) -> None:
 def search_subject_by_episode_closed_date(page: Page, episode_closed_date: str) -> None:
     """
     This searches for a subject by their episode closed date and checks the page has redirected accordingly
-    
+
     Args:
         page (Page): This is the playwright page object
         episode_closed_date (str): The screening subject's episode closed date
@@ -125,7 +125,7 @@ def search_subject_by_episode_closed_date(page: Page, episode_closed_date: str) 
 def search_subject_by_status(page: Page, status: str) -> None:
     """
     This searches for a subject by their screening status and checks the page has redirected accordingly
-    
+
     Args:
         page (Page): This is the playwright page object
         status (str): The screening subject's screening status
@@ -139,7 +139,7 @@ def search_subject_by_status(page: Page, status: str) -> None:
 def search_subject_by_latest_event_status(page: Page, status: str) -> None:
     """
     This searches for a subject by their latest event status and checks the page has redirected accordingly
-    
+
     Args:
         page (Page): This is the playwright page object
         status (str): The screening subject's latest event status
@@ -155,7 +155,7 @@ def search_subject_by_search_area(
 ) -> None:
     """
     This searches for a subject by the search area, populating necessary fields were needed, and checks that the page has redirected accordingly
-    
+
     Args:
         page (Page): This is the playwright page object
         status (str): The screening subject's screening status
