@@ -21,7 +21,6 @@ class DiagnosticTestOutcomePage(BasePage):
     def verify_diagnostic_test_outcome(self, outcome_name: str) -> None:
         """Verify that the diagnostic test outcome is visible."""
         expect(self.test_outcome_result).to_be_visible()
-  
 
     def select_test_outcome_option(self, option: str) -> None:
         """Select an option from the Outcome of Diagnostic Test dropdown."""
@@ -38,4 +37,4 @@ class OutcomeOfDiagnosticTest(StrEnum):
     Failed_Test_Refer_Another = "20363"
     Refer_Symptomatic = "20366"
     Refer_Surveillance = "20365"
-    Investigation_Complete='20360'
+    Investigation_Complete = "20360"
