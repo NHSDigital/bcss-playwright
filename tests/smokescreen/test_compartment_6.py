@@ -220,7 +220,7 @@ def after_high_risk_result(page: Page) -> None:
 
     # The following code is on the diagnostic test outcome page
     DiagnosticTestOutcomePage(page).verify_diagnostic_test_outcome("High-risk findings")
-    DiagnosticTestOutcomePage(page).select_test_outcome_option(OutcomeOfDiagnosticTest.Refer_Surveillance)
+    DiagnosticTestOutcomePage(page).select_test_outcome_option(OutcomeOfDiagnosticTest.REFER_SURVEILLANCE)
     DiagnosticTestOutcomePage(page).click_save_button()
 
 def after_lnpcp_result(page: Page) -> None:
@@ -238,7 +238,7 @@ def after_lnpcp_result(page: Page) -> None:
 
     # The following code is on the diagnostic test outcome page
     DiagnosticTestOutcomePage(page).verify_diagnostic_test_outcome("LNPCP")
-    DiagnosticTestOutcomePage(page).select_test_outcome_option(OutcomeOfDiagnosticTest.Refer_Surveillance)
+    DiagnosticTestOutcomePage(page).select_test_outcome_option(OutcomeOfDiagnosticTest.REFER_SURVEILLANCE)
     DiagnosticTestOutcomePage(page).click_save_button()
 
 def handover_subject_to_symptomatic_care(page: Page) -> None:
@@ -400,7 +400,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     DiagnosticTestOutcomePage(page).verify_diagnostic_test_outcome(
         "Normal (No Abnormalities"
     )
-    DiagnosticTestOutcomePage(page).select_test_outcome_option(OutcomeOfDiagnosticTest.Investigation_Complete)
+    DiagnosticTestOutcomePage(page).select_test_outcome_option(OutcomeOfDiagnosticTest.INVESTIGATION_COMPLETE)
     DiagnosticTestOutcomePage(page).click_save_button()
 
     SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
