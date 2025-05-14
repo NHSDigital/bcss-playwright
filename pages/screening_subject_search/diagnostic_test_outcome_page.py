@@ -28,7 +28,7 @@ class DiagnosticTestOutcomePage(BasePage):
         """Select an option from the Outcome of Diagnostic Test dropdown.
 
         Args:
-        option (str): option (str): The option to select from the Outcome Of Diagnostic Test options.
+            option (str): option (str): The option to select from the Outcome Of Diagnostic Test options.
         """
         self.test_outcome_dropdown.select_option(option)
 
@@ -40,7 +40,7 @@ class DiagnosticTestOutcomePage(BasePage):
 class OutcomeOfDiagnosticTest(StrEnum):
     """Enum for outcome of diagnostic test options."""
 
-    Failed_Test_Refer_Another = "20363"
-    Refer_Symptomatic = "20366"
-    Refer_Surveillance = "20365"
-    Investigation_Complete = "20360"
+    FAILED_TEST_REFER_ANOTHER = "20363"
+    REFER_SYMPTOMATIC = "20366"
+    REFER_SURVEILLANCE = "20365"
+    INVESTIGATION_COMPLETE = "20360"
