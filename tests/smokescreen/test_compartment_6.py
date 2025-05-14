@@ -2,8 +2,6 @@ import pytest
 from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 from utils.user_tools import UserTools
-from utils.calendar_picker import CalendarPicker
-from datetime import datetime
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
@@ -279,7 +277,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # This needs to be repeated for two subjects, one old and one not - High Risk Result
     # Older patient
-    nhs_no = "9109877185"
+    nhs_no = "9577049095"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -294,7 +292,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     handover_subject_to_symptomatic_care(page)
 
     # Younger patient
-    nhs_no = "9624131880"
+    nhs_no = "9567180636"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -324,7 +322,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # This needs to be repeated for two subjects, one old and one not - LNPCP Result
     # Older patient
-    nhs_no = "9648064792"
+    nhs_no = "9237051190"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -339,7 +337,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     handover_subject_to_symptomatic_care(page)
 
     # Younger patient
-    nhs_no = "9627060208"
+    nhs_no = "9564243211"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -367,7 +365,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     )
 
     # This needs to be repeated for 1 subject, age does not matter - Normal Result
-    nhs_no_normal = "9965184321"
+    nhs_no_normal = "9648226105"
     go_to_investigation_datasets_page(page, nhs_no_normal)
 
     # The following code is on the investigation datasets page

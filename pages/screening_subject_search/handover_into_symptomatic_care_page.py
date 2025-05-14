@@ -15,7 +15,12 @@ class HandoverIntoSymptomaticCarePage(BasePage):
         self.save_button = self.page.get_by_role("button", name="Save")
 
     def select_referral_dropdown_option(self, value: str) -> None:
-        """Select a given option from the Referral dropdown."""
+        """
+        Select a given option from the Referral dropdown.
+
+        Args:
+            value (str): The value of the option you want to select
+        """
         self.referral_dropdown.select_option(value)
 
     def click_calendar_button(self) -> None:
@@ -23,14 +28,24 @@ class HandoverIntoSymptomaticCarePage(BasePage):
         self.click(self.calendar_button)
 
     def select_consultant(self, value: str) -> None:
-        """Select a consultant from the dropdown."""
+        """
+        Select a consultant from the consultant dropdown using the given value.
+
+        Args:
+        value (str): The value attribute of the consultant option to select.
+        """
         self.consultant_link.click()
         option_locator = self.page.locator(f'[value="{value}"]:visible')
         option_locator.wait_for(state="visible")
         self.click(option_locator)
 
     def fill_notes(self, notes: str) -> None:
-        """Fill the notes textbox with the given text."""
+        """
+        Fill the 'Notes' textbox with the provided text.
+
+        Args:
+        notes (str): The text to enter into the notes textbox.
+        """
         self.notes_textbox.click()
         self.notes_textbox.fill(notes)
 
