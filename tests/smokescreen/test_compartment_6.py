@@ -14,6 +14,9 @@ from datetime import datetime
 from pages.screening_subject_search.record_diagnosis_date_page import (
     RecordDiagnosisDatePage,
 )
+from pages.screening_subject_search.diagnostic_test_outcome_page import (
+    DiagnosticTestOutcomePage,
+)
 from pages.datasets.investigation_dataset_page import (
     InvestigationDatasetsPage,
     SiteLookupOptions,
@@ -213,10 +216,9 @@ def after_high_risk_result(page: Page) -> None:
     AdvanceFOBTScreeningEpisodePage(page).click_enter_diagnostic_test_outcome_button()
 
     # The following code is on the diagnostic test outcome page
-    expect(page.get_by_role("cell", name="High-risk findings").nth(1)).to_be_visible()
-    page.get_by_label("Outcome of Diagnostic Test").select_option("20365")
-    page.get_by_role("button", name="Save").click()
-
+    DiagnosticTestOutcomePage(page).verify_diagnostic_test_outcome("High-risk findings")
+    DiagnosticTestOutcomePage(page).select_test_outcome_option("20365")
+    DiagnosticTestOutcomePage(page).click_save_button()
 
 def after_lnpcp_result(page: Page) -> None:
     InvestigationDatasetsPage(page).expect_text_to_be_visible("LNPCP")
@@ -232,10 +234,9 @@ def after_lnpcp_result(page: Page) -> None:
     AdvanceFOBTScreeningEpisodePage(page).click_enter_diagnostic_test_outcome_button()
 
     # The following code is on the diagnostic test outcome page
-    expect(page.get_by_role("cell", name="LNPCP").nth(1)).to_be_visible()
-    page.get_by_label("Outcome of Diagnostic Test").select_option("20365")
-    page.get_by_role("button", name="Save").click()
-
+    DiagnosticTestOutcomePage(page).verify_diagnostic_test_outcome("LNPCP")
+    DiagnosticTestOutcomePage(page).select_test_outcome_option("20365")
+    DiagnosticTestOutcomePage(page).click_save_button()
 
 def handover_subject_to_symptomatic_care(page: Page) -> None:
     SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
@@ -244,7 +245,7 @@ def handover_subject_to_symptomatic_care(page: Page) -> None:
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
 
     # The following code is on the advance fobt screening episode page
-    page.get_by_role("button", name="Handover into Symptomatic Care").click()
+    AdvanceFOBTScreeningEpisodePage(page).click_handover_into_symptomatic_care_button()
 
     # The following code is on the handover into symptomatic care page
     page.get_by_label("Referral").select_option("20445")
@@ -362,7 +363,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
 
     # The following code is on the advance fobt screening episode page
-    page.get_by_role("button", name="Record Diagnosis Date").click()
+    AdvanceFOBTScreeningEpisodePage(page).click_record_diagnosis_date_button()
 
     # The following code is on the record diagnosis date page
     RecordDiagnosisDatePage(page).enter_date_in_diagnosis_date_field(datetime.today())
@@ -400,11 +401,11 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     AdvanceFOBTScreeningEpisodePage(page).click_enter_diagnostic_test_outcome_button()
 
     # The following code is on the diagnostic test outcome page
-    expect(
-        page.get_by_role("cell", name="Normal (No Abnormalities").nth(1)
-    ).to_be_visible()
-    page.get_by_label("Outcome of Diagnostic Test").select_option("20360")
-    page.get_by_role("button", name="Save").click()
+    DiagnosticTestOutcomePage(page).verify_diagnostic_test_outcome(
+        "Normal (No Abnormalities"
+    )
+    DiagnosticTestOutcomePage(page).select_test_outcome_option("20360")
+    DiagnosticTestOutcomePage(page).click_save_button()
 
     SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
         "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
