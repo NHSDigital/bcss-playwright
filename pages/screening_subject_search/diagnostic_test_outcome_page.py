@@ -1,4 +1,4 @@
-from playwright.sync_api import Page,expect
+from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 from enum import StrEnum
 
@@ -10,8 +10,12 @@ class DiagnosticTestOutcomePage(BasePage):
         super().__init__(page)
         self.page = page
         # Diagnostic Test Outcome- page locators
-        self.test_outcome_result = self.page.get_by_role("cell", name="outcome_name").nth(1)
-        self.test_outcome_dropdown = self.page.get_by_label("Outcome of Diagnostic Test")
+        self.test_outcome_result = self.page.get_by_role(
+            "cell", name="outcome_name"
+        ).nth(1)
+        self.test_outcome_dropdown = self.page.get_by_label(
+            "Outcome of Diagnostic Test"
+        )
         self.save_button = self.page.get_by_role("button", name="Save")
 
     def verify_diagnostic_test_outcome(self, outcome_name: str) -> None:
@@ -26,9 +30,10 @@ class DiagnosticTestOutcomePage(BasePage):
         """Click the 'Save' button."""
         self.click(self.save_button)
 
+
 class OutcomeOfDiagnosticTest(StrEnum):
     """Enum for outcome of diagnostic test options."""
 
     Failed_Test_Refer_Another = "20363"
     Refer_Symptomatic = "20366"
-    Refer_Surveillance = "20365"   
+    Refer_Surveillance = "20365"
