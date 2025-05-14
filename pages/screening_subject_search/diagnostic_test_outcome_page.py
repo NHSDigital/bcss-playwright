@@ -25,7 +25,11 @@ class DiagnosticTestOutcomePage(BasePage):
         expect(self.page.get_by_role("cell", name=outcome_name).nth(1)).to_be_visible()
 
     def select_test_outcome_option(self, option: str) -> None:
-        """Select an option from the Outcome of Diagnostic Test dropdown."""
+        """Select an option from the Outcome of Diagnostic Test dropdown.
+
+        Args:
+        option (str): option (str): The option to select from the Outcome Of Diagnostic Test options.
+        """
         self.test_outcome_dropdown.select_option(option)
 
     def click_save_button(self) -> None:
