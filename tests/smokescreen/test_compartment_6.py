@@ -286,7 +286,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # This needs to be repeated for two subjects, one old and one not - High Risk Result
     # Older patient
-    nhs_no = "9408053060"
+    nhs_no = "9772286785"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -301,7 +301,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     handover_subject_to_symptomatic_care(page)
 
     # Younger patient
-    nhs_no = "9867151259"
+    nhs_no = "9802397318"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -331,7 +331,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # This needs to be repeated for two subjects, one old and one not - LNPCP Result
     # Older patient
-    nhs_no = "9546869694"
+    nhs_no = "9359523194"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -346,7 +346,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     handover_subject_to_symptomatic_care(page)
 
     # Younger patient
-    nhs_no = "9546692670"
+    nhs_no = "9828941813"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -374,7 +374,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     )
 
     # This needs to be repeated for 1 subject, age does not matter - Normal Result
-    nhs_no_normal = "9692517950"
+    nhs_no_normal = "9852356488"
     go_to_investigation_datasets_page(page, nhs_no_normal)
 
     # The following code is on the investigation datasets page
