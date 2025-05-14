@@ -1,4 +1,4 @@
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page, expect, Locator
 from pages.base_page import BasePage
 from enum import StrEnum
 
@@ -18,9 +18,28 @@ class DiagnosticTestOutcomePage(BasePage):
         )
         self.save_button = self.page.get_by_role("button", name="Save")
 
+    def get_test_outcome_locator(self, outcome_name: str) -> Locator:
+        """
+        Get the locator for the test outcome dynamically.
+
+        Args:
+            outcome_name (str): The accessible name or visible text of the test outcome cell.
+
+        Returns:
+            Locator: A Playwright Locator object for the specified test outcome cell.
+        """
+        return self.page.get_by_role("cell", name=outcome_name).nth(1)
+
     def verify_diagnostic_test_outcome(self, outcome_name: str) -> None:
-        """Verify that the diagnostic test outcome is visible."""
-        expect(self.test_outcome_result).to_be_visible()
+        """
+        Verify that the diagnostic test outcome is visible.
+
+        Args:
+            outcome_name (str): The accessible name or visible text of the test outcome cell to verify.
+        """
+
+        test_outcome_locator = self.get_test_outcome_locator(outcome_name)
+        expect(test_outcome_locator).to_be_visible()
 
     def select_test_outcome_option(self, option: str) -> None:
         """Select an option from the Outcome of Diagnostic Test dropdown."""
