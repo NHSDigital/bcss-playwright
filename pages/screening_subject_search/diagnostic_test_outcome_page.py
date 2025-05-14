@@ -20,11 +20,12 @@ class DiagnosticTestOutcomePage(BasePage):
 
     def verify_diagnostic_test_outcome(self, outcome_name: str) -> None:
         """Verify that the diagnostic test outcome is visible."""
-        expect(self.test_outcome_result(outcome_name)).to_be_visible()
+        expect(self.test_outcome_result).to_be_visible()
+  
 
     def select_test_outcome_option(self, option: str) -> None:
         """Select an option from the Outcome of Diagnostic Test dropdown."""
-        self.outcome_dropdown.select_option(option)
+        self.test_outcome_dropdown.select_option(option)
 
     def click_save_button(self) -> None:
         """Click the 'Save' button."""
@@ -37,3 +38,4 @@ class OutcomeOfDiagnosticTest(StrEnum):
     Failed_Test_Refer_Another = "20363"
     Refer_Symptomatic = "20366"
     Refer_Surveillance = "20365"
+    Investigation_Complete='20360'
