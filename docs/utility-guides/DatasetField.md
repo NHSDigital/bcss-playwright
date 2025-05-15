@@ -1,25 +1,25 @@
-# Utility Guide: Dynamic Locator Retriever
+# Utility Guide: Dataset Field Util
 
-The Dynamic Locator Retriever utility allows for selecting different locators dynamically.<br>
+The Dataset Field Util utility allows for selecting different locators dynamically.<br>
 For example, on the investigation dataset, if we want to select the input locator for the `Start of intubation time` field, we can do this by providing the utility with the name of the field
 
-    DynamicLocatorRetriever(page).populate_input_locator_for_field(
+    DatasetFieldUtil(page).populate_input_locator_for_field(
         "Start of intubation time", "09:00"
     )
 
 ## Table of Contents
 
-- [Utility Guide: Dynamic Locator Retriever](#utility-guide-dynamic-locator-retriever)
+- [Utility Guide: Dataset Field Util](#utility-guide-dataset-field-util)
   - [Table of Contents](#table-of-contents)
-  - [Using the Dynamic Locator Retriever class](#using-the-dynamic-locator-retriever-class)
+  - [Using the Dataset Field Util class](#using-the-dataset-field-util-class)
     - [Required Args](#required-args)
     - [How to use this method](#how-to-use-this-method)
 
-## Using the Dynamic Locator Retriever class
+## Using the Dataset Field Util class
 
-You can initialise the Dynamic Locator Retriever class by using the following code in your test file:
+You can initialise the Dataset Field Util class by using the following code in your test file:
 
-    from utils.dynamic_locator_retriever import DynamicLocatorRetriever
+    from utils.dataset_field_util import DatasetFieldUtil
 
 This will allow you to use the following methods:
 
@@ -57,24 +57,24 @@ This will allow you to use the following methods:
 
 ### How to use this method
 
-To use this method simply import the SubjectDemographicUtil class and call one of the methods, providing the necessary arguments:
+To use this method simply import the DatasetFieldUtil class and call one of the methods, providing the necessary arguments:
 
     # populate_input_locator_for_field
-    DynamicLocatorRetriever(page).populate_input_locator_for_field(
+    DatasetFieldUtil(page).populate_input_locator_for_field(
         "End time of procedure", "09:30"
     )
 
     # populate_select_locator_for_field
-    DynamicLocatorRetriever(page).populate_select_locator_for_field(
+    DatasetFieldUtil(page).populate_select_locator_for_field(
         "Insufflation", InsufflationOptions.AIR
     )
 
     # populate_input_locator_for_field_inside_div
-    DynamicLocatorRetriever(page).populate_input_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_input_locator_for_field_inside_div(
         "Estimate of whole polyp size", "divPolypNumber1Section", "15"
     )
 
     # populate_select_locator_for_field_inside_div
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Classification", "divPolypNumber1Section", PolypClassificationOptions.LS
     )

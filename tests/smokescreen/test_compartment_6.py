@@ -47,7 +47,7 @@ from pages.datasets.investigation_dataset_page import (
 from pages.screening_subject_search.advance_fobt_screening_episode_page import (
     AdvanceFOBTScreeningEpisodePage,
 )
-from utils.dynamic_locator_retriever import DynamicLocatorRetriever
+from utils.dataset_field_util import DatasetFieldUtil
 
 
 # This should go into a util. Adding it here to avoid SonarQube duplication errors:
@@ -82,46 +82,46 @@ def default_investigation_dataset_forms(page: Page) -> None:
 
 
 def default_investigation_dataset_forms_continuation(page: Page) -> None:
-    DynamicLocatorRetriever(page).populate_select_locator_for_field(
+    DatasetFieldUtil(page).populate_select_locator_for_field(
         "Bowel preparation quality", BowelPreparationQualityOptions.GOOD
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field(
+    DatasetFieldUtil(page).populate_select_locator_for_field(
         "Comfort during examination", ComfortOptions.NO_DISCOMFORT
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field(
+    DatasetFieldUtil(page).populate_select_locator_for_field(
         "Comfort during recovery", ComfortOptions.NO_DISCOMFORT
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field(
+    DatasetFieldUtil(page).populate_select_locator_for_field(
         "Endoscopist defined extent", EndoscopyLocationOptions.ILEUM
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field(
+    DatasetFieldUtil(page).populate_select_locator_for_field(
         "Scope imager used", YesNoOptions.YES
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field(
+    DatasetFieldUtil(page).populate_select_locator_for_field(
         "Retroverted view", YesNoOptions.NO
     )
-    DynamicLocatorRetriever(page).populate_input_locator_for_field(
+    DatasetFieldUtil(page).populate_input_locator_for_field(
         "Start of intubation time", "09:00"
     )
-    DynamicLocatorRetriever(page).populate_input_locator_for_field(
+    DatasetFieldUtil(page).populate_input_locator_for_field(
         "Start of extubation time", "09:15"
     )
-    DynamicLocatorRetriever(page).populate_input_locator_for_field(
+    DatasetFieldUtil(page).populate_input_locator_for_field(
         "End time of procedure", "09:30"
     )
-    DynamicLocatorRetriever(page).populate_input_locator_for_field("Scope ID", "A1")
-    DynamicLocatorRetriever(page).populate_select_locator_for_field(
+    DatasetFieldUtil(page).populate_input_locator_for_field("Scope ID", "A1")
+    DatasetFieldUtil(page).populate_select_locator_for_field(
         "Insufflation", InsufflationOptions.AIR
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field(
+    DatasetFieldUtil(page).populate_select_locator_for_field(
         "Outcome at time of procedure", OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field(
+    DatasetFieldUtil(page).populate_select_locator_for_field(
         "Late outcome", LateOutcomeOptions.NO_COMPLICATIONS
     )
     InvestigationDatasetsPage(page).click_show_completion_proof_information()
     # Completion Proof Information
-    DynamicLocatorRetriever(page).populate_select_locator_for_field(
+    DatasetFieldUtil(page).populate_select_locator_for_field(
         "Proof Parameters", CompletionProofOptions.PHOTO_ILEO
     )
 
@@ -129,7 +129,7 @@ def default_investigation_dataset_forms_continuation(page: Page) -> None:
 def investigation_datasets_failure_reason(page: Page) -> None:
     # Failure Information
     InvestigationDatasetsPage(page).click_show_failure_information()
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Failure Reasons", "divFailureSection", FailureReasonsOptions.BLEEDING_INCIDENT
     )
 
@@ -137,46 +137,46 @@ def investigation_datasets_failure_reason(page: Page) -> None:
 def polyps_for_high_risk_result(page: Page) -> None:
     # Polyp Information
     InvestigationDatasetsPage(page).click_add_polyp_button()
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Location", "divPolypNumber1Section", EndoscopyLocationOptions.ILEUM
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Classification", "divPolypNumber1Section", PolypClassificationOptions.LS
     )
-    DynamicLocatorRetriever(page).populate_input_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_input_locator_for_field_inside_div(
         "Estimate of whole polyp size", "divPolypNumber1Section", "15"
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Polyp Access", "divPolypNumber1Section", PolypAccessOptions.NOT_KNOWN
     )
     polyp1_intervention(page)
     InvestigationDatasetsPage(page).click_add_polyp_button()
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Location", "divPolypNumber2Section", EndoscopyLocationOptions.CAECUM
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Classification", "divPolypNumber2Section", PolypClassificationOptions.LS
     )
-    DynamicLocatorRetriever(page).populate_input_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_input_locator_for_field_inside_div(
         "Estimate of whole polyp size", "divPolypNumber2Section", "15"
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Polyp Access", "divPolypNumber2Section", PolypAccessOptions.NOT_KNOWN
     )
     InvestigationDatasetsPage(page).click_polyp2_add_intervention_button()
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Modality", "divPolypTherapy2_1Section", PolypInterventionModalityOptions.EMR
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Device", "divPolypTherapy2_1Section", PolypInterventionDeviceOptions.HOT_SNARE
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Excised", "divPolypResected2_1", YesNoOptions.YES
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Retrieved", "divPolypTherapy2_1Section", YesNoOptions.NO
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Excision Technique",
         "divPolypTherapy2_1Section",
         PolypInterventionExcisionTechniqueOptions.EN_BLOC,
@@ -186,16 +186,16 @@ def polyps_for_high_risk_result(page: Page) -> None:
 def polyps_for_lnpcp_result(page: Page) -> None:
     # Polyp Information
     InvestigationDatasetsPage(page).click_add_polyp_button()
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Location", "divPolypNumber1Section", EndoscopyLocationOptions.ILEUM
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Classification", "divPolypNumber1Section", PolypClassificationOptions.LS
     )
-    DynamicLocatorRetriever(page).populate_input_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_input_locator_for_field_inside_div(
         "Estimate of whole polyp size", "divPolypNumber1Section", "30"
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Polyp Access", "divPolypNumber1Section", PolypAccessOptions.NOT_KNOWN
     )
     polyp1_intervention(page)
@@ -203,21 +203,21 @@ def polyps_for_lnpcp_result(page: Page) -> None:
 
 def polyp1_intervention(page: Page) -> None:
     InvestigationDatasetsPage(page).click_polyp1_add_intervention_button()
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Modality",
         "divPolypTherapy1_1Section",
         PolypInterventionModalityOptions.POLYPECTOMY,
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Device", "divPolypTherapy1_1Section", PolypInterventionDeviceOptions.HOT_SNARE
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Excised", "divPolypResected1_1", YesNoOptions.YES
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Retrieved", "divPolypTherapy1_1Section", YesNoOptions.NO
     )
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Excision Technique",
         "divPolypTherapy1_1Section",
         PolypInterventionExcisionTechniqueOptions.EN_BLOC,
@@ -407,7 +407,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     InvestigationDatasetsPage(page).select_diagnostic_procedure_type()
     default_investigation_dataset_forms_continuation(page)
     InvestigationDatasetsPage(page).click_show_failure_information()
-    DynamicLocatorRetriever(page).populate_select_locator_for_field_inside_div(
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
         "Failure Reasons", "divFailureSection", FailureReasonsOptions.NO_FAILURE_REASONS
     )
     save_investigation_dataset(page)
