@@ -57,7 +57,14 @@ This will allow you to use the following methods:
 
 ### How to use this method
 
-To use this method simply import the DatasetFieldUtil class and call one of the methods, providing the necessary arguments:
+To use this method simply import the DatasetFieldUtil class and call one of the methods, providing the necessary arguments.<br>
+The example below is using options that can be imported from `pages.datasets.investigation_dataset_page`
+
+    from utils.dataset_field_util import DatasetFieldUtil
+    from pages.datasets.investigation_dataset_page import (
+    InsufflationOptions,
+    PolypClassificationOptions,
+    )
 
     # populate_input_locator_for_field
     DatasetFieldUtil(page).populate_input_locator_for_field(
