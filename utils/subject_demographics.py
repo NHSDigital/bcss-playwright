@@ -21,7 +21,7 @@ class SubjectDemographicUtil:
 
     def update_subject_dob(self, nhs_no: str, younger_subject: bool) -> None:
         """
-        This updates a subjects age to a random age between 50-70 and 75-100 depending on if younger_subject is set to True or False.
+        Navigates to the subject demographics page and updates a subject's date of birth.
 
         Args:
             nhs_no (str): The NHS number of the subject you want to update.

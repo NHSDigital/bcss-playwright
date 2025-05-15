@@ -1,6 +1,11 @@
 # Utility Guide: Subject Demographics
 
-The Subject Demographics utility allows for different updates to subjects to be made
+The Subject Demographics utility allows for different updates to subjects to be made.<br>
+This includes the follwoing:
+
+1. Updating a subjects DOB to the following age ranges:
+   1. 50-70
+   2. 75-100
 
 ## Table of Contents
 
