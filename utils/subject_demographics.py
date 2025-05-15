@@ -36,7 +36,7 @@ class SubjectDemographicUtil:
             start_date = datetime.today() - relativedelta(years=100)
             date = self.random_datetime(start_date, end_date)
 
-        logging.info(f"Navigating to subject demogprahic page for: {nhs_no}")
+        logging.info(f"Navigating to subject demographic page for: {nhs_no}")
         BasePage(self.page).click_main_menu_link()
         BasePage(self.page).go_to_screening_subject_search_page()
         SubjectScreeningPage(self.page).click_demographics_filter()
