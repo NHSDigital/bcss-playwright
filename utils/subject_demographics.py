@@ -11,7 +11,6 @@ from pages.screening_subject_search.subject_screening_search_page import (
 from pages.screening_subject_search.subject_demographic_page import (
     SubjectDemographicPage,
 )
-from utils.date_time_utils import DateTimeUtils
 
 
 class SubjectDemographicUtil:
@@ -26,7 +25,7 @@ class SubjectDemographicUtil:
 
         Args:
             nhs_no (str): The NHS number of the subject you want to update.
-            younger_subject (bool): whether you want the subject to be younger (50-70) or older (75-100).
+            younger_subject (bool): Whether you want the subject to be younger (50-70) or older (75-100).
         """
         if younger_subject:
             end_date = datetime.today() - relativedelta(years=50)
