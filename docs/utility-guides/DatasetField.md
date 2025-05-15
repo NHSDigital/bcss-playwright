@@ -1,6 +1,6 @@
-# Utility Guide: Dataset Field Util
+# Utility Guide: Dataset Field Utility
 
-The Dataset Field Util utility allows for selecting different locators dynamically.<br>
+The Dataset Field utility allows for selecting different locators dynamically.<br>
 For example, on the investigation dataset, if we want to select the input locator for the `Start of intubation time` field, we can do this by providing the utility with the name of the field
 
     DatasetFieldUtil(page).populate_input_locator_for_field(
@@ -9,15 +9,15 @@ For example, on the investigation dataset, if we want to select the input locato
 
 ## Table of Contents
 
-- [Utility Guide: Dataset Field Util](#utility-guide-dataset-field-util)
+- [Utility Guide: Dataset Field Utility](#utility-guide-dataset-field-utility)
   - [Table of Contents](#table-of-contents)
-  - [Using the Dataset Field Util class](#using-the-dataset-field-util-class)
+  - [Using the DatasetFieldUtil class](#using-the-datasetfieldutil-class)
     - [Required Args](#required-args)
     - [How to use this method](#how-to-use-this-method)
 
-## Using the Dataset Field Util class
+## Using the DatasetFieldUtil class
 
-You can initialise the Dataset Field Util class by using the following code in your test file:
+You can initialise the DatasetFieldUtil class by using the following code in your test file:
 
     from utils.dataset_field_util import DatasetFieldUtil
 
