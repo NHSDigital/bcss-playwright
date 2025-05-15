@@ -1,4 +1,4 @@
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 
 
@@ -31,3 +31,13 @@ class SubjectDatasetsPage(BasePage):
     def click_investigation_show_datasets(self) -> None:
         """Clicks on the 'Show Dataset' button for the Investigation row on the Subject Datasets Page."""
         self.click(self.investigation_show_dataset_button)
+
+    def expect_text_to_be_visible(self, text: str) -> None:
+        """
+        This method is designed to expect a text to be visible on the page.
+        It checks if the given text is visible.
+
+        Args:
+            text (str): The text to check for visibility.
+        """
+        expect(self.page.get_by_text(text).nth(1)).to_be_visible()
