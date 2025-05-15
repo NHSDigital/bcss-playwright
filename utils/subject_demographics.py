@@ -37,6 +37,7 @@ class SubjectDemographicUtil:
             start_date = datetime.today() - relativedelta(years=100)
             date = self.random_datetime(start_date, end_date)
 
+        logging.info(f"Navigating to subject demogprahic page for: {nhs_no}")
         BasePage(self.page).click_main_menu_link()
         BasePage(self.page).go_to_screening_subject_search_page()
         SubjectScreeningPage(self.page).click_demographics_filter()
@@ -54,16 +55,11 @@ class SubjectDemographicUtil:
             SubjectDemographicPage(self.page).fill_postcode_input(random_postcode)
 
         current_dob = SubjectDemographicPage(self.page).get_dob_field_value()
-        date = DateTimeUtils.format_date(date)
         logging.info(f"Current DOB: {current_dob}")
-        logging.info(f"New DOB: {date}")
         SubjectDemographicPage(self.page).fill_dob_input(date)
         SubjectDemographicPage(self.page).click_update_subject_data_button()
         updated_dob = SubjectDemographicPage(self.page).get_dob_field_value()
-        if updated_dob == date:
-            logging.info("New date of birth matches as expect")
-        else:
-            logging.error("New date of birth does not match the expected.")
+        logging.info(f"Updated DOB: {updated_dob}")
 
     def random_datetime(self, start: datetime, end: datetime) -> datetime:
         """
