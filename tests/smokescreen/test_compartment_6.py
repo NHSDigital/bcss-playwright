@@ -448,11 +448,11 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
         "A382 - Handover into Symptomatic Care - GP Letter Printed",
     )
 
-    # batch_processing(
-    #     page,
-    #     "A382",
-    #     "Handover into Symptomatic Care Adenoma Surveillance - Patient Letter",
-    #     "P202 - Waiting Completion of Outstanding Events",
-    # )
+    batch_processing(
+        page,
+        "A382",
+        "Handover into Symptomatic Care Adenoma Surveillance - Patient Letter",
+        "P202 - Waiting Completion of Outstanding Events",
+    )
 
     LogoutPage(page).log_out()
