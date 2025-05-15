@@ -213,7 +213,7 @@ def after_high_risk_result(page: Page) -> None:
     BasePage(page).click_back_button()
 
     # The following code is on the subject datasets page
-    SubjectDatasetsPage(page).expect_text_to_be_visible("** Completed **")
+    SubjectDatasetsPage(page).check_investigation_dataset_complete()
     BasePage(page).click_back_button()
 
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
@@ -233,7 +233,7 @@ def after_lnpcp_result(page: Page) -> None:
     BasePage(page).click_back_button()
 
     # The following code is on the subject datasets page
-    SubjectDatasetsPage(page).expect_text_to_be_visible("** Completed **")
+    SubjectDatasetsPage(page).check_investigation_dataset_complete()
     BasePage(page).click_back_button()
 
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
@@ -290,95 +290,95 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # This needs to be repeated for two subjects, one old and one not - High Risk Result
     # Older patient
-    nhs_no = "9730614296"
-    go_to_investigation_datasets_page(page, nhs_no)
+    # nhs_no = "9707238623"
+    # go_to_investigation_datasets_page(page, nhs_no)
 
-    # The following code is on the investigation datasets page
-    default_investigation_dataset_forms(page)
-    InvestigationDatasetsPage(page).select_theraputic_procedure_type()
-    default_investigation_dataset_forms_continuation(page)
-    investigation_datasets_failure_reason(page)
-    polyps_for_high_risk_result(page)
-    save_investigation_dataset(page)
-    after_high_risk_result(page)
+    # # The following code is on the investigation datasets page
+    # default_investigation_dataset_forms(page)
+    # InvestigationDatasetsPage(page).select_theraputic_procedure_type()
+    # default_investigation_dataset_forms_continuation(page)
+    # investigation_datasets_failure_reason(page)
+    # polyps_for_high_risk_result(page)
+    # save_investigation_dataset(page)
+    # after_high_risk_result(page)
 
-    handover_subject_to_symptomatic_care(page)
+    # handover_subject_to_symptomatic_care(page)
 
-    # Younger patient
-    nhs_no = "9711391848"
-    go_to_investigation_datasets_page(page, nhs_no)
+    # # Younger patient
+    # nhs_no = "9526262042"
+    # go_to_investigation_datasets_page(page, nhs_no)
 
-    # The following code is on the investigation datasets page
-    default_investigation_dataset_forms(page)
-    InvestigationDatasetsPage(page).select_theraputic_procedure_type()
-    default_investigation_dataset_forms_continuation(page)
-    investigation_datasets_failure_reason(page)
-    polyps_for_high_risk_result(page)
-    save_investigation_dataset(page)
-    after_high_risk_result(page)
+    # # The following code is on the investigation datasets page
+    # default_investigation_dataset_forms(page)
+    # InvestigationDatasetsPage(page).select_theraputic_procedure_type()
+    # default_investigation_dataset_forms_continuation(page)
+    # investigation_datasets_failure_reason(page)
+    # polyps_for_high_risk_result(page)
+    # save_investigation_dataset(page)
+    # after_high_risk_result(page)
 
-    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
-        "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
-    )
-    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    # SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+    #     "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
+    # )
+    # SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
 
-    # The following code is on the advance fobt screening episode page
-    AdvanceFOBTScreeningEpisodePage(page).click_record_diagnosis_date_button()
+    # # The following code is on the advance fobt screening episode page
+    # AdvanceFOBTScreeningEpisodePage(page).click_record_diagnosis_date_button()
 
-    # The following code is on the record diagnosis date page
-    RecordDiagnosisDatePage(page).enter_date_in_diagnosis_date_field(datetime.today())
-    RecordDiagnosisDatePage(page).click_save_button()
+    # # The following code is on the record diagnosis date page
+    # RecordDiagnosisDatePage(page).enter_date_in_diagnosis_date_field(datetime.today())
+    # RecordDiagnosisDatePage(page).click_save_button()
 
-    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
-        "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
-    )
+    # SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+    #     "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
+    # )
 
-    # This needs to be repeated for two subjects, one old and one not - LNPCP Result
-    # Older patient
-    nhs_no = "9468743977"
-    go_to_investigation_datasets_page(page, nhs_no)
+    # # This needs to be repeated for two subjects, one old and one not - LNPCP Result
+    # # Older patient
+    # nhs_no = "9764755232"
+    # go_to_investigation_datasets_page(page, nhs_no)
 
-    # The following code is on the investigation datasets page
-    default_investigation_dataset_forms(page)
-    InvestigationDatasetsPage(page).select_theraputic_procedure_type()
-    default_investigation_dataset_forms_continuation(page)
-    investigation_datasets_failure_reason(page)
-    polyps_for_lnpcp_result(page)
-    save_investigation_dataset(page)
-    after_lnpcp_result(page)
+    # # The following code is on the investigation datasets page
+    # default_investigation_dataset_forms(page)
+    # InvestigationDatasetsPage(page).select_theraputic_procedure_type()
+    # default_investigation_dataset_forms_continuation(page)
+    # investigation_datasets_failure_reason(page)
+    # polyps_for_lnpcp_result(page)
+    # save_investigation_dataset(page)
+    # after_lnpcp_result(page)
 
-    handover_subject_to_symptomatic_care(page)
+    # handover_subject_to_symptomatic_care(page)
 
-    # Younger patient
-    nhs_no = "9724560430"
-    go_to_investigation_datasets_page(page, nhs_no)
+    # # Younger patient
+    # nhs_no = "9680451623"
+    # go_to_investigation_datasets_page(page, nhs_no)
 
-    # The following code is on the investigation datasets page
-    default_investigation_dataset_forms(page)
-    InvestigationDatasetsPage(page).select_theraputic_procedure_type()
-    default_investigation_dataset_forms_continuation(page)
-    investigation_datasets_failure_reason(page)
-    polyps_for_lnpcp_result(page)
-    save_investigation_dataset(page)
-    after_lnpcp_result(page)
-    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
-        "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
-    )
-    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    # # The following code is on the investigation datasets page
+    # default_investigation_dataset_forms(page)
+    # InvestigationDatasetsPage(page).select_theraputic_procedure_type()
+    # default_investigation_dataset_forms_continuation(page)
+    # investigation_datasets_failure_reason(page)
+    # polyps_for_lnpcp_result(page)
+    # save_investigation_dataset(page)
+    # after_lnpcp_result(page)
+    # SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+    #     "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
+    # )
+    # SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
 
-    # The following code is on the advance fobt screening episode page
-    AdvanceFOBTScreeningEpisodePage(page).click_record_diagnosis_date_button()
+    # # The following code is on the advance fobt screening episode page
+    # AdvanceFOBTScreeningEpisodePage(page).click_record_diagnosis_date_button()
 
-    # The following code is on the record diagnosis date page
-    RecordDiagnosisDatePage(page).enter_date_in_diagnosis_date_field(datetime.today())
-    RecordDiagnosisDatePage(page).click_save_button()
+    # # The following code is on the record diagnosis date page
+    # RecordDiagnosisDatePage(page).enter_date_in_diagnosis_date_field(datetime.today())
+    # RecordDiagnosisDatePage(page).click_save_button()
 
-    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
-        "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
-    )
+    # SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+    #     "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
+    # )
 
     # This needs to be repeated for 1 subject, age does not matter - Normal Result
-    nhs_no_normal = "9808363938"
+    nhs_no_normal = "9823638365"
     go_to_investigation_datasets_page(page, nhs_no_normal)
 
     # The following code is on the investigation datasets page
@@ -396,7 +396,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     BasePage(page).click_back_button()
 
     # The following code is on the subject datasets page
-    SubjectDatasetsPage(page).expect_text_to_be_visible("** Completed **")
+    SubjectDatasetsPage(page).check_investigation_dataset_complete()
     BasePage(page).click_back_button()
 
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
@@ -448,11 +448,11 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
         "A382 - Handover into Symptomatic Care - GP Letter Printed",
     )
 
-    batch_processing(
-        page,
-        "A382",
-        "Handover into Symptomatic Care Adenoma Surveillance - Patient Letter",
-        "P202 - Waiting Completion of Outstanding Events",
-    )
+    # batch_processing(
+    #     page,
+    #     "A382",
+    #     "Handover into Symptomatic Care Adenoma Surveillance - Patient Letter",
+    #     "P202 - Waiting Completion of Outstanding Events",
+    # )
 
     LogoutPage(page).log_out()

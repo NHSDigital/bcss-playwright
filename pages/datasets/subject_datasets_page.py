@@ -32,12 +32,14 @@ class SubjectDatasetsPage(BasePage):
         """Clicks on the 'Show Dataset' button for the Investigation row on the Subject Datasets Page."""
         self.click(self.investigation_show_dataset_button)
 
-    def expect_text_to_be_visible(self, text: str) -> None:
+    def check_investigation_dataset_complete(self) -> None:
         """
-        This method is designed to expect a text to be visible on the page.
-        It checks if the given text is visible.
+        Verify that the investigation dataset is marked as complete.
 
-        Args:
-            text (str): The text to check for visibility.
         """
-        expect(self.page.get_by_text(text).nth(1)).to_be_visible()
+        expect(
+            self.page.locator(
+                "h4:has-text('Investigation') span.softHighlight",
+                has_text="** Completed **",
+            )
+        ).to_be_visible()
