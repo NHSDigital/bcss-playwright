@@ -21,6 +21,7 @@ from pages.screening_subject_search.diagnostic_test_outcome_page import (
     DiagnosticTestOutcomePage,
     OutcomeOfDiagnosticTest,
 )
+from pages.datasets.subject_datasets_page import SubjectDatasetsPage
 from pages.datasets.investigation_dataset_page import (
     InvestigationDatasetsPage,
     SiteLookupOptions,
@@ -212,7 +213,7 @@ def after_high_risk_result(page: Page) -> None:
     BasePage(page).click_back_button()
 
     # The following code is on the subject datasets page
-    expect(page.get_by_text("** Completed **").nth(1)).to_be_visible()
+    SubjectDatasetsPage(page).check_investigation_dataset_complete()
     BasePage(page).click_back_button()
 
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
@@ -232,7 +233,7 @@ def after_lnpcp_result(page: Page) -> None:
     BasePage(page).click_back_button()
 
     # The following code is on the subject datasets page
-    expect(page.get_by_text("** Completed **").nth(1)).to_be_visible()
+    SubjectDatasetsPage(page).check_investigation_dataset_complete()
     BasePage(page).click_back_button()
 
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
@@ -289,7 +290,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # This needs to be repeated for two subjects, one old and one not - High Risk Result
     # Older patient
-    nhs_no = "9772286785"
+    nhs_no = "9707238623"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -304,7 +305,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     handover_subject_to_symptomatic_care(page)
 
     # Younger patient
-    nhs_no = "9802397318"
+    nhs_no = "9526262042"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -334,7 +335,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # This needs to be repeated for two subjects, one old and one not - LNPCP Result
     # Older patient
-    nhs_no = "9359523194"
+    nhs_no = "9764755232"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -349,7 +350,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     handover_subject_to_symptomatic_care(page)
 
     # Younger patient
-    nhs_no = "9828941813"
+    nhs_no = "9680451623"
     go_to_investigation_datasets_page(page, nhs_no)
 
     # The following code is on the investigation datasets page
@@ -377,7 +378,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     )
 
     # This needs to be repeated for 1 subject, age does not matter - Normal Result
-    nhs_no_normal = "9852356488"
+    nhs_no_normal = "9823638365"
     go_to_investigation_datasets_page(page, nhs_no_normal)
 
     # The following code is on the investigation datasets page
@@ -395,7 +396,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     BasePage(page).click_back_button()
 
     # The following code is on the subject datasets page
-    expect(page.get_by_text("** Completed **").nth(1)).to_be_visible()
+    SubjectDatasetsPage(page).check_investigation_dataset_complete()
     BasePage(page).click_back_button()
 
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
