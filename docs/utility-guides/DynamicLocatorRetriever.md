@@ -1,7 +1,7 @@
 # Utility Guide: Dynamic Locator Retriever
 
 The Dynamic Locator Retriever utility allows for selecting different locators dynamically.<br>
-For example, on the investigation dataset, if we want to select the input locator for the `Start of intubation time` field, we can do this by providing the util with the name of the field
+For example, on the investigation dataset, if we want to select the input locator for the `Start of intubation time` field, we can do this by providing the utility with the name of the field
 
     DynamicLocatorRetriever(page).populate_input_locator_for_field(
         "Start of intubation time", "09:00"
@@ -34,7 +34,7 @@ This will allow you to use the following methods:
 
 ### Required Args
 
-populate_input_locator_for_field / populate_select_locator_for_field
+`populate_input_locator_for_field` / `populate_select_locator_for_field`
 
 - text:
   - Type: `str`
@@ -43,7 +43,7 @@ populate_input_locator_for_field / populate_select_locator_for_field
   - Type: `str`
   - The value or option you want to input / select (depending on what method is called)
 
-populate_input_locator_for_field_inside_div / populate_select_locator_for_field_inside_div
+`populate_input_locator_for_field_inside_div` / `populate_select_locator_for_field_inside_div`
 
 - text:
   - Type: `str`
