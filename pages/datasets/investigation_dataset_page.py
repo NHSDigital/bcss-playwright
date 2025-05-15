@@ -26,7 +26,7 @@ class InvestigationDatasetsPage(BasePage):
             "#anchorColonoscopy"
         )
         self.endoscope_inserted_yes = self.page.locator("#radScopeInsertedYes")
-        self.theraputic_procedure_type = self.page.get_by_role(
+        self.therapeutic_procedure_type = self.page.get_by_role(
             "radio", name="Therapeutic"
         )
         self.diagnostic_procedure_type = self.page.get_by_role(
@@ -206,12 +206,12 @@ class InvestigationDatasetsPage(BasePage):
         """
         self.endoscope_inserted_yes.check()
 
-    def select_theraputic_procedure_type(self) -> None:
+    def select_therapeutic_procedure_type(self) -> None:
         """
         This method is designed to select the therapeutic procedure type.
         It selects the therapeutic procedure type.
         """
-        self.theraputic_procedure_type.check()
+        self.therapeutic_procedure_type.check()
 
     def select_diagnostic_procedure_type(self) -> None:
         """

@@ -10,7 +10,7 @@ from utils.batch_processing import batch_processing
 from pages.logout.log_out_page import LogoutPage
 from pages.datasets.subject_datasets_page import SubjectDatasetsPage
 from pages.screening_subject_search.handover_into_symptomatic_care_page import (
-    HandoverIntoSymptomaticCarePage
+    HandoverIntoSymptomaticCarePage,
 )
 from utils.calendar_picker import CalendarPicker
 from datetime import datetime
@@ -18,7 +18,8 @@ from pages.screening_subject_search.record_diagnosis_date_page import (
     RecordDiagnosisDatePage,
 )
 from pages.screening_subject_search.diagnostic_test_outcome_page import (
-    DiagnosticTestOutcomePage,OutcomeOfDiagnosticTest
+    DiagnosticTestOutcomePage,
+    OutcomeOfDiagnosticTest,
 )
 from pages.datasets.investigation_dataset_page import (
     InvestigationDatasetsPage,
@@ -220,8 +221,11 @@ def after_high_risk_result(page: Page) -> None:
 
     # The following code is on the diagnostic test outcome page
     DiagnosticTestOutcomePage(page).verify_diagnostic_test_outcome("High-risk findings")
-    DiagnosticTestOutcomePage(page).select_test_outcome_option(OutcomeOfDiagnosticTest.REFER_SURVEILLANCE)
+    DiagnosticTestOutcomePage(page).select_test_outcome_option(
+        OutcomeOfDiagnosticTest.REFER_SURVEILLANCE
+    )
     DiagnosticTestOutcomePage(page).click_save_button()
+
 
 def after_lnpcp_result(page: Page) -> None:
     InvestigationDatasetsPage(page).expect_text_to_be_visible("LNPCP")
@@ -238,8 +242,11 @@ def after_lnpcp_result(page: Page) -> None:
 
     # The following code is on the diagnostic test outcome page
     DiagnosticTestOutcomePage(page).verify_diagnostic_test_outcome("LNPCP")
-    DiagnosticTestOutcomePage(page).select_test_outcome_option(OutcomeOfDiagnosticTest.REFER_SURVEILLANCE)
+    DiagnosticTestOutcomePage(page).select_test_outcome_option(
+        OutcomeOfDiagnosticTest.REFER_SURVEILLANCE
+    )
     DiagnosticTestOutcomePage(page).click_save_button()
+
 
 def handover_subject_to_symptomatic_care(page: Page) -> None:
     SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
@@ -287,7 +294,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # The following code is on the investigation datasets page
     default_investigation_dataset_forms(page)
-    InvestigationDatasetsPage(page).select_theraputic_procedure_type()
+    InvestigationDatasetsPage(page).select_therapeutic_procedure_type()
     default_investigation_dataset_forms_continuation(page)
     investigation_datasets_failure_reason(page)
     polyps_for_high_risk_result(page)
@@ -302,7 +309,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # The following code is on the investigation datasets page
     default_investigation_dataset_forms(page)
-    InvestigationDatasetsPage(page).select_theraputic_procedure_type()
+    InvestigationDatasetsPage(page).select_therapeutic_procedure_type()
     default_investigation_dataset_forms_continuation(page)
     investigation_datasets_failure_reason(page)
     polyps_for_high_risk_result(page)
@@ -332,7 +339,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # The following code is on the investigation datasets page
     default_investigation_dataset_forms(page)
-    InvestigationDatasetsPage(page).select_theraputic_procedure_type()
+    InvestigationDatasetsPage(page).select_therapeutic_procedure_type()
     default_investigation_dataset_forms_continuation(page)
     investigation_datasets_failure_reason(page)
     polyps_for_lnpcp_result(page)
@@ -347,7 +354,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # The following code is on the investigation datasets page
     default_investigation_dataset_forms(page)
-    InvestigationDatasetsPage(page).select_theraputic_procedure_type()
+    InvestigationDatasetsPage(page).select_therapeutic_procedure_type()
     default_investigation_dataset_forms_continuation(page)
     investigation_datasets_failure_reason(page)
     polyps_for_lnpcp_result(page)
@@ -400,7 +407,9 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     DiagnosticTestOutcomePage(page).verify_diagnostic_test_outcome(
         "Normal (No Abnormalities"
     )
-    DiagnosticTestOutcomePage(page).select_test_outcome_option(OutcomeOfDiagnosticTest.INVESTIGATION_COMPLETE)
+    DiagnosticTestOutcomePage(page).select_test_outcome_option(
+        OutcomeOfDiagnosticTest.INVESTIGATION_COMPLETE
+    )
     DiagnosticTestOutcomePage(page).click_save_button()
 
     SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
