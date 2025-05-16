@@ -367,7 +367,7 @@ def get_subjects_with_booked_appointments(subjects_to_retrieve: int) -> pd.DataF
     return subjects_df
 
 
-def get_subjects_for_investigations(
+def get_subjects_for_investigation_dataset_updates(
     number_of_subjects: int, hub_id: str
 ) -> pd.DataFrame:
     """

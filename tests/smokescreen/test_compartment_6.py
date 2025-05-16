@@ -48,7 +48,7 @@ from pages.screening_subject_search.advance_fobt_screening_episode_page import (
     AdvanceFOBTScreeningEpisodePage,
 )
 from utils.dataset_field_util import DatasetFieldUtil
-from utils.oracle.oracle_specific_functions import get_subjects_for_investigations
+from utils.oracle.oracle_specific_functions import get_subjects_for_investigation_dataset_updates
 from utils.subject_demographics import SubjectDemographicUtil
 
 
@@ -313,7 +313,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # This needs to be repeated for two subjects, one old and one not - High Risk Result
     # Older patient
-    subjects_df = get_subjects_for_investigations(smokescreen_properties["c6_eng_number_of_subjects_to_record"], smokescreen_properties["c6_eng_org_id"])
+    subjects_df = get_subjects_for_investigation_dataset_updates(smokescreen_properties["c6_eng_number_of_subjects_to_record"], smokescreen_properties["c6_eng_org_id"])
     nhs_no = subjects_df["subject_nhs_number"].iloc[0]
     SubjectDemographicUtil(page).update_subject_dob(nhs_no, False)
     go_to_investigation_datasets_page(page, nhs_no)
@@ -362,7 +362,6 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # This needs to be repeated for two subjects, one old and one not - LNPCP Result
     # Older patient
-    # nhs_no = "9840970194"
     nhs_no = subjects_df["subject_nhs_number"].iloc[2]
     SubjectDemographicUtil(page).update_subject_dob(nhs_no, False)
     go_to_investigation_datasets_page(page, nhs_no)
@@ -379,7 +378,6 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     handover_subject_to_symptomatic_care(page)
 
     # Younger patient
-    # nhs_no = "9717136637"
     nhs_no = subjects_df["subject_nhs_number"].iloc[3]
     SubjectDemographicUtil(page).update_subject_dob(nhs_no, True)
     go_to_investigation_datasets_page(page, nhs_no)
@@ -409,7 +407,6 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     )
 
     # This needs to be repeated for 1 subject, age does not matter - Normal Result
-    # nhs_no_normal = "9673858853"
     nhs_no_normal = subjects_df["subject_nhs_number"].iloc[4]
     go_to_investigation_datasets_page(page, nhs_no_normal)
 
