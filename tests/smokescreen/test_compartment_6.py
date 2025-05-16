@@ -20,7 +20,7 @@ def test_compartment_6(page: Page) -> None:
     This is the main compartment 6 method
     This test fills out the investigation datasets for different subjects to get different outcomes for a diagnostic test
     based on the test results and the subject's age, then prints the diagnostic test result letters.
-    If the subject is old enough and they get a high-risk or LNPCP result, then they are handed over 
+    If the subject is old enough and they get a high-risk or LNPCP result, then they are handed over
     into symptomatic care, and the relevant letters are printed.
     """
 

@@ -61,7 +61,15 @@ class InvestigationDatasetResults(StrEnum):
 class InvestigationDatasetCompletion:
     """
     This class is used to complete the investigation dataset forms for a subject.
-    It contains methods to fill out the forms based on the result of the investigation dataset.
+    It contains methods to fill out the forms, and progress episodes, based on the
+    age of the subject and the test result.
+
+    This class provides methods to:
+    - Navigate to the investigation datasets page for a subject.
+    - Fill out investigation dataset forms with default or result-specific data.
+    - Handle different investigation outcomes (e.g., HIGH_RISK, LNPCP, NORMAL) by populating relevant form fields and sections.
+    - Add and configure polyp information and interventions to trigger specific result scenarios.
+    - Save the completed investigation dataset.
     """
 
     def __init__(self, page: Page):
@@ -69,11 +77,12 @@ class InvestigationDatasetCompletion:
         self.estimate_whole_polyp_size_string = "Estimate of whole polyp size"
         self.polyp_access_string = "Polyp Access"
 
-    def complete_with_result(self, nhs_no: str, result: str):
+    def complete_with_result(self, nhs_no: str, result: str) -> None:
         """This method fills out the investigation dataset forms based on the test result and the subject's age.
         Args:
             nhs_no (str): The NHS number of the subject.
             result (str): The result of the investigation dataset.
+                Should be one of InvestigationDatasetResults (HIGH_RISK, LNPCP, NORMAL).
         """
         if result == InvestigationDatasetResults.HIGH_RISK:
             self.go_to_investigation_datasets_page(nhs_no)
@@ -119,7 +128,7 @@ class InvestigationDatasetCompletion:
         SubjectDatasetsPage(self.page).click_investigation_show_datasets()
 
     def default_investigation_dataset_forms(self) -> None:
-        """This method fills out the first art of the default investigation dataset form."""
+        """This method fills out the first part of the default investigation dataset form."""
         # Investigation Dataset
         InvestigationDatasetsPage(self.page).select_site_lookup_option(
             SiteLookupOptions.RL401
@@ -200,7 +209,7 @@ class InvestigationDatasetCompletion:
         )
 
     def polyps_for_high_risk_result(self) -> None:
-        """This method fills out the polyp information section of the investigation dataset form o trigger a high risk result."""
+        """This method fills out the polyp information section of the investigation dataset form to trigger a high risk result."""
         # Polyp Information
         InvestigationDatasetsPage(self.page).click_add_polyp_button()
         DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
@@ -323,6 +332,7 @@ class AfterInvestigationDatasetComplete:
         """This method progresses the episode based on the result of the investigation dataset.
         Args:
             result (str): The result of the investigation dataset.
+                Should be one of InvestigationDatasetResults (HIGH_RISK, LNPCP, NORMAL).
             younger (bool): True if the subject is younger than 50, False otherwise.
         """
         if result == InvestigationDatasetResults.HIGH_RISK:
