@@ -15,14 +15,16 @@ import logging
 @pytest.mark.vpn_required
 @pytest.mark.smokescreen
 @pytest.mark.compartment6
-def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
+def test_compartment_6(page: Page) -> None:
     """
     This is the main compartment 6 method
-    Filling out the investigation datasets for different subjects to get different results for a diagnostic test.
-    Printing the diagnostic test result letters.
+    This test fills out the investigation datasets for different subjects to get different outcomes for a diagnostic test
+    based on the test results and the subject's age, then prints the diagnostic test result letters.
+    If the subject is old enough and they get a high-risk or LNPCP result, then they are handed over 
+    into symptomatic care, and the relevant letters are printed.
     """
 
-    # For the following tests old refers to if they are over 75 at recall
+    # For the following tests 'old' refers to if a subject is over 75 at recall
     # The recall period is 2 years from the last diagnostic test for a Normal or Abnormal diagnostic test result
     # or 3 years for someone who is going in to Surveillance (High-risk findings or LNPCP)
 
@@ -31,7 +33,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     # This needs to be repeated for two subjects, one old and one not - High Risk Result
     # Older patient
     logging.info("High-risk result for an older subject")
-    nhs_no = "9104989449"
+    nhs_no = "9687319364"
     InvestigationDatasetCompletion(page).complete_with_result(
         nhs_no, InvestigationDatasetResults.HIGH_RISK
     )
@@ -41,7 +43,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # Younger patient
     logging.info("High-risk result for a younger subject")
-    nhs_no = "9160670894"
+    nhs_no = "9462733759"
     InvestigationDatasetCompletion(page).complete_with_result(
         nhs_no, InvestigationDatasetResults.HIGH_RISK
     )
@@ -52,7 +54,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     # This needs to be repeated for two subjects, one old and one not - LNPCP Result
     # Older patient
     logging.info("LNPCP result for an older subject")
-    nhs_no = "9661266328"
+    nhs_no = "9434999847"
     InvestigationDatasetCompletion(page).complete_with_result(
         nhs_no, InvestigationDatasetResults.LNPCP
     )
@@ -62,7 +64,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # Younger patient
     logging.info("LNPCP result for a younger subject")
-    nhs_no = "9345483594"
+    nhs_no = "9773554414"
     InvestigationDatasetCompletion(page).complete_with_result(
         nhs_no, InvestigationDatasetResults.LNPCP
     )
@@ -72,7 +74,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
 
     # This needs to be repeated for 1 subject, age does not matter - Normal Result
     logging.info("Normal result for any age subject")
-    nhs_no_normal = "9029243430"
+    nhs_no_normal = "9039985766"
     InvestigationDatasetCompletion(page).complete_with_result(
         nhs_no_normal, InvestigationDatasetResults.NORMAL
     )

@@ -1,24 +1,3 @@
-# Create a new util that can populate the investigations dataset to get the following
-# results:
-
-# High risk
-# LNPCP
-# Normal
-
-# This needs to be done as there is a lot of repeat code between the three results
-# and we need 2 subjects with high risk and LNPCP results.
-# Also create any utils to reduce the amount of duplicated code
-# to as close to 0% as possible.
-
-# Update compartment 6
-
-# Add utility guide
-
-# In the code I have added these comments to show the different actions:
-# This needs to be repeated for 1 subject, age does not matter - Normal Result
-# This needs to be repeated for two subjects, one old and one not - LNPCP Result
-# This needs to be repeated for two subjects, one old and one not - High Risk Result
-
 from playwright.sync_api import Page
 from enum import StrEnum
 import logging
@@ -80,12 +59,22 @@ class InvestigationDatasetResults(StrEnum):
 
 
 class InvestigationDatasetCompletion:
+    """
+    This class is used to complete the investigation dataset forms for a subject.
+    It contains methods to fill out the forms based on the result of the investigation dataset.
+    """
+
     def __init__(self, page: Page):
         self.page = page
         self.estimate_whole_polyp_size_string = "Estimate of whole polyp size"
         self.polyp_access_string = "Polyp Access"
 
     def complete_with_result(self, nhs_no: str, result: str):
+        """This method fills out the investigation dataset forms based on the test result and the subject's age.
+        Args:
+            nhs_no (str): The NHS number of the subject.
+            result (str): The result of the investigation dataset.
+        """
         if result == InvestigationDatasetResults.HIGH_RISK:
             self.go_to_investigation_datasets_page(nhs_no)
             self.default_investigation_dataset_forms()
@@ -118,6 +107,10 @@ class InvestigationDatasetCompletion:
             logging.error("Incorrect result entered")
 
     def go_to_investigation_datasets_page(self, nhs_no) -> None:
+        """This method navigates to the investigation datasets page for a subject.
+        Args:
+            nhs_no (str): The NHS number of the subject.
+        """
         verify_subject_event_status_by_nhs_no(
             self.page, nhs_no, "A323 - Post-investigation Appointment NOT Required"
         )
@@ -126,6 +119,7 @@ class InvestigationDatasetCompletion:
         SubjectDatasetsPage(self.page).click_investigation_show_datasets()
 
     def default_investigation_dataset_forms(self) -> None:
+        """This method fills out the first art of the default investigation dataset form."""
         # Investigation Dataset
         InvestigationDatasetsPage(self.page).select_site_lookup_option(
             SiteLookupOptions.RL401
@@ -145,11 +139,12 @@ class InvestigationDatasetCompletion:
             DrugTypeOptions.BISACODYL
         )
         InvestigationDatasetsPage(self.page).fill_drug_type_dose1("10")
-        # Ensocopy Information
+        # Endoscopy Information
         InvestigationDatasetsPage(self.page).click_show_endoscopy_information()
         InvestigationDatasetsPage(self.page).check_endoscope_inserted_yes()
 
     def default_investigation_dataset_forms_continuation(self) -> None:
+        """This method fills out the second part of the default investigation dataset form."""
         DatasetFieldUtil(self.page).populate_select_locator_for_field(
             "Bowel preparation quality", BowelPreparationQualityOptions.GOOD
         )
@@ -195,6 +190,7 @@ class InvestigationDatasetCompletion:
         )
 
     def investigation_datasets_failure_reason(self) -> None:
+        """This method fills out the failure reason section of the investigation dataset form."""
         # Failure Information
         InvestigationDatasetsPage(self.page).click_show_failure_information()
         DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
@@ -204,6 +200,7 @@ class InvestigationDatasetCompletion:
         )
 
     def polyps_for_high_risk_result(self) -> None:
+        """This method fills out the polyp information section of the investigation dataset form o trigger a high risk result."""
         # Polyp Information
         InvestigationDatasetsPage(self.page).click_add_polyp_button()
         DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
@@ -260,6 +257,7 @@ class InvestigationDatasetCompletion:
         )
 
     def polyps_for_lnpcp_result(self) -> None:
+        """This method fills out the polyp information section of the investigation dataset form to trigger a LNPCP result."""
         # Polyp Information
         InvestigationDatasetsPage(self.page).click_add_polyp_button()
         DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
@@ -279,6 +277,7 @@ class InvestigationDatasetCompletion:
         self.polyp1_intervention()
 
     def polyp1_intervention(self) -> None:
+        """This method fills out the intervention section of the investigation dataset form for polyp 1."""
         InvestigationDatasetsPage(self.page).click_polyp1_add_intervention_button()
         DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
             "Modality",
@@ -303,18 +302,29 @@ class InvestigationDatasetCompletion:
         )
 
     def save_investigation_dataset(self) -> None:
+        """This method saves the investigation dataset form."""
         InvestigationDatasetsPage(self.page).check_dataset_complete_checkbox()
         InvestigationDatasetsPage(self.page).click_save_dataset_button()
 
 
 class AfterInvestigationDatasetComplete:
+    """
+    This class is used to progress the episode based on the result of the investigation dataset.
+    It contains methods to handle the different outcomes of the investigation dataset.
+    """
+
     def __init__(self, page: Page) -> None:
         self.page = page
         self.a318_latest_event_status_string = (
             "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
         )
 
-    def progress_episode_based_on_result(self, result: str, younger: bool):
+    def progress_episode_based_on_result(self, result: str, younger: bool) -> None:
+        """This method progresses the episode based on the result of the investigation dataset.
+        Args:
+            result (str): The result of the investigation dataset.
+            younger (bool): True if the subject is younger than 50, False otherwise.
+        """
         if result == InvestigationDatasetResults.HIGH_RISK:
             self.after_high_risk_result()
             if younger:
@@ -334,6 +344,7 @@ class AfterInvestigationDatasetComplete:
             logging.error("Incorrect result entered")
 
     def after_high_risk_result(self) -> None:
+        """This method advances an episode that has a high-risk result."""
         InvestigationDatasetsPage(self.page).expect_text_to_be_visible(
             "High-risk findings"
         )
@@ -361,6 +372,7 @@ class AfterInvestigationDatasetComplete:
         DiagnosticTestOutcomePage(self.page).click_save_button()
 
     def after_lnpcp_result(self) -> None:
+        """This method advances an episode that has a LNPCP result."""
         InvestigationDatasetsPage(self.page).expect_text_to_be_visible("LNPCP")
         BasePage(self.page).click_back_button()
 
@@ -384,7 +396,8 @@ class AfterInvestigationDatasetComplete:
         )
         DiagnosticTestOutcomePage(self.page).click_save_button()
 
-    def after_normal_result(self):
+    def after_normal_result(self) -> None:
+        """This method advances an episode that has a normal result."""
         InvestigationDatasetsPage(self.page).expect_text_to_be_visible(
             "Normal (No Abnormalities"
         )
@@ -417,6 +430,7 @@ class AfterInvestigationDatasetComplete:
         )
 
     def handover_subject_to_symptomatic_care(self) -> None:
+        """This method hands over a subject to symptomatic care."""
         SubjectScreeningSummaryPage(self.page).verify_latest_event_status_value(
             "A394 - Handover into Symptomatic Care for Surveillance - Patient Age"
         )
@@ -444,7 +458,8 @@ class AfterInvestigationDatasetComplete:
             "A385 - Handover into Symptomatic Care"
         )
 
-    def record_diagnosis_date(self):
+    def record_diagnosis_date(self) -> None:
+        """This method records the diagnosis date for a subject."""
         SubjectScreeningSummaryPage(self.page).verify_latest_event_status_value(
             self.a318_latest_event_status_string
         )
