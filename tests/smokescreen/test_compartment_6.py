@@ -48,16 +48,11 @@ from pages.screening_subject_search.advance_fobt_screening_episode_page import (
     AdvanceFOBTScreeningEpisodePage,
 )
 from utils.dataset_field_util import DatasetFieldUtil
+from utils import investigation_dataset
 
 
-# This should go into a util. Adding it here to avoid SonarQube duplication errors:
-def go_to_investigation_datasets_page(page: Page, nhs_no) -> None:
-    verify_subject_event_status_by_nhs_no(
-        page, nhs_no, "A323 - Post-investigation Appointment NOT Required"
-    )
-
-    SubjectScreeningSummaryPage(page).click_datasets_link()
-    SubjectDatasetsPage(page).click_investigation_show_datasets()
+# Go to the investigation datasets page
+investigation_dataset.go_to_investigation_datasets_page(page, nhs_no)
 
 
 def default_investigation_dataset_forms(page: Page) -> None:
