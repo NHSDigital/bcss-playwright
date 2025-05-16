@@ -127,7 +127,10 @@ class BasePage:
         )
 
     def main_menu_header_is_displayed(self) -> None:
-        """Asserts that the Main Menu header is displayed."""
+        """
+        Asserts that the Main Menu header is displayed.
+        self.main_menu_string contains the string 'Main Menu'
+        """
         expect(self.main_menu__header).to_contain_text(self.main_menu_string)
 
     def bowel_cancer_screening_page_title_contains_text(self, text: str) -> None:
