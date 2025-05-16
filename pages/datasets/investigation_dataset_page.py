@@ -10,7 +10,7 @@ class InvestigationDatasetsPage(BasePage):
         super().__init__(page)
         self.page = page
 
-        # Colonoscopy datasets page locators
+        # Investigation datasets page locators
         self.site_lookup_link = self.page.locator("#UI_SITE_SELECT_LINK")
         self.practitioner_link = self.page.locator("#UI_SSP_PIO_SELECT_LINK")
         self.testing_clinician_link = self.page.locator(
@@ -242,6 +242,7 @@ class PractitionerOptions(StrEnum):
 
 class TestingClinicianOptions(StrEnum):
     """Enum for testing clinician options"""
+
     __test__ = False
 
     BORROWING_PROPERTY = "886"
