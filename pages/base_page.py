@@ -57,6 +57,8 @@ class BasePage:
     def click_main_menu_link(self) -> None:
         """Click the Base Page 'Main Menu' link if it is visible."""
         loops = 0
+        text = None
+
         while loops <= 3:
             if self.main_menu_link.is_visible():
                 self.click(self.main_menu_link)
@@ -70,13 +72,17 @@ class BasePage:
                 text = None
 
             if text and self.main_menu_string in text:
-                break
+                return  # Success
             else:
                 logging.warning("Main Menu click failed, retrying after 0.2 seconds")
                 # The timeout is in place here to allow the page ample time to load if it has not already been loaded
                 self.page.wait_for_timeout(200)
 
             loops += 1
+        # All attempts failed
+        raise RuntimeError(
+            f"Failed to navigate to Main Menu after {loops} attempts. Last page title was: '{text or 'unknown'}'"
+        )
 
     def click_log_out_link(self) -> None:
         """Click the Base Page 'Log-out' link."""
