@@ -4,6 +4,10 @@ from utils.user_tools import UserTools
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
 from utils.batch_processing import batch_processing
 from pages.logout.log_out_page import LogoutPage
+from utils.oracle.oracle_specific_functions import (
+    get_subjects_for_investigation_dataset_updates,
+)
+from utils.subject_demographics import SubjectDemographicUtil
 from utils.investigation_dataset import (
     InvestigationDatasetCompletion,
     InvestigationDatasetResults,
@@ -15,13 +19,14 @@ import logging
 @pytest.mark.vpn_required
 @pytest.mark.smokescreen
 @pytest.mark.compartment6
-def test_compartment_6(page: Page) -> None:
+def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     """
     This is the main compartment 6 method
     This test fills out the investigation datasets for different subjects to get different outcomes for a diagnostic test
     based on the test results and the subject's age, then prints the diagnostic test result letters.
     If the subject is old enough and they get a high-risk or LNPCP result, then they are handed over
     into symptomatic care, and the relevant letters are printed.
+    Here old refers to if a subject is over 75 at recall
     """
 
     # For the following tests 'old' refers to if a subject is over 75 at recall
@@ -30,10 +35,14 @@ def test_compartment_6(page: Page) -> None:
 
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
 
-    # This needs to be repeated for two subjects, one old and one not - High Risk Result
-    # Older patient
+    # Older patient - High Risk Result
     logging.info("High-risk result for an older subject")
-    nhs_no = "9687319364"
+    subjects_df = get_subjects_for_investigation_dataset_updates(
+        smokescreen_properties["c6_eng_number_of_subjects_to_record"],
+        smokescreen_properties["c6_eng_org_id"],
+    )
+    nhs_no = subjects_df["subject_nhs_number"].iloc[0]
+    SubjectDemographicUtil(page).update_subject_dob(nhs_no, False)
     InvestigationDatasetCompletion(page).complete_with_result(
         nhs_no, InvestigationDatasetResults.HIGH_RISK
     )
@@ -41,9 +50,10 @@ def test_compartment_6(page: Page) -> None:
         InvestigationDatasetResults.HIGH_RISK, False
     )
 
-    # Younger patient
+    # Younger patient - High Risk Result
     logging.info("High-risk result for a younger subject")
-    nhs_no = "9462733759"
+    nhs_no = subjects_df["subject_nhs_number"].iloc[1]
+    SubjectDemographicUtil(page).update_subject_dob(nhs_no, True)
     InvestigationDatasetCompletion(page).complete_with_result(
         nhs_no, InvestigationDatasetResults.HIGH_RISK
     )
@@ -51,10 +61,10 @@ def test_compartment_6(page: Page) -> None:
         InvestigationDatasetResults.HIGH_RISK, True
     )
 
-    # This needs to be repeated for two subjects, one old and one not - LNPCP Result
-    # Older patient
+    # Older patient - LNPCP Result
     logging.info("LNPCP result for an older subject")
-    nhs_no = "9434999847"
+    nhs_no = subjects_df["subject_nhs_number"].iloc[2]
+    SubjectDemographicUtil(page).update_subject_dob(nhs_no, False)
     InvestigationDatasetCompletion(page).complete_with_result(
         nhs_no, InvestigationDatasetResults.LNPCP
     )
@@ -62,9 +72,10 @@ def test_compartment_6(page: Page) -> None:
         InvestigationDatasetResults.LNPCP, False
     )
 
-    # Younger patient
+    # Younger patient - LNPCP Result
     logging.info("LNPCP result for a younger subject")
-    nhs_no = "9773554414"
+    nhs_no = subjects_df["subject_nhs_number"].iloc[3]
+    SubjectDemographicUtil(page).update_subject_dob(nhs_no, True)
     InvestigationDatasetCompletion(page).complete_with_result(
         nhs_no, InvestigationDatasetResults.LNPCP
     )
@@ -72,9 +83,9 @@ def test_compartment_6(page: Page) -> None:
         InvestigationDatasetResults.LNPCP, True
     )
 
-    # This needs to be repeated for 1 subject, age does not matter - Normal Result
+    # Any patient -  Normal Result
     logging.info("Normal result for any age subject")
-    nhs_no_normal = "9039985766"
+    nhs_no_normal = subjects_df["subject_nhs_number"].iloc[4]
     InvestigationDatasetCompletion(page).complete_with_result(
         nhs_no_normal, InvestigationDatasetResults.NORMAL
     )
