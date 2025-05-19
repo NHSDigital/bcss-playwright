@@ -80,7 +80,7 @@ def batch_processing(
     check_batch_in_archived_batch_list(page, link_text)
 
     if nhs_no_df is None:
-        pytest.fail("No NHS numbers were retrieved for the batch")
+        raise ValueError("No NHS numbers were retrieved for the batch")
 
     for subject in range(len(nhs_no_df)):
         nhs_no = nhs_no_df["subject_nhs_number"].iloc[subject]
