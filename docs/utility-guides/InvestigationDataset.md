@@ -36,7 +36,7 @@ The methods in this utility require specific arguments. Below is a summary of th
 
   Required arguments for main method:
       - result (str): The result of the investigation dataset. Should be one of InvestigationDatasetResults (HIGH_RISK, LNPCP, NORMAL).
-      - younger (`bool`): True if the subject is younger than 50, False otherwise.
+      - younger (`bool`): True if the subject is younger than 70, False otherwise.
 
 ## Investigation Dataset Specific Functions
 

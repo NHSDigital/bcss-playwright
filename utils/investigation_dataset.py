@@ -333,7 +333,7 @@ class AfterInvestigationDatasetComplete:
         Args:
             result (str): The result of the investigation dataset.
                 Should be one of InvestigationDatasetResults (HIGH_RISK, LNPCP, NORMAL).
-            younger (bool): True if the subject is younger than 50, False otherwise.
+            younger (bool): True if the subject is younger than 70, False otherwise.
         """
         if result == InvestigationDatasetResults.HIGH_RISK:
             self.after_high_risk_result()
