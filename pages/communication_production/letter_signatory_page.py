@@ -13,4 +13,6 @@ class LetterSignatoryPage(BasePage):
 
     def verify_letter_signatory_title(self) -> None:
         """Verify the Letter Signatory page title is displayed as expected"""
-        expect(self.letter_signatory_title).to_contain_text("Letter Signatory")
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
+            "Letter Signatory"
+        )

@@ -30,11 +30,13 @@ class GenerateInvitationsPage(BasePage):
 
     def verify_generate_invitations_title(self) -> None:
         """This function is used to verify the Generate Invitations page title."""
-        expect(self.generate_invitations_title).to_contain_text("Generate Invitations")
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
+            "Generate Invitations"
+        )
 
     def verify_invitation_generation_progress_title(self) -> None:
         """This function is used to verify the Invitation Generation Progress page title."""
-        expect(self.generate_invitations_title).to_contain_text(
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
             "Invitation Generation Progress"
         )
 

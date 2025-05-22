@@ -59,4 +59,6 @@ class CreateAPlanPage(BasePage):
 
     def verify_create_a_plan_title(self) -> None:
         """Verifies the Create a Plan page title"""
-        expect(self.create_a_plan_title).to_contain_text("View a plan")
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
+            "View a plan"
+        )

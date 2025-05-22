@@ -14,6 +14,6 @@ class InvitationsMonitoringPage(BasePage):
         self.click(self.page.get_by_role("link", name=sc_id))
 
     def verify_invitations_monitoring_title(self) -> None:
-        expect(self.invitations_monitoring_title).to_contain_text(
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
             "Invitations Monitoring - Screening Centre"
         )

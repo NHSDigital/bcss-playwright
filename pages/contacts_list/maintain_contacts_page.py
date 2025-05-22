@@ -13,4 +13,6 @@ class MaintainContactsPage(BasePage):
 
     def verify_maintain_contacts_title(self) -> None:
         """Verify the Maintain Contacts page title is displayed correctly"""
-        expect(self.maintain_contacts_title).to_contain_text("Maintain Contacts")
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
+            "Maintain Contacts"
+        )

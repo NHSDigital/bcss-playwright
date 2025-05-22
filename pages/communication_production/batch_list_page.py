@@ -35,7 +35,7 @@ class BatchListPage(BasePage):
 
     def verify_batch_list_page_title(self, text) -> None:
         """Verify the Batch List page title is displayed as expected"""
-        expect(self.batch_list_page_title).to_contain_text(text)
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(text)
 
     def verify_table_data(self, value) -> None:
         """Verify the table data is displayed as expected"""

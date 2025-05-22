@@ -13,4 +13,6 @@ class BowelScopeAppointmentsPage(BasePage):
 
     def verify_page_title(self) -> None:
         """Verifies the page title of the Bowel Scope Appointments page"""
-        expect(self.page_title).to_contain_text("Appointment Calendar")
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
+            "Appointment Calendar"
+        )

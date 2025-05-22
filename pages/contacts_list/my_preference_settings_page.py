@@ -13,6 +13,6 @@ class MyPreferenceSettingsPage(BasePage):
 
     def verify_my_preference_settings_title(self) -> None:
         """Verify the My Preference Settings page title is displayed correctly"""
-        expect(self.my_preference_settings_title).to_contain_text(
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
             "My Preference Settings"
         )

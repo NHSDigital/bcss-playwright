@@ -15,6 +15,6 @@ class ElectronicCommunicationManagementPage(BasePage):
 
     def verify_electronic_communication_management_title(self) -> None:
         """Verify the Electronic Communication Management page title is displayed as expected"""
-        expect(self.electronic_communication_management_title).to_contain_text(
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
             "Electronic Communication Management"
         )

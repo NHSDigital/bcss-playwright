@@ -13,4 +13,6 @@ class NonInvitationDaysPage(BasePage):
 
     def verify_non_invitation_days_tile(self) -> None:
         """Verifies the page title of the Non Invitation Days page"""
-        expect(self.non_invitations_days_title).to_contain_text("Non-Invitation Days")
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
+            "Non-Invitation Days"
+        )

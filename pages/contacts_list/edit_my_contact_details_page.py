@@ -13,6 +13,6 @@ class EditMyContactDetailsPage(BasePage):
 
     def verify_edit_my_contact_details_title(self) -> None:
         """Verify the Edit My Contact Details page title is displayed correctly"""
-        expect(self.edit_my_contact_details_title).to_contain_text(
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
             "Edit My Contact Details"
         )
