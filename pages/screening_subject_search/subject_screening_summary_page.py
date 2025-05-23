@@ -66,13 +66,13 @@ class SubjectScreeningSummaryPage(BasePage):
 
     def verify_subject_search_results_title_subject_screening_summary(self) -> None:
         """Verify that the subject search results title contains 'Subject Screening Summary'."""
-        expect(self.subject_search_results_title).to_contain_text(
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
             "Subject Screening Summary"
         )
 
     def verify_subject_search_results_title_subject_search_results(self) -> None:
         """Verify that the subject search results title contains 'Subject Search Results'."""
-        expect(self.subject_search_results_title).to_contain_text(
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
             "Subject Search Results"
         )
 

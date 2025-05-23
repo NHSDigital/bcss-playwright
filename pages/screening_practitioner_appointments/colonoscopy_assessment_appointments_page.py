@@ -18,7 +18,7 @@ class ColonoscopyAssessmentAppointmentsPage(BasePage):
 
     def verify_page_header(self) -> None:
         """Verifies the Colonoscopy Assessment Appointments page header is displayed correctly."""
-        expect(self.page_header).to_contain_text(
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
             "Patients that Require Colonoscopy Assessment Appointments"
         )
 

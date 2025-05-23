@@ -12,4 +12,6 @@ class GFOBTTestKitLoggingPage(BasePage):
 
     def verify_test_kit_logging_title(self) -> None:
         """Verify the title of the GFOBT Test Kit Logging page."""
-        expect(self.test_kit_logging_title).to_contain_text("Test Kit Logging")
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
+            "Test Kit Logging"
+        )

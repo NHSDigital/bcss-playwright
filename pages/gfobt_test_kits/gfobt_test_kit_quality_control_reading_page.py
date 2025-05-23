@@ -14,6 +14,6 @@ class GFOBTTestKitQualityControlReadingPage(BasePage):
 
     def verify_test_kit_logging_tile(self) -> None:
         """Verify the title of the GFOBT Test Kit Quality Control Reading page."""
-        expect(self.test_kit_quality_control_reading_title).to_contain_text(
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
             "Test Kit Quality Control Reading"
         )

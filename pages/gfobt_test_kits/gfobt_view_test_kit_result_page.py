@@ -12,4 +12,6 @@ class ViewTestKitResultPage(BasePage):
 
     def verify_view_test_kit_result_title(self) -> None:
         """Verify the title of the View Test Kit Result page."""
-        expect(self.view_test_kit_result_title).to_contain_text("View Test Kit Result")
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
+            "View Test Kit Result"
+        )

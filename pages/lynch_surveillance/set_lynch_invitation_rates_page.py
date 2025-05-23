@@ -13,6 +13,6 @@ class SetLynchInvitationRatesPage(BasePage):
 
     def verify_set_lynch_invitation_rates_title(self) -> None:
         """Verifies that the Set Lynch Invitation Rates title is displayed."""
-        expect(self.set_lynch_invitation_rates_title).to_contain_text(
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
             "Set Lynch Surveillance Invitation Rates"
         )
