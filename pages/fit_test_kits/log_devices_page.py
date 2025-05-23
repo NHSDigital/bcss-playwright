@@ -33,7 +33,7 @@ class LogDevicesPage(BasePage):
 
     def verify_log_devices_title(self) -> None:
         """Verifies that the Log Devices page title is displayed correctly."""
-        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
+        self.bowel_cancer_screening_page_title_contains_text(
             "Scan Device"
         )
 

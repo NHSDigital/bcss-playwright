@@ -23,7 +23,7 @@ class CreateQCKitPage(BasePage):
 
     def verify_create_qc_kit_title(self) -> None:
         """Verify the Create QC Kit page title contains text "Create QC Kit"."""
-        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
+        self.bowel_cancer_screening_page_title_contains_text(
             "Create QC Kit"
         )
 

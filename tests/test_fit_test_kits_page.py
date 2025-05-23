@@ -30,7 +30,7 @@ def before_each(page: Page):
     BasePage(page).go_to_fit_test_kits_page()
 
 
-@pytest.mark.smoked
+@pytest.mark.smoke
 def test_fit_test_kits_page_navigation(page: Page, general_properties: dict) -> None:
     """
     Confirms all menu items are displayed on the fit test kits page, and that the relevant pages

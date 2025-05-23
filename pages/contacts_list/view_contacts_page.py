@@ -8,11 +8,10 @@ class ViewContactsPage(BasePage):
     def __init__(self, page: Page):
         super().__init__(page)
         self.page = page
-        # View Contacts - page locators
-        self.view_contacts_title = self.page.locator("#ntshPageTitle")
+        # View Contacts - page locators, methods
 
     def verify_view_contacts_title(self) -> None:
         """Verify the View Contacts page title is displayed correctly"""
-        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
+        self.bowel_cancer_screening_page_title_contains_text(
             "View Contacts"
         )

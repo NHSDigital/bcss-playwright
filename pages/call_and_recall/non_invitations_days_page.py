@@ -8,11 +8,8 @@ class NonInvitationDaysPage(BasePage):
     def __init__(self, page: Page):
         super().__init__(page)
         self.page = page
-        # Non Invitation Days - page locators
-        self.non_invitations_days_title = self.page.locator("#ntshPageTitle")
+        # Non Invitation Days - page locators, methods
 
     def verify_non_invitation_days_tile(self) -> None:
         """Verifies the page title of the Non Invitation Days page"""
-        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
-            "Non-Invitation Days"
-        )
+        self.bowel_cancer_screening_page_title_contains_text("Non-Invitation Days")

@@ -23,7 +23,6 @@ class CreateAPlanPage(BasePage):
         self.save_note_button = self.page.locator("#saveNote").get_by_role(
             "button", name="Save"
         )
-        self.create_a_plan_title = self.page.locator("#page-title")
 
     def click_set_all_button(self) -> None:
         """Clicks the Set all button to set all values"""
@@ -59,6 +58,4 @@ class CreateAPlanPage(BasePage):
 
     def verify_create_a_plan_title(self) -> None:
         """Verifies the Create a Plan page title"""
-        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
-            "View a plan"
-        )
+        self.bowel_cancer_screening_page_title_contains_text("View a plan")

@@ -8,11 +8,10 @@ class ManageQCProductsPage(BasePage):
     def __init__(self, page: Page):
         super().__init__(page)
         self.page = page
-        # Manage QC Products - page locators
-        self.manage_qc_products_title = self.page.locator("#page-title")
+        # Manage QC Products - page locators, methods
 
     def verify_manage_qc_products_title(self) -> None:
         """Verify the Manage QC Products page title is displayed correctly."""
-        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
+        self.bowel_cancer_screening_page_title_contains_text(
             "FIT QC Products"
         )
