@@ -83,7 +83,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     )
 
     # Older patient - LNPCP Result
-    logging.info("Processing LNPCP result for an older subject")
+    logging.info("LNPCP result for an older subject")
     nhs_no = subjects_df["subject_nhs_number"].iloc[2]
     logging.info(f"Selected NHS number for older subject: {nhs_no}")
     SubjectDemographicUtil(page).update_subject_dob(nhs_no, False)
@@ -102,7 +102,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     logging.info(f"Progressed episode for NHS number {nhs_no} based on result: LNPCP.")
 
     # Younger patient - LNPCP Result
-    logging.info("Processing LNPCP result for a younger subject")
+    logging.info("LNPCP result for a younger subject")
     nhs_no = subjects_df["subject_nhs_number"].iloc[3]
     logging.info(f"Selected NHS number for younger subject: {nhs_no}")
     SubjectDemographicUtil(page).update_subject_dob(nhs_no, True)
@@ -117,7 +117,7 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
     logging.info(f"Progressed episode for NHS number {nhs_no} based on result: LNPCP.")
 
     # Any patient -  Normal Result
-    logging.info("Processing Normal result for any age subject")
+    logging.info("Normal result for any age subject")
     nhs_no_normal = subjects_df["subject_nhs_number"].iloc[4]
     logging.info(f"Selected NHS number for normal result: {nhs_no_normal}")
     InvestigationDatasetCompletion(page).complete_with_result(
