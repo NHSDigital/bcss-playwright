@@ -14,5 +14,5 @@ class AgeExtensionRolloutPlansPage(BasePage):
     def verify_age_extension_rollout_plans_title(self) -> None:
         """Verifies the page title of the Age Extension Rollout Plans page"""
         BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
-            "Age Extension Rollout Plans"    
+            "Age Extension Rollout Plans"
         )
