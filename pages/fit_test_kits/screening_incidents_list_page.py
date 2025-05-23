@@ -13,6 +13,6 @@ class ScreeningIncidentsListPage(BasePage):
 
     def verify_screening_incidents_list_title(self) -> None:
         """Verify the Screening Incidents List page title is displayed correctly."""
-        expect(self.screening_incidents_list_title).to_contain_text(
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
             "Screening Incidents List"
         )

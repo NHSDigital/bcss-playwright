@@ -16,7 +16,7 @@ class IndividualDownloadRequestAndRetrievalPage(BasePage):
 
     def verify_individual_download_request_and_retrieval_title(self) -> None:
         """Verifies that the Individual Download Request and Retrieval page title is displayed correctly."""
-        expect(self.individual_download_request_and_retrieval_title).to_contain_text(
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
             "Individual Download Request and Retrieval"
         )
 

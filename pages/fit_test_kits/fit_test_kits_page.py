@@ -44,7 +44,9 @@ class FITTestKitsPage(BasePage):
 
     def verify_fit_test_kits_title(self) -> None:
         """Verifies that the FIT Test Kits page title is displayed correctly."""
-        expect(self.fit_test_kits_title).to_contain_text("FIT Test Kits")
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
+            "FIT Test Kits"
+        )
 
     def go_to_fit_rollout_summary_page(self) -> None:
         """Navigates to the FIT Rollout Summary page."""

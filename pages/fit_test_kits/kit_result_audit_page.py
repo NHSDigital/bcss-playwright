@@ -13,4 +13,6 @@ class KitResultAuditPage(BasePage):
 
     def verify_kit_result_audit_title(self) -> None:
         """Verifies that the Kit Result Audit page title is displayed correctly."""
-        expect(self.kit_result_audit_title).to_contain_text("Kit Result Audit")
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
+            "Kit Result Audit"
+        )

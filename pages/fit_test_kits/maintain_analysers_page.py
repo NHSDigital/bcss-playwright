@@ -13,4 +13,6 @@ class MaintainAnalysersPage(BasePage):
 
     def verify_maintain_analysers_title(self) -> None:
         """Verify the Maintain Analysers page title is displayed correctly."""
-        expect(self.maintain_analysers_title).to_contain_text("Maintain Analysers")
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
+            "Maintain Analysers"
+        )

@@ -13,6 +13,6 @@ class KitServiceManagementPage(BasePage):
 
     def verify_kit_service_management_title(self) -> None:
         """Verifies that the Kit Service Management page title is displayed correctly."""
-        expect(self.kit_service_management_title).to_contain_text(
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
             "Kit Service Management"
         )

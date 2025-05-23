@@ -13,4 +13,6 @@ class ManageQCProductsPage(BasePage):
 
     def verify_manage_qc_products_title(self) -> None:
         """Verify the Manage QC Products page title is displayed correctly."""
-        expect(self.manage_qc_products_title).to_contain_text("FIT QC Products")
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
+            "FIT QC Products"
+        )

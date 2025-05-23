@@ -13,6 +13,6 @@ class ListOfIndividualDownloadsPage(BasePage):
 
     def verify_list_of_individual_downloads_title(self) -> None:
         """Verifies that the List of Individual Downloads page title is displayed correctly."""
-        expect(self.list_of_individual_downloads_title).to_contain_text(
+        BasePage(self.page).bowel_cancer_screening_page_title_contains_text(
             "List of Individual Downloads"
         )
