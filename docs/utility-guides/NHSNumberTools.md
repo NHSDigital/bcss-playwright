@@ -8,7 +8,7 @@ common functionality that may apply to many services in relation to NHS Number m
 - [Utility Guide: NHS Number Tools](#utility-guide-nhs-number-tools)
   - [Table of Contents](#table-of-contents)
   - [Using the NHS Number Tools class](#using-the-nhs-number-tools-class)
-  - [`_nhs_number_checks()`: If the input is not numeric or not 10 digits, it raises a NHSNumberToolsException()](#_nhs_number_checks-if-the-input-is-not-numeric-or-not-10-digits-it-raises-a-nhsnumbertoolsexception)
+  - [`_nhs_number_checks()`: Checks if the NHS number is valid](#_nhs_number_checks-checks-if-the-nhs-number-is-valid)
     - [Required Arguments](#required-arguments)
     - [Raises](#raises)
   - [`spaced_nhs_number()`: Return Spaced NHS Number](#spaced_nhs_number-return-spaced-nhs-number)
@@ -21,19 +21,13 @@ You can initialise the NHS Number Tools class by using the following code in you
 
     from utils.nhs_number_tools import NHSNumberTools
 
-## `_nhs_number_checks()`: If the input is not numeric or not 10 digits, it raises a NHSNumberToolsException()
+## `_nhs_number_checks()`: Checks if the NHS number is valid
 
-The `_nhs_number_checks()` method does basic checks on NHS number values provided and raises an exception if the number is not valid:
+The `_nhs_number_checks()` method does basic checks on NHS number value provided and raises an exception if the number is not valid:
 
-    # Args nhs_number (str): The NHS number to check
-    if not nhs_number.isnumeric():
-            raise NHSNumberToolsException(
-                "The NHS number provided ({}) is not numeric.".format(nhs_number)
-            )
-        if len(nhs_number) != 10:
-            raise NHSNumberToolsException(
-                "The NHS number provided ({}) is not 10 digits.".format(nhs_number)
-            )
+    from utils.nhs_number_tools import NHSNumberTools
+    incorrect_nhs_no = "A23456789"
+    NHSNumberTools._nhs_number_checks(incorrect_nhs_no)
 
 ### Required Arguments
 
