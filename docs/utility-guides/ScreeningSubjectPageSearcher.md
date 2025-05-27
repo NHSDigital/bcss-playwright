@@ -42,7 +42,7 @@ All functions require the Playwright `page` object as their first argument.
 
 #### verify_subject_event_status_by_nhs_no
 
-navigates to the subject screening serach page and searches for the provided NHS Number. Then this checks that the latest event status of the subject matches the expected value(s).
+Navigates to the subject screening search page and searches for the provided NHS Number. Then this checks that the latest event status of the subject matches the expected value(s).
 
 **Arguments:**
 
