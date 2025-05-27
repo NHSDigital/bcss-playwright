@@ -25,11 +25,11 @@ The Batch Processing utility provides a one-stop function for processing batches
 ```python
 from batch_processing_utility import batch_processing
 
-await batch_processing(
+batch_processing(
     page=page,
     batch_type="S1",
     batch_description="Pre-invitation (FIT)",
-    latest_event_status=["Status1", "Status2"],  # Can be str, list[str], or None
+    latest_event_status=["Status1", "Status2"],  # Can be str or  list[str]
     run_timed_events=True,
     get_subjects_from_pdf=False
 )
@@ -59,8 +59,8 @@ This is the **main entry point function** that should be called to process a bat
   - Type: `str`
   - This is the description of the batch. For example: **Pre-invitation (FIT)** or **Post-investigation Appointment NOT Required**
 - `latest_event_status`:
-  - Type: `str | list[str] | None`
-  - This is the status or list of statuses the subject(s) will get updated to after the batch has been processed. It is used to check that the subject(s) have been updated to the correct status after a batch has been printed. If not required, set to `None`.
+  - Type: `str | list[str] |`
+  - This is the status or list of statuses the subject(s) will get updated to after the batch has been processed. It is used to check that the subject(s) have been updated to the correct status after a batch has been printed.
 
 #### Optional Arguments
 
