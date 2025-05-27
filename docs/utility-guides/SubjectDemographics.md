@@ -80,6 +80,6 @@ SubjectDemographicUtil(page).update_subject_dob(nhs_no, random_dob=False, new_do
     - If `younger` is `False`, returns a DOB for age 75-100.
 
 - `random_datetime(start: datetime, end: datetime) -> datetime`
-  Generates a random datetime between two datetime objects.
+  Generates a random date between two `datetime` objects.
 
 Refer to the source code in `utils/subject_demographics.py` for more details on available methods and their usage.
