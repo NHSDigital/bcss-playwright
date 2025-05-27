@@ -9,9 +9,11 @@ common functionality that may apply to many services in relation to NHS Number m
   - [Table of Contents](#table-of-contents)
   - [Using the NHS Number Tools class](#using-the-nhs-number-tools-class)
   - [`_nhs_number_checks()`: Checks if the NHS number is valid](#_nhs_number_checks-checks-if-the-nhs-number-is-valid)
+  - [Example Usage for `_nhs_number_checks()`](#example-usage-for-_nhs_number_checks)
     - [Required Arguments](#required-arguments)
     - [Raises](#raises)
   - [`spaced_nhs_number()`: Return Spaced NHS Number](#spaced_nhs_number-return-spaced-nhs-number)
+  - [Example Usage for `spaced_nhs_number()`](#example-usage-for-spaced_nhs_number)
     - [Required Arguments](#required-arguments-1)
     - [Returns](#returns)
 
@@ -24,6 +26,8 @@ You can initialise the NHS Number Tools class by using the following code in you
 ## `_nhs_number_checks()`: Checks if the NHS number is valid
 
 The `_nhs_number_checks()` method does basic checks on NHS number value provided and raises an exception if the number is not valid:
+
+## Example Usage for `_nhs_number_checks()`
 
     from utils.nhs_number_tools import NHSNumberTools
     incorrect_nhs_no = "A23456789"
@@ -45,6 +49,8 @@ NHSNumberToolsException: If the NHS number is not numeric or not 10 digits long.
 
 The `spaced_nhs_number()` method is designed to take the provided NHS number and return it in a formatted
 string of the format `nnn nnn nnnn`.  It's a static method so can be used in the following way:
+
+## Example Usage for `spaced_nhs_number()`
 
     # Return formatted NHS number
     spaced_nhs_number = NHSNumberTools.spaced_nhs_number("1234567890")
