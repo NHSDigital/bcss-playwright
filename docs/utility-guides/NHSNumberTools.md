@@ -8,8 +8,11 @@ common functionality that may apply to many services in relation to NHS Number m
 - [Utility Guide: NHS Number Tools](#utility-guide-nhs-number-tools)
   - [Table of Contents](#table-of-contents)
   - [Using the NHS Number Tools class](#using-the-nhs-number-tools-class)
-  - [`spaced_nhs_number()`: Return Spaced NHS Number](#spaced_nhs_number-return-spaced-nhs-number)
+  - [`_nhs_number_checks()`: If the input is not numeric or not 10 digits, it raises a NHSNumberToolsException()](#_nhs_number_checks-if-the-input-is-not-numeric-or-not-10-digits-it-raises-a-nhsnumbertoolsexception)
     - [Required Arguments](#required-arguments)
+    - [Raises](#raises)
+  - [`spaced_nhs_number()`: Return Spaced NHS Number](#spaced_nhs_number-return-spaced-nhs-number)
+    - [Required Arguments](#required-arguments-1)
     - [Returns](#returns)
 
 ## Using the NHS Number Tools class
@@ -17,6 +20,32 @@ common functionality that may apply to many services in relation to NHS Number m
 You can initialise the NHS Number Tools class by using the following code in your test file:
 
     from utils.nhs_number_tools import NHSNumberTools
+
+## `_nhs_number_checks()`: If the input is not numeric or not 10 digits, it raises a NHSNumberToolsException()
+
+The `_nhs_number_checks()` method does basic checks on NHS number values provided and raises an exception if the number is not valid:
+
+    # Args nhs_number (str): The NHS number to check
+    if not nhs_number.isnumeric():
+            raise NHSNumberToolsException(
+                "The NHS number provided ({}) is not numeric.".format(nhs_number)
+            )
+        if len(nhs_number) != 10:
+            raise NHSNumberToolsException(
+                "The NHS number provided ({}) is not 10 digits.".format(nhs_number)
+            )
+
+### Required Arguments
+
+The following are required for `_nhs_number_checks()`:
+
+| Argument   | Format         | Description               |
+| -----------| -------------- | ------------------------- |
+| nhs_number | `str`          | The NHS number to check   |
+
+### Raises
+
+NHSNumberToolsException: If the NHS number is not numeric or not 10 digits long.
 
 ## `spaced_nhs_number()`: Return Spaced NHS Number
 
