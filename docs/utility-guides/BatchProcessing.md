@@ -23,7 +23,7 @@ The Batch Processing utility provides a one-stop function for processing batches
 ## Example Usage
 
 ```python
-from batch_processing_utility import batch_processing
+from utils.batch_processing import batch_processing
 
 batch_processing(
     page=page,
@@ -67,7 +67,7 @@ This is the **main entry point function** that should be called to process a bat
 - `run_timed_events`:
   - Type: `bool`
   - If this is set to **True**, then bcss_timed_events will be executed against all the subjects found in the batch
-  - These timed events might include actions such as updating subject statuses, triggering scheduled workflows, or simulating the passage of time-dependent processing steps.
+  - These timed events simulate the passage of time-dependent processing steps.
 - `get_subjects_from_pdf`:
   - Type: `bool`
   - If this is set to **True**, then the subjects will be retrieved from the downloaded PDF file instead of from the DB
