@@ -99,7 +99,7 @@ It is in charge of pressing on the following button: **Prepare Batch**, **Retrie
 - `link_text`:
   - Type: `str`
   - This is the batch ID of the batch currently being processed
-  
+
 #### Optional Arguments
 
 - `get_subjects_from_pdf`:
@@ -111,7 +111,7 @@ It is in charge of pressing on the following button: **Prepare Batch**, **Retrie
 1. It starts off by clicking on the **Prepare Batch** button.
 2. After this it waits for the button to turn into **Re-Prepare Batch**. Once this happens it means that the batch is ready to be printed.
 3. Now It clicks on each **Retrieve** button visible.
-   1. If `get_subjects_from_pdf` was set to True and the file is a **.pdf**, then it calls `extract_nhs_no_from_pdf`, which is imported from *utils/pdf_reader*, to get the subjects from the pdf and stores them as a pandas DataFrame - **nhs_no_df**
+   1. If `get_subjects_from_pdf` was set to True and the file is a **.pdf**, then it calls `extract_nhs_no_from_pdf`, which is imported from *utils/pdf_reader*, to get the subjects from the PDF and stores them as a pandas DataFrame - **nhs_no_df**
    2. For more Info on `extract_nhs_no_from_pdf` please look at: [`PDFReader`](PDFReader.md)
    3. After a file is downloaded, it gets deleted.
 4. Then it clicks on each **Confirm Printed** button ensuring to handle the dialog that appears.
