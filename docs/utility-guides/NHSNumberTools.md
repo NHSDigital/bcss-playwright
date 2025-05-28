@@ -21,7 +21,6 @@ common functionality that may apply to many services in relation to NHS Number m
 
 You can initialise the NHS Number Tools class by using the following code in your test file:
 
-
 ```python
 from utils.nhs_number_tools import NHSNumberTools
 ```
