@@ -7,6 +7,7 @@ The Load Properties Utility can be used to retrieve values from a properties fil
 - [Utility Guide: Load Properties](#utility-guide-load-properties)
   - [Table of Contents](#table-of-contents)
   - [How This Works](#how-this-works)
+  - [Example Usage - Properties files use key value pairs and the reason for using it is to avoid hard coded values in our tests](#example-usage---properties-files-use-key-value-pairs-and-the-reason-for-using-it-is-to-avoid-hard-coded-values-in-our-tests)
   - [Using the Load Properties Utility](#using-the-load-properties-utility)
   - [Example usage](#example-usage)
 
@@ -26,11 +27,21 @@ To ensure that there are no mistakes when providing this input there are two add
 
 To add values to the properties file follow the format:
 
-    # ----------------------------------
-    # EXAMPLE VALUES
-    # ----------------------------------
-    example_value_1=value1
-    example_value_2=value2
+## Example Usage - Properties files use key value pairs and the reason for using it is to avoid hard coded values in our tests
+
+```python
+from utils.load_properties import PropertiesFile
+# Create an instance of the PropertiesFile class
+    properties = PropertiesFile()
+
+# Load smokescreen properties
+    smokescreen_props = properties.get_smokescreen_properties()
+    print(smokescreen_props["example_value_1"])
+
+# Load general properties
+    general_props = properties.get_general_properties()
+    print(general_props["example_value_2"])
+```
 
 ## Using the Load Properties Utility
 
@@ -43,7 +54,9 @@ Here there are two fixtures:
 
 ## Example usage
 
+```python
     def test_example_1(page: Page, general_properties: dict) -> None:
         print(
             general_properties["example_value_1"]
         )
+```
