@@ -34,7 +34,8 @@ This function extracts all NHS numbers from a PDF file by searching for the stri
 2. Loops through each page of the PDF.
 3. Searches for the string *"NHS No"* on each page.
 4. If found, extracts the NHS number, removes any whitespaces, and adds it to a pandas DataFrame (`nhs_no_df`).
-5. Returns the DataFrame containing all extracted NHS numbers.
+5. If no NHS numbers are found on that page, it goes to the next page.
+6. Returns the DataFrame containing all extracted NHS numbers.
 
 #### Example Usage
 
