@@ -20,11 +20,11 @@ The Calendar Picker utility provides functions for interacting with the differen
   - [Table of Contents](#table-of-contents)
   - [Summary of Calendar Types](#summary-of-calendar-types)
   - [Main Methods](#main-methods)
-    - [calendar\_picker\_ddmmyyyy (V1 Calendar Picker)](#calendar_picker_ddmmyyyy-v1-calendar-picker)
-    - [calendar\_picker\_ddmonyy (V2 Calendar Picker)](#calendar_picker_ddmonyy-v2-calendar-picker)
-    - [v1\_calender\_picker (V1 Calendar Picker)](#v1_calender_picker-v1-calendar-picker)
-    - [v2\_calendar\_picker (V2 Calendar Picker)](#v2_calendar_picker-v2-calendar-picker)
-    - [book\_first\_eligible\_appointment (Appointments Calendar)](#book_first_eligible_appointment-appointments-calendar)
+    - [`calendar_picker_ddmmyyyy` (V1 Calendar Picker)](#calendar_picker_ddmmyyyy-v1-calendar-picker)
+    - [`calendar_picker_ddmonyy` (V2 Calendar Picker)](#calendar_picker_ddmonyy-v2-calendar-picker)
+    - [`v1_calender_picker` (V1 Calendar Picker)](#v1_calender_picker-v1-calendar-picker)
+    - [`v2_calendar_picker` (V2 Calendar Picker)](#v2_calendar_picker-v2-calendar-picker)
+    - [`book_first_eligible_appointment` (Appointments Calendar)](#book_first_eligible_appointment-appointments-calendar)
   - [Supporting Methods](#supporting-methods)
   - [Example Usage](#example-usage)
 
@@ -42,7 +42,7 @@ The Calendar Picker utility provides functions for interacting with the differen
 
 ## Main Methods
 
-### calendar_picker_ddmmyyyy (V1 Calendar Picker)
+### `calendar_picker_ddmmyyyy` (V1 Calendar Picker)
 
 Inputs a date as a string in the format `dd/mm/yyyy` (e.g. 16/01/2025) into a field, instead of using the picker UI.
 
@@ -56,7 +56,7 @@ Formats the date using DateTimeUtils and enters it directly into the field.
 
 ---
 
-### calendar_picker_ddmonyy (V2 Calendar Picker)
+### `calendar_picker_ddmonyy` (V2 Calendar Picker)
 
 Inputs a date as a string in the format `dd mon yy` (e.g. 16 Jan 25) into a field, instead of using the picker UI.
 
@@ -70,7 +70,7 @@ Formats the date using DateTimeUtils (with OS-specific handling) and enters it d
 
 ---
 
-### v1_calender_picker (V1 Calendar Picker)
+### `v1_calender_picker` (V1 Calendar Picker)
 
 Uses the navigation buttons (`<<`, `<`, `>`, `>>`) to select a date in the V1 calendar picker.
 
@@ -83,7 +83,7 @@ Determines how many years/months to traverse, navigates using the appropriate bu
 
 ---
 
-### v2_calendar_picker (V2 Calendar Picker)
+### `v2_calendar_picker` (V2 Calendar Picker)
 
 Uses the navigation controls to select a date in the V2 calendar picker, which allows for faster navigation by expanding the view.
 
@@ -96,7 +96,7 @@ Calculates the required navigation steps, expands the picker view as needed, and
 
 ---
 
-### book_first_eligible_appointment (Appointments Calendar)
+### `book_first_eligible_appointment` (Appointments Calendar)
 
 Selects the first day with available appointment slots in the appointments calendar (which shows two months side by side).
 
