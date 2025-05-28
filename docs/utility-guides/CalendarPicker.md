@@ -22,7 +22,7 @@ The Calendar Picker utility provides functions for interacting with the differen
   - [Main Methods](#main-methods)
     - [`calendar_picker_ddmmyyyy` (V1 Calendar Picker)](#calendar_picker_ddmmyyyy-v1-calendar-picker)
     - [`calendar_picker_ddmonyy` (V2 Calendar Picker)](#calendar_picker_ddmonyy-v2-calendar-picker)
-    - [`v1_calender_picker` (V1 Calendar Picker)](#v1_calender_picker-v1-calendar-picker)
+    - [`v1_calendar_picker` (V1 Calendar Picker)](#v1_calendar_picker-v1-calendar-picker)
     - [`v2_calendar_picker` (V2 Calendar Picker)](#v2_calendar_picker-v2-calendar-picker)
     - [`book_first_eligible_appointment` (Appointments Calendar)](#book_first_eligible_appointment-appointments-calendar)
   - [Supporting Methods](#supporting-methods)
@@ -34,7 +34,7 @@ The Calendar Picker utility provides functions for interacting with the differen
 
 | Calendar Type           | Where Seen                        | Navigation Style                                  | Main Method(s) to Use                |
 |------------------------ |-----------------------------------|---------------------------------------------------|--------------------------------------|
-| V1 Calendar Picker      | Screening Subject Search, others  | Year/month navigation with `<<`, `<`, `>`, `>>`   | `calendar_picker_ddmmyyyy`, `v1_calender_picker` |
+| V1 Calendar Picker      | Screening Subject Search, others  | Year/month navigation with `<<`, `<`, `>`, `>>`   | `calendar_picker_ddmmyyyy`, `v1_calendar_picker` |
 | V2 Calendar Picker      | Active Batch List, others         | Expandable view for fast navigation               | `calendar_picker_ddmonyy`, `v2_calendar_picker`  |
 | Appointments Calendar   | Appointment booking pages         | Two calendars, cell colours for availability      | `book_first_eligible_appointment`    |
 
@@ -70,7 +70,7 @@ Formats the date using DateTimeUtils (with OS-specific handling) and enters it d
 
 ---
 
-### `v1_calender_picker` (V1 Calendar Picker)
+### `v1_calendar_picker` (V1 Calendar Picker)
 
 Uses the navigation buttons (`<<`, `<`, `>`, `>>`) to select a date in the V1 calendar picker.
 
@@ -140,13 +140,13 @@ CalendarPicker(page).calendar_picker_ddmmyyyy(datetime(2025, 1, 16), page.locato
 CalendarPicker(page).calendar_picker_ddmonyy(datetime(2025, 1, 16), page.locator("#date-input"))
 
 # Example 3: Use the V1 calendar picker to select a date
-CalendarPicker(page).v1_calender_picker(datetime(2025, 1, 16))
+CalendarPicker(page).v1_calendar_picker(datetime(2025, 1, 16))
 
 # Example 4: Use the V2 calendar picker to select a date
 CalendarPicker(page).v2_calendar_picker(datetime(2025, 1, 16))
 
 # Example 5: Book the first eligible appointment in the appointments calendar
-# For this example we are using hard coded variables, however in our tests these are obtained from POMs. See C4 as a better practical example.
+# In this example, we use hard-coded variables. In our actual tests, these values are obtained from Page Object Models (POMs). See [C4] for a more practical example.
 CalendarPicker(page).book_first_eligible_appointment(
     current_month_displayed="January",
     locator=page.locator(".appointment-day"),
