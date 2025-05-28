@@ -14,7 +14,7 @@ The Investigation Dataset Utility provides methods to fill out the investigation
   - [AfterInvestigationDatasetComplete Class](#afterinvestigationdatasetcomplete-class)
     - [Required Arguments](#required-arguments-1)
     - [Key Methods](#key-methods-1)
-  - [InvestigationDatasetResults Enum](#investigationdatasetresults-enum)
+  - [InvestigationDatasetResults Class](#investigationdatasetresults-class)
   - [Example Usage](#example-usage)
 
 ## Using the Investigation Dataset Utility
@@ -110,9 +110,9 @@ This class provides methods to progress an episode after the investigation datas
 
 ---
 
-## InvestigationDatasetResults Enum
+## InvestigationDatasetResults Class
 
-This enum provides the possible result values for the investigation dataset:
+This `enum` provides the possible result values for the investigation dataset:
 
 - `HIGH_RISK`
 - `LNPCP`
