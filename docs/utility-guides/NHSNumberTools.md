@@ -43,7 +43,11 @@ NHSNumberToolsException: If the NHS number is not numeric or not 10 digits long.
 
 ## Example Usage for `_nhs_number_checks()`
 
-```python from utils.nhs_number_tools import NHSNumberTools incorrect_nhs_no = "A23456789" NHSNumberTools._nhs_number_checks(incorrect_nhs_no)```
+```python
+from utils.nhs_number_tools import NHSNumberTools
+    incorrect_nhs_no = "A23456789"
+    NHSNumberTools._nhs_number_checks(incorrect_nhs_no)
+```
 
 ## `spaced_nhs_number()`: Return Spaced NHS Number
 
@@ -66,4 +70,8 @@ A `str` with the provided NHS number in `nnn nnn nnnn` format. For example, `NHS
 
 ## Example Usage for `spaced_nhs_number()`
 
-```python from utils.nhs_number_tools import NHSNumberTools # Return formatted NHS number spaced_nhs_number = NHSNumberTools.spaced_nhs_number("1234567890")```
+```python
+from utils.nhs_number_tools import NHSNumberTools
+# Return formatted NHS number
+    spaced_nhs_number = NHSNumberTools.spaced_nhs_number("1234567890")
+```
