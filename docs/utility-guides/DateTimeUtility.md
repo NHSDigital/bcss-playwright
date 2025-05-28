@@ -92,7 +92,7 @@ print(month_num_short)  # 9
 
 ### `current_datetime(format_date: str = "%d/%m/%Y %H:%M") -> str`
 
-Returns the current datetime as a string in the specified format.
+Returns the current date as a string in the specified format.
 
 ### `format_date(date: datetime, format_date: str = "%d/%m/%Y") -> str`
 
