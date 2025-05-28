@@ -12,7 +12,7 @@ common functionality that may apply to many services in relation to NHS Number m
     - [Required Arguments](#required-arguments)
     - [Raises](#raises)
   - [Example Usage for `_nhs_number_checks()`](#example-usage-for-_nhs_number_checks)
-  - [`spaced_nhs_number()`: Return Spaced NHS Number](#spaced_nhs_number-return-spaced-nhs-number)
+  - [`spaced_nhs_number()`: Returns Spaced NHS Number](#spaced_nhs_number-returns-spaced-nhs-number)
     - [Required Arguments](#required-arguments-1)
     - [Returns](#returns)
   - [Example Usage for `spaced_nhs_number()`](#example-usage-for-spaced_nhs_number)
@@ -21,9 +21,11 @@ common functionality that may apply to many services in relation to NHS Number m
 
 You can initialise the NHS Number Tools class by using the following code in your test file:
 
+
 ```python
 from utils.nhs_number_tools import NHSNumberTools
 ```
+
 ## `_nhs_number_checks()`: Checks if the NHS number is valid
 
 The `_nhs_number_checks()` method does basic checks on NHS number value provided and raises an exception if the number is not valid:
@@ -52,7 +54,7 @@ from utils.nhs_number_tools import NHSNumberTools
     NHSNumberTools._nhs_number_checks(incorrect_nhs_no)
 ```
 
-## `spaced_nhs_number()`: Return Spaced NHS Number
+## `spaced_nhs_number()`: Returns Spaced NHS Number
 
 The `spaced_nhs_number()` method is designed to take the provided NHS number and return it in a formatted
 string of the format `nnn nnn nnnn`.  It's a static method so can be used in the following way:
