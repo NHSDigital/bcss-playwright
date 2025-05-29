@@ -7,10 +7,7 @@ The Load Properties Utility can be used to retrieve values from a properties fil
 - [Utility Guide: Load Properties](#utility-guide-load-properties)
   - [Table of Contents](#table-of-contents)
   - [How This Works](#how-this-works)
-- [----------------------------------](#----------------------------------)
-- [EXAMPLE VALUES](#example-values)
-- [----------------------------------](#-----------------------------------1)
-  - [Reasoning for storing values in the properties file](#reasoning-for-storing-values-in-the-properties-file)
+  - [EXAMPLE VALUES](#example-values)
   - [Using the Load Properties Utility](#using-the-load-properties-utility)
   - [Example Usage](#example-usage)
 
@@ -30,13 +27,11 @@ To ensure that there are no mistakes when providing this input there are two add
 
 To add values to the properties file follow the format:
 
-# ----------------------------------
-# EXAMPLE VALUES
-# ----------------------------------
+## EXAMPLE VALUES
 example_value_1=value1
 example_value_2=value2
 
-## Reasoning for storing values in the properties file
+Reasoning for storing values in the properties file:
 
 1. Properties files use key-value pairs because they provide a simple, organized, and flexible way to store configuration data.
 
