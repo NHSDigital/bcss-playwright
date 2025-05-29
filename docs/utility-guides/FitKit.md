@@ -97,7 +97,7 @@ from utils.fit_kit import FitKitLogged
 
 1. **`process_kit_data(smokescreen_properties: dict) -> list`**
    - Retrieves test data for compartment 3 and splits it into normal and abnormal kits using `split_fit_kits`.
-   - **Returns:** A list of tuples, each containing a device ID (str) and a boolean flag (`True` for normal, `False` for abnormal).
+   - **Returns:** A list of tuples, each containing a device ID (str) and a `boolean` flag (`True` for normal, `False` for abnormal).
 
 2. **`split_fit_kits(kit_id_df: pd.DataFrame, smokescreen_properties: dict) -> tuple[pd.DataFrame, pd.DataFrame]`**
    - Splits the DataFrame into two: one for normal kits and one for abnormal kits, based on the numbers specified in `smokescreen_properties`.
@@ -112,7 +112,7 @@ from utils.fit_kit import FitKitLogged
 
 #### 1st Example - Basic
 
-This example is showing how the utility can be used to get a dataframe containing a list of normal / abnormal kits.
+This example is showing how the utility can be used to get a pandas `dataframe` containing a list of normal / abnormal kits.
 
 ```python
 from utils.fit_kit import FitKitLogged
