@@ -7,9 +7,9 @@ The Load Properties Utility can be used to retrieve values from a properties fil
 - [Utility Guide: Load Properties](#utility-guide-load-properties)
   - [Table of Contents](#table-of-contents)
   - [How This Works](#how-this-works)
-  - [Example Usage](#example-usage)
+  - [Example Usage for Properties](#example-usage-for-properties)
   - [Using the Load Properties Utility](#using-the-load-properties-utility)
-  - [Example Usage](#example-usage-1)
+  - [Example Usage Python Code Block](#example-usage-python-code-block)
 
 ## How This Works
 
@@ -27,7 +27,7 @@ To ensure that there are no mistakes when providing this input there are two add
 
 To add values to the properties file follow the format:
 
-## Example Usage
+## Example Usage for Properties
 
 1. Properties files use key-value pairs because they provide a simple, organized, and flexible way to store configuration data.
 
@@ -45,7 +45,7 @@ Why avoid hard coded values in tests?
 
 4. Readability: It’s easier to see and manage all your test settings and data in one file.
 
-5. Environment Flexibility: We can have different properties files for different environments (e.g., Dev, Test, Prod) without changing your test code.
+5. Environment Flexibility: We can have different properties files for different environments (e.g., Development, Test, Production) without changing your test code.
 
 ## Using the Load Properties Utility
 
@@ -56,7 +56,7 @@ Here there are two fixtures:
 1. `smokescreen_properties` - which is used to load the file: tests/smokescreen/bcss_smokescreen_tests.properties
 2. `get_general_properties` - which is used to load the file: tests/bcss_tests.properties
 
-## Example Usage
+## Example Usage Python Code Block
 
 ```python
 def test_example_1(page: Page, general_properties: dict) -> None:
