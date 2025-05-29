@@ -7,9 +7,9 @@ The Load Properties Utility can be used to retrieve values from a properties fil
 - [Utility Guide: Load Properties](#utility-guide-load-properties)
   - [Table of Contents](#table-of-contents)
   - [How This Works](#how-this-works)
-  - [Example Usage - Properties files use key value pairs and the reason for using it is to avoid hard coded values in our tests](#example-usage---properties-files-use-key-value-pairs-and-the-reason-for-using-it-is-to-avoid-hard-coded-values-in-our-tests)
+  - [Example Usage](#example-usage)
   - [Using the Load Properties Utility](#using-the-load-properties-utility)
-  - [Example usage](#example-usage)
+  - [Example Usage](#example-usage-1)
 
 ## How This Works
 
@@ -27,21 +27,25 @@ To ensure that there are no mistakes when providing this input there are two add
 
 To add values to the properties file follow the format:
 
-## Example Usage - Properties files use key value pairs and the reason for using it is to avoid hard coded values in our tests
+## Example Usage
 
-```python
-from utils.load_properties import PropertiesFile
-# Create an instance of the PropertiesFile class
-    properties = PropertiesFile()
+1. Properties files use key-value pairs because they provide a simple, organized, and flexible way to store configuration data.
 
-# Load smokescreen properties
-    smokescreen_props = properties.get_smokescreen_properties()
-    print(smokescreen_props["example_value_1"])
+2. Each line in the file assigns a value to a key (For example, c1_daily_invitation_rate=10). This makes it easy to look up and change values as needed.
 
-# Load general properties
-    general_props = properties.get_general_properties()
-    print(general_props["example_value_2"])
-```
+3. Using key-value pairs in properties files helps keep your tests clean, flexible, and easy to maintain by avoiding hard-coded values in your test scripts.
+
+Why avoid hard coded values in tests?
+
+1. Maintainability: If we need to update a value (like a test organization ID or a rate), we only have to change it in one place—the properties file—instead of searching through all your test code.
+
+2. Reusability: The same test code can be run with different data just by changing the properties file, making your tests more flexible.
+
+3. Separation of Concerns: Test logic stays in your code, while test data and configuration are kept separate in the properties file.
+
+4. Readability: It’s easier to see and manage all your test settings and data in one file.
+
+5. Environment Flexibility: We can have different properties files for different environments (e.g., Dev, Test, Prod) without changing your test code.
 
 ## Using the Load Properties Utility
 
@@ -52,11 +56,11 @@ Here there are two fixtures:
 1. `smokescreen_properties` - which is used to load the file: tests/smokescreen/bcss_smokescreen_tests.properties
 2. `get_general_properties` - which is used to load the file: tests/bcss_tests.properties
 
-## Example usage
+## Example Usage
 
 ```python
-    def test_example_1(page: Page, general_properties: dict) -> None:
-        print(
-            general_properties["example_value_1"]
-        )
+def test_example_1(page: Page, general_properties: dict) -> None:
+    print(
+        general_properties["example_value_1"]
+    )
 ```
