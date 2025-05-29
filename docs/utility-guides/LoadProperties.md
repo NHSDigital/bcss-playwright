@@ -7,7 +7,7 @@ The Load Properties Utility can be used to retrieve values from a properties fil
 - [Utility Guide: Load Properties](#utility-guide-load-properties)
   - [Table of Contents](#table-of-contents)
   - [How This Works](#how-this-works)
-  - [EXAMPLE VALUES](#example-values)
+  - [Adding to the Properties File](#adding-to-the-properties-file)
   - [Using the Load Properties Utility](#using-the-load-properties-utility)
   - [Example Usage](#example-usage)
 
@@ -25,12 +25,17 @@ To ensure that there are no mistakes when providing this input there are two add
 1. `get_smokescreen_properties()`: Which will load `self.smokescreen_properties_file`
 2. `get_general_properties()`: Which will load `self.general_properties_file`
 
+## Adding to the Properties File
+
 To add values to the properties file follow the format:
 
-## EXAMPLE VALUES
-
+```java
+# ----------------------------------
+#   Example Values
+# ----------------------------------
 example_value_1=value1
 example_value_2=value2
+```
 
 **Reasoning for storing values in the properties file:**
 
