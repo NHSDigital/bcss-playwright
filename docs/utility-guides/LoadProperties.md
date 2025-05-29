@@ -7,9 +7,12 @@ The Load Properties Utility can be used to retrieve values from a properties fil
 - [Utility Guide: Load Properties](#utility-guide-load-properties)
   - [Table of Contents](#table-of-contents)
   - [How This Works](#how-this-works)
-  - [Example Usage for Properties](#example-usage-for-properties)
+- [----------------------------------](#----------------------------------)
+- [EXAMPLE VALUES](#example-values)
+- [----------------------------------](#-----------------------------------1)
+  - [Reasoning for storing values in the properties file](#reasoning-for-storing-values-in-the-properties-file)
   - [Using the Load Properties Utility](#using-the-load-properties-utility)
-  - [Example Usage Python Code Block](#example-usage-python-code-block)
+  - [Example Usage](#example-usage)
 
 ## How This Works
 
@@ -27,7 +30,13 @@ To ensure that there are no mistakes when providing this input there are two add
 
 To add values to the properties file follow the format:
 
-## Example Usage for Properties
+# ----------------------------------
+# EXAMPLE VALUES
+# ----------------------------------
+example_value_1=value1
+example_value_2=value2
+
+## Reasoning for storing values in the properties file
 
 1. Properties files use key-value pairs because they provide a simple, organized, and flexible way to store configuration data.
 
@@ -35,7 +44,7 @@ To add values to the properties file follow the format:
 
 3. Using key-value pairs in properties files helps keep your tests clean, flexible, and easy to maintain by avoiding hard-coded values in your test scripts.
 
-Why avoid hard coded values in tests?
+**Why avoid hard coded values in tests?**
 
 1. Maintainability: If we need to update a value (like a test organization ID or a rate), we only have to change it in one place—the properties file—instead of searching through all your test code.
 
@@ -56,7 +65,7 @@ Here there are two fixtures:
 1. `smokescreen_properties` - which is used to load the file: tests/smokescreen/bcss_smokescreen_tests.properties
 2. `get_general_properties` - which is used to load the file: tests/bcss_tests.properties
 
-## Example Usage Python Code Block
+## Example Usage
 
 ```python
 def test_example_1(page: Page, general_properties: dict) -> None:
