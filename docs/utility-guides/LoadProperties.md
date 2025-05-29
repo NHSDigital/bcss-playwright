@@ -28,10 +28,11 @@ To ensure that there are no mistakes when providing this input there are two add
 To add values to the properties file follow the format:
 
 ## EXAMPLE VALUES
+
 example_value_1=value1
 example_value_2=value2
 
-Reasoning for storing values in the properties file:
+**Reasoning for storing values in the properties file:**
 
 1. Properties files use key-value pairs because they provide a simple, organized, and flexible way to store configuration data.
 
