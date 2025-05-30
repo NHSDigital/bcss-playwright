@@ -37,12 +37,12 @@ The docstrings also specify when arguments are optional, and what the default va
 
 **The main methods provided by OracleDB are:**
 
-    -connect_to_db(self)-Connects to the Oracle database using credentials from environment variables.
-    -disconnect_from_db(self, conn)-Closes the provided Oracle database connection.
-    -execute_query(self, query, params=None)-Executes a SQL query with optional parameters and returns the results as a pandas DataFrame.
-    -execute_stored_procedure(self, procedure_name, params=None)-Executes a named stored procedure with optional parameters.
-    -exec_bcss_timed_events(self, nhs_number_df)-Runs the bcss_timed_events stored procedure for each NHS number provided in a DataFrame.
-    -get_subject_id_from_nhs_number(self, nhs_number)-Retrieves the subject_screening_id for a given NHS number.
+- **connect_to_db(self)**: Connects to the Oracle database using credentials from environment variables.
+- **disconnect_from_db(self, conn)**: Closes the provided Oracle database connection.
+- **execute_query(self, query, params=None)**: Executes a SQL query with optional parameters and returns the results as a pandas DataFrame.
+- **execute_stored_procedure(self, procedure_name, params=None)**: Executes a named stored procedure with optional parameters.
+- **exec_bcss_timed_events(self, nhs_number_df)**: Runs the `bcss_timed_events` stored procedure for each NHS number provided in a DataFrame.
+- **get_subject_id_from_nhs_number(self, nhs_number)**: Retrieves the `subject_screening_id` for a given NHS number.
 
 For full implementation details, see utils/oracle/oracle.py.
 
@@ -71,6 +71,8 @@ def run_stored_procedure() -> None:
     OracleDB().execute_stored_procedure("bcss_timed_events")
 ```
 
+---
+
 ## Oracle Specific Functions
 
 This contains SQL queries that can be used to run tests.<br>
@@ -80,11 +82,11 @@ Common values are placed in the `SqlQueryValues` class to avoid repeating the sa
 
 ## How to Add New Oracle-Specific Functions
 
-    -Define a new function in utils/oracle/oracle_specific_functions.py.
-    -Create your SQL query, parameterizing as needed.
-    -Call OracleDB().execute_query(query, params) to run the query.
-    -Return the result as a pandas DataFrame.
-    -Document the function with a clear docstring.
+- Define a new function in `utils/oracle/oracle_specific_functions.py`.
+- Create your SQL query, parameterizing as needed.
+- Call `OracleDB().execute_query(query, params)` to run the query.
+- Return the result as a pandas DataFrame.
+- Document the function with a clear docstring.
 
 ## Example Usage
 
