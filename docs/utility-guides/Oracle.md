@@ -84,7 +84,7 @@ Common values are placed in the `SqlQueryValues` class to avoid repeating the sa
 - Define a new function in `utils/oracle/oracle_specific_functions.py`.
 - Create your SQL query, `parameterizing` as needed.
 - Call the  relevant methods from the oracle `util` based on your needs (e.g., `execute_query`, stored procedure methods, etc.).
-- Return the result as a pandas DataFrame.
+- Return the result in the appropriate format for your function.
 - Document the function with a clear docstring.
 
 ## Example Usage
