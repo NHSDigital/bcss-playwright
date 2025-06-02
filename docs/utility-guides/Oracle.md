@@ -21,7 +21,6 @@ You might need to use this utility in scenarios such as:
   - [Oracle Specific Functions](#oracle-specific-functions)
   - [How to Add New Oracle-Specific Functions](#how-to-add-new-oracle-specific-functions)
   - [Example Usage](#example-usage-1)
-  - [Note](#note)
 
 ## Using the Oracle Utility
 
@@ -84,7 +83,7 @@ Common values are placed in the `SqlQueryValues` class to avoid repeating the sa
 
 - Define a new function in `utils/oracle/oracle_specific_functions.py`.
 - Create your SQL query, `parameterizing` as needed.
-- Call `OracleDB().execute_query(query, params)` to run the query.
+- Call the  relevant methods from the oracle util based on your needs (e.g., `execute_query`, stored procedure methods, etc.).
 - Return the result as a pandas DataFrame.
 - Document the function with a clear docstring.
 
@@ -94,7 +93,11 @@ Common values are placed in the `SqlQueryValues` class to avoid repeating the sa
 from utils.oracle.oracle import OracleDB
 
 def example_query() -> pd.DataFrame:
-
+    """
+    Example function to demonstrate OracleDB usage for querying subject NHS numbers.
+    Returns:
+        pd.DataFrame: Query results as a pandas DataFrame.
+    """
     example_df = OracleDB().execute_query(
         f"""subject_nhs_number
     from ep_subject_episode_t
@@ -103,7 +106,6 @@ def example_query() -> pd.DataFrame:
     return example_df
 ```
 
-## Note
-
-The Oracle utility and its helper functions are available under utils/oracle/.
-See the source code for more details.
+> **Note:**<br>
+> The Oracle utility and its helper functions are available under utils/oracle/.<br>
+> See the source code for more details.
