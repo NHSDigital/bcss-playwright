@@ -22,17 +22,16 @@ def before_each(page: Page):
 
 @pytest.mark.regression
 @pytest.mark.call_and_recall
-def test_set_create_a_plan_daily_rate(page: Page, tests_properties: dict) -> None:
+def test_set_create_a_plan_daily_rate(page: Page, general_properties: dict) -> None:
     """
     Verifies that a user is able to click on the Set all button and enter a daily rate.
     """
-
     # When I go to "Invitations Monitoring - Screening Centre"
     CallAndRecallPage(page).go_to_planning_and_monitoring_page()
 
     # And I click the link text "BCS001"
     InvitationsMonitoringPage(page).go_to_invitation_plan_page(
-        tests_properties["screening_centre_code"]
+        general_properties["screening_centre_code"]
     )
     # And I click the "Create a Plan" button
     InvitationsPlansPage(page).go_to_create_a_plan_page()
@@ -42,7 +41,7 @@ def test_set_create_a_plan_daily_rate(page: Page, tests_properties: dict) -> Non
 
     # And I enter "28" in the input box with id "dailyRate"
     CreateAPlanPage(page).fill_daily_invitation_rate_field(
-        tests_properties["daily_invitation_rate"]
+        general_properties["daily_invitation_rate"]
     )
 
     # And I click the "Update" button
@@ -51,14 +50,16 @@ def test_set_create_a_plan_daily_rate(page: Page, tests_properties: dict) -> Non
     # And I click the "Save" button
     CreateAPlanPage(page).click_save_button()
 
-    # Then the Weekly Invitation Rate for weeks 0 to 83 is set correctly
+    # Then the Weekly Invitation Rate for weeks 1 to 83 is set correctly
     # based on a set all daily rate of 28
     CreateAPlanPage(page).verify_weekly_invitation_rate_for_weeks(1, 83, "28")
 
 
 @pytest.mark.regression
 @pytest.mark.call_and_recall
-def test_create_invitation_plan_weekly_rate(page: Page, tests_properties: dict) -> None:
+def test_create_invitation_plan_weekly_rate(
+    page: Page, general_properties: dict
+) -> None:
     """
     Verifies that a user can set a weekly invitation rate in Create a Plan.
     """
@@ -68,7 +69,7 @@ def test_create_invitation_plan_weekly_rate(page: Page, tests_properties: dict) 
 
     # And I click the link text "BCS001"
     InvitationsMonitoringPage(page).go_to_invitation_plan_page(
-        tests_properties["screening_centre_code"]
+        general_properties["screening_centre_code"]
     )
     # And I click the "Create a Plan" button
     InvitationsPlansPage(page).go_to_create_a_plan_page()
@@ -78,7 +79,7 @@ def test_create_invitation_plan_weekly_rate(page: Page, tests_properties: dict) 
 
     # And I enter "130" in the input box with id "weeklyRate"
     CreateAPlanPage(page).fill_weekly_invitation_rate_field(
-        tests_properties["weekly_invitation_rate"]
+        general_properties["weekly_invitation_rate"]
     )
 
     # And I click the "Update" button
@@ -88,7 +89,7 @@ def test_create_invitation_plan_weekly_rate(page: Page, tests_properties: dict) 
     CreateAPlanPage(page).click_save_button()
 
     # And the Weekly Invitation Rate for weeks 1 to 83 is set to the set all weekly rate of 130
-    CreateAPlanPage(page).verify_weekly_invitation_rate_for_weeks(1, 83, "28")
+    CreateAPlanPage(page).verify_weekly_invitation_rate_for_weeks(1, 83, "130")
 
 
 @pytest.mark.regression

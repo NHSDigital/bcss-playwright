@@ -1,5 +1,4 @@
 import pytest
-import logging
 from playwright.sync_api import Page
 from pages.base_page import BasePage
 from pages.call_and_recall.call_and_recall_page import CallAndRecallPage
@@ -17,7 +16,7 @@ def before_each(page: Page):
     Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the call and recall page
     """
     # Log in to BCSS
-    UserTools.user_login(page, "Hub Manager State Registered at BCS01")
+    UserTools.user_login(page, "Hub Manager at BCS01")
 
     # Go to call and recall page
     BasePage(page).go_to_call_and_recall_page()
@@ -25,7 +24,6 @@ def before_each(page: Page):
 
 # Scenario: Run FOBT invitations and process the S1 letter batch
 # Many feature scenarios need a subject at S9.
-#     Given I log in to BCSS "England" as user role "Hub Manager"
 #     When I generate invitations
 #     And I view the active batch list
 #     And I view the "Original" type "Open" status active letter batch for "S1" "Pre-invitation (FIT)"

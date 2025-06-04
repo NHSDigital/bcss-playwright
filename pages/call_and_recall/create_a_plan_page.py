@@ -88,7 +88,7 @@ class CreateAPlanPage(BasePage):
         # Get the current weekly invitation rate for the starting week
         weekly_invitation_rate = self.page.query_selector_all(
             "css:nth-child(" + str(start_week) + ") .text"
-        )[0].text
+        )[0].inner_text()
         assert (
             weekly_invitation_rate == expected_weekly_rate
         ), f"Expected weekly invitation rate '{expected_weekly_rate}' for week {start_week} but got '{weekly_invitation_rate}'"
@@ -97,9 +97,9 @@ class CreateAPlanPage(BasePage):
         for week in range(start_week + 1, end_week + 1):
             weekly_rate_locator = f".week-{week} .text"
             assert (
-                self.page.query_selector_all(weekly_rate_locator)[0].text
+                self.page.query_selector_all(weekly_rate_locator)[0].inner_text()
                 == expected_weekly_rate
-            ), f"Week {week} invitation rate should be '{expected_weekly_rate}', but found '{self.page.query_selector_all(weekly_rate_locator)[0].text}'"
+            ), f"Week {week} invitation rate should be '{expected_weekly_rate}', but found '{self.page.query_selector_all(weekly_rate_locator)[0].inner_text()}'"
 
     def increment_invitation_rate_and_verify_changes(self) -> None:
         """
