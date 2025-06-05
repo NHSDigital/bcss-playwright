@@ -2,11 +2,7 @@ import pytest
 from playwright.sync_api import Page
 from pages.base_page import BasePage
 from pages.call_and_recall.call_and_recall_page import CallAndRecallPage
-from pages.call_and_recall.invitations_monitoring_page import InvitationsMonitoringPage
-from pages.call_and_recall.generate_invitations_page import GenerateInvitationsPage
 from pages.call_and_recall.non_invitations_days_page import NonInvitationDaysPage
-from pages.call_and_recall.invitations_plans_page import InvitationsPlansPage
-from pages.call_and_recall.create_a_plan_page import CreateAPlanPage
 from utils.user_tools import UserTools
 
 
@@ -46,9 +42,9 @@ def test_add_then_delete_non_invitation_day(page: Page) -> None:
     # Then todays date is visible in the non-invitation days table
     NonInvitationDaysPage(page).verify_date_is_visible()
     # When I click the delete button for the non-invitation day
-    NonInvitationDaysPage(page).click_delete_button()
-    # And I press OK on my confirmation prompt TODO: This is a modal/popup that needs to be handled
-    NonInvitationDaysPage(page).confirm_delete_action()
+    # NonInvitationDaysPage(page).click_delete_button() TODO: this step should be executed as part of the next step (delete this step once confirmed working)
+    # And I press OK on my confirmation prompt
+    BasePage(page).safe_accept_dialog(page.get_by_role("button", name="Delete"))
     # Then todays date is not visible in the non-invitation days table
     NonInvitationDaysPage(page).verify_date_is_not_visible()
 
@@ -65,7 +61,5 @@ def test_non_invitation_day_note_is_mandatory(page: Page) -> None:
     NonInvitationDaysPage(page).enter_date("14/11/2030")
     # And I click the "Add Non-Invitation Day" button
     NonInvitationDaysPage(page).click_add_non_invitation_day_button()
-    # Then I get an alert message that "contains" "The Note field is mandatory" TODO: This is a modal/popup that needs to be handled
-    NonInvitationDaysPage(page).verify_alert_message_contains(
-        "The Note field is mandatory"
-    )
+    # Then I get an alert message that "contains" "The Note field is mandatory"
+    BasePage(page).assert_dialog_text("The Note field is mandatory")
