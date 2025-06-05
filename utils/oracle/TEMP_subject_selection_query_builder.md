@@ -256,7 +256,7 @@ Returns a `SelectionBuilderException` for invalid use of "unchanged".
 
 - [ ] Add additional match case in `_add_variable_selection_criteria`. This is almost a direct copy of `addVariableSelectionCriteria` in the Selenium framework.
 - [ ] Add any additional methods that are required by this utility: `_add_criteria_.....`.
-- [ ] Create any new classes needed in the classes folder
+- [ ] Create any new classes needed in the classes folder.
 
 ### General
 
@@ -265,3 +265,4 @@ Returns a `SelectionBuilderException` for invalid use of "unchanged".
 - [ ] Document all enums and supporting classes used by the builder.
 - [ ] Add logging for all major decision points in query construction.
 - [ ] Review and update doc strings for clarity and completeness.
+- [ ] Double check `_add_criteria_date_field` against `addCriteriaDateField` to see if functionality ported over correctly. This included looking at any methods referenced in this method.

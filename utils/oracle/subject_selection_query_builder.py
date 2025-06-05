@@ -5,6 +5,8 @@ from classes.date_description import DateDescription
 from classes.event_status_type import EventStatusType
 from classes.has_gp_practice import HasGPPractice
 from classes.screening_status_type import ScreeningStatusType
+from classes.sdd_reason_for_change_type import SDDReasonForChangeType
+from classes.ssdd_reason_for_change_type import SSDDReasonForChangeType
 from classes.ss_reason_for_change_type import SSReasonForChangeType
 from classes.subject_hub_code import SubjectHubCode
 from classes.subject_screening_centre_code import SubjectScreeningCentreCode
@@ -51,7 +53,14 @@ class SubjectSelectionQueryBuilder:
         else:
             self._end_where_clause(1)
 
-        query = " ".join(self.sql_select + self.sql_from + self.sql_where)
+        query = " ".join(
+            self.sql_select
+            + self.sql_from
+            + self.sql_from_episode
+            + self.sql_from_genetic_condition_diagnosis
+            + self.sql_from_cancer_audit_datasets
+            + self.sql_where
+        )
         logging.info("Final query: %s", query)
         return query, self.bind_vars
 
@@ -169,6 +178,60 @@ class SubjectSelectionQueryBuilder:
                         ):
                             self._add_criteria_date_field(
                                 subject, "ALL_PATHWAYS", "SCREENING_STATUS_CHANGE_DATE"
+                            )
+                        case SubjectSelectionCriteriaKey.PREVIOUS_LYNCH_DUE_DATE:
+                            self._add_criteria_date_field(
+                                subject, "LYNCH", "PREVIOUS_DUE_DATE"
+                            )
+                        case (
+                            SubjectSelectionCriteriaKey.PREVIOUS_SCREENING_DUE_DATE
+                            | SubjectSelectionCriteriaKey.PREVIOUS_SCREENING_DUE_DATE_BIRTHDAY
+                        ):
+                            self._add_criteria_date_field(
+                                subject, "FOBT", "PREVIOUS_DUE_DATE"
+                            )
+                        case SubjectSelectionCriteriaKey.PREVIOUS_SURVEILLANCE_DUE_DATE:
+                            self._add_criteria_date_field(
+                                subject, "SURVEILLANCE", "PREVIOUS_DUE_DATE"
+                            )
+                        case (
+                            SubjectSelectionCriteriaKey.SCREENING_DUE_DATE
+                            | SubjectSelectionCriteriaKey.SCREENING_DUE_DATE_BIRTHDAY
+                        ):
+                            self._add_criteria_date_field(subject, "FOBT", "DUE_DATE")
+                        case (
+                            SubjectSelectionCriteriaKey.CALCULATED_SCREENING_DUE_DATE
+                            | SubjectSelectionCriteriaKey.CALCULATED_SCREENING_DUE_DATE_BIRTHDAY
+                            | SubjectSelectionCriteriaKey.CALCULATED_FOBT_DUE_DATE
+                        ):
+                            self._add_criteria_date_field(
+                                subject, "FOBT", "CALCULATED_DUE_DATE"
+                            )
+                        case SubjectSelectionCriteriaKey.SCREENING_DUE_DATE_REASON:
+                            self._add_criteria_screening_due_date_reason(subject)
+                        case (
+                            SubjectSelectionCriteriaKey.SCREENING_DUE_DATE_DATE_OF_CHANGE
+                        ):
+                            self._add_criteria_date_field(
+                                subject, "FOBT", "DUE_DATE_CHANGE_DATE"
+                            )
+                        case SubjectSelectionCriteriaKey.SURVEILLANCE_DUE_DATE:
+                            self._add_criteria_date_field(
+                                subject, "SURVEILLANCE", "DUE_DATE"
+                            )
+                        case (
+                            SubjectSelectionCriteriaKey.CALCULATED_SURVEILLANCE_DUE_DATE
+                        ):
+                            self._add_criteria_date_field(
+                                subject, "SURVEILLANCE", "CALCULATED_DUE_DATE"
+                            )
+                        case SubjectSelectionCriteriaKey.SURVEILLANCE_DUE_DATE_REASON:
+                            self._add_criteria_surveillance_due_date_reason(subject)
+                        case (
+                            SubjectSelectionCriteriaKey.SURVEILLANCE_DUE_DATE_DATE_OF_CHANGE
+                        ):
+                            self._add_criteria_date_field(
+                                subject, "SURVEILLANCE", "DUE_DATE_CHANGE_DATE"
                             )
 
                 except Exception:
@@ -498,6 +561,87 @@ class SubjectSelectionQueryBuilder:
             self._add_criteria_date_field_special_cases(
                 self.criteria_value, subject, pathway, date_type, date_column_name
             )
+
+    def _add_criteria_screening_due_date_reason(self, subject: "Subject"):
+        due_date_reason = "ss.sdd_reason_for_change_id"
+        try:
+            screening_due_date_change_reason_type = (
+                SDDReasonForChangeType.by_description_case_insensitive(
+                    self.criteria_value
+                )
+            )
+            self.sql_where.append(" AND ")
+
+            if screening_due_date_change_reason_type is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+
+            match screening_due_date_change_reason_type:
+                case SDDReasonForChangeType.NULL:
+                    self.sql_where.append(f"{due_date_reason}{" IS NULL "}")
+                case SDDReasonForChangeType.NOT_NULL:
+                    self.sql_where.append(f"{due_date_reason}{" IS NOT NULL "}")
+                case SDDReasonForChangeType.UNCHANGED:
+                    self._force_not_modifier_is_invalid_for_criteria_value()
+                    if subject is None:
+                        raise self.invalid_use_of_unchanged_exception(
+                            self.criteria_key_name, "no existing subject"
+                        )
+                    elif subject.get_screening_due_date_change_reason_id() is None:
+                        self.sql_where.append(f"{due_date_reason}{" IS NULL "}")
+                    else:
+                        self.sql_where.append(
+                            f"{due_date_reason}{" = "}{subject.get_screening_due_date_change_reason_id()}"
+                        )
+                case _:
+                    self.sql_where.append(
+                        f"{due_date_reason}{self.criteria_comparator}{screening_due_date_change_reason_type.valid_value_id}"
+                    )
+        except SelectionBuilderException as ssbe:
+            raise ssbe
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_surveillance_due_date_reason(self, subject: "Subject"):
+        try:
+            surveillance_due_date_change_reason = (
+                SSDDReasonForChangeType.by_description_case_insensitive(
+                    self.criteria_value
+                )
+            )
+            self.sql_where.append(" AND ss.surveillance_sdd_rsn_change_id ")
+
+            if surveillance_due_date_change_reason is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+
+            match surveillance_due_date_change_reason:
+                case SSDDReasonForChangeType.NULL | SSDDReasonForChangeType.NOT_NULL:
+                    self.sql_where.append(
+                        f" IS {surveillance_due_date_change_reason.description}"
+                    )
+                case SSDDReasonForChangeType.UNCHANGED:
+                    self._force_not_modifier_is_invalid_for_criteria_value()
+                    if subject is None:
+                        raise self.invalid_use_of_unchanged_exception(
+                            self.criteria_key_name, "no existing subject"
+                        )
+                    elif subject.get_surveillance_due_date_change_reason_id() is None:
+                        self.sql_where.append(" IS NULL ")
+                    else:
+                        self.sql_where.append(
+                            f" = {subject.get_surveillance_due_date_change_reason_id()}"
+                        )
+                case _:
+                    self.sql_where.append(
+                        f"{self.criteria_comparator}{surveillance_due_date_change_reason.valid_value_id}"
+                    )
+        except SelectionBuilderException as ssbe:
+            raise ssbe
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
     def _get_date_field_column_name(self, pathway: str, date_type: str) -> str:
         """
