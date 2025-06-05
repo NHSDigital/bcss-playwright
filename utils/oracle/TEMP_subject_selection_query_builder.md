@@ -255,7 +255,7 @@ Returns a `SelectionBuilderException` for invalid use of "unchanged".
 ### Selenium Copy
 
 - [ ] Add additional match case in `_add_variable_selection_criteria`. This is almost a direct copy of `addVariableSelectionCriteria` in the Selenium framework.
-- [ ] Add any additional methods that are required by this util: `_add_criteria_.....`.
+- [ ] Add any additional methods that are required by this utility: `_add_criteria_.....`.
 - [ ] Create any new classes needed in the classes folder
 
 ### General
