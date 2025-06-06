@@ -9,6 +9,7 @@ from classes.ceased_confirmation_user_id import CeasedConfirmationUserId
 from classes.clinical_cease_reason_type import ClinicalCeaseReasonType
 from classes.date_description import DateDescription
 from classes.event_status_type import EventStatusType
+from classes.episode_type import EpisodeType
 from classes.has_gp_practice import HasGPPractice
 from classes.has_unprocessed_sspi_updates import HasUnprocessedSSPIUpdates
 from classes.has_user_dob_update import HasUserDobUpdate
@@ -267,6 +268,7 @@ class SubjectSelectionQueryBuilder:
                             self._add_criteria_has_unprocessed_sspi_updates()
                         case SubjectSelectionCriteriaKey.SUBJECT_HAS_USER_DOB_UPDATES:
                             self._add_criteria_has_user_dob_update()
+                        # TODO: Add more case statemented here, copying the Java code
 
                 except Exception:
                     raise SelectionBuilderException(
