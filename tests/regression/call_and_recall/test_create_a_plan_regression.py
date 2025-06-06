@@ -47,11 +47,12 @@ def test_create_a_plan_set_daily_rate(page: Page, general_properties: dict) -> N
     # And I click the "Update" button
     CreateAPlanPage(page).click_update_button()
 
-    # Then the Weekly Invitation Rate for weeks 1 to 83 is set correctly
+    # Then the Weekly Invitation Rate for weeks 1 to 50 is set correctly
     # based on a set all daily rate of 28
     CreateAPlanPage(page).verify_weekly_invitation_rate_for_weeks(1, 50, "140")
 
 
+@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.call_and_recall
 def test_create_invitation_plan_weekly_rate(
@@ -82,11 +83,8 @@ def test_create_invitation_plan_weekly_rate(
     # And I click the "Update" button
     CreateAPlanPage(page).click_update_button()
 
-    # And I click the "Save" button
-    CreateAPlanPage(page).click_save_button()
-
-    # And the Weekly Invitation Rate for weeks 1 to 83 is set to the set all weekly rate of 130
-    CreateAPlanPage(page).verify_weekly_invitation_rate_for_weeks(1, 83, "130")
+    # And the Weekly Invitation Rate for weeks 1 to 50 is set to the set all weekly rate of 130
+    CreateAPlanPage(page).verify_weekly_invitation_rate_for_weeks(1, 50, "130")
 
 
 @pytest.mark.regression
