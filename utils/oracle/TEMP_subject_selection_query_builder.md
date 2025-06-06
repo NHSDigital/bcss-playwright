@@ -144,6 +144,42 @@ Adds a date-based filter, supporting a wide range of date logic, including speci
 
 Handles special date criteria such as "last birthday", "calculated due date", "unchanged", and various event-based offsets.
 
+#### `_add_criteria_screening_due_date_reason(self, subject)`
+
+Adds a filter for the screening due date reason, handling null, not null, unchanged, and specific value logic.
+
+#### `_add_criteria_surveillance_due_date_reason(self, subject)`
+
+Adds a filter for the surveillance due date reason, handling null, not null, unchanged, and specific value logic.
+
+#### `_add_criteria_bowel_scope_due_date_reason(self, subject)`
+
+Adds a filter for the bowel scope due date reason, handling null, not null, unchanged, and specific value logic.
+
+#### `_add_criteria_ceased_confirmation_details(self)`
+
+Adds a filter for ceased confirmation details, handling null, not null, and string matching.
+
+#### `_add_criteria_ceased_confirmation_user_id(self, user)`
+
+Adds a filter for ceased confirmation user ID, handling numeric IDs, enum values, and special cases.
+
+#### `_add_criteria_clinical_reason_for_cease(self)`
+
+Adds a filter for clinical reason for cease, supporting string and enum-based logic.
+
+#### `_add_criteria_subject_has_event_status(self)`
+
+Adds a filter for subjects with or without a specific event status.
+
+#### `_add_criteria_has_unprocessed_sspi_updates(self)`
+
+Adds a filter for subjects with unprocessed SSPI updates.
+
+#### `_add_criteria_has_user_dob_update(self)`
+
+Adds a filter for subjects with user date of birth updates.
+
 ---
 
 ### SQL Helper Methods
@@ -250,6 +286,62 @@ Returns a `SelectionBuilderException` for invalid use of "unchanged".
 
 ---
 
+### Classes Used in This Module
+
+#### `Subject`
+
+Represents a screening subject, encapsulating all relevant subject data and providing methods to access screening status, due dates, and other subject-specific information.
+
+#### `User`
+
+Represents a user of the system, including their associated organisation and permissions.
+
+#### `Organisation`
+
+Represents an organisation (such as a hub or screening centre) with an organisation ID and related metadata.
+
+#### `SubjectSelectionCriteriaKey`
+
+An enum representing all possible criteria keys that can be used for subject selection. Each key includes metadata such as whether it allows the "NOT:" modifier or multiple values.
+
+#### `ScreeningStatusType`
+
+An enum representing possible screening statuses for a subject, with methods for lookup by description and value.
+
+#### `SSReasonForChangeType`
+
+An enum for reasons a subject's screening status was changed, with lookup methods.
+
+#### `SDDReasonForChangeType`
+
+An enum for reasons a subject's screening due date was changed, with lookup methods.
+
+#### `SSDDReasonForChangeType`
+
+An enum for reasons a subject's surveillance due date was changed, with lookup methods.
+
+#### `BowelScopeDDReasonForChangeType`
+
+An enum for reasons a subject's bowel scope due date was changed, with lookup methods.
+
+#### `CeasedConfirmationDetails`
+
+An enum for ceased confirmation details, supporting null/not-null and string matching.
+
+#### `CeasedConfirmationUserId`
+
+An enum for ceased confirmation user IDs, supporting special values and user lookups.
+
+#### `ManualCeaseRequested`
+
+An enum for manual cease request statuses, with case-insensitive lookup.
+
+#### `HasGPPractice`
+
+An enum for GP practice status (yes/no/active/inactive), with description-based lookup.
+
+---
+
 ## ToDo
 
 ### Selenium Copy
@@ -266,3 +358,8 @@ Returns a `SelectionBuilderException` for invalid use of "unchanged".
 - [ ] Add logging for all major decision points in query construction.
 - [ ] Review and update doc strings for clarity and completeness.
 - [ ] Double check `_add_criteria_date_field` against `addCriteriaDateField` to see if functionality ported over correctly. This included looking at any methods referenced in this method.
+
+### May Require Another Jira Ticket
+
+- [ ] Create tests around this utility to prove it works as intended. See if there is a current selenium test that does this.
+- [ ] Create a new utility around populating the Subject and User class objects. This will be beneficial as these two objects are passed into this utility.

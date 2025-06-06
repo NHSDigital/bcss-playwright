@@ -1,9 +1,18 @@
 from typing import Dict, Union, Tuple, Optional
 import logging
 from datetime import datetime, date
+from classes.bowel_scope_dd_reason_for_change_type import (
+    BowelScopeDDReasonForChangeType,
+)
+from classes.ceased_confirmation_details import CeasedConfirmationDetails
+from classes.ceased_confirmation_user_id import CeasedConfirmationUserId
+from classes.clinical_cease_reason_type import ClinicalCeaseReasonType
 from classes.date_description import DateDescription
 from classes.event_status_type import EventStatusType
 from classes.has_gp_practice import HasGPPractice
+from classes.has_unprocessed_sspi_updates import HasUnprocessedSSPIUpdates
+from classes.has_user_dob_update import HasUserDobUpdate
+from classes.manual_cease_requested import ManualCeaseRequested
 from classes.screening_status_type import ScreeningStatusType
 from classes.sdd_reason_for_change_type import SDDReasonForChangeType
 from classes.ssdd_reason_for_change_type import SSDDReasonForChangeType
@@ -233,6 +242,31 @@ class SubjectSelectionQueryBuilder:
                             self._add_criteria_date_field(
                                 subject, "SURVEILLANCE", "DUE_DATE_CHANGE_DATE"
                             )
+                        case SubjectSelectionCriteriaKey.BOWEL_SCOPE_DUE_DATE_REASON:
+                            self._add_criteria_bowel_scope_due_date_reason()
+                        case SubjectSelectionCriteriaKey.MANUAL_CEASE_REQUESTED:
+                            self._add_criteria_manual_cease_requested()
+                        case SubjectSelectionCriteriaKey.CEASED_CONFIRMATION_DATE:
+                            self._add_criteria_date_field(
+                                subject, "ALL_PATHWAYS", "CEASED_CONFIRMATION_DATE"
+                            )
+                        case SubjectSelectionCriteriaKey.CEASED_CONFIRMATION_DETAILS:
+                            self._add_criteria_ceased_confirmation_details()
+                        case SubjectSelectionCriteriaKey.CEASED_CONFIRMATION_USER_ID:
+                            self._add_criteria_ceased_confirmation_user_id(user)
+                        case SubjectSelectionCriteriaKey.CLINICAL_REASON_FOR_CEASE:
+                            self._add_criteria_clinical_reason_for_cease()
+                        case (
+                            SubjectSelectionCriteriaKey.SUBJECT_HAS_EVENT_STATUS
+                            | SubjectSelectionCriteriaKey.SUBJECT_DOES_NOT_HAVE_EVENT_STATUS
+                        ):
+                            self._add_criteria_subject_has_event_status()
+                        case (
+                            SubjectSelectionCriteriaKey.SUBJECT_HAS_UNPROCESSED_SSPI_UPDATES
+                        ):
+                            self._add_criteria_has_unprocessed_sspi_updates()
+                        case SubjectSelectionCriteriaKey.SUBJECT_HAS_USER_DOB_UPDATES:
+                            self._add_criteria_has_user_dob_update()
 
                 except Exception:
                     raise SelectionBuilderException(
@@ -642,6 +676,197 @@ class SubjectSelectionQueryBuilder:
             raise ssbe
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_bowel_scope_due_date_reason(self):
+        try:
+            bowel_scope_due_date_change_reason_type = (
+                BowelScopeDDReasonForChangeType.by_description(self.criteria_value)
+            )
+
+            if bowel_scope_due_date_change_reason_type is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+
+            self.sql_where.append(" AND ss.fs_sdd_reason_for_change_id ")
+            self.sql_where.append(
+                f"{self.criteria_comparator}{bowel_scope_due_date_change_reason_type.valid_value_id}"
+            )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_manual_cease_requested(self) -> None:
+        try:
+            self.sql_where.append(" AND ss.cease_requested_status_id ")
+
+            criterion = ManualCeaseRequested.by_description_case_insensitive(
+                self.criteria_value
+            )
+            if criterion is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+
+            match criterion:
+                case ManualCeaseRequested.NO:
+                    self.sql_where.append(" IS NULL ")
+                case ManualCeaseRequested.YES:
+                    self.sql_where.append(" IS NOT NULL ")
+                case ManualCeaseRequested.DISCLAIMER_LETTER_REQUIRED:
+                    self.sql_where.append("= 35")  # C1
+                case ManualCeaseRequested.DISCLAIMER_LETTER_SENT:
+                    self.sql_where.append("= 36")  # C2
+                case _:
+                    raise SelectionBuilderException(
+                        self.criteria_key_name, self.criteria_value
+                    )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_ceased_confirmation_details(self):
+        self.sql_where.append(" AND LOWER(ss.ceased_confirmation_details) ")
+
+        try:
+            ccd = CeasedConfirmationDetails.by_description(self.criteria_value.lower())
+            if ccd in (
+                CeasedConfirmationDetails.NULL,
+                CeasedConfirmationDetails.NOT_NULL,
+            ):
+                self.sql_where.append(f" IS {ccd.get_description()} ")
+            else:
+                raise ValueError("Unrecognized enum value")
+        except Exception:
+            # Fall back to string matching
+            value_quoted = f"'{self.criteria_value.lower()}'"
+            self.sql_where.append(f"{self.criteria_comparator} {value_quoted} ")
+
+    def _add_criteria_ceased_confirmation_user_id(self, user: "User") -> None:
+        self.sql_where.append(" AND ss.ceased_confirmation_pio_id ")
+
+        if self.criteria_value.isnumeric():  # actual PIO ID
+            self.sql_where.append(self.criteria_comparator)
+            self.sql_where.append(self.criteria_value)
+            self.sql_where.append(" ")
+        else:
+            try:
+                enum_value = CeasedConfirmationUserId.by_description(
+                    self.criteria_value.lower()
+                )
+                if enum_value == CeasedConfirmationUserId.AUTOMATED_PROCESS_ID:
+                    self.sql_where.append(self.criteria_comparator)
+                    self.sql_where.append(" 2 ")
+                elif enum_value == CeasedConfirmationUserId.NOT_NULL:
+                    self.sql_where.append(" IS NOT NULL ")
+                elif enum_value == CeasedConfirmationUserId.NULL:
+                    self.sql_where.append(" IS NULL ")
+                elif enum_value == CeasedConfirmationUserId.USER_ID:
+                    self.sql_where.append(self.criteria_comparator)
+                    self.sql_where.append(str(user.user_id) + " ")
+                else:
+                    raise SelectionBuilderException(
+                        self.criteria_key_name, self.criteria_value
+                    )
+            except Exception:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+
+    def _add_criteria_clinical_reason_for_cease(self) -> None:
+        try:
+            clinical_cease_reason = (
+                ClinicalCeaseReasonType.by_description_case_insensitive(
+                    self.criteria_value
+                )
+            )
+            self.sql_where.append(" AND ss.clinical_reason_for_cease_id ")
+
+            if clinical_cease_reason is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+
+            if clinical_cease_reason in {
+                ClinicalCeaseReasonType.NULL,
+                ClinicalCeaseReasonType.NOT_NULL,
+            }:
+                self.sql_where.append(f" IS {clinical_cease_reason.description}")
+            else:
+                self.sql_where.append(
+                    f"{self.criteria_comparator}{clinical_cease_reason.valid_value_id}"
+                )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_subject_has_event_status(self) -> None:
+        event_exists = (
+            self.criteria_key == SubjectSelectionCriteriaKey.SUBJECT_HAS_EVENT_STATUS
+        )
+
+        try:
+            event_status = EventStatusType.get_by_code(self.criteria_value.upper())
+
+            if event_status is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+
+            self.sql_where.append(" AND")
+
+            if not event_exists:
+                self.sql_where.append(" NOT")
+
+            self.sql_where.append(
+                f" EXISTS ("
+                f" SELECT 1"
+                f" FROM ep_events_t sev"
+                f" WHERE sev.screening_subject_id = ss.screening_subject_id"
+                f" AND sev.event_status_id = {event_status.id}"
+                f") "
+            )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_has_unprocessed_sspi_updates(self) -> None:
+        try:
+            value = HasUnprocessedSSPIUpdates.by_description(
+                self.criteria_value.lower()
+            )
+            if value == HasUnprocessedSSPIUpdates.YES:
+                self.sql_where.append(" AND EXISTS ( SELECT 'sdfp' ")
+            elif value == HasUnprocessedSSPIUpdates.NO:
+                self.sql_where.append(" AND NOT EXISTS ( SELECT 'sdfp' ")
+            else:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+        self.sql_where.append("   FROM sd_feed_processing_t sdfp ")
+        self.sql_where.append("   WHERE sdfp.contact_id = c.contact_id ")
+        self.sql_where.append("   AND sdfp.awaiting_manual_intervention = 'Y' ) ")
+
+    def _add_criteria_has_user_dob_update(self) -> None:
+        try:
+            value = HasUserDobUpdate.by_description(self.criteria_value.lower())
+            if value == HasUserDobUpdate.YES:
+                self.sql_where.append(" AND EXISTS ( SELECT 'div' ")
+            elif value == HasUserDobUpdate.NO:
+                self.sql_where.append(" AND NOT EXISTS ( SELECT 'div' ")
+            else:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+        self.sql_where.append("   from mpi.sd_data_item_value_t div ")
+        self.sql_where.append("   WHERE div.contact_id = c.contact_id ")
+        self.sql_where.append("   AND div.data_item_id = 4 ) ")
 
     def _get_date_field_column_name(self, pathway: str, date_type: str) -> str:
         """
