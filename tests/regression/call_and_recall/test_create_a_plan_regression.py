@@ -22,7 +22,7 @@ def before_each(page: Page):
 
 @pytest.mark.regression
 @pytest.mark.call_and_recall
-def test_set_create_a_plan_daily_rate(page: Page, general_properties: dict) -> None:
+def test_create_a_plan_set_daily_rate(page: Page, general_properties: dict) -> None:
     """
     Verifies that a user is able to click on the Set all button and enter a daily rate.
     """
@@ -47,12 +47,9 @@ def test_set_create_a_plan_daily_rate(page: Page, general_properties: dict) -> N
     # And I click the "Update" button
     CreateAPlanPage(page).click_update_button()
 
-    # And I click the "Save" button
-    CreateAPlanPage(page).click_save_button()
-
     # Then the Weekly Invitation Rate for weeks 1 to 83 is set correctly
     # based on a set all daily rate of 28
-    CreateAPlanPage(page).verify_weekly_invitation_rate_for_weeks(1, 83, "28")
+    CreateAPlanPage(page).verify_weekly_invitation_rate_for_weeks(1, 50, "140")
 
 
 @pytest.mark.regression

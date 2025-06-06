@@ -85,21 +85,55 @@ class CreateAPlanPage(BasePage):
         end_week (int): The ending week of the range.
         expected_weekly_rate (str): The expected weekly invitation rate.
         """
-        # Get the current weekly invitation rate for the starting week
-        weekly_invitation_rate = self.page.query_selector_all(
-            "css:nth-child(" + str(start_week) + ") .text"
-        )[0].inner_text()
+
+        # Verify the rate for the starting week
+        weekly_invitation_rate_selector = "#invitationPlan > tbody > tr:nth-child(2) > td.input.border-right.dt-type-numeric > input"
+        self.page.wait_for_selector(weekly_invitation_rate_selector)
+        weekly_invitation_rate = self.page.locator(
+            weekly_invitation_rate_selector
+        ).input_value()
+
         assert (
             weekly_invitation_rate == expected_weekly_rate
         ), f"Expected weekly invitation rate '{expected_weekly_rate}' for week {start_week} but got '{weekly_invitation_rate}'"
-
         # Verify the rate for the specified range of weeks
         for week in range(start_week + 1, end_week + 1):
-            weekly_rate_locator = f".week-{week} .text"
+            weekly_rate_locator = f"#invitationPlan > tbody > tr:nth-child({week + 2}) > td.input.border-right.dt-type-numeric > input"
+
+            # Wait for the element to be available
+            self.page.wait_for_selector(weekly_rate_locator)
+
+            # Get the input value safely
+            weekly_rate_element = self.page.locator(weekly_rate_locator)
             assert (
-                self.page.query_selector_all(weekly_rate_locator)[0].inner_text()
-                == expected_weekly_rate
-            ), f"Week {week} invitation rate should be '{expected_weekly_rate}', but found '{self.page.query_selector_all(weekly_rate_locator)[0].inner_text()}'"
+                weekly_rate_element.is_visible()
+            ), f"Week {week} rate element not visible"
+
+            # Verify the value
+            actual_weekly_rate = weekly_rate_element.input_value()
+            assert (
+                actual_weekly_rate == expected_weekly_rate
+            ), f"Week {week} invitation rate should be '{expected_weekly_rate}', but found '{actual_weekly_rate}'"
+
+            # Get the text safely
+        # Get the frame first
+        frame = self.page.frame(
+            url="https://bcss-bcss-18680-ddc-bcss.k8s-nonprod.texasplatform.uk/invitation/plan/23159/23162/create"
+        )
+
+        # Ensure the frame is found before proceeding
+        assert frame, "Frame not found!"
+
+        # Now locate the input field inside the frame and get its value
+        weekly_invitation_rate_selector = "#invitationPlan > tbody > tr:nth-child(2) > td.input.border-right.dt-type-numeric > input"
+        weekly_invitation_rate = frame.locator(
+            weekly_invitation_rate_selector
+        ).input_value()
+
+        # Assert the expected value
+        assert (
+            weekly_invitation_rate == expected_weekly_rate
+        ), f"Week 2 invitation rate should be '{expected_weekly_rate}', but found '{weekly_invitation_rate}'"
 
     def increment_invitation_rate_and_verify_changes(self) -> None:
         """
