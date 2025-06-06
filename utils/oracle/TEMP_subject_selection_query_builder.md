@@ -162,7 +162,7 @@ Adds a filter for ceased confirmation details, handling null, not null, and stri
 
 #### `_add_criteria_ceased_confirmation_user_id(self, user)`
 
-Adds a filter for ceased confirmation user ID, handling numeric IDs, enum values, and special cases.
+Adds a filter for ceased confirmation user ID, handling numeric IDs, `enum` values, and special cases.
 
 #### `_add_criteria_clinical_reason_for_cease(self)`
 
@@ -302,43 +302,43 @@ Represents an organisation (such as a hub or screening centre) with an organisat
 
 #### `SubjectSelectionCriteriaKey`
 
-An enum representing all possible criteria keys that can be used for subject selection. Each key includes metadata such as whether it allows the "NOT:" modifier or multiple values.
+An `enum` representing all possible criteria keys that can be used for subject selection. Each key includes metadata such as whether it allows the "NOT:" modifier or multiple values.
 
 #### `ScreeningStatusType`
 
-An enum representing possible screening statuses for a subject, with methods for lookup by description and value.
+An `enum` representing possible screening statuses for a subject, with methods for lookup by description and value.
 
 #### `SSReasonForChangeType`
 
-An enum for reasons a subject's screening status was changed, with lookup methods.
+An `enum` for reasons a subject's screening status was changed, with lookup methods.
 
 #### `SDDReasonForChangeType`
 
-An enum for reasons a subject's screening due date was changed, with lookup methods.
+An `enum` for reasons a subject's screening due date was changed, with lookup methods.
 
 #### `SSDDReasonForChangeType`
 
-An enum for reasons a subject's surveillance due date was changed, with lookup methods.
+An `enum` for reasons a subject's surveillance due date was changed, with lookup methods.
 
 #### `BowelScopeDDReasonForChangeType`
 
-An enum for reasons a subject's bowel scope due date was changed, with lookup methods.
+An `enum` for reasons a subject's bowel scope due date was changed, with lookup methods.
 
 #### `CeasedConfirmationDetails`
 
-An enum for ceased confirmation details, supporting null/not-null and string matching.
+An `enum` for ceased confirmation details, supporting null/not-null and string matching.
 
 #### `CeasedConfirmationUserId`
 
-An enum for ceased confirmation user IDs, supporting special values and user lookups.
+An `enum` for ceased confirmation user IDs, supporting special values and user lookups.
 
 #### `ManualCeaseRequested`
 
-An enum for manual cease request statuses, with case-insensitive lookup.
+An `enum` for manual cease request statuses, with case-insensitive lookup.
 
 #### `HasGPPractice`
 
-An enum for GP practice status (yes/no/active/inactive), with description-based lookup.
+An `enum` for GP practice status (yes/no/active/inactive), with description-based lookup.
 
 ---
 
@@ -359,7 +359,7 @@ An enum for GP practice status (yes/no/active/inactive), with description-based 
 - [ ] Review and update doc strings for clarity and completeness.
 - [ ] Double check `_add_criteria_date_field` against `addCriteriaDateField` to see if functionality ported over correctly. This included looking at any methods referenced in this method.
 
-### May Require Another Jira Ticket
+### May Require Another `Jira` Ticket
 
 - [ ] Create tests around this utility to prove it works as intended. See if there is a current selenium test that does this.
 - [ ] Create a new utility around populating the Subject and User class objects. This will be beneficial as these two objects are passed into this utility.
