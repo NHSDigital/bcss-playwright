@@ -49,7 +49,7 @@ class TableUtils:
 
         # Extract first-row headers (general headers)
         header_texts = headers.evaluate_all("ths => ths.map(th => th.innerText.trim())")
-        print("First Row Headers Found:", header_texts)
+        logging.info(f"First Row Headers Found: {header_texts}")
 
         # Extract detailed second-row headers if first-row headers seem generic
         second_row_headers = self.table.locator(
@@ -59,7 +59,7 @@ class TableUtils:
         if second_row_headers:
             header_texts = second_row_headers
 
-        print("Second Row Headers Found:", header_texts)
+        logging.info(f"Second Row Headers Found: {header_texts}")
         for index, header in enumerate(header_texts):
             if column_name.lower() in header.lower():
                 return index + 1  # Convert to 1-based index
