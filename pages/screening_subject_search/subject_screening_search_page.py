@@ -15,6 +15,7 @@ class SubjectScreeningPage(BasePage):
         self.demographics_filter = self.page.get_by_role("radio", name="Demographics")
         self.datasets_filter = self.page.get_by_role("radio", name="Datasets")
         self.nhs_number_filter = self.page.get_by_role("textbox", name="NHS Number")
+        self.nhs_number_input = self.page.get_by_label("NHS Number")
         self.surname_filter = self.page.locator("#A_C_Surname")
         self.soundex_filter = self.page.get_by_role("checkbox", name="Use soundex")
         self.forename_filter = self.page.get_by_role("textbox", name="Forename")
@@ -78,6 +79,15 @@ class SubjectScreeningPage(BasePage):
     def click_nhs_number_filter(self) -> None:
         """Click the 'NHS Number' filter."""
         self.click(self.nhs_number_filter)
+
+    def fill_nhs_number(self, nhs_no: str) -> None:
+        """
+        Fills the NHS Number field with the provided NHS number.
+
+        Args:
+            nhs_no (str): The NHS number to fill in the input field.
+        """
+        self.nhs_number_input.fill(nhs_no)
 
     def click_surname_filter(self) -> None:
         """Click the 'Surname' filter."""

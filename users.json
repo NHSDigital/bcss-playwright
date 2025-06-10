@@ -12,5 +12,17 @@
     "roles": [
       "Screening Centre Manager for Wolverhampton, Midlands and North West"
     ]
-  }
+  },
+  "ScreeningAssistant at BCS02": {
+    "username": "BCSS412",
+    "roles": [
+      "Screening Assistant"
+    ]
+},
+  "Team Leader at BCS01": {
+    "username": "BCSS403",
+    "roles": [
+      "Team Leader"
+    ]
+}
 }
