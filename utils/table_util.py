@@ -50,11 +50,11 @@ class TableUtils:
         # Extract first-row headers (general headers)
         header_texts = headers.evaluate_all("ths => ths.map(th => th.innerText.trim())")
         print("First Row Headers Found:", header_texts)
-        
+
         # Extract detailed second-row headers if first-row headers seem generic
-        second_row_headers = self.table.locator("thead tr:nth-child(2) th").evaluate_all(
-        "ths => ths.map(th => th.innerText.trim())"
-    )
+        second_row_headers = self.table.locator(
+            "thead tr:nth-child(2) th"
+        ).evaluate_all("ths => ths.map(th => th.innerText.trim())")
         # Merge both lists: Prioritize second-row headers if available
         if second_row_headers:
             header_texts = second_row_headers
@@ -225,9 +225,7 @@ class TableUtils:
         if column_index == -1:
             raise ValueError(f"Column '{column_name}' not found in table")
 
-        cell_locator = (
-            f"{self.table_id} tbody tr:nth-child({row_index}) td:nth-child({column_index})"
-        )
+        cell_locator = f"{self.table_id} tbody tr:nth-child({row_index}) td:nth-child({column_index})"
         cell = self.page.locator(cell_locator).first
 
         if cell:
