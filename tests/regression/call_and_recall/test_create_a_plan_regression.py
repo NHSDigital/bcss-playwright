@@ -52,12 +52,9 @@ def test_create_a_plan_set_daily_rate(page: Page, general_properties: dict) -> N
     CreateAPlanPage(page).verify_weekly_invitation_rate_for_weeks(1, 50, "140")
 
 
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.call_and_recall
-def test_create_invitation_plan_weekly_rate(
-    page: Page, general_properties: dict
-) -> None:
+def test_create_a_plan_weekly_rate(page: Page, general_properties: dict) -> None:
     """
     Verifies that a user can set a weekly invitation rate in Create a Plan.
     """
@@ -89,7 +86,7 @@ def test_create_invitation_plan_weekly_rate(
 
 @pytest.mark.regression
 @pytest.mark.call_and_recall
-def test_update_invitation_rate_weekly(page: Page, tests_properties: dict) -> None:
+def test_update_invitation_rate_weekly(page: Page, general_properties: dict) -> None:
     """
     Verifies that a Hub Manager State Registered is able to update a weekly Invitation rate
     and the Cumulative 'Invitations sent' and 'Resulting Position' values are updated.
@@ -100,7 +97,7 @@ def test_update_invitation_rate_weekly(page: Page, tests_properties: dict) -> No
 
     # And I click the link text "BCS001"
     InvitationsMonitoringPage(page).go_to_invitation_plan_page(
-        tests_properties["screening_centre_code"]
+        general_properties["screening_centre_code"]
     )
 
     # And I click the "Create a Plan" button

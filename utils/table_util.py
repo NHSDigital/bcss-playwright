@@ -46,8 +46,20 @@ class TableUtils:
             )
 
         headers = header_row.locator("th")
-        header_texts = headers.evaluate_all("ths => ths.map(th => th.innerText.trim())")
 
+        # Extract first-row headers (general headers)
+        header_texts = headers.evaluate_all("ths => ths.map(th => th.innerText.trim())")
+        print("First Row Headers Found:", header_texts)
+        
+        # Extract detailed second-row headers if first-row headers seem generic
+        second_row_headers = self.table.locator("thead tr:nth-child(2) th").evaluate_all(
+        "ths => ths.map(th => th.innerText.trim())"
+    )
+        # Merge both lists: Prioritize second-row headers if available
+        if second_row_headers:
+            header_texts = second_row_headers
+
+        print("Second Row Headers Found:", header_texts)
         for index, header in enumerate(header_texts):
             if column_name.lower() in header.lower():
                 return index + 1  # Convert to 1-based index
@@ -197,7 +209,6 @@ class TableUtils:
         for row in range(self.get_row_count()):
             full_results[row + 1] = self.get_row_data_with_headers(row)
         return full_results
-
 
     def get_cell_value(self, column_name: str, row_index: int) -> str:
         """

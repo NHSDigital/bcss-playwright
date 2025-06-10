@@ -26,11 +26,12 @@ class CreateAPlanPage(BasePage):
         )
         # Create A Plan Table Locators
         self.weekly_invitation_rate_field_on_table = self.page.locator(
-            "#invitationRateField"
+            "#invitationPlan > tbody > tr:nth-child(1) > td.input.border-right.dt-type-numeric > input"
         )
         self.invitations_sent_value = self.page.locator(
-            "#invitationPlan > tbody > tr:nth-child(1) > td:nth-child(8)"
+            "tbody tr:nth-child(1) td:nth-child(8)"
         )
+
         self.resulting_position_value = self.page.locator(
             "#invitationPlan > tbody > tr:nth-child(1) > td:nth-child(9)"
         )
@@ -137,28 +138,42 @@ class CreateAPlanPage(BasePage):
 
     def increment_invitation_rate_and_verify_changes(self) -> None:
         """
-        Increments the invitation rate by 1, then verifies that both the 'Invitations Sent' and 'Resulting Position' have increased by 1.
+        Increments the invitation rate by 1, then verifies that both the
+        'Invitations Sent' has increased by 1 and 'Resulting Position' has decreased by 1.
         """
-        # Get the current value of the Weekly Invitation Rate field
-        current_value = int(
-            self.create_a_plan_table.get_cell_value("Invitation Rate", 0)
+        # Capture initial values before any changes
+        initial_invitations_sent = int(self.invitations_sent_value.inner_text().strip())
+        initial_resulting_position = int(
+            self.resulting_position_value.inner_text().strip()
         )
-        # Increments by 1, fills the field with the new value, and Tabs out of the field
-        new_value = str(current_value + 1)
-        locator = self.weekly_invitation_rate_field_on_table
-        locator.fill(new_value)
-        locator.press("Tab")
 
-        # Verifies 'Invitations Sent' has increased by 1
-        initial_invitations_sent = int(self.invitations_sent_value.inner_text())
-        assert (
-            int(self.invitations_sent_value.inner_text())
-            == initial_invitations_sent + 1
-        ), "Invitations Sent did not increase by 1."
+        # Increment the invitation rate
+        current_rate = int(
+            self.create_a_plan_table.get_cell_value("Invitation Rate", 1)
+        )
+        new_rate = str(current_rate + 1)
+        self.weekly_invitation_rate_field_on_table.fill(new_rate)
+        self.page.keyboard.press("Tab")
 
-        # Verifies 'Resulting Position' has increased by 1
-        initial_resulting_position = int(self.resulting_position_value.inner_text())
+        # Wait dynamically for updates
+        expect(self.invitations_sent_value).to_have_text(
+            str(initial_invitations_sent + 1)
+        )
+        expect(self.resulting_position_value).to_have_text(
+            str(initial_resulting_position + 1)
+        )
+
+        # Capture updated values
+        updated_invitations_sent = int(self.invitations_sent_value.inner_text().strip())
+        updated_resulting_position = int(
+            self.resulting_position_value.inner_text().strip()
+        )
+
+        # Assert changes
         assert (
-            int(self.resulting_position_value.inner_text())
-            == initial_resulting_position - 1
-        ), "Resulting Position did not decrease by 1."
+            updated_invitations_sent == initial_invitations_sent + 1
+        ), f"Expected Invitations Sent to increase by 1. Was {initial_invitations_sent}, now {updated_invitations_sent}."
+
+        assert (
+            updated_resulting_position == initial_resulting_position + 1
+        ), f"Expected Resulting Position to increase by 1. Was {initial_resulting_position}, now {updated_resulting_position}."
