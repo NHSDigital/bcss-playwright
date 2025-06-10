@@ -199,8 +199,7 @@ def test_add_additional_care_note_for_subject_with_existing_note(page: Page, smo
 
 def test_identify_subject_with_additional_care_note(page: Page, smokescreen_properties: dict) -> None:
     """
-        Test to identify if a subject has an Additional Care note.
-        
+        Test to identify if a subject has an Additional Care note.   
     """  
     logging.info("Starting test: Verify subject has an additional care note.")
     logging.info("Logging in as 'ScreeningAssistant at BCS02'.")
@@ -267,3 +266,4 @@ def test_view_active_additional_care_note(page: Page, smokescreen_properties: di
     # Filter the DataFrame to only include rows where type_id == 4112
     filtered_notes_df = notes_df[notes_df["type_id"] == type_id]
       # Verify title and note match the UI values
+      

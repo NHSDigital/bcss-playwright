@@ -438,8 +438,7 @@ def get_subjects_by_note_count(type_id: int, note_count: int = 0) -> pd.DataFram
     SELECT ss.screening_subject_id, ss.subject_nhs_number, :type_id AS type_id
     FROM screening_subject_t ss
     INNER JOIN sd_contact_t c ON ss.subject_nhs_number = c.nhs_number
-    WHERE 
-    (
+    WHERE (
     (:note_count = 0 AND NOT EXISTS (
         SELECT 1
         FROM supporting_notes_t sn
@@ -482,12 +481,10 @@ def get_supporting_notes(screening_subject_id: int, type_id: int) -> pd.DataFram
     SELECT *
     FROM supporting_notes_t sn
     WHERE sn.screening_subject_id = :screening_subject_id
-      AND sn.type_id = :type_id
-      AND sn.status_id = 4100
+    AND sn.type_id = :type_id
+    AND sn.status_id = 4100
     ORDER BY NVL(sn.updated_datestamp, sn.created_datestamp) DESC
     """
-
     params = {"screening_subject_id": screening_subject_id, "type_id": type_id}
     notes_df = OracleDB().execute_query(query, params)
-
     return notes_df

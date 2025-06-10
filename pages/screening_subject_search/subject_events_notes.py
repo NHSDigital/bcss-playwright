@@ -48,11 +48,11 @@ class SubjectEventsNotes(BasePage):
                                                 - AdditionalCareNoteTypeOptions.LANGUAGE
                                                 - AdditionalCareNoteTypeOptions.OTHER
         """
-        self.additional_care_note_type.select_option(option)  
+        self.additional_care_note_type.select_option(option) 
 
     def fill_notes(self, notes: str) -> None:
         """Fills the notes field with the provided text."""
-        self.notes_upto_500_char.fill(notes)  
+        self.notes_upto_500_char.fill(notes) 
 
     def dismiss_dialog_and_update_notes(self) -> None:
         """Clicks the 'Update Notes' button and handles the dialog by clicking 'OK'."""
