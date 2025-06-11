@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Optional
 import random
 
 
@@ -46,27 +47,18 @@ class DateTimeUtils:
         return date + timedelta(days=days)
 
     @staticmethod
-    def get_day_of_week_for_today(date: datetime) -> str:
-        """Gets the day of the week (e.g., Monday, Tuesday) from the specified date.
+    def get_day_of_week(date: Optional[datetime] = None) -> str:
+        """
+        Returns the day of the week (e.g., Monday, Tuesday) for the given date.
+        If no date is provided, uses today’s date.
 
         Args:
-            date (datetime): The current date using the now function
+            date (Optional[datetime]): The date to inspect. Defaults to now.
 
         Returns:
-            str: The day of the week relating to the specified date.
+            str: Day of week corresponding to the date.
         """
-        return date.strftime("%A")
-
-    @staticmethod
-    def get_a_day_of_week(date: datetime) -> str:
-        """Gets the day of the week (e.g., Monday, Tuesday) from the specified date.
-
-        Args:
-            date (datetime): The date for which the day of the week will be returned.
-
-        Returns:
-            str: The day of the week relating to the specified date.
-        """
+        date = date or datetime.now()
         return date.strftime("%A")
 
     @staticmethod
@@ -99,7 +91,8 @@ class DateTimeUtils:
 
         return DateTimeUtils.format_date(datetime.now(), "%d.%m.%Y at %H:%M:%S")
 
-    def month_string_to_number(self, string: str) -> int:
+    @staticmethod
+    def month_string_to_number(string: str) -> int:
         """
         This is used to convert a month from a string to an integer.
         It accepts the full month or the short version and is not case sensitive
@@ -126,7 +119,8 @@ class DateTimeUtils:
         except Exception:
             raise ValueError("Not a month")
 
-    def generate_unique_weekday_date(self, start_year: int = 2025) -> str:
+    @staticmethod
+    def generate_unique_weekday_date(start_year: int = 2025) -> str:
         """
         Generates a future weekday date from the specified year onward.
 
