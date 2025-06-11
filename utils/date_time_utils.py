@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import random
 
 
 class DateTimeUtils:
@@ -124,3 +125,22 @@ class DateTimeUtils:
             return out
         except Exception:
             raise ValueError("Not a month")
+
+    def generate_unique_weekday_date(self, start_year: int = 2025) -> str:
+        # Start from tomorrow to ensure future date
+        base_date = datetime.now() + timedelta(days=1)
+
+        # Keep moving forward until we find a weekday in 2025 or later
+        while True:
+            if base_date.weekday() < 5 and base_date.year >= start_year:
+                break
+            base_date += timedelta(days=1)
+
+        # Add randomness to avoid repeated values across runs
+        base_date += timedelta(days=random.randint(0, 10))
+
+        # Re-check for weekday after shift
+        while base_date.weekday() >= 5:
+            base_date += timedelta(days=1)
+
+        return base_date.strftime("%d/%m/%Y")
