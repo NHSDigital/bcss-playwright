@@ -93,6 +93,26 @@ class BatchListPage(BasePage):
     def verify_deadline_date_filter_input(self, expected_text: str) -> None:
         expect(self.deadline_date_filter_with_input).to_have_value(expected_text)
 
+    def open_letter_batch(
+        self, batch_type: str, status: str, level: str, description: str
+    ) -> None:
+        """
+        Finds and opens the batch row based on type, status, level, and description.
+        """
+        # Step 1: Match the row using nested filters, one per column value
+        row = (
+            self.page.locator("table tbody tr")
+            .filter(has=self.page.locator("td", has_text=batch_type))
+            .filter(has=self.page.locator("td", has_text=status))
+            .filter(has=self.page.locator("td", has_text=level))
+            .filter(has=self.page.locator("td", has_text=description))
+        )
+
+        # Step 2: Click the "View" link in the matched row
+        view_link = row.get_by_role("link", name="View")
+        expect(view_link).to_be_visible()
+        view_link.click()
+
 
 class ActiveBatchListPage(BatchListPage):
     """Active Batch List Page locators, and methods for interacting with the Active Batch List page"""
