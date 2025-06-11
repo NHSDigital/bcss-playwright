@@ -127,6 +127,26 @@ class DateTimeUtils:
             raise ValueError("Not a month")
 
     def generate_unique_weekday_date(self, start_year: int = 2025) -> str:
+        """
+        Generates a future weekday date from the specified year onward.
+
+        This function returns a dynamically generated date string in the format 'dd/mm/yyyy'
+        that always falls on a weekday (Monday–Friday) and is suitable for use in automated tests
+        where the date must differ on each run to avoid duplication issues.
+
+        A small pseudorandom offset is added to ensure uniqueness between runs.
+
+        Note:
+            This function uses Python's built-in `random` module to add variability.
+            Since this is for test-only purposes and does not involve security-sensitive logic,
+            the use of a non-cryptographic PRNG is appropriate and intentional.
+
+        Args:
+            start_year (int): The minimum year from which the date may be generated. Defaults to 2025.
+
+        Returns:
+            str: A future weekday date in the format 'dd/mm/yyyy'.
+        """
         # Start from tomorrow to ensure future date
         base_date = datetime.now() + timedelta(days=1)
 
