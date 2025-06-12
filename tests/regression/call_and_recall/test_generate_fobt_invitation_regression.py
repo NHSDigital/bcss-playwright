@@ -12,6 +12,7 @@ from pages.communication_production.manage_active_batch_page import (
     ManageActiveBatchPage,
 )
 from utils.user_tools import UserTools
+from utils.batch_processing import prepare_and_print_batch
 
 
 @pytest.fixture(scope="function", autouse=True)
