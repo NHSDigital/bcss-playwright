@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Optional
 import random
 
 
@@ -46,27 +47,18 @@ class DateTimeUtils:
         return date + timedelta(days=days)
 
     @staticmethod
-    def get_day_of_week_for_today(date: datetime) -> str:
-        """Gets the day of the week (e.g., Monday, Tuesday) from the specified date.
+    def get_day_of_week(date: Optional[datetime] = None) -> str:
+        """
+        Returns the day of the week (e.g., Monday, Tuesday) for the given date.
+        If no date is provided, uses today’s date.
 
         Args:
-            date (datetime): The current date using the now function
+            date (Optional[datetime]): The date to inspect. Defaults to now.
 
         Returns:
-            str: The day of the week relating to the specified date.
+            str: Day of week corresponding to the date.
         """
-        return date.strftime("%A")
-
-    @staticmethod
-    def get_a_day_of_week(date: datetime) -> str:
-        """Gets the day of the week (e.g., Monday, Tuesday) from the specified date.
-
-        Args:
-            date (datetime): The date for which the day of the week will be returned.
-
-        Returns:
-            str: The day of the week relating to the specified date.
-        """
+        date = date or datetime.now()
         return date.strftime("%A")
 
     @staticmethod
@@ -99,7 +91,8 @@ class DateTimeUtils:
 
         return DateTimeUtils.format_date(datetime.now(), "%d.%m.%Y at %H:%M:%S")
 
-    def month_string_to_number(self, string: str) -> int:
+    @staticmethod
+    def month_string_to_number(string: str) -> int:
         """
         This is used to convert a month from a string to an integer.
         It accepts the full month or the short version and is not case sensitive
@@ -124,22 +117,17 @@ class DateTimeUtils:
             out = months[month_short]
             return out
         except Exception:
-            raise ValueError("Not a month")
+            raise ValueError(
+                f"'{string}' is not a valid month name. Accepted values are: {', '.join(months.keys())}"
+            )
 
-    def generate_unique_weekday_date(self, start_year: int = 2025) -> str:
+    @staticmethod
+    def generate_unique_weekday_date(start_year: int = 2025) -> str:
         """
-        Generates a future weekday date from the specified year onward.
+        Returns a random future weekday (Mon–Fri) date from the given year onward.
 
-        This function returns a dynamically generated date string in the format 'dd/mm/yyyy'
-        that always falls on a weekday (Monday–Friday) and is suitable for use in automated tests
-        where the date must differ on each run to avoid duplication issues.
-
-        A small pseudorandom offset is added to ensure uniqueness between runs.
-
-        Note:
-            This function uses Python's built-in `random` module to add variability.
-            Since this is for test-only purposes and does not involve security-sensitive logic,
-            the use of a non-cryptographic PRNG is appropriate and intentional.
+        The result is in 'dd/mm/yyyy' format and useful for automated tests needing
+        unique, non-weekend dates. Uses non-cryptographic randomness for variability between runs.
 
         Args:
             start_year (int): The minimum year from which the date may be generated. Defaults to 2025.
