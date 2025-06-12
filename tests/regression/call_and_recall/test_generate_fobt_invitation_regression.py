@@ -12,7 +12,6 @@ from pages.communication_production.manage_active_batch_page import (
     ManageActiveBatchPage,
 )
 from utils.user_tools import UserTools
-from utils.batch_processing import prepare_and_print_batch
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -27,10 +26,11 @@ def before_each(page: Page):
     BasePage(page).go_to_call_and_recall_page()
 
 
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.call_and_recall
-def test_run_fobt_invitations_and_process_s1_batch(page, general_properties: dict):
+def test_run_fobt_invitations_and_process_s1_batch(
+    page: Page, general_properties: dict
+):
     """
     Run FOBT invitations, open the S1 batch, prepare, retrieve+confirm,
     and assert we have a subject at status S9.
@@ -47,6 +47,8 @@ def test_run_fobt_invitations_and_process_s1_batch(page, general_properties: dic
     logging.info("Invitations generated successfully")
 
     # And I view the active batch list
+    BasePage(page).click_main_menu_link()
+    BasePage(page).go_to_communications_production_page()
     CommunicationsProductionPage(page).go_to_active_batch_list_page()
 
     # And I open the "Original" / "Open" / "S1" / "Pre-invitation (FIT)" batch
@@ -57,15 +59,9 @@ def test_run_fobt_invitations_and_process_s1_batch(page, general_properties: dic
         description="Pre-invitation (FIT)",
     )
 
-    # # And I prepare, retrieve & confirm
-    # ManageActiveBatchPage(page).click_prepare_button()
-    # ManageActiveBatchPage(page).click_retrieve_button()
-    # ManageActiveBatchPage(page).click_confirm_button()
-
-    # # Then there is a subject matching the criteria
-    # assert lb.subject_exists(
-    #     latest_kit_class="FIT",
-    #     latest_event_status="S9",
-    #     latest_episode_type="FOBT",
-    #     subject_hub_code="BCS01",
-    # ), "Expected at least one subject at S9 with FIT/FOBT/BCS01"
+    # Then I retrieve and confirm the letters
+    ManageActiveBatchPage(page).click_prepare_button()
+    ManageActiveBatchPage(page).click_retrieve_button()
+    BasePage(page).safe_accept_dialog(
+        page.get_by_role("button", name="Confirm Printed")
+    )  # Click the confirm button and accept the confirmation dialog

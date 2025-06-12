@@ -98,6 +98,11 @@ class BatchListPage(BasePage):
     ) -> None:
         """
         Finds and opens the batch row based on type, status, level, and description.
+        Args:
+            batch_type (str): The type of the batch (e.g., "Original").
+            status (str): The status of the batch (e.g., "Open").
+            level (str): The level of the batch (e.g., "S1").
+            description (str): The description of the batch (e.g., "Pre-invitation (FIT)").
         """
         # Step 1: Match the row using nested filters, one per column value
         row = (
@@ -109,7 +114,9 @@ class BatchListPage(BasePage):
         )
 
         # Step 2: Click the "View" link in the matched row
-        view_link = row.get_by_role("link", name="View")
+        view_link = row.locator(
+            "a"
+        )  # Click the first link in the row identified in step 1
         expect(view_link).to_be_visible()
         view_link.click()
 
