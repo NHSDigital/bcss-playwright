@@ -32,8 +32,7 @@ def test_run_fobt_invitations_and_process_s1_batch(
     page: Page, general_properties: dict
 ):
     """
-    Run FOBT invitations, open the S1 batch, prepare, retrieve+confirm,
-    and assert we have a subject at status S9.
+    Run FOBT invitations, open the S1 batch, prepare, retrieve and confirm.
     """
     # Navigate to generate invitations
     CallAndRecallPage(page).go_to_generate_invitations_page()
