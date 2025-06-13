@@ -643,6 +643,27 @@ class SubjectSelectionQueryBuilder:
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
+    def _add_criteria_subject_lower_lynch_age(self) -> None:
+        """
+        Adds a SQL constraint for Lynch syndrome lower-age eligibility.
+
+        If value is 'default', it's replaced with '35'.
+        Uses comparator to build the WHERE clause.
+        """
+        try:
+            value = self.criteria_value
+            comparator = self.criteria_comparator
+
+            if value.lower() == "default":
+                value = "35"
+
+            self.sql_where.append(
+                f"AND pkg_bcss_common.f_get_lynch_lower_age_limit (ss.screening_subject_id) "
+                f"{comparator} {value}"
+            )
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
     def _add_criteria_subject_hub_code(self, user: "User") -> None:
         hub_code = None
         try:
