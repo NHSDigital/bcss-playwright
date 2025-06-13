@@ -20,3 +20,6 @@ axe-reports/
 local.env
 
 # Please, add your custom content below!
+
+# Dev/test harness artifacts
+utils/oracle/test_subject_criteria_dev.py
