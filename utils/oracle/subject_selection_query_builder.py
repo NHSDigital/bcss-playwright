@@ -13,6 +13,7 @@ from classes.episode_type import EpisodeType
 from classes.has_gp_practice import HasGPPractice
 from classes.has_unprocessed_sspi_updates import HasUnprocessedSSPIUpdates
 from classes.has_user_dob_update import HasUserDobUpdate
+from classes.subject_has_episode import SubjectHasEpisode
 from classes.manual_cease_requested import ManualCeaseRequested
 from classes.screening_status_type import ScreeningStatusType
 from classes.sdd_reason_for_change_type import SDDReasonForChangeType
@@ -268,6 +269,290 @@ class SubjectSelectionQueryBuilder:
                             self._add_criteria_has_unprocessed_sspi_updates()
                         case SubjectSelectionCriteriaKey.SUBJECT_HAS_USER_DOB_UPDATES:
                             self._add_criteria_has_user_dob_update()
+                        case (
+                            SubjectSelectionCriteriaKey.SUBJECT_HAS_EPISODES
+                            | SubjectSelectionCriteriaKey.SUBJECT_HAS_AN_OPEN_EPISODE
+                        ):
+                            self._add_criteria_subject_has_episodes()
+                        case SubjectSelectionCriteriaKey.SUBJECT_HAS_FOBT_EPISODES:
+                            self._add_criteria_subject_has_episodes(EpisodeType.FOBT)
+                        case SubjectSelectionCriteriaKey.SUBJECT_LOWER_FOBT_AGE:
+                            self._add_criteria_subject_lower_fobt_age()
+                        case SubjectSelectionCriteriaKey.SUBJECT_LOWER_LYNCH_AGE:
+                            self._add_criteria_subject_lower_lynch_age()
+                        case SubjectSelectionCriteriaKey.LATEST_EPISODE_TYPE:
+                            self._add_criteria_latest_episode_type()
+                        case SubjectSelectionCriteriaKey.LATEST_EPISODE_SUB_TYPE:
+                            self._add_criteria_latest_episode_sub_type()
+                        case SubjectSelectionCriteriaKey.LATEST_EPISODE_STATUS:
+                            self._add_criteria_latest_episode_status()
+                        case SubjectSelectionCriteriaKey.LATEST_EPISODE_STATUS_REASON:
+                            self._add_criteria_latest_episode_status_reason()
+                        case (
+                            SubjectSelectionCriteriaKey.LATEST_EPISODE_RECALL_CALCULATION_METHOD
+                        ):
+                            self._add_criteria_latest_episode_recall_calc_method()
+                        case (
+                            SubjectSelectionCriteriaKey.LATEST_EPISODE_RECALL_EPISODE_TYPE
+                        ):
+                            self._add_criteria_latest_episode_recall_episode_type()
+                        case (
+                            SubjectSelectionCriteriaKey.LATEST_EPISODE_RECALL_SURVEILLANCE_TYPE
+                        ):
+                            self._add_criteria_latest_episode_recall_surveillance_type()
+                        case SubjectSelectionCriteriaKey.LATEST_EVENT_STATUS:
+                            self._add_criteria_event_status("ep.latest_event_status_id")
+                        case SubjectSelectionCriteriaKey.PRE_INTERRUPT_EVENT_STATUS:
+                            self._add_criteria_event_status(
+                                "ep.pre_interrupt_event_status_id"
+                            )
+                        case (
+                            SubjectSelectionCriteriaKey.LATEST_EPISODE_INCLUDES_EVENT_CODE
+                        ):
+                            self._add_criteria_event_code_in_episode(True)
+                        case (
+                            SubjectSelectionCriteriaKey.LATEST_EPISODE_DOES_NOT_INCLUDE_EVENT_CODE
+                        ):
+                            self._add_criteria_event_code_in_episode(False)
+                        case (
+                            SubjectSelectionCriteriaKey.LATEST_EPISODE_INCLUDES_EVENT_STATUS
+                        ):
+                            self._add_criteria_event_status_in_episode(True)
+                        case (
+                            SubjectSelectionCriteriaKey.LATEST_EPISODE_DOES_NOT_INCLUDE_EVENT_STATUS
+                        ):
+                            self._add_criteria_event_status_in_episode(False)
+                        case SubjectSelectionCriteriaKey.LATEST_EPISODE_STARTED:
+                            self._add_criteria_date_field(
+                                subject, "ALL_PATHWAYS", "LATEST_EPISODE_START_DATE"
+                            )
+                        case SubjectSelectionCriteriaKey.LATEST_EPISODE_ENDED:
+                            self._add_criteria_date_field(
+                                subject, "ALL_PATHWAYS", "LATEST_EPISODE_END_DATE"
+                            )
+                        case SubjectSelectionCriteriaKey.LATEST_EPISODE_KIT_CLASS:
+                            self._add_criteria_latest_episode_kit_class()
+                        case (
+                            SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_SIGNIFICANT_KIT_RESULT
+                        ):
+                            self._add_criteria_has_significant_kit_result()
+                        case (
+                            SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_REFERRAL_DATE
+                        ):
+                            self._add_criteria_has_referral_date()
+                        case (
+                            SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_DIAGNOSIS_DATE
+                        ):
+                            self._add_criteria_has_diagnosis_date()
+                        case SubjectSelectionCriteriaKey.SUBJECT_HAS_DIAGNOSTIC_TESTS:
+                            self._add_criteria_has_diagnostic_test(False)
+                        case (
+                            SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_DIAGNOSTIC_TEST
+                        ):
+                            self._add_criteria_has_diagnostic_test(True)
+                        case (
+                            SubjectSelectionCriteriaKey.LATEST_EPISODE_DIAGNOSIS_DATE_REASON
+                        ):
+                            self._add_criteria_diagnosis_date_reason()
+                        case (
+                            SubjectSelectionCriteriaKey.LATEST_EPISODE_COMPLETED_SATISFACTORILY
+                        ):
+                            self._add_criteria_latest_episode_completed_satisfactorily()
+                        case (
+                            SubjectSelectionCriteriaKey.HAS_DIAGNOSTIC_TEST_CONTAINING_POLYP
+                        ):
+                            self._add_criteria_has_diagnostic_test_containing_polyp()
+                        case SubjectSelectionCriteriaKey.SUBJECT_HAS_UNLOGGED_KITS:
+                            self._add_criteria_subject_has_unlogged_kits()
+                        case SubjectSelectionCriteriaKey.SUBJECT_HAS_LOGGED_FIT_KITS:
+                            self._add_criteria_subject_has_logged_fit_kits()
+                        case SubjectSelectionCriteriaKey.SUBJECT_HAS_KIT_NOTES:
+                            self._add_criteria_subject_has_kit_notes()
+                        case SubjectSelectionCriteriaKey.SUBJECT_HAS_LYNCH_DIAGNOSIS:
+                            self._add_criteria_subject_has_lynch_diagnosis()
+                        case SubjectSelectionCriteriaKey.WHICH_TEST_KIT:
+                            self._add_join_to_test_kits()
+                        case SubjectSelectionCriteriaKey.KIT_HAS_BEEN_READ:
+                            self._add_criteria_kit_has_been_read()
+                        case SubjectSelectionCriteriaKey.KIT_RESULT:
+                            self._add_criteria_kit_result()
+                        case SubjectSelectionCriteriaKey.KIT_HAS_ANALYSER_RESULT_CODE:
+                            self._add_criteria_kit_has_analyser_result_code()
+                        case SubjectSelectionCriteriaKey.WHICH_APPOINTMENT:
+                            self._add_join_to_appointments()
+                        case SubjectSelectionCriteriaKey.APPOINTMENT_TYPE:
+                            self._add_criteria_appointment_type()
+                        case SubjectSelectionCriteriaKey.APPOINTMENT_STATUS:
+                            self._add_criteria_appointment_status()
+                        case SubjectSelectionCriteriaKey.APPOINTMENT_DATE:
+                            self._add_criteria_date_field(
+                                subject, "ALL_PATHWAYS", "APPOINTMENT_DATE"
+                            )
+                        case SubjectSelectionCriteriaKey.WHICH_DIAGNOSTIC_TEST:
+                            self._add_join_to_diagnostic_tests()
+                        case SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_CONFIRMED_TYPE:
+                            self._add_criteria_diagnostic_test_type("confirmed")
+                        case SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_PROPOSED_TYPE:
+                            self._add_criteria_diagnostic_test_type("proposed")
+                        case SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_IS_VOID:
+                            self._add_criteria_diagnostic_test_is_void()
+                        case SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_HAS_RESULT:
+                            self._add_criteria_diagnostic_test_has_result()
+                        case SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_HAS_OUTCOME:
+                            self._add_criteria_diagnostic_test_has_outcome_of_result()
+                        case (
+                            SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_INTENDED_EXTENT
+                        ):
+                            self._add_criteria_diagnostic_test_intended_extent()
+                        case (
+                            SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_CANCER_AUDIT_DATASET
+                            | SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_COLONOSCOPY_ASSESSMENT_DATASET
+                            | SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_MDT_DATASET
+                        ):
+                            self._add_criteria_latest_episode_has_dataset()
+                        case (
+                            SubjectSelectionCriteriaKey.LATEST_EPISODE_LATEST_INVESTIGATION_DATASET
+                        ):
+                            self._add_criteria_latest_episode_latest_investigation_dataset()
+                        case (
+                            SubjectSelectionCriteriaKey.LATEST_EPISODE_DATASET_INTENDED_EXTENT
+                        ):
+                            self._add_criteria_latest_episode_intended_extent()
+                        case SubjectSelectionCriteriaKey.SURVEILLANCE_REVIEW_STATUS:
+                            self._add_criteria_surveillance_review_status()
+                        case (
+                            SubjectSelectionCriteriaKey.HAS_EXISTING_SURVEILLANCE_REVIEW_CASE
+                        ):
+                            self._add_criteria_does_subject_have_surveillance_review_case()
+                        case SubjectSelectionCriteriaKey.SURVEILLANCE_REVIEW_CASE_TYPE:
+                            self._add_criteria_surveillance_review_type()
+                        case SubjectSelectionCriteriaKey.DATE_OF_DEATH:
+                            self._add_criteria_date_field(
+                                subject, "ALL_PATHWAYS", "DATE_OF_DEATH"
+                            )
+                        case (
+                            SubjectSelectionCriteriaKey.HAS_HAD_A_DATE_OF_DEATH_REMOVAL
+                        ):
+                            self._add_criteria_has_date_of_death_removal()
+                        case SubjectSelectionCriteriaKey.INVITED_SINCE_AGE_EXTENSION:
+                            self._add_criteria_invited_since_age_extension()
+                        case SubjectSelectionCriteriaKey.NOTE_COUNT:
+                            self._add_criteria_note_count()
+                        case (
+                            SubjectSelectionCriteriaKey.LATEST_EPISODE_ACCUMULATED_RESULT
+                        ):
+                            self._add_criteria_latest_episode_accumulated_episode_result()
+                        case SubjectSelectionCriteriaKey.SYMPTOMATIC_PROCEDURE_RESULT:
+                            self._add_criteria_symmetric_procedure_result()
+                        case SubjectSelectionCriteriaKey.SYMPTOMATIC_PROCEDURE_DATE:
+                            self._add_criteria_date_field(
+                                subject, "ALL_PATHWAYS", "SYMPTOMATIC_PROCEDURE_DATE"
+                            )
+                        case SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_CONFIRMED_DATE:
+                            self._add_criteria_date_field(
+                                subject,
+                                "ALL_PATHWAYS",
+                                "DIAGNOSTIC_TEST_CONFIRMED_DATE",
+                            )
+                        case SubjectSelectionCriteriaKey.SCREENING_REFERRAL_TYPE:
+                            self._add_criteria_screening_referral_type()
+                        case SubjectSelectionCriteriaKey.CALCULATED_LYNCH_DUE_DATE:
+                            self._add_criteria_date_field(
+                                subject, "LYNCH", "CALCULATED_DUE_DATE"
+                            )
+                        case SubjectSelectionCriteriaKey.LYNCH_DUE_DATE:
+                            self._add_criteria_date_field(subject, "LYNCH", "DUE_DATE")
+                        case SubjectSelectionCriteriaKey.LYNCH_DUE_DATE_REASON:
+                            self._add_criteria_lynch_due_date_reason(subject)
+                        case SubjectSelectionCriteriaKey.LYNCH_DUE_DATE_DATE_OF_CHANGE:
+                            self._add_criteria_date_field(
+                                subject, "LYNCH", "DUE_DATE_CHANGE_DATE"
+                            )
+                        case SubjectSelectionCriteriaKey.LYNCH_INCIDENT_EPISODE:
+                            self._add_criteria_lynch_incident_episode()
+                        case SubjectSelectionCriteriaKey.LYNCH_DIAGNOSIS_DATE:
+                            self._add_criteria_date_field(
+                                subject, "LYNCH", "DIAGNOSIS_DATE"
+                            )
+                        case SubjectSelectionCriteriaKey.LYNCH_LAST_COLONOSCOPY_DATE:
+                            self._add_criteria_date_field(
+                                subject, "LYNCH", "LAST_COLONOSCOPY_DATE"
+                            )
+                        case SubjectSelectionCriteriaKey.SUBJECT_75TH_BIRTHDAY:
+                            self._add_criteria_date_field(
+                                subject, "ALL_PATHWAYS", "SEVENTY_FIFTH_BIRTHDAY"
+                            )
+                        case SubjectSelectionCriteriaKey.CADS_ASA_GRADE:
+                            self._add_criteria_cads_asa_grade()
+                        case SubjectSelectionCriteriaKey.CADS_STAGING_SCANS:
+                            self._add_criteria_cads_staging_scans()
+                        case SubjectSelectionCriteriaKey.CADS_TYPE_OF_SCAN:
+                            self._add_criteria_cads_type_of_scan()
+                        case SubjectSelectionCriteriaKey.CADS_METASTASES_PRESENT:
+                            self._add_criteria_cads_metastases_present()
+                        case SubjectSelectionCriteriaKey.CADS_METASTASES_LOCATION:
+                            self._add_criteria_cads_metastases_location()
+                        case SubjectSelectionCriteriaKey.CADS_METASTASES_OTHER_LOCATION:
+                            self._add_criteria_cads_metastases_other_location(
+                                self.criteria_value
+                            )
+                        case (
+                            SubjectSelectionCriteriaKey.CADS_FINAL_PRE_TREATMENT_T_CATEGORY
+                        ):
+                            self._add_criteria_cads_final_pre_treatment_t_category()
+                        case (
+                            SubjectSelectionCriteriaKey.CADS_FINAL_PRE_TREATMENT_N_CATEGORY
+                        ):
+                            self._add_criteria_cads_final_pre_treatment_n_category()
+                        case (
+                            SubjectSelectionCriteriaKey.CADS_FINAL_PRETREATMENT_M_CATEGORY
+                        ):
+                            self._add_criteria_cads_final_pre_treatment_m_category()
+                        case SubjectSelectionCriteriaKey.CADS_TREATMENT_RECEIVED:
+                            self._add_criteria_cads_treatment_received()
+                        case (
+                            SubjectSelectionCriteriaKey.CADS_REASON_NO_TREATMENT_RECEIVED
+                        ):
+                            self._add_criteria_cads_reason_no_treatment_received()
+                        case SubjectSelectionCriteriaKey.CADS_TUMOUR_DATE_OF_DIAGNOSIS:
+                            self._add_criteria_date_field(
+                                subject, "ALL_PATHWAYS", "CADS_TUMOUR_DATE_OF_DIAGNOSIS"
+                            )
+                        case SubjectSelectionCriteriaKey.CADS_TUMOUR_LOCATION:
+                            self._add_criteria_cads_tumour_location()
+                        case (
+                            SubjectSelectionCriteriaKey.CADS_TUMOUR_HEIGHT_OF_TUMOUR_ABOVE_ANAL_VERGE
+                        ):
+                            self._add_criteria_cads_tumour_height_of_tumour_above_anal_verge()
+                        case (
+                            SubjectSelectionCriteriaKey.CADS_TUMOUR_PREVIOUSLY_EXCISED_TUMOUR
+                        ):
+                            self._add_criteria_cads_tumour_previously_excised_tumour()
+                        case SubjectSelectionCriteriaKey.CADS_TREATMENT_START_DATE:
+                            self._add_criteria_date_field(
+                                subject, "ALL_PATHWAYS", "CADS_TREATMENT_START_DATE"
+                            )
+                        case SubjectSelectionCriteriaKey.CADS_TREATMENT_TYPE:
+                            self._add_criteria_cads_treatment_type()
+                        case SubjectSelectionCriteriaKey.CADS_TREATMENT_GIVEN:
+                            self._add_criteria_cads_treatment_given()
+                        case SubjectSelectionCriteriaKey.CADS_CANCER_TREATMENT_INTENT:
+                            self._add_criteria_cads_cancer_treatment_intent()
+                        case SubjectSelectionCriteriaKey.FOBT_PREVALENT_INCIDENT_STATUS:
+                            self._add_criteria_fobt_prevalent_incident_status()
+                        case SubjectSelectionCriteriaKey.NOTIFY_QUEUED_MESSAGE_STATUS:
+                            self._add_criteria_notify_queued_message_status()
+                        case SubjectSelectionCriteriaKey.NOTIFY_ARCHIVED_MESSAGE_STATUS:
+                            self._add_criteria_notify_archived_message_status()
+                        case SubjectSelectionCriteriaKey.HAS_PREVIOUSLY_HAD_CANCER:
+                            self._add_criteria_has_previously_had_cancer()
+                        case SubjectSelectionCriteriaKey.DEMOGRAPHICS_TEMPORARY_ADDRESS:
+                            self._add_criteria_has_temporary_address()
+                        case _:
+                            raise SelectionBuilderException(
+                                f"Invalid subject selection criteria key: {self.criteria_key_name}"
+                            )
+
                         # TODO: Add more case statemented here, copying the Java code
 
                 except Exception:
@@ -869,6 +1154,37 @@ class SubjectSelectionQueryBuilder:
         self.sql_where.append("   from mpi.sd_data_item_value_t div ")
         self.sql_where.append("   WHERE div.contact_id = c.contact_id ")
         self.sql_where.append("   AND div.data_item_id = 4 ) ")
+
+    def _add_criteria_subject_has_episodes(
+        self, episode_type: Optional["EpisodeType"] = None
+    ) -> None:
+        try:
+            value = SubjectHasEpisode.by_description(self.criteria_value.lower())
+            if value == SubjectHasEpisode.YES:
+                self.sql_where.append(" AND EXISTS ( SELECT 'ep' ")
+            elif value == SubjectHasEpisode.NO:
+                self.sql_where.append(" AND NOT EXISTS ( SELECT 'ep' ")
+            else:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+        self.sql_where.append("   FROM ep_subject_episode_t ep ")
+        self.sql_where.append(
+            "   WHERE ep.screening_subject_id = ss.screening_subject_id "
+        )
+
+        if episode_type is not None:
+            self.sql_where.append(
+                f"   AND ep.episode_type_id = {episode_type.valid_value_id} "
+            )
+
+        if self.criteria_key == SubjectSelectionCriteriaKey.SUBJECT_HAS_AN_OPEN_EPISODE:
+            self.sql_where.append("   AND ep.episode_end_date IS NULL ")
+
+        self.sql_where.append(" )")
 
     def _get_date_field_column_name(self, pathway: str, date_type: str) -> str:
         """
