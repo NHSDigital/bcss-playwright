@@ -621,6 +621,28 @@ class SubjectSelectionQueryBuilder:
                 self.sql_where.append("= ")
             self.sql_where.append(self.criteria_value)
 
+    def _add_criteria_subject_lower_fobt_age(self) -> None:
+        """
+        Adds a SQL constraint that compares a subject's lower FOBT age eligibility
+        using a comparator and a value (e.g. '>= 55' or '>= default').
+
+        If value is 'default', it's replaced with a national parameter lookup:
+        pkg_parameters.f_get_national_param_val(10)
+        """
+        try:
+            value = self.criteria_value
+            comparator = self.criteria_comparator
+
+            if value.lower() == "default":
+                value = "pkg_parameters.f_get_national_param_val (10)"
+
+            self.sql_where.append(
+                f"AND pkg_bcss_common.f_get_ss_lower_age_limit (ss.screening_subject_id) "
+                f"{comparator} {value}"
+            )
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
     def _add_criteria_subject_hub_code(self, user: "User") -> None:
         hub_code = None
         try:
