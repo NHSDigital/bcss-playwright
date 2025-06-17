@@ -35,33 +35,26 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_latest_episode_recall_surveillance_type(self) -> None:
+    def _add_criteria_has_referral_date(self) -> None:
         """
-        Adds a filter for recall_polyp_surv_type_id based on the type of surveillance used during recall.
-        Supports mapped descriptions and null values.
+        Adds a filter for the presence or timing of referral_date in the latest episode.
+        Accepts values: yes, no, past, more_than_28_days_ago, within_the_last_28_days.
         """
         try:
-            value = self.criteria_value.lower()
+            value = self.criteria_value.strip().lower()
 
-            recall_surv_type_map = {
-                "routine": 500,
-                "enhanced": 501,
-                "annual": 502,
-                "null": None,
+            clause_map = {
+                "yes": "ep.referral_date IS NOT NULL",
+                "no": "ep.referral_date IS NULL",
+                "past": "ep.referral_date < trunc(sysdate)",
+                "more_than_28_days_ago": "(ep.referral_date + 28) < trunc(sysdate)",
+                "within_the_last_28_days": "(ep.referral_date + 28) > trunc(sysdate)",
             }
 
-            if value not in recall_surv_type_map:
-                raise ValueError(f"Unknown recall surveillance type: {value}")
+            if value not in clause_map:
+                raise ValueError(f"Unknown referral date condition: {value}")
 
-            surv_id = recall_surv_type_map[value]
-
-            if surv_id is None:
-                self.sql_where.append("AND ep.recall_polyp_surv_type_id IS NULL")
-            else:
-                comparator = self.criteria_comparator
-                self.sql_where.append(
-                    f"AND ep.recall_polyp_surv_type_id {comparator} {surv_id}"
-                )
+            self.sql_where.append(f"AND {clause_map[value]}")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

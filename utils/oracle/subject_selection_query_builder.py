@@ -325,9 +325,8 @@ class SubjectSelectionQueryBuilder:
                             SubjectSelectionCriteriaKey.LATEST_EPISODE_RECALL_SURVEILLANCE_TYPE
                         ):
                             self._add_criteria_latest_episode_recall_surveillance_type()
-                # TODO: Continue working on the case statements below, copying the Java code
                         # ------------------------------------------------------------------------
-                        # 🔄 Event & Workflow State Criteria
+                        # 🎯 Event Code & Status Inclusion Criteria
                         # ------------------------------------------------------------------------
                         case SubjectSelectionCriteriaKey.LATEST_EVENT_STATUS:
                             self._add_criteria_event_status("ep.latest_event_status_id")
@@ -921,6 +920,195 @@ class SubjectSelectionQueryBuilder:
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_event_status(self, column_name: str) -> None:
+        """
+        Filters based on the event status code found in the specified column.
+
+        Extracts a code from the criteria value (e.g. "ES01 - Invitation Received"),
+        and injects its corresponding event_status_id into SQL.
+        """
+        try:
+            # Extract the code (e.g. "ES01") from the first word
+            code = self.criteria_value.strip().split()[0].upper()
+            comparator = self.criteria_comparator
+
+            # Simulated EventStatusType registry
+            event_status_code_map = {
+                "ES01": 600,
+                "ES02": 601,
+                "ES03": 602,
+                "ES99": 699,
+                # ...update with real mappings
+            }
+
+            if code not in event_status_code_map:
+                raise ValueError(f"Unknown event status code: {code}")
+
+            event_status_id = event_status_code_map[code]
+            self.sql_where.append(f"AND {column_name} {comparator} {event_status_id}")
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_event_code_in_episode(self, event_is_included: bool) -> None:
+        """
+        Adds a filter checking whether the given event code appears in the latest episode's event list.
+        Uses EXISTS or NOT EXISTS depending on the flag.
+        """
+        try:
+            code = self.criteria_value.strip().split()[0].upper()
+
+            # Simulated EventCodeType registry
+            event_code_map = {
+                "EV101": 701,
+                "EV102": 702,
+                "EV900": 799,
+                # ...extend with real mappings
+            }
+
+            if code not in event_code_map:
+                raise ValueError(f"Unknown event code: {code}")
+
+            event_code_id = event_code_map[code]
+
+            exists_clause = "EXISTS" if event_is_included else "NOT EXISTS"
+
+            self.sql_where.append(
+                f"""AND {exists_clause} (
+        SELECT 'evc'
+        FROM ep_events_t evc
+        WHERE evc.event_code_id = {event_code_id}
+        AND evc.subject_epis_id = ep.subject_epis_id
+    )"""
+            )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_event_status_in_episode(self, event_is_included: bool) -> None:
+        """
+        Adds a filter that checks whether the specified event status is present
+        in the latest episode. Uses EXISTS or NOT EXISTS depending on the flag.
+        """
+        try:
+            code = self.criteria_value.strip().split()[0].upper()
+
+            # Simulated EventStatusType code-to-ID map
+            event_status_code_map = {
+                "ES01": 600,
+                "ES02": 601,
+                "ES03": 602,
+                "ES99": 699,
+                # Extend with actual mappings
+            }
+
+            if code not in event_status_code_map:
+                raise ValueError(f"Unknown event status code: {code}")
+
+            status_id = event_status_code_map[code]
+            exists_clause = "EXISTS" if event_is_included else "NOT EXISTS"
+
+            self.sql_where.append(
+                f"""AND {exists_clause} (
+        SELECT 'ev'
+        FROM ep_events_t ev
+        WHERE ev.event_status_id = {status_id}
+        AND ev.subject_epis_id = ep.subject_epis_id
+    )"""
+            )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_latest_episode_kit_class(self) -> None:
+        """
+        Filters based on the test kit class of the latest episode using a nested IN clause.
+        Resolves from symbolic class name (e.g. 'FIT') to test class ID.
+        """
+        try:
+            value = self.criteria_value.upper()
+            comparator = self.criteria_comparator
+
+            # Simulated TestKitClass enum
+            test_kit_class_map = {
+                "GFOBT": 800,
+                "FIT": 801,
+                # Extend as needed
+            }
+
+            if value not in test_kit_class_map:
+                raise ValueError(f"Unknown test kit class: {value}")
+
+            kit_class_id = test_kit_class_map[value]
+
+            self.sql_where.append(
+                f"""AND ep.tk_type_id IN (
+        SELECT tkt.tk_type_id
+        FROM tk_type_t tkt
+        WHERE tkt.tk_test_class_id {comparator} {kit_class_id}
+    )"""
+            )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_has_significant_kit_result(self) -> None:
+        """
+        Adds a filter to check if the latest episode has a significant kit result.
+        Significant values: NORMAL, ABNORMAL, WEAK_POSITIVE.
+        Accepts criteriaValue: "yes" or "no".
+        """
+        try:
+            value = self.criteria_value.strip().lower()
+
+            if value == "yes":
+                exists_clause = "EXISTS"
+            elif value == "no":
+                exists_clause = "NOT EXISTS"
+            else:
+                raise ValueError(
+                    f"Unknown response for significant kit result: {value}"
+                )
+
+            self.sql_where.append(
+                f"""AND {exists_clause} (
+        SELECT 'tks'
+        FROM tk_items_t tks
+        WHERE tks.screening_subject_id = ss.screening_subject_id
+        AND tks.logged_subject_epis_id = ep.subject_epis_id
+        AND tks.test_results IN ('NORMAL', 'ABNORMAL', 'WEAK_POSITIVE')
+    )"""
+            )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_has_referral_date(self) -> None:
+        """
+        Adds a filter for the presence or timing of referral_date in the latest episode.
+        Accepts values: yes, no, past, more_than_28_days_ago, within_the_last_28_days.
+        """
+        try:
+            value = self.criteria_value.strip().lower()
+
+            clause_map = {
+                "yes": "ep.referral_date IS NOT NULL",
+                "no": "ep.referral_date IS NULL",
+                "past": "ep.referral_date < trunc(sysdate)",
+                "more_than_28_days_ago": "(ep.referral_date + 28) < trunc(sysdate)",
+                "within_the_last_28_days": "(ep.referral_date + 28) > trunc(sysdate)",
+            }
+
+            if value not in clause_map:
+                raise ValueError(f"Unknown referral date condition: {value}")
+
+            self.sql_where.append(f"AND {clause_map[value]}")
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+        
+#TODO: Add methods below for other criteria keys as needed
 
     def _add_criteria_subject_hub_code(self, user: "User") -> None:
         hub_code = None

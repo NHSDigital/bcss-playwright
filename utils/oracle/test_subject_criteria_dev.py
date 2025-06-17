@@ -30,18 +30,44 @@ from classes.episode_type import EpisodeType  # Add this for the third test
 # === Example usage ===
 # Replace the examples below with the method you want to test
 
-# === Test: LATEST_EPISODE_RECALL_SURVEILLANCE_TYPE — Enhanced ===
+# === Test: LATEST_EPISODE_HAS_REFERRAL_DATE — yes ===
 builder = MockSelectionBuilder(
-    SubjectSelectionCriteriaKey.LATEST_EPISODE_RECALL_SURVEILLANCE_TYPE, "enhanced"
+    SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_REFERRAL_DATE, "yes"
 )
-builder._add_criteria_latest_episode_recall_surveillance_type()
-print("=== LATEST_EPISODE_RECALL_SURVEILLANCE_TYPE — enhanced ===")
+builder._add_criteria_has_referral_date()
+print("=== LATEST_EPISODE_HAS_REFERRAL_DATE — yes ===")
 print(builder.dump_sql(), end="\n\n")
 
-# === Test: LATEST_EPISODE_RECALL_SURVEILLANCE_TYPE — Null ===
+# === Test: LATEST_EPISODE_HAS_REFERRAL_DATE — no ===
 builder = MockSelectionBuilder(
-    SubjectSelectionCriteriaKey.LATEST_EPISODE_RECALL_SURVEILLANCE_TYPE, "null"
+    SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_REFERRAL_DATE, "no"
 )
-builder._add_criteria_latest_episode_recall_surveillance_type()
-print("=== LATEST_EPISODE_RECALL_SURVEILLANCE_TYPE — null ===")
+builder._add_criteria_has_referral_date()
+print("=== LATEST_EPISODE_HAS_REFERRAL_DATE — no ===")
+print(builder.dump_sql(), end="\n\n")
+
+# === Test: LATEST_EPISODE_HAS_REFERRAL_DATE — past ===
+builder = MockSelectionBuilder(
+    SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_REFERRAL_DATE, "past"
+)
+builder._add_criteria_has_referral_date()
+print("=== LATEST_EPISODE_HAS_REFERRAL_DATE — past ===")
+print(builder.dump_sql(), end="\n\n")
+
+# === Test: LATEST_EPISODE_HAS_REFERRAL_DATE — more_than_28_days_ago ===
+builder = MockSelectionBuilder(
+    SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_REFERRAL_DATE,
+    "more_than_28_days_ago",
+)
+builder._add_criteria_has_referral_date()
+print("=== LATEST_EPISODE_HAS_REFERRAL_DATE — more_than_28_days_ago ===")
+print(builder.dump_sql(), end="\n\n")
+
+# === Test: LATEST_EPISODE_HAS_REFERRAL_DATE — within_the_last_28_days ===
+builder = MockSelectionBuilder(
+    SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_REFERRAL_DATE,
+    "within_the_last_28_days",
+)
+builder._add_criteria_has_referral_date()
+print("=== LATEST_EPISODE_HAS_REFERRAL_DATE — within_the_last_28_days ===")
 print(builder.dump_sql(), end="\n\n")
