@@ -30,18 +30,18 @@ from classes.episode_type import EpisodeType  # Add this for the third test
 # === Example usage ===
 # Replace the examples below with the method you want to test
 
-# === Test: LATEST_EPISODE_SUB_TYPE — Routine Screening ===
+# === Test: LATEST_EPISODE_RECALL_SURVEILLANCE_TYPE — Enhanced ===
 builder = MockSelectionBuilder(
-    SubjectSelectionCriteriaKey.LATEST_EPISODE_SUB_TYPE, "routine screening"
+    SubjectSelectionCriteriaKey.LATEST_EPISODE_RECALL_SURVEILLANCE_TYPE, "enhanced"
 )
-builder._add_criteria_latest_episode_sub_type()
-print("=== LATEST_EPISODE_SUB_TYPE — routine screening ===")
+builder._add_criteria_latest_episode_recall_surveillance_type()
+print("=== LATEST_EPISODE_RECALL_SURVEILLANCE_TYPE — enhanced ===")
 print(builder.dump_sql(), end="\n\n")
 
-# === Test: LATEST_EPISODE_SUB_TYPE — Follow-up with custom comparator ===
+# === Test: LATEST_EPISODE_RECALL_SURVEILLANCE_TYPE — Null ===
 builder = MockSelectionBuilder(
-    SubjectSelectionCriteriaKey.LATEST_EPISODE_SUB_TYPE, "follow-up", "!="
+    SubjectSelectionCriteriaKey.LATEST_EPISODE_RECALL_SURVEILLANCE_TYPE, "null"
 )
-builder._add_criteria_latest_episode_sub_type()
-print("=== LATEST_EPISODE_SUB_TYPE — follow-up (!=) ===")
+builder._add_criteria_latest_episode_recall_surveillance_type()
+print("=== LATEST_EPISODE_RECALL_SURVEILLANCE_TYPE — null ===")
 print(builder.dump_sql(), end="\n\n")

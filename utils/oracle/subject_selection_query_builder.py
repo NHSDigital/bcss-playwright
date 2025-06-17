@@ -158,6 +158,9 @@ class SubjectSelectionQueryBuilder:
                     self._check_if_not_modifier_is_valid_for_criteria_key()
 
                     match self.criteria_key:
+                        # ------------------------------------------------------------------------
+                        # 👤 Demographics & Subject Identity Criteria
+                        # ------------------------------------------------------------------------
                         case SubjectSelectionCriteriaKey.NHS_NUMBER:
                             self.criteria_value.replace(" ", "")
                             self._add_criteria_nhs_number()
@@ -168,6 +171,9 @@ class SubjectSelectionQueryBuilder:
                             self._add_criteria_subject_age()
                         case SubjectSelectionCriteriaKey.SUBJECT_HUB_CODE:
                             self._add_criteria_subject_hub_code(user)
+                        # ------------------------------------------------------------------------
+                        # 🏥 Screening Centre & GP Linkage Criteria
+                        # ------------------------------------------------------------------------
                         case (
                             SubjectSelectionCriteriaKey.RESPONSIBLE_SCREENING_CENTRE_CODE
                         ):
@@ -178,6 +184,9 @@ class SubjectSelectionQueryBuilder:
                             SubjectSelectionCriteriaKey.HAS_GP_PRACTICE_ASSOCIATED_WITH_SCREENING_CENTRE_CODE
                         ):
                             self._add_criteria_has_gp_practice_linked_to_sc()
+                        # ------------------------------------------------------------------------
+                        # 🩺 Screening Status & Change History Criteria
+                        # ------------------------------------------------------------------------
                         case SubjectSelectionCriteriaKey.SCREENING_STATUS:
                             self._add_criteria_screening_status(subject)
                         case SubjectSelectionCriteriaKey.PREVIOUS_SCREENING_STATUS:
@@ -190,6 +199,9 @@ class SubjectSelectionQueryBuilder:
                             self._add_criteria_date_field(
                                 subject, "ALL_PATHWAYS", "SCREENING_STATUS_CHANGE_DATE"
                             )
+                        # ------------------------------------------------------------------------
+                        # ⏰ Due Dates: Screening, Surveillance & Lynch Pathways
+                        # ------------------------------------------------------------------------
                         case SubjectSelectionCriteriaKey.PREVIOUS_LYNCH_DUE_DATE:
                             self._add_criteria_date_field(
                                 subject, "LYNCH", "PREVIOUS_DUE_DATE"
@@ -246,6 +258,9 @@ class SubjectSelectionQueryBuilder:
                             )
                         case SubjectSelectionCriteriaKey.BOWEL_SCOPE_DUE_DATE_REASON:
                             self._add_criteria_bowel_scope_due_date_reason()
+                        # ------------------------------------------------------------------------
+                        # ⛔ Cease & Manual Override Criteria
+                        # ------------------------------------------------------------------------
                         case SubjectSelectionCriteriaKey.MANUAL_CEASE_REQUESTED:
                             self._add_criteria_manual_cease_requested()
                         case SubjectSelectionCriteriaKey.CEASED_CONFIRMATION_DATE:
@@ -258,6 +273,9 @@ class SubjectSelectionQueryBuilder:
                             self._add_criteria_ceased_confirmation_user_id(user)
                         case SubjectSelectionCriteriaKey.CLINICAL_REASON_FOR_CEASE:
                             self._add_criteria_clinical_reason_for_cease()
+                        # ------------------------------------------------------------------------
+                        # 📦 Event Status & System Update Flags
+                        # ------------------------------------------------------------------------
                         case (
                             SubjectSelectionCriteriaKey.SUBJECT_HAS_EVENT_STATUS
                             | SubjectSelectionCriteriaKey.SUBJECT_DOES_NOT_HAVE_EVENT_STATUS
@@ -269,6 +287,9 @@ class SubjectSelectionQueryBuilder:
                             self._add_criteria_has_unprocessed_sspi_updates()
                         case SubjectSelectionCriteriaKey.SUBJECT_HAS_USER_DOB_UPDATES:
                             self._add_criteria_has_user_dob_update()
+                        # ------------------------------------------------------------------------
+                        # 📁 Subject Has Episode & Age-Based Criteria
+                        # ------------------------------------------------------------------------
                         case (
                             SubjectSelectionCriteriaKey.SUBJECT_HAS_EPISODES
                             | SubjectSelectionCriteriaKey.SUBJECT_HAS_AN_OPEN_EPISODE
@@ -280,12 +301,16 @@ class SubjectSelectionQueryBuilder:
                             self._add_criteria_subject_lower_fobt_age()
                         case SubjectSelectionCriteriaKey.SUBJECT_LOWER_LYNCH_AGE:
                             self._add_criteria_subject_lower_lynch_age()
+                        # ------------------------------------------------------------------------
+                        # 🧱 Latest Episode Attributes
+                        # ------------------------------------------------------------------------
                         case SubjectSelectionCriteriaKey.LATEST_EPISODE_TYPE:
                             self._add_criteria_latest_episode_type()
                         case SubjectSelectionCriteriaKey.LATEST_EPISODE_SUB_TYPE:
                             self._add_criteria_latest_episode_sub_type()
                         case SubjectSelectionCriteriaKey.LATEST_EPISODE_STATUS:
                             self._add_criteria_latest_episode_status()
+
                         case SubjectSelectionCriteriaKey.LATEST_EPISODE_STATUS_REASON:
                             self._add_criteria_latest_episode_status_reason()
                         case (
@@ -300,6 +325,10 @@ class SubjectSelectionQueryBuilder:
                             SubjectSelectionCriteriaKey.LATEST_EPISODE_RECALL_SURVEILLANCE_TYPE
                         ):
                             self._add_criteria_latest_episode_recall_surveillance_type()
+                # TODO: Continue working on the case statements below, copying the Java code
+                        # ------------------------------------------------------------------------
+                        # 🔄 Event & Workflow State Criteria
+                        # ------------------------------------------------------------------------
                         case SubjectSelectionCriteriaKey.LATEST_EVENT_STATUS:
                             self._add_criteria_event_status("ep.latest_event_status_id")
                         case SubjectSelectionCriteriaKey.PRE_INTERRUPT_EVENT_STATUS:
@@ -553,8 +582,6 @@ class SubjectSelectionQueryBuilder:
                                 f"Invalid subject selection criteria key: {self.criteria_key_name}"
                             )
 
-                        # TODO: Add more case statemented here, copying the Java code
-
                 except Exception:
                     raise SelectionBuilderException(
                         f"Invalid subject selection criteria key: {self.criteria_key_name}"
@@ -694,6 +721,203 @@ class SubjectSelectionQueryBuilder:
             self.sql_where.append(
                 f"AND ep.episode_type_id {comparator} {episode_type_id}"
             )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_latest_episode_sub_type(self) -> None:
+        """
+        Adds a SQL condition that filters based on the episode_subtype_id of a subject's latest episode.
+
+        Translates a human-readable episode sub-type string into an internal numeric ID.
+        """
+        try:
+            value = self.criteria_value.lower()
+            comparator = self.criteria_comparator
+
+            # Simulated EpisodeSubType enum mapping
+            episode_subtype_map = {
+                "routine screening": 10,
+                "urgent referral": 11,
+                "pre-assessment": 12,
+                "follow-up": 13,
+                "surveillance": 14,
+                # Add more mappings as needed
+            }
+
+            if value not in episode_subtype_map:
+                raise ValueError(f"Unknown episode sub-type: {value}")
+
+            episode_subtype_id = episode_subtype_map[value]
+
+            # Add SQL condition using the mapped ID
+            self.sql_where.append(
+                f"AND ep.episode_subtype_id {comparator} {episode_subtype_id}"
+            )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_latest_episode_status(self) -> None:
+        """
+        Adds a SQL condition that filters based on the episode_status_id of a subject's latest episode.
+
+        Translates a human-readable episode status into an internal numeric ID.
+        """
+        try:
+            value = self.criteria_value.lower()
+            comparator = self.criteria_comparator
+
+            # Simulated EpisodeStatusType mapping
+            episode_status_map = {
+                "active": 100,
+                "completed": 101,
+                "pending": 102,
+                "cancelled": 103,
+                "invalid": 104,
+                # Add actual mappings as needed
+            }
+
+            if value not in episode_status_map:
+                raise ValueError(f"Unknown episode status: {value}")
+
+            episode_status_id = episode_status_map[value]
+
+            self.sql_where.append(
+                f"AND ep.episode_status_id {comparator} {episode_status_id}"
+            )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_latest_episode_status_reason(self) -> None:
+        """
+        Adds a SQL condition that filters based on the episode_status_reason_id of the subject's latest episode.
+
+        Allows for explicit mapping or handling of NULL where no status reason is recorded.
+        """
+        try:
+            value = self.criteria_value.lower()
+
+            # Simulated EpisodeStatusReasonType enum
+            episode_status_reason_map = {
+                "completed screening": 200,
+                "no longer eligible": 201,
+                "deceased": 202,
+                "moved away": 203,
+                "null": None,  # Special case to represent SQL IS NULL
+                # Extend as needed
+            }
+
+            if value not in episode_status_reason_map:
+                raise ValueError(f"Unknown episode status reason: {value}")
+
+            status_reason_id = episode_status_reason_map[value]
+
+            if status_reason_id is None:
+                self.sql_where.append("AND ep.episode_status_reason_id IS NULL")
+            else:
+                comparator = self.criteria_comparator
+                self.sql_where.append(
+                    f"AND ep.episode_status_reason_id {comparator} {status_reason_id}"
+                )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_latest_episode_recall_calc_method(self) -> None:
+        """
+        Adds a SQL condition filtering on recall_calculation_method_id from the latest episode.
+
+        Handles mapped descriptions or nulls for closed episodes with no recall method.
+        """
+        try:
+            value = self.criteria_value.lower()
+
+            # Simulated enum-like mapping
+            recall_calc_method_map = {
+                "standard": 300,
+                "accelerated": 301,
+                "paused": 302,
+                "null": None,  # For episodes with no recall method
+                # Extend with real values as needed
+            }
+
+            if value not in recall_calc_method_map:
+                raise ValueError(f"Unknown recall calculation method: {value}")
+
+            method_id = recall_calc_method_map[value]
+
+            if method_id is None:
+                self.sql_where.append("AND ep.recall_calculation_method_id IS NULL")
+            else:
+                comparator = self.criteria_comparator
+                self.sql_where.append(
+                    f"AND ep.recall_calculation_method_id {comparator} {method_id}"
+                )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_latest_episode_recall_episode_type(self) -> None:
+        """
+        Adds a filter for recall_episode_type_id based on the type of episode that triggered the recall.
+        Supports mapped descriptions and IS NULL.
+        """
+        try:
+            value = self.criteria_value.lower()
+
+            recall_episode_type_map = {
+                "referral": 1,
+                "invitation": 2,
+                "reminder": 3,
+                "episode_end": 4,
+                "null": None,
+            }
+
+            if value not in recall_episode_type_map:
+                raise ValueError(f"Unknown recall episode type: {value}")
+
+            type_id = recall_episode_type_map[value]
+
+            if type_id is None:
+                self.sql_where.append("AND ep.recall_episode_type_id IS NULL")
+            else:
+                comparator = self.criteria_comparator
+                self.sql_where.append(
+                    f"AND ep.recall_episode_type_id {comparator} {type_id}"
+                )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_latest_episode_recall_surveillance_type(self) -> None:
+        """
+        Adds a filter for recall_polyp_surv_type_id based on the type of surveillance used during recall.
+        Supports mapped descriptions and null values.
+        """
+        try:
+            value = self.criteria_value.lower()
+
+            recall_surv_type_map = {
+                "routine": 500,
+                "enhanced": 501,
+                "annual": 502,
+                "null": None,
+            }
+
+            if value not in recall_surv_type_map:
+                raise ValueError(f"Unknown recall surveillance type: {value}")
+
+            surv_id = recall_surv_type_map[value]
+
+            if surv_id is None:
+                self.sql_where.append("AND ep.recall_polyp_surv_type_id IS NULL")
+            else:
+                comparator = self.criteria_comparator
+                self.sql_where.append(
+                    f"AND ep.recall_polyp_surv_type_id {comparator} {surv_id}"
+                )
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

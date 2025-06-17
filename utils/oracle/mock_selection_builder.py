@@ -35,35 +35,33 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_latest_episode_sub_type(self) -> None:
+    def _add_criteria_latest_episode_recall_surveillance_type(self) -> None:
         """
-        Adds a SQL condition that filters based on the episode_subtype_id of a subject's latest episode.
-
-        Translates a human-readable episode sub-type string into an internal numeric ID.
+        Adds a filter for recall_polyp_surv_type_id based on the type of surveillance used during recall.
+        Supports mapped descriptions and null values.
         """
         try:
             value = self.criteria_value.lower()
-            comparator = self.criteria_comparator
 
-            # Simulated EpisodeSubType enum mapping
-            episode_subtype_map = {
-                "routine screening": 10,
-                "urgent referral": 11,
-                "pre-assessment": 12,
-                "follow-up": 13,
-                "surveillance": 14,
-                # Add more mappings as needed
+            recall_surv_type_map = {
+                "routine": 500,
+                "enhanced": 501,
+                "annual": 502,
+                "null": None,
             }
 
-            if value not in episode_subtype_map:
-                raise ValueError(f"Unknown episode sub-type: {value}")
+            if value not in recall_surv_type_map:
+                raise ValueError(f"Unknown recall surveillance type: {value}")
 
-            episode_subtype_id = episode_subtype_map[value]
+            surv_id = recall_surv_type_map[value]
 
-            # Add SQL condition using the mapped ID
-            self.sql_where.append(
-                f"AND ep.episode_subtype_id {comparator} {episode_subtype_id}"
-            )
+            if surv_id is None:
+                self.sql_where.append("AND ep.recall_polyp_surv_type_id IS NULL")
+            else:
+                comparator = self.criteria_comparator
+                self.sql_where.append(
+                    f"AND ep.recall_polyp_surv_type_id {comparator} {surv_id}"
+                )
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
