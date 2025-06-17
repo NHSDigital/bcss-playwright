@@ -37,6 +37,32 @@ class UserTools:
         CognitoLoginPage(page).login_as_user(user_details["username"], password)
 
     @staticmethod
+    def login(page, user_role, region):
+        # Implement login logic here
+        pass
+
+    @staticmethod
+    def get_subject_with_criteria(episode_type, episode_status, has_referral_date, has_diagnosis_date, diagnosis_date_reason):
+        # Example implementation: fetch NHS number from a test data file based on criteria
+        test_data_file = Path(os.getcwd()) / "test_subjects.json"
+        if not test_data_file.exists():
+            # Fallback to dummy NHS number if file does not exist
+            return "1234567890"
+        with open(test_data_file, "r") as file:
+            subjects = json.load(file)
+        for subject in subjects:
+            if (
+                subject.get("episode_type") == episode_type and
+                subject.get("episode_status") == episode_status and
+                subject.get("has_referral_date") == has_referral_date and
+                subject.get("has_diagnosis_date") == has_diagnosis_date and
+                subject.get("diagnosis_date_reason") == diagnosis_date_reason
+            ):
+                return subject.get("nhs_number", "1234567890")
+        # If no match found, return dummy NHS number
+        return "1234567890"
+
+    @staticmethod
     def retrieve_user(user: str) -> dict:
         """
         Retrieves the user information as a dict for the user provided.
