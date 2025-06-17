@@ -30,30 +30,18 @@ from classes.episode_type import EpisodeType  # Add this for the third test
 # === Example usage ===
 # Replace the examples below with the method you want to test
 
-# === Test: SUBJECT_HAS_AN_OPEN_EPISODE — yes ===
+# === Test: LATEST_EPISODE_SUB_TYPE — Routine Screening ===
 builder = MockSelectionBuilder(
-    SubjectSelectionCriteriaKey.SUBJECT_HAS_AN_OPEN_EPISODE, "yes"
+    SubjectSelectionCriteriaKey.LATEST_EPISODE_SUB_TYPE, "routine screening"
 )
-builder._add_criteria_subject_has_episodes()
-print("=== SUBJECT_HAS_AN_OPEN_EPISODE — yes ===")
+builder._add_criteria_latest_episode_sub_type()
+print("=== LATEST_EPISODE_SUB_TYPE — routine screening ===")
 print(builder.dump_sql(), end="\n\n")
 
-# === Test: SUBJECT_HAS_EPISODES — yes ===
-builder = MockSelectionBuilder(SubjectSelectionCriteriaKey.SUBJECT_HAS_EPISODES, "yes")
-builder._add_criteria_subject_has_episodes()
-print("=== SUBJECT_HAS_EPISODES — yes ===")
-print(builder.dump_sql(), end="\n\n")
-
-# === Test: SUBJECT_HAS_EPISODES — no ===
-builder = MockSelectionBuilder(SubjectSelectionCriteriaKey.SUBJECT_HAS_EPISODES, "no")
-builder._add_criteria_subject_has_episodes()
-print("=== SUBJECT_HAS_EPISODES — no ===")
-print(builder.dump_sql(), end="\n\n")
-
-# === Test: SUBJECT_HAS_FOBT_EPISODES — yes ===
+# === Test: LATEST_EPISODE_SUB_TYPE — Follow-up with custom comparator ===
 builder = MockSelectionBuilder(
-    SubjectSelectionCriteriaKey.SUBJECT_HAS_FOBT_EPISODES, "yes"
+    SubjectSelectionCriteriaKey.LATEST_EPISODE_SUB_TYPE, "follow-up", "!="
 )
-builder._add_criteria_subject_has_episodes(EpisodeType.FOBT)
-print("=== SUBJECT_HAS_FOBT_EPISODES — yes with episode_type ===")
+builder._add_criteria_latest_episode_sub_type()
+print("=== LATEST_EPISODE_SUB_TYPE — follow-up (!=) ===")
 print(builder.dump_sql(), end="\n\n")

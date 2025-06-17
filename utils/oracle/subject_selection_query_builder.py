@@ -664,6 +664,40 @@ class SubjectSelectionQueryBuilder:
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
+    def _add_criteria_latest_episode_type(self) -> None:
+        """
+        Adds a SQL condition that restricts subjects based on the episode_type_id of their latest episode.
+
+        Translates a human-readable episode type string into an internal numeric ID.
+        """
+        try:
+            value = self.criteria_value.lower()
+            comparator = self.criteria_comparator
+
+            # Simulate EpisodeType enum mapping
+            episode_type_map = {
+                "referral": 1,
+                "invitation": 2,
+                "test_kit_sent": 3,
+                "reminder": 4,
+                "episode_end": 5,
+                # Add more mappings as needed
+            }
+
+            if value not in episode_type_map:
+                raise ValueError(f"Unknown episode type: {value}")
+
+            episode_type_id = episode_type_map[value]
+
+            # Simulate the required join (docs only—no real SQL execution here)
+            # In real builder this would ensure join to 'latest_episode' alias (ep)
+            self.sql_where.append(
+                f"AND ep.episode_type_id {comparator} {episode_type_id}"
+            )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
     def _add_criteria_subject_hub_code(self, user: "User") -> None:
         hub_code = None
         try:

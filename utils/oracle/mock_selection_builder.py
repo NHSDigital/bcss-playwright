@@ -27,6 +27,7 @@ class MockSelectionBuilder:
         self.criteria_comparator = criteria_comparator
         self.sql_where = []
 
+    # Don't delete this method; it is used to inspect the SQL fragments
     def dump_sql(self):
         return "\n".join(self.sql_where)
 
@@ -34,23 +35,35 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_subject_lower_lynch_age(self) -> None:
+    def _add_criteria_latest_episode_sub_type(self) -> None:
         """
-        Adds a SQL constraint for Lynch syndrome lower-age eligibility.
+        Adds a SQL condition that filters based on the episode_subtype_id of a subject's latest episode.
 
-        If value is 'default', it's replaced with '35'.
-        Uses comparator to build the WHERE clause.
+        Translates a human-readable episode sub-type string into an internal numeric ID.
         """
         try:
-            value = self.criteria_value
+            value = self.criteria_value.lower()
             comparator = self.criteria_comparator
 
-            if value.lower() == "default":
-                value = "35"
+            # Simulated EpisodeSubType enum mapping
+            episode_subtype_map = {
+                "routine screening": 10,
+                "urgent referral": 11,
+                "pre-assessment": 12,
+                "follow-up": 13,
+                "surveillance": 14,
+                # Add more mappings as needed
+            }
 
+            if value not in episode_subtype_map:
+                raise ValueError(f"Unknown episode sub-type: {value}")
+
+            episode_subtype_id = episode_subtype_map[value]
+
+            # Add SQL condition using the mapped ID
             self.sql_where.append(
-                f"AND pkg_bcss_common.f_get_lynch_lower_age_limit (ss.screening_subject_id) "
-                f"{comparator} {value}"
+                f"AND ep.episode_subtype_id {comparator} {episode_subtype_id}"
             )
+
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
