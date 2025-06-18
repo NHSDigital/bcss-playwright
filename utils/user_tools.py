@@ -37,11 +37,6 @@ class UserTools:
         CognitoLoginPage(page).login_as_user(user_details["username"], password)
 
     @staticmethod
-    def login(page, user_role, region):
-        # Implement login logic here
-        pass
-
-    @staticmethod
     def get_subject_with_criteria(episode_type, episode_status, has_referral_date, has_diagnosis_date, diagnosis_date_reason):
         # Example implementation: fetch NHS number from a test data file based on criteria
         test_data_file = Path(os.getcwd()) / "test_subjects.json"
@@ -59,8 +54,8 @@ class UserTools:
                 subject.get("diagnosis_date_reason") == diagnosis_date_reason
             ):
                 return subject.get("nhs_number", "1234567890")
-        # If no match found, return dummy NHS number
-        return "1234567890"
+        # If no match found, then exception is raised
+        raise SubjectNotFoundError("No NHS number found using the provided criteria.")
 
     @staticmethod
     def retrieve_user(user: str) -> dict:
@@ -84,4 +79,8 @@ class UserTools:
 
 
 class UserToolsException(Exception):
+    pass
+
+class SubjectNotFoundError(Exception):
+    """Raised when no subject matches the provided criteria."""
     pass
