@@ -390,6 +390,9 @@ class SubjectSelectionQueryBuilder:
                             SubjectSelectionCriteriaKey.HAS_DIAGNOSTIC_TEST_CONTAINING_POLYP
                         ):
                             self._add_criteria_has_diagnostic_test_containing_polyp()
+                        # ------------------------------------------------------------------------
+                        # 📦 Kit Metadata & Participation History
+                        # ------------------------------------------------------------------------
                         case SubjectSelectionCriteriaKey.SUBJECT_HAS_UNLOGGED_KITS:
                             self._add_criteria_subject_has_unlogged_kits()
                         case SubjectSelectionCriteriaKey.SUBJECT_HAS_LOGGED_FIT_KITS:
@@ -1257,6 +1260,104 @@ class SubjectSelectionQueryBuilder:
                 raise ValueError(
                     f"Unknown value for diagnostic test containing polyp: {value}"
                 )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_subject_has_unlogged_kits(self) -> None:
+        """
+        Adds a filter to check for unlogged kits across subject history,
+        or scoped to the latest episode. Accepts:
+        - "yes"
+        - "yes_latest_episode"
+        - "no"
+        """
+        try:
+            value = self.criteria_value.strip().lower()
+
+            if value in ("yes", "yes_latest_episode"):
+                prefix = "AND EXISTS"
+            elif value == "no":
+                prefix = "AND NOT EXISTS"
+            else:
+                raise ValueError(f"Unknown value for unlogged kits: {value}")
+
+            subquery = [
+                f"{prefix} (",
+                "  SELECT 'tku'",
+                "  FROM tk_items_t tku",
+                "  WHERE tku.screening_subject_id = ss.screening_subject_id",
+            ]
+
+            if value == "yes_latest_episode":
+                self._add_join_to_latest_episode()
+                subquery.append("    AND tku.subject_epis_id = ep.subject_epis_id")
+
+            subquery.append("    AND tku.logged_in_flag = 'N'")
+            subquery.append(")")
+
+            self.sql_where.append("\n".join(subquery))
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_subject_has_logged_fit_kits(self) -> None:
+        """
+        Adds a filter to check if the subject has logged FIT kits (tk_type_id > 1 and logged_in_flag = 'Y').
+        Accepts values: 'yes' or 'no'.
+        """
+        try:
+            value = self.criteria_value.strip().lower()
+
+            if value == "yes":
+                prefix = "AND EXISTS"
+            elif value == "no":
+                prefix = "AND NOT EXISTS"
+            else:
+                raise ValueError(f"Invalid value for logged FIT kits: {value}")
+
+            self.sql_where.append(
+                f"""{prefix} (
+    SELECT 'tkl'
+    FROM tk_items_t tkl
+    WHERE tkl.screening_subject_id = ss.screening_subject_id
+        AND tkl.tk_type_id > 1
+        AND tkl.logged_in_flag = 'Y'
+    )"""
+            )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_subject_has_kit_notes(self) -> None:
+        """
+        Filters subjects based on presence of active kit-related notes.
+        Accepts values: 'yes' or 'no'.
+        """
+        try:
+            value = self.criteria_value.strip().lower()
+
+            if value == "yes":
+                prefix = "AND EXISTS"
+            elif value == "no":
+                prefix = "AND NOT EXISTS"
+            else:
+                raise ValueError(f"Invalid value for kit notes: {value}")
+
+            self.sql_where.append(
+                f"""{prefix} (
+        SELECT 1
+        FROM supporting_notes_t sn
+        WHERE sn.screening_subject_id = ss.screening_subject_id
+            AND (
+            sn.type_id = '308015'
+            OR sn.promote_pio_id IS NOT NULL
+            )
+            AND sn.status_id = 4100
+        )
+        AND ss.number_of_invitations > 0
+        AND rownum = 1"""
+            )
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

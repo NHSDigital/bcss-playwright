@@ -36,35 +36,35 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_has_diagnostic_test_containing_polyp(self) -> None:
+    def _add_criteria_subject_has_kit_notes(self) -> None:
         """
-        Adds logic to filter based on whether a diagnostic test has a recorded polyp.
-        'Yes' joins polyp tables; 'No' checks for absence via NOT EXISTS.
+        Filters subjects based on presence of active kit-related notes.
+        Accepts values: 'yes' or 'no'.
         """
         try:
             value = self.criteria_value.strip().lower()
 
             if value == "yes":
-                self.sql_from.append(
-                    "INNER JOIN external_tests_t ext ON ep.subject_epis_id = ext.subject_epis_id\n"
-                    "INNER JOIN ds_colonoscopy_t dsc ON ext.ext_test_id = dsc.ext_test_id\n"
-                    "INNER JOIN ds_polyp_t dst ON ext.ext_test_id = dst.ext_test_id"
-                )
-                self.sql_where.append(
-                    "AND ext.void = 'N'\n"
-                    "AND dst.deleted_flag = 'N'"
-                )
+                prefix = "AND EXISTS"
             elif value == "no":
-                self.sql_where.append(
-                    """AND NOT EXISTS (
-        SELECT 'ext'
-        FROM external_tests_t ext
-        LEFT JOIN ds_polyp_t dst ON ext.ext_test_id = dst.ext_test_id
-        WHERE ext.subject_epis_id = ep.subject_epis_id
-    )"""
-                )
+                prefix = "AND NOT EXISTS"
             else:
-                raise ValueError(f"Unknown value for diagnostic test containing polyp: {value}")
+                raise ValueError(f"Invalid value for kit notes: {value}")
+
+            self.sql_where.append(
+                f"""{prefix} (
+    SELECT 1
+    FROM supporting_notes_t sn
+    WHERE sn.screening_subject_id = ss.screening_subject_id
+        AND (
+        sn.type_id = '308015'
+        OR sn.promote_pio_id IS NOT NULL
+        )
+        AND sn.status_id = 4100
+    )
+    AND ss.number_of_invitations > 0
+    AND rownum = 1"""
+            )
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

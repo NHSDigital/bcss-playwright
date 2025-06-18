@@ -25,23 +25,18 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 print("PYTHONPATH set to:", sys.path[0])
 from mock_selection_builder import MockSelectionBuilder
 from classes.subject_selection_criteria_key import SubjectSelectionCriteriaKey
-from classes.episode_type import EpisodeType  # Add this for the third test
 
 # === Example usage ===
-# Replace the examples below with the method you want to test
+# Replace the examples below with your tests for the method you want to test
 
-# === Test: HAS_DIAGNOSTIC_TEST_CONTAINING_POLYP — yes ===
-builder = MockSelectionBuilder(
-    SubjectSelectionCriteriaKey.HAS_DIAGNOSTIC_TEST_CONTAINING_POLYP, "yes"
-)
-builder._add_criteria_has_diagnostic_test_containing_polyp()
-print("=== HAS_DIAGNOSTIC_TEST_CONTAINING_POLYP — yes ===")
+# === Test: SUBJECT_HAS_KIT_NOTES — yes ===
+builder = MockSelectionBuilder(SubjectSelectionCriteriaKey.SUBJECT_HAS_KIT_NOTES, "yes")
+builder._add_criteria_subject_has_kit_notes()
+print("=== SUBJECT_HAS_KIT_NOTES — yes ===")
 print(builder.dump_sql(), end="\n\n")
 
-# === Test: HAS_DIAGNOSTIC_TEST_CONTAINING_POLYP — no ===
-builder = MockSelectionBuilder(
-    SubjectSelectionCriteriaKey.HAS_DIAGNOSTIC_TEST_CONTAINING_POLYP, "no"
-)
-builder._add_criteria_has_diagnostic_test_containing_polyp()
-print("=== HAS_DIAGNOSTIC_TEST_CONTAINING_POLYP — no ===")
+# === Test: SUBJECT_HAS_KIT_NOTES — no ===
+builder = MockSelectionBuilder(SubjectSelectionCriteriaKey.SUBJECT_HAS_KIT_NOTES, "no")
+builder._add_criteria_subject_has_kit_notes()
+print("=== SUBJECT_HAS_KIT_NOTES — no ===")
 print(builder.dump_sql(), end="\n\n")
