@@ -26,6 +26,7 @@ class MockSelectionBuilder:
         self.criteria_value = criteria_value
         self.criteria_comparator = criteria_comparator
         self.sql_where = []
+        self.sql_from = []
 
     # Don't delete this method; it is used to inspect the SQL fragments
     def dump_sql(self):
@@ -35,26 +36,35 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_has_referral_date(self) -> None:
+    def _add_criteria_has_diagnostic_test_containing_polyp(self) -> None:
         """
-        Adds a filter for the presence or timing of referral_date in the latest episode.
-        Accepts values: yes, no, past, more_than_28_days_ago, within_the_last_28_days.
+        Adds logic to filter based on whether a diagnostic test has a recorded polyp.
+        'Yes' joins polyp tables; 'No' checks for absence via NOT EXISTS.
         """
         try:
             value = self.criteria_value.strip().lower()
 
-            clause_map = {
-                "yes": "ep.referral_date IS NOT NULL",
-                "no": "ep.referral_date IS NULL",
-                "past": "ep.referral_date < trunc(sysdate)",
-                "more_than_28_days_ago": "(ep.referral_date + 28) < trunc(sysdate)",
-                "within_the_last_28_days": "(ep.referral_date + 28) > trunc(sysdate)",
-            }
-
-            if value not in clause_map:
-                raise ValueError(f"Unknown referral date condition: {value}")
-
-            self.sql_where.append(f"AND {clause_map[value]}")
+            if value == "yes":
+                self.sql_from.append(
+                    "INNER JOIN external_tests_t ext ON ep.subject_epis_id = ext.subject_epis_id\n"
+                    "INNER JOIN ds_colonoscopy_t dsc ON ext.ext_test_id = dsc.ext_test_id\n"
+                    "INNER JOIN ds_polyp_t dst ON ext.ext_test_id = dst.ext_test_id"
+                )
+                self.sql_where.append(
+                    "AND ext.void = 'N'\n"
+                    "AND dst.deleted_flag = 'N'"
+                )
+            elif value == "no":
+                self.sql_where.append(
+                    """AND NOT EXISTS (
+        SELECT 'ext'
+        FROM external_tests_t ext
+        LEFT JOIN ds_polyp_t dst ON ext.ext_test_id = dst.ext_test_id
+        WHERE ext.subject_epis_id = ep.subject_epis_id
+    )"""
+                )
+            else:
+                raise ValueError(f"Unknown value for diagnostic test containing polyp: {value}")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

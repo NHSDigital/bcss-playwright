@@ -1107,8 +1107,159 @@ class SubjectSelectionQueryBuilder:
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
-        
-#TODO: Add methods below for other criteria keys as needed
+
+    # TODO: Add methods below for other criteria keys as needed
+
+    def _add_criteria_has_diagnosis_date(self) -> None:
+        """
+        Adds a filter to check if the latest episode has a diagnosis_date set,
+        and whether it matches the subject's date of death if specified.
+        Accepts values: yes, no, yes_date_of_death
+        """
+        try:
+            value = self.criteria_value.strip().lower()
+
+            if value == "yes":
+                self.sql_where.append("AND ep.diagnosis_date IS NOT NULL")
+            elif value == "no":
+                self.sql_where.append("AND ep.diagnosis_date IS NULL")
+            elif value == "yes_date_of_death":
+                self.sql_where.append("AND ep.diagnosis_date IS NOT NULL")
+                self.sql_where.append("AND ep.diagnosis_date = c.date_of_death")
+            else:
+                raise ValueError(f"Unknown condition for diagnosis date: {value}")
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_has_diagnostic_test(self, latest_episode_only: bool) -> None:
+        """
+        Adds a filter checking if the subject has (or doesn't have) a diagnostic test.
+        Void tests are excluded. The `latest_episode_only` flag limits scope to the latest episode.
+        Accepts criteria value: "yes" or "no".
+        """
+        try:
+            value = self.criteria_value.strip().lower()
+
+            if value == "no":
+                prefix = "AND NOT "
+            elif value == "yes":
+                prefix = "AND "
+            else:
+                raise ValueError(f"Invalid diagnostic test condition: {value}")
+
+            subquery = [
+                "EXISTS (",
+                "  SELECT 1",
+                "  FROM external_tests_t lesxt",
+                "  WHERE lesxt.screening_subject_id = ss.screening_subject_id",
+                "    AND lesxt.void = 'N'",
+            ]
+            if latest_episode_only:
+                subquery.append("    AND lesxt.subject_epis_id = ep.subject_epis_id")
+            subquery.append(")")
+
+            self.sql_where.append(prefix + "\n".join(subquery))
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_diagnosis_date_reason(self) -> None:
+        """
+        Adds a filter on ep.diagnosis_date_reason_id.
+        Supports symbolic matches (via ID) and special values: NULL, NOT_NULL.
+        """
+        try:
+            value = self.criteria_value.strip().lower()
+            comparator = self.criteria_comparator
+
+            # Simulated DiagnosisDateReasonType
+            reason_map = {
+                "patient informed": 900,
+                "clinician notified": 901,
+                "screening outcome": 902,
+                "null": "NULL",
+                "not_null": "NOT NULL",
+                # Extend as needed
+            }
+
+            if value not in reason_map:
+                raise ValueError(f"Unknown diagnosis date reason: {value}")
+
+            resolved = reason_map[value]
+            if resolved in ("NULL", "NOT NULL"):
+                self.sql_where.append(f"AND ep.diagnosis_date_reason_id IS {resolved}")
+            else:
+                self.sql_where.append(
+                    f"AND ep.diagnosis_date_reason_id {comparator} {resolved}"
+                )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_latest_episode_completed_satisfactorily(self) -> None:
+        """
+        Adds a filter to check whether the latest episode completed satisfactorily or not.
+        Checks for presence/absence of interruption events or disqualifying result codes.
+        """
+        try:
+            value = self.criteria_value.strip().lower()
+
+            if value == "yes":
+                exists_prefix = "AND NOT EXISTS"
+            elif value == "no":
+                exists_prefix = "AND EXISTS"
+            else:
+                raise ValueError(f"Invalid completion flag: {value}")
+
+            self.sql_where.append(
+                f"""{exists_prefix} (
+        SELECT 'ev'
+        FROM ep_events_t ev
+        WHERE ev.subject_epis_id = ep.subject_epis_id
+        AND (
+            ev.event_status_id IN (11237, 20188)
+            OR ep.episode_result_id IN (605002, 605003, 605004, 605007)
+        )
+    )"""
+            )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_has_diagnostic_test_containing_polyp(self) -> None:
+        """
+        Adds logic to filter based on whether a diagnostic test has a recorded polyp.
+        'Yes' joins polyp tables; 'No' checks for absence via NOT EXISTS.
+        """
+        try:
+            value = self.criteria_value.strip().lower()
+
+            if value == "yes":
+                self.sql_from.append(
+                    "INNER JOIN external_tests_t ext ON ep.subject_epis_id = ext.subject_epis_id\n"
+                    "INNER JOIN ds_colonoscopy_t dsc ON ext.ext_test_id = dsc.ext_test_id\n"
+                    "INNER JOIN ds_polyp_t dst ON ext.ext_test_id = dst.ext_test_id"
+                )
+                self.sql_where.append(
+                    "AND ext.void = 'N'\n" "AND dst.deleted_flag = 'N'"
+                )
+            elif value == "no":
+                self.sql_where.append(
+                    """AND NOT EXISTS (
+        SELECT 'ext'
+        FROM external_tests_t ext
+        LEFT JOIN ds_polyp_t dst ON ext.ext_test_id = dst.ext_test_id
+        WHERE ext.subject_epis_id = ep.subject_epis_id
+    )"""
+                )
+            else:
+                raise ValueError(
+                    f"Unknown value for diagnostic test containing polyp: {value}"
+                )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
     def _add_criteria_subject_hub_code(self, user: "User") -> None:
         hub_code = None

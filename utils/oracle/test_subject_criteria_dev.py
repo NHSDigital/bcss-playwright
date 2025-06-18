@@ -30,44 +30,18 @@ from classes.episode_type import EpisodeType  # Add this for the third test
 # === Example usage ===
 # Replace the examples below with the method you want to test
 
-# === Test: LATEST_EPISODE_HAS_REFERRAL_DATE — yes ===
+# === Test: HAS_DIAGNOSTIC_TEST_CONTAINING_POLYP — yes ===
 builder = MockSelectionBuilder(
-    SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_REFERRAL_DATE, "yes"
+    SubjectSelectionCriteriaKey.HAS_DIAGNOSTIC_TEST_CONTAINING_POLYP, "yes"
 )
-builder._add_criteria_has_referral_date()
-print("=== LATEST_EPISODE_HAS_REFERRAL_DATE — yes ===")
+builder._add_criteria_has_diagnostic_test_containing_polyp()
+print("=== HAS_DIAGNOSTIC_TEST_CONTAINING_POLYP — yes ===")
 print(builder.dump_sql(), end="\n\n")
 
-# === Test: LATEST_EPISODE_HAS_REFERRAL_DATE — no ===
+# === Test: HAS_DIAGNOSTIC_TEST_CONTAINING_POLYP — no ===
 builder = MockSelectionBuilder(
-    SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_REFERRAL_DATE, "no"
+    SubjectSelectionCriteriaKey.HAS_DIAGNOSTIC_TEST_CONTAINING_POLYP, "no"
 )
-builder._add_criteria_has_referral_date()
-print("=== LATEST_EPISODE_HAS_REFERRAL_DATE — no ===")
-print(builder.dump_sql(), end="\n\n")
-
-# === Test: LATEST_EPISODE_HAS_REFERRAL_DATE — past ===
-builder = MockSelectionBuilder(
-    SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_REFERRAL_DATE, "past"
-)
-builder._add_criteria_has_referral_date()
-print("=== LATEST_EPISODE_HAS_REFERRAL_DATE — past ===")
-print(builder.dump_sql(), end="\n\n")
-
-# === Test: LATEST_EPISODE_HAS_REFERRAL_DATE — more_than_28_days_ago ===
-builder = MockSelectionBuilder(
-    SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_REFERRAL_DATE,
-    "more_than_28_days_ago",
-)
-builder._add_criteria_has_referral_date()
-print("=== LATEST_EPISODE_HAS_REFERRAL_DATE — more_than_28_days_ago ===")
-print(builder.dump_sql(), end="\n\n")
-
-# === Test: LATEST_EPISODE_HAS_REFERRAL_DATE — within_the_last_28_days ===
-builder = MockSelectionBuilder(
-    SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_REFERRAL_DATE,
-    "within_the_last_28_days",
-)
-builder._add_criteria_has_referral_date()
-print("=== LATEST_EPISODE_HAS_REFERRAL_DATE — within_the_last_28_days ===")
+builder._add_criteria_has_diagnostic_test_containing_polyp()
+print("=== HAS_DIAGNOSTIC_TEST_CONTAINING_POLYP — no ===")
 print(builder.dump_sql(), end="\n\n")
