@@ -37,10 +37,40 @@ def make_builder(key, value, index=0):
     return b
 
 
-# === Test: LATEST_EPISODE_HAS_CANCER_AUDIT_DATASET (yes_complete) ===
+# === Test: LATEST_EPISODE_LATEST_INVESTIGATION_DATASET (none) ===
 b = make_builder(
-    SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_CANCER_AUDIT_DATASET, "yes_complete"
+    SubjectSelectionCriteriaKey.LATEST_EPISODE_LATEST_INVESTIGATION_DATASET, "none"
 )
-b._add_criteria_latest_episode_has_dataset()
-print("=== LATEST_EPISODE_HAS_CANCER_AUDIT_DATASET (yes_complete) ===")
+b._add_criteria_latest_episode_latest_investigation_dataset()
+print("=== LATEST_EPISODE_LATEST_INVESTIGATION_DATASET (none) ===")
+print(b.dump_sql(), end="\n\n")
+
+# === Test: LATEST_EPISODE_LATEST_INVESTIGATION_DATASET (colonoscopy_new) ===
+b = make_builder(
+    SubjectSelectionCriteriaKey.LATEST_EPISODE_LATEST_INVESTIGATION_DATASET,
+    "colonoscopy_new",
+    index=1,
+)
+b._add_criteria_latest_episode_latest_investigation_dataset()
+print("=== LATEST_EPISODE_LATEST_INVESTIGATION_DATASET (colonoscopy_new) ===")
+print(b.dump_sql(), end="\n\n")
+
+# === Test: LATEST_EPISODE_LATEST_INVESTIGATION_DATASET (ct_colonography_new) ===
+b = make_builder(
+    SubjectSelectionCriteriaKey.LATEST_EPISODE_LATEST_INVESTIGATION_DATASET,
+    "ct_colonography_new",
+    index=2,
+)
+b._add_criteria_latest_episode_latest_investigation_dataset()
+print("=== LATEST_EPISODE_LATEST_INVESTIGATION_DATASET (ct_colonography_new) ===")
+print(b.dump_sql(), end="\n\n")
+
+# === Test: LATEST_EPISODE_LATEST_INVESTIGATION_DATASET (endoscopy_incomplete) ===
+b = make_builder(
+    SubjectSelectionCriteriaKey.LATEST_EPISODE_LATEST_INVESTIGATION_DATASET,
+    "endoscopy_incomplete",
+    index=3,
+)
+b._add_criteria_latest_episode_latest_investigation_dataset()
+print("=== LATEST_EPISODE_LATEST_INVESTIGATION_DATASET (endoscopy_incomplete) ===")
 print(b.dump_sql(), end="\n\n")

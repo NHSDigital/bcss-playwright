@@ -8,28 +8,30 @@ from classes.subject_selection_criteria_key import SubjectSelectionCriteriaKey
 
 
 # Add helper class stubs below
-class LatestEpisodeHasDataset:
-    """
-    Maps dataset status descriptions to filter interpretations.
-    """
-
-    NO = "no"
-    YES_INCOMPLETE = "yes_incomplete"
-    YES_COMPLETE = "yes_complete"
-    PAST = "past"
+class LatestEpisodeLatestInvestigationDataset:
+    NONE = "none"
+    COLONOSCOPY_NEW = "colonoscopy_new"
+    LIMITED_COLONOSCOPY_NEW = "limited_colonoscopy_new"
+    FLEXIBLE_SIGMOIDOSCOPY_NEW = "flexible_sigmoidoscopy_new"
+    CT_COLONOGRAPHY_NEW = "ct_colonography_new"
+    ENDOSCOPY_INCOMPLETE = "endoscopy_incomplete"
+    RADIOLOGY_INCOMPLETE = "radiology_incomplete"
 
     _mapping = {
-        "no": NO,
-        "yes_incomplete": YES_INCOMPLETE,
-        "yes_complete": YES_COMPLETE,
-        "past": PAST,
+        "none": NONE,
+        "colonoscopy_new": COLONOSCOPY_NEW,
+        "limited_colonoscopy_new": LIMITED_COLONOSCOPY_NEW,
+        "flexible_sigmoidoscopy_new": FLEXIBLE_SIGMOIDOSCOPY_NEW,
+        "ct_colonography_new": CT_COLONOGRAPHY_NEW,
+        "endoscopy_incomplete": ENDOSCOPY_INCOMPLETE,
+        "radiology_incomplete": RADIOLOGY_INCOMPLETE,
     }
 
     @classmethod
     def from_description(cls, description: str) -> str:
         key = description.strip().lower()
         if key not in cls._mapping:
-            raise ValueError(f"Unknown dataset filter type: '{description}'")
+            raise ValueError(f"Unknown investigation dataset filter: '{description}'")
         return cls._mapping[key]
 
 
@@ -96,49 +98,73 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_latest_episode_has_dataset(self) -> None:
+    def _add_criteria_latest_episode_latest_investigation_dataset(self) -> None:
         """
-        Filters based on presence or completion status of a dataset in the latest episode.
+        Filters subjects based on their latest investigation dataset in their latest episode.
+        Supports colonoscopy and radiology variations.
         """
         try:
             self._add_join_to_latest_episode()
+            value = LatestEpisodeLatestInvestigationDataset.from_description(self.criteria_value)
 
-            dataset_info = self._dataset_source_for_criteria_key()
-            dataset_table = dataset_info["table"]
-            alias = dataset_info["alias"]
-
-            clause = "AND EXISTS ( "
-            value = self.criteria_value.strip().lower()
-            status = LatestEpisodeHasDataset.from_description(value)
-            filter_clause = ""
-
-            if status == LatestEpisodeHasDataset.NO:
-                clause = "AND NOT EXISTS ( "
-            elif status == LatestEpisodeHasDataset.YES_INCOMPLETE:
-                filter_clause = f"AND {alias}.dataset_completed_date IS NULL"
-            elif status == LatestEpisodeHasDataset.YES_COMPLETE:
-                filter_clause = f"AND {alias}.dataset_completed_date IS NOT NULL"
-            elif status == LatestEpisodeHasDataset.PAST:
-                filter_clause = (
-                    f"AND TRUNC({alias}.dataset_completed_date) < TRUNC(SYSDATE)"
+            if value == "none":
+                self.sql_where.append(
+                    "AND NOT EXISTS (SELECT 'dsc1' FROM v_ds_colonoscopy dsc1 "
+                    "WHERE dsc1.episode_id = ep.subject_epis_id "
+                    "AND dsc1.confirmed_type_id = 16002)"
+                )
+            elif value == "colonoscopy_new":
+                self.sql_where.append(
+                    "AND EXISTS (SELECT 'dsc2' FROM v_ds_colonoscopy dsc2 "
+                    "WHERE dsc2.episode_id = ep.subject_epis_id "
+                    "AND dsc2.confirmed_type_id = 16002 "
+                    "AND dsc2.deleted_flag = 'N' "
+                    "AND dsc2.dataset_new_flag = 'Y')"
+                )
+            elif value == "limited_colonoscopy_new":
+                self.sql_where.append(
+                    "AND EXISTS (SELECT 'dsc3' FROM v_ds_colonoscopy dsc3 "
+                    "WHERE dsc3.episode_id = ep.subject_epis_id "
+                    "AND dsc3.confirmed_type_id = 17996 "
+                    "AND dsc3.deleted_flag = 'N' "
+                    "AND dsc3.dataset_new_flag = 'Y')"
+                )
+            elif value == "flexible_sigmoidoscopy_new":
+                self.sql_where.append(
+                    "AND EXISTS (SELECT 'dsc4' FROM v_ds_colonoscopy dsc4 "
+                    "WHERE dsc4.episode_id = ep.subject_epis_id "
+                    "AND dsc4.confirmed_type_id = 16004 "
+                    "AND dsc4.deleted_flag = 'N' "
+                    "AND dsc4.dataset_new_flag = 'Y')"
+                )
+            elif value == "ct_colonography_new":
+                self.sql_where.append(
+                    "AND EXISTS (SELECT 'dsr1' FROM v_ds_radiology dsr1 "
+                    "WHERE dsr1.episode_id = ep.subject_epis_id "
+                    "AND dsr1.confirmed_type_id = 16087 "
+                    "AND dsr1.deleted_flag = 'N' "
+                    "AND dsr1.dataset_new_flag = 'Y')"
+                )
+            elif value == "endoscopy_incomplete":
+                self.sql_where.append(
+                    "AND EXISTS (SELECT 'dsei' FROM v_ds_colonoscopy dsei "
+                    "WHERE dsei.episode_id = ep.subject_epis_id "
+                    "AND dsei.deleted_flag = 'N' "
+                    "AND dsei.dataset_completed_flag = 'N' "
+                    "AND dsei.dataset_new_flag = 'N' "
+                    "AND dsei.confirmed_test_date >= TO_DATE('01/01/2020','dd/mm/yyyy'))"
+                )
+            elif value == "radiology_incomplete":
+                self.sql_where.append(
+                    "AND EXISTS (SELECT 'dsri' FROM v_ds_radiology dsri "
+                    "WHERE dsri.episode_id = ep.subject_epis_id "
+                    "AND dsri.deleted_flag = 'N' "
+                    "AND dsri.dataset_completed_flag = 'N' "
+                    "AND dsri.dataset_new_flag = 'N' "
+                    "AND dsri.confirmed_test_date >= TO_DATE('01/01/2020','dd/mm/yyyy'))"
                 )
             else:
-                raise SelectionBuilderException(
-                    self.criteria_key_name, self.criteria_value
-                )
-
-            self.sql_where.append(
-                "".join(
-                    [
-                        clause,
-                        f"SELECT 1 FROM {dataset_table} {alias} ",
-                        f"WHERE {alias}.episode_id = ep.subject_epis_id ",
-                        f"AND {alias}.deleted_flag = 'N' ",
-                        filter_clause,
-                        ")",
-                    ]
-                )
-            )
+                raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

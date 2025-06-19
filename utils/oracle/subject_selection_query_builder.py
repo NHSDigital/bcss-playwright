@@ -36,6 +36,9 @@ from classes.diagnostic_test_has_outcome_of_result import (
 )
 from classes.intended_extent_type import IntendedExtentType
 from classes.latest_episode_has_dataset import LatestEpisodeHasDataset
+from classes.latest_episode_latest_investigation_dataset import (
+    LatestEpisodeLatestInvestigationDataset,
+)
 
 
 class SubjectSelectionQueryBuilder:
@@ -1887,6 +1890,81 @@ class SubjectSelectionQueryBuilder:
         if key == SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_MDT_DATASET:
             return {"table": "ds_mdt_t", "alias": "mdt"}
         raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_latest_episode_latest_investigation_dataset(self) -> None:
+        """
+        Filters subjects based on their latest investigation dataset in their latest episode.
+        Supports colonoscopy and radiology variations.
+        """
+        try:
+            self._add_join_to_latest_episode()
+            value = LatestEpisodeLatestInvestigationDataset.from_description(
+                self.criteria_value
+            )
+
+            if value == "none":
+                self.sql_where.append(
+                    "AND NOT EXISTS (SELECT 'dsc1' FROM v_ds_colonoscopy dsc1 "
+                    "WHERE dsc1.episode_id = ep.subject_epis_id "
+                    "AND dsc1.confirmed_type_id = 16002)"
+                )
+            elif value == "colonoscopy_new":
+                self.sql_where.append(
+                    "AND EXISTS (SELECT 'dsc2' FROM v_ds_colonoscopy dsc2 "
+                    "WHERE dsc2.episode_id = ep.subject_epis_id "
+                    "AND dsc2.confirmed_type_id = 16002 "
+                    "AND dsc2.deleted_flag = 'N' "
+                    "AND dsc2.dataset_new_flag = 'Y')"
+                )
+            elif value == "limited_colonoscopy_new":
+                self.sql_where.append(
+                    "AND EXISTS (SELECT 'dsc3' FROM v_ds_colonoscopy dsc3 "
+                    "WHERE dsc3.episode_id = ep.subject_epis_id "
+                    "AND dsc3.confirmed_type_id = 17996 "
+                    "AND dsc3.deleted_flag = 'N' "
+                    "AND dsc3.dataset_new_flag = 'Y')"
+                )
+            elif value == "flexible_sigmoidoscopy_new":
+                self.sql_where.append(
+                    "AND EXISTS (SELECT 'dsc4' FROM v_ds_colonoscopy dsc4 "
+                    "WHERE dsc4.episode_id = ep.subject_epis_id "
+                    "AND dsc4.confirmed_type_id = 16004 "
+                    "AND dsc4.deleted_flag = 'N' "
+                    "AND dsc4.dataset_new_flag = 'Y')"
+                )
+            elif value == "ct_colonography_new":
+                self.sql_where.append(
+                    "AND EXISTS (SELECT 'dsr1' FROM v_ds_radiology dsr1 "
+                    "WHERE dsr1.episode_id = ep.subject_epis_id "
+                    "AND dsr1.confirmed_type_id = 16087 "
+                    "AND dsr1.deleted_flag = 'N' "
+                    "AND dsr1.dataset_new_flag = 'Y')"
+                )
+            elif value == "endoscopy_incomplete":
+                self.sql_where.append(
+                    "AND EXISTS (SELECT 'dsei' FROM v_ds_colonoscopy dsei "
+                    "WHERE dsei.episode_id = ep.subject_epis_id "
+                    "AND dsei.deleted_flag = 'N' "
+                    "AND dsei.dataset_completed_flag = 'N' "
+                    "AND dsei.dataset_new_flag = 'N' "
+                    "AND dsei.confirmed_test_date >= TO_DATE('01/01/2020','dd/mm/yyyy'))"
+                )
+            elif value == "radiology_incomplete":
+                self.sql_where.append(
+                    "AND EXISTS (SELECT 'dsri' FROM v_ds_radiology dsri "
+                    "WHERE dsri.episode_id = ep.subject_epis_id "
+                    "AND dsri.deleted_flag = 'N' "
+                    "AND dsri.dataset_completed_flag = 'N' "
+                    "AND dsri.dataset_new_flag = 'N' "
+                    "AND dsri.confirmed_test_date >= TO_DATE('01/01/2020','dd/mm/yyyy'))"
+                )
+            else:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
     # ------------------------------------------------------------------------
     # 🧬 CADS Clinical Dataset Filters
