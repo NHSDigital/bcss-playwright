@@ -95,22 +95,19 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_invited_since_age_extension(self) -> None:
+    def _add_criteria_note_count(self) -> None:
         """
-        Filters subjects based on whether they were invited since age extension began.
+        Filters subjects based on the count of associated supporting notes.
         """
         try:
-            self._add_join_to_latest_episode()
-            value = InvitedSinceAgeExtension.from_description(self.criteria_value)
-            clause = "EXISTS" if value == "yes" else "NOT EXISTS"
+            # Assumes criteriaValue contains both comparator and numeric literal, e.g., '>= 2'
+            comparator_clause = self.criteria_value.strip()
 
             self.sql_where.append(
-                f"AND {clause} (SELECT 'sagex' FROM screening_subject_attribute_t sagex "
-                "INNER JOIN valid_values vvagex ON vvagex.valid_value_id = sagex.attribute_id "
-                "AND vvagex.domain = 'FOBT_AGEX_LOWER_AGE' "
-                "WHERE sagex.screening_subject_id = ep.screening_subject_id "
-                "AND sagex.start_date < ep.episode_start_date)"
+                "AND (SELECT COUNT(*) FROM SUPPORTING_NOTES_T snt "
+                "WHERE snt.screening_subject_id = ss.screening_subject_id) "
+                f"{comparator_clause}"
             )
+
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
-

@@ -2082,6 +2082,23 @@ class SubjectSelectionQueryBuilder:
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
+    def _add_criteria_note_count(self) -> None:
+        """
+        Filters subjects based on the count of associated supporting notes.
+        """
+        try:
+            # Assumes criteriaValue contains both comparator and numeric literal, e.g., '>= 2'
+            comparator_clause = self.criteria_value.strip()
+
+            self.sql_where.append(
+                "AND (SELECT COUNT(*) FROM SUPPORTING_NOTES_T snt "
+                "WHERE snt.screening_subject_id = ss.screening_subject_id) "
+                f"{comparator_clause}"
+            )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
     # ------------------------------------------------------------------------
     # 🧬 CADS Clinical Dataset Filters
     # ------------------------------------------------------------------------
