@@ -30,6 +30,7 @@ from classes.appointment_status_type import AppointmentStatusType
 from classes.which_diagnostic_test import WhichDiagnosticTest
 from classes.diagnostic_test_type import DiagnosticTestType
 from classes.diagnostic_test_is_void import DiagnosticTestIsVoid
+from classes.diagnostic_test_has_result import DiagnosticTestHasResult
 
 
 class SubjectSelectionQueryBuilder:
@@ -1743,6 +1744,29 @@ class SubjectSelectionQueryBuilder:
                 raise SelectionBuilderException(
                     self.criteria_key_name, self.criteria_value
                 )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_diagnostic_test_has_result(self) -> None:
+        """
+        Adds WHERE clause to check whether a diagnostic test has a result (IS NULL / NOT NULL / = result_id).
+        """
+        try:
+            idx = getattr(self, "criteria_index", 0)
+            xt = f"xt{idx}"
+            value = self.criteria_value.strip().lower()
+            result = DiagnosticTestHasResult.from_description(value)
+
+            self.sql_where.append(f"AND {xt}.result_id ")
+
+            if result == DiagnosticTestHasResult.YES:
+                self.sql_where.append("IS NOT NULL")
+            elif result == DiagnosticTestHasResult.NO:
+                self.sql_where.append("IS NULL")
+            else:
+                result_id = DiagnosticTestHasResult.get_id(value)
+                self.sql_where.append(f"= {result_id}")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

@@ -37,14 +37,20 @@ def make_builder(key, value, index=0):
     return b
 
 
-# === Test: DIAGNOSTIC_TEST_IS_VOID ===
-b = make_builder(SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_IS_VOID, "yes")
-b._add_criteria_diagnostic_test_is_void()
-print("=== DIAGNOSTIC_TEST_IS_VOID ===")
+# === Test: DIAGNOSTIC_TEST_HAS_RESULT (yes) ===
+b = make_builder(SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_HAS_RESULT, "yes")
+b._add_criteria_diagnostic_test_has_result()
+print("=== DIAGNOSTIC_TEST_HAS_RESULT (yes) ===")
 print(b.dump_sql(), end="\n\n")
 
-# === Test: DIAGNOSTIC_TEST_IS_VOID (not void) ===
-b = make_builder(SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_IS_VOID, "no", index=1)
-b._add_criteria_diagnostic_test_is_void()
-print("=== DIAGNOSTIC_TEST_IS_VOID (not void) ===")
+# === Test: DIAGNOSTIC_TEST_HAS_RESULT (no) ===
+b = make_builder(SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_HAS_RESULT, "no")
+b._add_criteria_diagnostic_test_has_result()
+print("=== DIAGNOSTIC_TEST_HAS_RESULT (no) ===")
+print(b.dump_sql(), end="\n\n")
+
+# === Test: DIAGNOSTIC_TEST_HAS_RESULT (positive) ===
+b = make_builder(SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_HAS_RESULT, "positive")
+b._add_criteria_diagnostic_test_has_result()
+print("=== DIAGNOSTIC_TEST_HAS_RESULT (positive) ===")
 print(b.dump_sql(), end="\n\n")

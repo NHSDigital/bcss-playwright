@@ -7,9 +7,9 @@ from classes.selection_builder_exception import SelectionBuilderException
 
 
 # Add helper class stubs below
-class DiagnosticTestIsVoid:
+class DiagnosticTestHasResult:
     """
-    Maps yes/no descriptions to boolean flags for test void criteria.
+    Resolves whether a diagnostic test has a result, or maps to a specific result ID.
     """
 
     YES = "yes"
@@ -18,14 +18,24 @@ class DiagnosticTestIsVoid:
     _mapping = {
         "yes": YES,
         "no": NO,
+        "positive": 9001,
+        "negative": 9002,
+        "indeterminate": 9003,
     }
 
     @classmethod
-    def from_description(cls, description: str) -> str:
+    def from_description(cls, description: str):
         key = description.strip().lower()
         if key not in cls._mapping:
-            raise ValueError(f"Unknown void flag: {description}")
+            raise ValueError(f"Unknown test result description: '{description}'")
         return cls._mapping[key]
+
+    @classmethod
+    def get_id(cls, description: str) -> int:
+        val = cls.from_description(description)
+        if isinstance(val, int):
+            return val
+        raise ValueError(f"No ID associated with: '{description}'")
 
 
 class MockSelectionBuilder:
@@ -75,22 +85,25 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_diagnostic_test_is_void(self) -> None:
+    def _add_criteria_diagnostic_test_has_result(self) -> None:
         """
-        Adds WHERE clause to check whether diagnostic test is voided ('Y' or 'N').
-        Requires prior join to external_tests_t using alias xtN.
+        Adds WHERE clause to check whether a diagnostic test has a result (IS NULL / NOT NULL / = result_id).
         """
         try:
             idx = getattr(self, "criteria_index", 0)
             xt = f"xt{idx}"
-            value = DiagnosticTestIsVoid.from_description(self.criteria_value)
+            value = self.criteria_value.strip().lower()
+            result = DiagnosticTestHasResult.from_description(value)
 
-            if value == DiagnosticTestIsVoid.YES:
-                self.sql_where.append(f"AND {xt}.void = 'Y'")
-            elif value == DiagnosticTestIsVoid.NO:
-                self.sql_where.append(f"AND {xt}.void = 'N'")
+            self.sql_where.append(f"AND {xt}.result_id ")
+
+            if result == DiagnosticTestHasResult.YES:
+                self.sql_where.append("IS NOT NULL")
+            elif result == DiagnosticTestHasResult.NO:
+                self.sql_where.append("IS NULL")
             else:
-                raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+                result_id = DiagnosticTestHasResult.get_id(value)
+                self.sql_where.append(f"= {result_id}")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
