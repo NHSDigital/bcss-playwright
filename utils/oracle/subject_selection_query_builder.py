@@ -35,6 +35,7 @@ from classes.diagnostic_test_has_outcome_of_result import (
     DiagnosticTestHasOutcomeOfResult,
 )
 from classes.intended_extent_type import IntendedExtentType
+from classes.latest_episode_has_dataset import LatestEpisodeHasDataset
 
 
 class SubjectSelectionQueryBuilder:
@@ -1821,6 +1822,71 @@ class SubjectSelectionQueryBuilder:
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_latest_episode_has_dataset(self) -> None:
+        """
+        Filters based on presence or completion status of a dataset in the latest episode.
+        """
+        try:
+            self._add_join_to_latest_episode()
+
+            dataset_info = self._dataset_source_for_criteria_key()
+            dataset_table = dataset_info["table"]
+            alias = dataset_info["alias"]
+
+            clause = "AND EXISTS ( "
+            value = self.criteria_value.strip().lower()
+            status = LatestEpisodeHasDataset.from_description(value)
+            filter_clause = ""
+
+            if status == LatestEpisodeHasDataset.NO:
+                clause = "AND NOT EXISTS ( "
+            elif status == LatestEpisodeHasDataset.YES_INCOMPLETE:
+                filter_clause = f"AND {alias}.dataset_completed_date IS NULL"
+            elif status == LatestEpisodeHasDataset.YES_COMPLETE:
+                filter_clause = f"AND {alias}.dataset_completed_date IS NOT NULL"
+            elif status == LatestEpisodeHasDataset.PAST:
+                filter_clause = (
+                    f"AND TRUNC({alias}.dataset_completed_date) < TRUNC(SYSDATE)"
+                )
+            else:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+
+            self.sql_where.append(
+                "".join(
+                    [
+                        clause,
+                        f"SELECT 1 FROM {dataset_table} {alias} ",
+                        f"WHERE {alias}.episode_id = ep.subject_epis_id ",
+                        f"AND {alias}.deleted_flag = 'N' ",
+                        filter_clause,
+                        ")",
+                    ]
+                )
+            )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _dataset_source_for_criteria_key(self) -> dict:
+        """
+        Internal helper method.
+        Maps LATEST_EPISODE_HAS_* criteria keys to their corresponding dataset tables and aliases.
+        Used by _add_criteria_latest_episode_has_dataset().
+        """
+        key = self.criteria_key
+        if key == SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_CANCER_AUDIT_DATASET:
+            return {"table": "ds_cancer_audit_t", "alias": "cads"}
+        if (
+            key
+            == SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_COLONOSCOPY_ASSESSMENT_DATASET
+        ):
+            return {"table": "ds_patient_assessment_t", "alias": "dspa"}
+        if key == SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_MDT_DATASET:
+            return {"table": "ds_mdt_t", "alias": "mdt"}
+        raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
     # ------------------------------------------------------------------------
     # 🧬 CADS Clinical Dataset Filters

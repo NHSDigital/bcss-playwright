@@ -37,24 +37,10 @@ def make_builder(key, value, index=0):
     return b
 
 
-# === Test: DIAGNOSTIC_TEST_INTENDED_EXTENT (null) ===
-b = make_builder(SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_INTENDED_EXTENT, "null")
-b._add_criteria_diagnostic_test_intended_extent()
-print("=== DIAGNOSTIC_TEST_INTENDED_EXTENT (null) ===")
-print(b.dump_sql(), end="\n\n")
-
-# === Test: DIAGNOSTIC_TEST_INTENDED_EXTENT (not null) ===
+# === Test: LATEST_EPISODE_HAS_CANCER_AUDIT_DATASET (yes_complete) ===
 b = make_builder(
-    SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_INTENDED_EXTENT, "not null", index=1
+    SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_CANCER_AUDIT_DATASET, "yes_complete"
 )
-b._add_criteria_diagnostic_test_intended_extent()
-print("=== DIAGNOSTIC_TEST_INTENDED_EXTENT (not null) ===")
-print(b.dump_sql(), end="\n\n")
-
-# === Test: DIAGNOSTIC_TEST_INTENDED_EXTENT (partial) ===
-b = make_builder(
-    SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_INTENDED_EXTENT, "partial", index=2
-)
-b._add_criteria_diagnostic_test_intended_extent()
-print("=== DIAGNOSTIC_TEST_INTENDED_EXTENT (partial) ===")
+b._add_criteria_latest_episode_has_dataset()
+print("=== LATEST_EPISODE_HAS_CANCER_AUDIT_DATASET (yes_complete) ===")
 print(b.dump_sql(), end="\n\n")

@@ -4,46 +4,33 @@ import os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 from classes.selection_builder_exception import SelectionBuilderException
+from classes.subject_selection_criteria_key import SubjectSelectionCriteriaKey
 
 
 # Add helper class stubs below
-class IntendedExtentType:
+class LatestEpisodeHasDataset:
     """
-    Resolves intended extent descriptions to valid value IDs or null-check constants.
+    Maps dataset status descriptions to filter interpretations.
     """
 
-    NULL = "null"
-    NOT_NULL = "not null"
+    NO = "no"
+    YES_INCOMPLETE = "yes_incomplete"
+    YES_COMPLETE = "yes_complete"
+    PAST = "past"
 
     _mapping = {
-        "null": NULL,
-        "not null": NOT_NULL,
-        "full": 9201,
-        "partial": 9202,
-        "none": 9203,
+        "no": NO,
+        "yes_incomplete": YES_INCOMPLETE,
+        "yes_complete": YES_COMPLETE,
+        "past": PAST,
     }
 
     @classmethod
-    def from_description(cls, description: str):
+    def from_description(cls, description: str) -> str:
         key = description.strip().lower()
         if key not in cls._mapping:
-            raise ValueError(f"Unknown intended extent: '{description}'")
+            raise ValueError(f"Unknown dataset filter type: '{description}'")
         return cls._mapping[key]
-
-    @classmethod
-    def get_id(cls, description: str) -> int:
-        val = cls.from_description(description)
-        if isinstance(val, int):
-            return val
-        raise ValueError(f"No ID associated with extent: '{description}'")
-
-    @classmethod
-    def get_description(cls, sentinel: str) -> str:
-        if sentinel == cls.NULL:
-            return "NULL"
-        if sentinel == cls.NOT_NULL:
-            return "NOT NULL"
-        raise ValueError(f"Unknown null sentinel: {sentinel}")
 
 
 class MockSelectionBuilder:
@@ -89,26 +76,69 @@ class MockSelectionBuilder:
         """
         self.sql_from.append("-- JOIN to latest episode placeholder")
 
+    def _dataset_source_for_criteria_key(self) -> dict:
+        """
+        Maps criteria key to dataset table and alias.
+        """
+        key = self.criteria_key
+        if key == SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_CANCER_AUDIT_DATASET:
+            return {"table": "ds_cancer_audit_t", "alias": "cads"}
+        if (
+            key
+            == SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_COLONOSCOPY_ASSESSMENT_DATASET
+        ):
+            return {"table": "ds_patient_assessment_t", "alias": "dspa"}
+        if key == SubjectSelectionCriteriaKey.LATEST_EPISODE_HAS_MDT_DATASET:
+            return {"table": "ds_mdt_t", "alias": "mdt"}
+        raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
     # === Example testable method below ===
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_diagnostic_test_intended_extent(self) -> None:
+    def _add_criteria_latest_episode_has_dataset(self) -> None:
         """
-        Adds WHERE clause filtering diagnostic tests by intended_extent_id.
-        Supports null checks and value comparisons.
+        Filters based on presence or completion status of a dataset in the latest episode.
         """
         try:
-            idx = getattr(self, "criteria_index", 0)
-            xt = f"xt{idx}"
-            extent = IntendedExtentType.from_description(self.criteria_value)
+            self._add_join_to_latest_episode()
 
-            self.sql_where.append(f"AND {xt}.intended_extent_id ")
+            dataset_info = self._dataset_source_for_criteria_key()
+            dataset_table = dataset_info["table"]
+            alias = dataset_info["alias"]
 
-            if extent in (IntendedExtentType.NULL, IntendedExtentType.NOT_NULL):
-                self.sql_where.append(f"IS {IntendedExtentType.get_description(extent)}")
+            clause = "AND EXISTS ( "
+            value = self.criteria_value.strip().lower()
+            status = LatestEpisodeHasDataset.from_description(value)
+            filter_clause = ""
+
+            if status == LatestEpisodeHasDataset.NO:
+                clause = "AND NOT EXISTS ( "
+            elif status == LatestEpisodeHasDataset.YES_INCOMPLETE:
+                filter_clause = f"AND {alias}.dataset_completed_date IS NULL"
+            elif status == LatestEpisodeHasDataset.YES_COMPLETE:
+                filter_clause = f"AND {alias}.dataset_completed_date IS NOT NULL"
+            elif status == LatestEpisodeHasDataset.PAST:
+                filter_clause = (
+                    f"AND TRUNC({alias}.dataset_completed_date) < TRUNC(SYSDATE)"
+                )
             else:
-                self.sql_where.append(f"{self.criteria_comparator} {IntendedExtentType.get_id(self.criteria_value)}")
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+
+            self.sql_where.append(
+                "".join(
+                    [
+                        clause,
+                        f"SELECT 1 FROM {dataset_table} {alias} ",
+                        f"WHERE {alias}.episode_id = ep.subject_epis_id ",
+                        f"AND {alias}.deleted_flag = 'N' ",
+                        filter_clause,
+                        ")",
+                    ]
+                )
+            )
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
