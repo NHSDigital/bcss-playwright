@@ -28,6 +28,7 @@ from classes.selection_builder_exception import SelectionBuilderException
 from classes.appointments_slot_type import AppointmentSlotType
 from classes.appointment_status_type import AppointmentStatusType
 from classes.which_diagnostic_test import WhichDiagnosticTest
+from classes.diagnostic_test_type import DiagnosticTestType
 
 
 class SubjectSelectionQueryBuilder:
@@ -1689,6 +1690,39 @@ class SubjectSelectionQueryBuilder:
             "<" if which == WhichDiagnosticTest.EARLIER_TEST_IN_LATEST_EPISODE else ">"
         )
         self.sql_from.append(f"AND {xt}.ext_test_id {comparator} {xtp}.ext_test_id")
+
+    def _add_criteria_diagnostic_test_type(self, proposed_or_confirmed: str) -> None:
+        """
+        Filters diagnostic tests by type—proposed or confirmed.
+        Requires prior join to external_tests_t (xt aliasing assumed).
+        """
+        try:
+            idx = getattr(self, "criteria_index", 0)
+            xt = f"xt{idx}"
+
+            if proposed_or_confirmed == "proposed":
+                column = f"{xt}.proposed_type_id"
+            elif proposed_or_confirmed == "confirmed":
+                column = f"{xt}.confirmed_type_id"
+            else:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+
+            self.sql_where.append(f"AND {column} ")
+
+            value = self.criteria_value.strip().lower()
+            if value == "null":
+                self.sql_where.append("IS NULL")
+            elif value == "not null":
+                self.sql_where.append("IS NOT NULL")
+            else:
+                comparator = self.criteria_comparator
+                type_id = DiagnosticTestType.get_valid_value_id(self.criteria_value)
+                self.sql_where.append(f"{comparator} {type_id}")
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
     # ------------------------------------------------------------------------
     # 🧬 CADS Clinical Dataset Filters
