@@ -7,9 +7,9 @@ from classes.selection_builder_exception import SelectionBuilderException
 
 
 # Add helper class stubs below
-class DiagnosticTestHasResult:
+class DiagnosticTestHasOutcomeOfResult:
     """
-    Resolves whether a diagnostic test has a result, or maps to a specific result ID.
+    Maps outcome-of-result criteria values to either flags or valid value IDs.
     """
 
     YES = "yes"
@@ -18,16 +18,16 @@ class DiagnosticTestHasResult:
     _mapping = {
         "yes": YES,
         "no": NO,
-        "positive": 9001,
-        "negative": 9002,
-        "indeterminate": 9003,
+        "referred": 9101,
+        "treated": 9102,
+        "not required": 9103,
     }
 
     @classmethod
     def from_description(cls, description: str):
         key = description.strip().lower()
         if key not in cls._mapping:
-            raise ValueError(f"Unknown test result description: '{description}'")
+            raise ValueError(f"Unknown outcome description: '{description}'")
         return cls._mapping[key]
 
     @classmethod
@@ -35,7 +35,7 @@ class DiagnosticTestHasResult:
         val = cls.from_description(description)
         if isinstance(val, int):
             return val
-        raise ValueError(f"No ID associated with: '{description}'")
+        raise ValueError(f"No ID associated with outcome: '{description}'")
 
 
 class MockSelectionBuilder:
@@ -85,25 +85,25 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_diagnostic_test_has_result(self) -> None:
+    def _add_criteria_diagnostic_test_has_outcome_of_result(self) -> None:
         """
-        Adds WHERE clause to check whether a diagnostic test has a result (IS NULL / NOT NULL / = result_id).
+        Adds WHERE clause filtering on whether the diagnostic test has an outcome-of-result.
         """
         try:
             idx = getattr(self, "criteria_index", 0)
             xt = f"xt{idx}"
             value = self.criteria_value.strip().lower()
-            result = DiagnosticTestHasResult.from_description(value)
+            outcome = DiagnosticTestHasOutcomeOfResult.from_description(value)
 
-            self.sql_where.append(f"AND {xt}.result_id ")
+            self.sql_where.append(f"AND {xt}.outcome_of_result_id ")
 
-            if result == DiagnosticTestHasResult.YES:
+            if outcome == DiagnosticTestHasOutcomeOfResult.YES:
                 self.sql_where.append("IS NOT NULL")
-            elif result == DiagnosticTestHasResult.NO:
+            elif outcome == DiagnosticTestHasOutcomeOfResult.NO:
                 self.sql_where.append("IS NULL")
             else:
-                result_id = DiagnosticTestHasResult.get_id(value)
-                self.sql_where.append(f"= {result_id}")
+                outcome_id = DiagnosticTestHasOutcomeOfResult.get_id(value)
+                self.sql_where.append(f"= {outcome_id}")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

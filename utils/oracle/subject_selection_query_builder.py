@@ -31,6 +31,9 @@ from classes.which_diagnostic_test import WhichDiagnosticTest
 from classes.diagnostic_test_type import DiagnosticTestType
 from classes.diagnostic_test_is_void import DiagnosticTestIsVoid
 from classes.diagnostic_test_has_result import DiagnosticTestHasResult
+from classes.diagnostic_test_has_outcome_of_result import (
+    DiagnosticTestHasOutcomeOfResult,
+)
 
 
 class SubjectSelectionQueryBuilder:
@@ -1767,6 +1770,29 @@ class SubjectSelectionQueryBuilder:
             else:
                 result_id = DiagnosticTestHasResult.get_id(value)
                 self.sql_where.append(f"= {result_id}")
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_diagnostic_test_has_outcome_of_result(self) -> None:
+        """
+        Adds WHERE clause filtering on whether the diagnostic test has an outcome-of-result.
+        """
+        try:
+            idx = getattr(self, "criteria_index", 0)
+            xt = f"xt{idx}"
+            value = self.criteria_value.strip().lower()
+            outcome = DiagnosticTestHasOutcomeOfResult.from_description(value)
+
+            self.sql_where.append(f"AND {xt}.outcome_of_result_id ")
+
+            if outcome == DiagnosticTestHasOutcomeOfResult.YES:
+                self.sql_where.append("IS NOT NULL")
+            elif outcome == DiagnosticTestHasOutcomeOfResult.NO:
+                self.sql_where.append("IS NULL")
+            else:
+                outcome_id = DiagnosticTestHasOutcomeOfResult.get_id(value)
+                self.sql_where.append(f"= {outcome_id}")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
