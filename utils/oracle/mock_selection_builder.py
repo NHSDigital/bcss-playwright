@@ -5,28 +5,34 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 from classes.selection_builder_exception import SelectionBuilderException
 from classes.subject_selection_criteria_key import SubjectSelectionCriteriaKey
-from classes.intended_extent_type import IntendedExtentType
 
 
 # Add helper class stubs below
-class InvitedSinceAgeExtension:
+class EpisodeResultType:
     """
-    Maps input describing whether subject was invited since age extension.
+    Represents various episode result types including special symbolic values.
     """
 
-    YES = "yes"
-    NO = "no"
+    NULL = "null"
+    NOT_NULL = "not_null"
+    ANY_SURVEILLANCE_NON_PARTICIPATION = "any_surveillance_non_participation"
 
-    _valid_values = {YES, NO}
+    _label_to_id = {
+        # Add actual mappings here, for example:
+        "normal": 9501,
+        "abnormal": 9502,
+        "surveillance offered": 9503,
+        # etc.
+    }
 
     @classmethod
-    def from_description(cls, description: str) -> str:
+    def from_description(cls, description: str):
         key = description.strip().lower()
-        if key not in cls._valid_values:
-            raise ValueError(
-                f"Unknown invited-since-age-extension flag: '{description}'"
-            )
-        return key
+        if key in {cls.NULL, cls.NOT_NULL, cls.ANY_SURVEILLANCE_NON_PARTICIPATION}:
+            return key
+        if key in cls._label_to_id:
+            return cls._label_to_id[key]
+        raise ValueError(f"Unknown episode result type: '{description}'")
 
 
 class MockSelectionBuilder:
@@ -95,19 +101,27 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_note_count(self) -> None:
+    def _add_criteria_latest_episode_accumulated_episode_result(self) -> None:
         """
-        Filters subjects based on the count of associated supporting notes.
+        Filters subjects based on the result of their latest episode.
         """
         try:
-            # Assumes criteriaValue contains both comparator and numeric literal, e.g., '>= 2'
-            comparator_clause = self.criteria_value.strip()
+            self._add_join_to_latest_episode()
+            value = EpisodeResultType.from_description(self.criteria_value)
 
-            self.sql_where.append(
-                "AND (SELECT COUNT(*) FROM SUPPORTING_NOTES_T snt "
-                "WHERE snt.screening_subject_id = ss.screening_subject_id) "
-                f"{comparator_clause}"
-            )
+            if value == EpisodeResultType.NULL:
+                self.sql_where.append("AND ep.episode_result_id IS NULL")
+            elif value == EpisodeResultType.NOT_NULL:
+                self.sql_where.append("AND ep.episode_result_id IS NOT NULL")
+            elif value == EpisodeResultType.ANY_SURVEILLANCE_NON_PARTICIPATION:
+                self.sql_where.append(
+                    "AND ep.episode_result_id IN ("
+                    "SELECT snp.valid_value_id FROM valid_values snp "
+                    "WHERE snp.domain = 'OTHER_EPISODE_RESULT' "
+                    "AND LOWER(snp.description) LIKE '%surveillance non-participation')"
+                )
+            else:
+                self.sql_where.append(f"AND ep.episode_result_id = {value}")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

@@ -46,6 +46,7 @@ from classes.does_subject_have_surveillance_review_case import (
 from classes.surveillance_review_case_type import SurveillanceReviewCaseType
 from classes.has_date_of_death_removal import HasDateOfDeathRemoval
 from classes.invited_since_age_extension import InvitedSinceAgeExtension
+from classes.episode_result_type import EpisodeResultType
 
 
 class SubjectSelectionQueryBuilder:
@@ -2095,6 +2096,31 @@ class SubjectSelectionQueryBuilder:
                 "WHERE snt.screening_subject_id = ss.screening_subject_id) "
                 f"{comparator_clause}"
             )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_latest_episode_accumulated_episode_result(self) -> None:
+        """
+        Filters subjects based on the result of their latest episode.
+        """
+        try:
+            self._add_join_to_latest_episode()
+            value = EpisodeResultType.from_description(self.criteria_value)
+
+            if value == EpisodeResultType.NULL:
+                self.sql_where.append("AND ep.episode_result_id IS NULL")
+            elif value == EpisodeResultType.NOT_NULL:
+                self.sql_where.append("AND ep.episode_result_id IS NOT NULL")
+            elif value == EpisodeResultType.ANY_SURVEILLANCE_NON_PARTICIPATION:
+                self.sql_where.append(
+                    "AND ep.episode_result_id IN ("
+                    "SELECT snp.valid_value_id FROM valid_values snp "
+                    "WHERE snp.domain = 'OTHER_EPISODE_RESULT' "
+                    "AND LOWER(snp.description) LIKE '%surveillance non-participation')"
+                )
+            else:
+                self.sql_where.append(f"AND ep.episode_result_id = {value}")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

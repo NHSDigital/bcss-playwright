@@ -41,8 +41,11 @@ def make_builder(key, value, index=0, comparator="="):
     return b
 
 
-# === Test: NOTE_COUNT >= 2 ===
-b = make_builder(SubjectSelectionCriteriaKey.NOTE_COUNT, ">= 2")
-b._add_criteria_note_count()
-print("=== NOTE_COUNT >= 2 ===")
+# === Test: LATEST_EPISODE_ACCUMULATED_RESULT (any_surveillance_non_participation) ===
+b = make_builder(
+    SubjectSelectionCriteriaKey.LATEST_EPISODE_ACCUMULATED_RESULT,
+    "any_surveillance_non_participation",
+)
+b._add_criteria_latest_episode_accumulated_episode_result()
+print("=== LATEST_EPISODE_ACCUMULATED_RESULT (any_surveillance_non_participation) ===")
 print(b.dump_sql(), end="\n\n")
