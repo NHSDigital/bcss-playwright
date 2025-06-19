@@ -29,36 +29,16 @@ from classes.subject_selection_criteria_key import SubjectSelectionCriteriaKey
 # === Example usage ===
 # Replace the examples below with your tests for the method you want to test
 
-# === Test: WHICH_APPOINTMENT — any_appointment_in_latest_episode ===
-builder = MockSelectionBuilder(
-    SubjectSelectionCriteriaKey.WHICH_APPOINTMENT, "any_appointment_in_latest_episode"
-)
-builder._add_join_to_appointments()
-print("=== WHICH_APPOINTMENT — any_appointment_in_latest_episode ===")
+# === Test: APPOINTMENT_TYPE — phone ===
+builder = MockSelectionBuilder(SubjectSelectionCriteriaKey.APPOINTMENT_TYPE, "phone")
+builder.criteria_comparator = "="
+builder._add_criteria_appointment_type()
+print("=== APPOINTMENT_TYPE — phone ===")
 print(builder.dump_sql(), end="\n\n")
 
-# === Test: WHICH_APPOINTMENT — latest_appointment_in_latest_episode ===
-builder = MockSelectionBuilder(
-    SubjectSelectionCriteriaKey.WHICH_APPOINTMENT,
-    "latest_appointment_in_latest_episode",
-)
-builder._add_join_to_appointments()
-print("=== WHICH_APPOINTMENT — latest_appointment_in_latest_episode ===")
-print(builder.dump_sql(), end="\n\n")
-
-# === Test: WHICH_APPOINTMENT — earlier_appointment_in_latest_episode ===
-builder = MockSelectionBuilder(
-    SubjectSelectionCriteriaKey.WHICH_APPOINTMENT,
-    "earlier_appointment_in_latest_episode",
-)
-builder._add_join_to_appointments()
-print("=== WHICH_APPOINTMENT — earlier_appointment_in_latest_episode ===")
-print(builder.dump_sql(), end="\n\n")
-
-# === Test: WHICH_APPOINTMENT — later_appointment_in_latest_episode ===
-builder = MockSelectionBuilder(
-    SubjectSelectionCriteriaKey.WHICH_APPOINTMENT, "later_appointment_in_latest_episode"
-)
-builder._add_join_to_appointments()
-print("=== WHICH_APPOINTMENT — later_appointment_in_latest_episode ===")
+# === Test: APPOINTMENT_TYPE — clinic !== ===
+builder = MockSelectionBuilder(SubjectSelectionCriteriaKey.APPOINTMENT_TYPE, "clinic")
+builder.criteria_comparator = "!="
+builder._add_criteria_appointment_type()
+print("=== APPOINTMENT_TYPE — clinic !== ===")
 print(builder.dump_sql(), end="\n\n")

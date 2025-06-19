@@ -25,6 +25,7 @@ from classes.subject_selection_criteria_key import SubjectSelectionCriteriaKey
 from classes.subject import Subject
 from classes.user import User
 from classes.selection_builder_exception import SelectionBuilderException
+from classes.appointments_slot_type import AppointmentSlotType
 
 
 class SubjectSelectionQueryBuilder:
@@ -1558,6 +1559,25 @@ class SubjectSelectionQueryBuilder:
                 )
             else:
                 raise ValueError(f"Invalid appointment selection value: {value}")
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_appointment_type(self) -> None:
+        """
+        Filters appointments by slot type (e.g. clinic, phone).
+        Requires prior join to appointment_t as alias 'ap' (via WHICH_APPOINTMENT).
+
+        Uses comparator and resolves slot type label to ID via AppointmentSlotType.
+        """
+        try:
+            comparator = self.criteria_comparator
+            value = self.criteria_value.strip()
+            slot_type_id = AppointmentSlotType.get_id(value)
+
+            self.sql_where.append(
+                f"AND ap.appointment_slot_type_id {comparator} {slot_type_id}"
+            )
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

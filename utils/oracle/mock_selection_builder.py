@@ -6,6 +6,27 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 from classes.selection_builder_exception import SelectionBuilderException
 
 
+# Add helper class stubs below
+class AppointmentSlotType:
+    """
+    Mocked appointment slot type mapping for test purposes.
+    Replace IDs with real values from production enum if needed.
+    """
+
+    _mapping = {
+        "clinic": 1001,
+        "phone": 1002,
+        "video": 1003,
+    }
+
+    @classmethod
+    def get_id(cls, description: str) -> int:
+        key = description.strip().lower()
+        if key not in cls._mapping:
+            raise ValueError(f"Unknown appointment slot type: {description}")
+        return cls._mapping[key]
+
+
 class MockSelectionBuilder:
     """
     Lightweight test harness that mimics SubjectSelectionQueryBuilder behavior.
@@ -52,47 +73,21 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_join_to_appointments(self) -> None:
+    def _add_criteria_appointment_type(self) -> None:
         """
-        Adds join to appointment_t table based on appointment selection strategy.
-        Requires prior join to latest episode (ep). Aliases the appointment table as 'ap'.
+        Filters appointments by slot type (e.g. clinic, phone).
+        Requires prior join to appointment_t as alias 'ap' (via WHICH_APPOINTMENT).
 
-        Accepts values:
-            - "any_appointment_in_latest_episode"
-            - "latest_appointment_in_latest_episode"
-            - "earlier_appointment_in_latest_episode"
-            - "later_appointment_in_latest_episode"
+        Uses comparator and resolves slot type label to ID via AppointmentSlotType.
         """
         try:
-            value = self.criteria_value.strip().lower()
-            ap_alias = "ap"
-            apr_alias = "ap_prev"  # Simulated prior alias for test support
+            comparator = self.criteria_comparator
+            value = self.criteria_value.strip()
+            slot_type_id = AppointmentSlotType.get_id(value)
 
-            self._add_join_to_latest_episode()
-            self.sql_from.append(
-                f"INNER JOIN appointment_t {ap_alias} ON {ap_alias}.subject_epis_id = ep.subject_epis_id"
+            self.sql_where.append(
+                f"AND ap.appointment_slot_type_id {comparator} {slot_type_id}"
             )
-
-            if value == "any_appointment_in_latest_episode":
-                return
-            elif value == "latest_appointment_in_latest_episode":
-                self.sql_from.append(
-                    f"AND {ap_alias}.appointment_id = ("
-                    f" SELECT MAX(apx.appointment_id)"
-                    f" FROM appointment_t apx"
-                    f" WHERE apx.subject_epis_id = ep.subject_epis_id"
-                    f" AND apx.void = 'N')"
-                )
-            elif value == "earlier_appointment_in_latest_episode":
-                self.sql_from.append(
-                    f"AND {ap_alias}.appointment_id < {apr_alias}.appointment_id"
-                )
-            elif value == "later_appointment_in_latest_episode":
-                self.sql_from.append(
-                    f"AND {ap_alias}.appointment_id > {apr_alias}.appointment_id"
-                )
-            else:
-                raise ValueError(f"Invalid appointment selection value: {value}")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
