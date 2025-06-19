@@ -30,38 +30,69 @@ class MockSelectionBuilder:
 
     # Don't delete this method; it is used to inspect the SQL fragments
     def dump_sql(self):
-        return "\n".join(self.sql_where)
-    
+        parts = []
+
+        if self.sql_from:
+            parts.append("-- FROM clause --")
+            parts.extend(self.sql_from)
+
+        if self.sql_where:
+            parts.append("-- WHERE clause --")
+            parts.extend(self.sql_where)
+
+        return "\n".join(parts)
+
     def _add_join_to_latest_episode(self) -> None:
         """
         Mock stub for adding latest episode join. No-op for test harness.
         """
         self.sql_from.append("-- JOIN to latest episode placeholder")
 
-
     # === Example testable method below ===
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_kit_has_analyser_result_code(self) -> None:
+    def _add_join_to_appointments(self) -> None:
         """
-        Filters kits based on whether they have an analyser error code.
-        Requires prior join to tk_items_t as alias 'tk' (via WHICH_TEST_KIT).
+        Adds join to appointment_t table based on appointment selection strategy.
+        Requires prior join to latest episode (ep). Aliases the appointment table as 'ap'.
 
         Accepts values:
-            - "yes" → analyser_error_code IS NOT NULL
-            - "no"  → analyser_error_code IS NULL
+            - "any_appointment_in_latest_episode"
+            - "latest_appointment_in_latest_episode"
+            - "earlier_appointment_in_latest_episode"
+            - "later_appointment_in_latest_episode"
         """
         try:
             value = self.criteria_value.strip().lower()
+            ap_alias = "ap"
+            apr_alias = "ap_prev"  # Simulated prior alias for test support
 
-            if value == "yes":
-                self.sql_where.append("AND tk.analyser_error_code IS NOT NULL")
-            elif value == "no":
-                self.sql_where.append("AND tk.analyser_error_code IS NULL")
+            self._add_join_to_latest_episode()
+            self.sql_from.append(
+                f"INNER JOIN appointment_t {ap_alias} ON {ap_alias}.subject_epis_id = ep.subject_epis_id"
+            )
+
+            if value == "any_appointment_in_latest_episode":
+                return
+            elif value == "latest_appointment_in_latest_episode":
+                self.sql_from.append(
+                    f"AND {ap_alias}.appointment_id = ("
+                    f" SELECT MAX(apx.appointment_id)"
+                    f" FROM appointment_t apx"
+                    f" WHERE apx.subject_epis_id = ep.subject_epis_id"
+                    f" AND apx.void = 'N')"
+                )
+            elif value == "earlier_appointment_in_latest_episode":
+                self.sql_from.append(
+                    f"AND {ap_alias}.appointment_id < {apr_alias}.appointment_id"
+                )
+            elif value == "later_appointment_in_latest_episode":
+                self.sql_from.append(
+                    f"AND {ap_alias}.appointment_id > {apr_alias}.appointment_id"
+                )
             else:
-                raise ValueError(f"Invalid value for analyser result code presence: {value}")
+                raise ValueError(f"Invalid appointment selection value: {value}")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
-
