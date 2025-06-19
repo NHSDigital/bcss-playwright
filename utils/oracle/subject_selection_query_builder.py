@@ -26,6 +26,7 @@ from classes.subject import Subject
 from classes.user import User
 from classes.selection_builder_exception import SelectionBuilderException
 from classes.appointments_slot_type import AppointmentSlotType
+from classes.appointment_status_type import AppointmentStatusType
 
 
 class SubjectSelectionQueryBuilder:
@@ -1577,6 +1578,25 @@ class SubjectSelectionQueryBuilder:
 
             self.sql_where.append(
                 f"AND ap.appointment_slot_type_id {comparator} {slot_type_id}"
+            )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_appointment_status(self) -> None:
+        """
+        Filters appointments by status (e.g. booked, attended).
+        Requires prior join to appointment_t as alias 'ap'.
+
+        Uses comparator and resolves status label to ID via AppointmentStatusType.
+        """
+        try:
+            comparator = self.criteria_comparator
+            value = self.criteria_value.strip()
+            status_id = AppointmentStatusType.get_id(value)
+
+            self.sql_where.append(
+                f"AND ap.appointment_status_id {comparator} {status_id}"
             )
 
         except Exception:

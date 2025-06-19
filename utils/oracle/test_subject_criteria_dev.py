@@ -29,16 +29,16 @@ from classes.subject_selection_criteria_key import SubjectSelectionCriteriaKey
 # === Example usage ===
 # Replace the examples below with your tests for the method you want to test
 
-# === Test: APPOINTMENT_TYPE — phone ===
-builder = MockSelectionBuilder(SubjectSelectionCriteriaKey.APPOINTMENT_TYPE, "phone")
+# === Test: APPOINTMENT_STATUS — booked ===
+builder = MockSelectionBuilder(SubjectSelectionCriteriaKey.APPOINTMENT_STATUS, "booked")
 builder.criteria_comparator = "="
-builder._add_criteria_appointment_type()
-print("=== APPOINTMENT_TYPE — phone ===")
+builder._add_criteria_appointment_status()
+print("=== APPOINTMENT_STATUS — booked ===")
 print(builder.dump_sql(), end="\n\n")
 
-# === Test: APPOINTMENT_TYPE — clinic !== ===
-builder = MockSelectionBuilder(SubjectSelectionCriteriaKey.APPOINTMENT_TYPE, "clinic")
+# === Test: APPOINTMENT_STATUS — dna !== ===
+builder = MockSelectionBuilder(SubjectSelectionCriteriaKey.APPOINTMENT_STATUS, "dna")
 builder.criteria_comparator = "!="
-builder._add_criteria_appointment_type()
-print("=== APPOINTMENT_TYPE — clinic !== ===")
+builder._add_criteria_appointment_status()
+print("=== APPOINTMENT_STATUS — dna !== ===")
 print(builder.dump_sql(), end="\n\n")

@@ -7,23 +7,24 @@ from classes.selection_builder_exception import SelectionBuilderException
 
 
 # Add helper class stubs below
-class AppointmentSlotType:
+class AppointmentStatusType:
     """
-    Mocked appointment slot type mapping for test purposes.
-    Replace IDs with real values from production enum if needed.
+    Mocked appointment status mapping for test purposes.
+    Replace IDs with real values from production if needed.
     """
 
     _mapping = {
-        "clinic": 1001,
-        "phone": 1002,
-        "video": 1003,
+        "booked": 2001,
+        "attended": 2002,
+        "cancelled": 2003,
+        "dna": 2004,  # Did Not Attend
     }
 
     @classmethod
     def get_id(cls, description: str) -> int:
         key = description.strip().lower()
         if key not in cls._mapping:
-            raise ValueError(f"Unknown appointment slot type: {description}")
+            raise ValueError(f"Unknown appointment status: {description}")
         return cls._mapping[key]
 
 
@@ -73,20 +74,20 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_appointment_type(self) -> None:
+    def _add_criteria_appointment_status(self) -> None:
         """
-        Filters appointments by slot type (e.g. clinic, phone).
-        Requires prior join to appointment_t as alias 'ap' (via WHICH_APPOINTMENT).
+        Filters appointments by status (e.g. booked, attended).
+        Requires prior join to appointment_t as alias 'ap'.
 
-        Uses comparator and resolves slot type label to ID via AppointmentSlotType.
+        Uses comparator and resolves status label to ID via AppointmentStatusType.
         """
         try:
             comparator = self.criteria_comparator
             value = self.criteria_value.strip()
-            slot_type_id = AppointmentSlotType.get_id(value)
+            status_id = AppointmentStatusType.get_id(value)
 
             self.sql_where.append(
-                f"AND ap.appointment_slot_type_id {comparator} {slot_type_id}"
+                f"AND ap.appointment_status_id {comparator} {status_id}"
             )
 
         except Exception:
