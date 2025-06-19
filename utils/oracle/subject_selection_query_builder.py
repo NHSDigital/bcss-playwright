@@ -27,6 +27,7 @@ from classes.user import User
 from classes.selection_builder_exception import SelectionBuilderException
 from classes.appointments_slot_type import AppointmentSlotType
 from classes.appointment_status_type import AppointmentStatusType
+from classes.which_diagnostic_test import WhichDiagnosticTest
 
 
 class SubjectSelectionQueryBuilder:
@@ -1601,6 +1602,93 @@ class SubjectSelectionQueryBuilder:
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    # ------------------------------------------------------------------------
+    # 🧪 Diagnostic Test Selection & Join Logic
+    # ------------------------------------------------------------------------
+
+    def _add_join_to_diagnostic_tests(self) -> None:
+        try:
+            which = WhichDiagnosticTest.from_description(self.criteria_value)
+            idx = getattr(self, "criteria_index", 0)
+            xt = f"xt{idx}"
+            xtp = f"xt{idx - 1}"
+
+            self.sql_from.append(
+                f"INNER JOIN external_tests_t {xt} ON {xt}.screening_subject_id = ss.screening_subject_id"
+            )
+
+            if which == WhichDiagnosticTest.ANY_TEST_IN_ANY_EPISODE:
+                return
+
+            self._add_join_to_latest_episode()
+
+            handlers = {
+                WhichDiagnosticTest.ANY_TEST_IN_LATEST_EPISODE: self._handle_any_test_in_latest_episode,
+                WhichDiagnosticTest.ONLY_TEST_IN_LATEST_EPISODE: self._handle_only_test_in_latest_episode,
+                WhichDiagnosticTest.ONLY_NOT_VOID_TEST_IN_LATEST_EPISODE: self._handle_only_test_in_latest_episode,
+                WhichDiagnosticTest.LATEST_TEST_IN_LATEST_EPISODE: self._handle_latest_test_in_latest_episode,
+                WhichDiagnosticTest.LATEST_NOT_VOID_TEST_IN_LATEST_EPISODE: self._handle_latest_test_in_latest_episode,
+                WhichDiagnosticTest.EARLIEST_NOT_VOID_TEST_IN_LATEST_EPISODE: self._handle_earliest_test_in_latest_episode,
+                WhichDiagnosticTest.EARLIER_TEST_IN_LATEST_EPISODE: self._handle_earlier_or_later_test,
+                WhichDiagnosticTest.LATER_TEST_IN_LATEST_EPISODE: self._handle_earlier_or_later_test,
+            }
+
+            if which in handlers:
+                handlers[which](which, xt, xtp)
+            else:
+                raise ValueError(f"Unsupported diagnostic test type: {which}")
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _handle_any_test_in_latest_episode(self, which, xt, _):
+        """Helper method for diagnostic test filtering"""
+
+        self.sql_from.append(f"AND {xt}.subject_epis_id = ep.subject_epis_id")
+
+    def _handle_only_test_in_latest_episode(self, which, xt, _):
+        """Helper method for diagnostic test filtering"""
+        self.sql_from.append(f"AND {xt}.subject_epis_id = ep.subject_epis_id")
+        if which == WhichDiagnosticTest.ONLY_NOT_VOID_TEST_IN_LATEST_EPISODE:
+            self.sql_from.append(f"AND {xt}.void = 'N'")
+        self.sql_from.append(
+            f"""AND NOT EXISTS (
+        SELECT 'xto' FROM external_tests_t xto
+        WHERE xto.screening_subject_id = ss.screening_subject_id
+        {'AND xto.void = \'N\'' if which == WhichDiagnosticTest.ONLY_NOT_VOID_TEST_IN_LATEST_EPISODE else ''}
+        AND xto.subject_epis_id = ep.subject_epis_id
+        AND xto.ext_test_id != {xt}.ext_test_id )"""
+        )
+
+    def _handle_latest_test_in_latest_episode(self, which, xt, _):
+        """Helper method for diagnostic test filtering"""
+        self.sql_from.append(
+            f"""AND {xt}.ext_test_id = (
+        SELECT MAX(xtx.ext_test_id) FROM external_tests_t xtx
+        WHERE xtx.screening_subject_id = ss.screening_subject_id
+        {'AND xtx.void = \'N\'' if which == WhichDiagnosticTest.LATEST_NOT_VOID_TEST_IN_LATEST_EPISODE else ''}
+        AND xtx.subject_epis_id = ep.subject_epis_id )"""
+        )
+
+    def _handle_earliest_test_in_latest_episode(self, which, xt, _):
+        """Helper method for diagnostic test filtering"""
+        self.sql_from.append(
+            f"""AND {xt}.ext_test_id = (
+        SELECT MIN(xtn.ext_test_id) FROM external_tests_t xtn
+        WHERE xtn.screening_subject_id = ss.screening_subject_id
+        AND xtn.void = 'N'
+        AND xtn.subject_epis_id = ep.subject_epis_id )"""
+        )
+
+    def _handle_earlier_or_later_test(self, which, xt, xtp):
+        """Helper method for diagnostic test filtering"""
+        if getattr(self, "criteria_index", 0) == 0:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+        comparator = (
+            "<" if which == WhichDiagnosticTest.EARLIER_TEST_IN_LATEST_EPISODE else ">"
+        )
+        self.sql_from.append(f"AND {xt}.ext_test_id {comparator} {xtp}.ext_test_id")
 
     # ------------------------------------------------------------------------
     # 🧬 CADS Clinical Dataset Filters

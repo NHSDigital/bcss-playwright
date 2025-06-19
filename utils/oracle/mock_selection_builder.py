@@ -7,24 +7,41 @@ from classes.selection_builder_exception import SelectionBuilderException
 
 
 # Add helper class stubs below
-class AppointmentStatusType:
+class WhichDiagnosticTest:
     """
-    Mocked appointment status mapping for test purposes.
-    Replace IDs with real values from production if needed.
+    Test stub that maps criteria values to normalized diagnostic test selection keys.
+    Used by _add_join_to_diagnostic_tests for test harness evaluation.
     """
 
+    ANY_TEST_IN_ANY_EPISODE = "any_test_in_any_episode"
+    ANY_TEST_IN_LATEST_EPISODE = "any_test_in_latest_episode"
+    ONLY_TEST_IN_LATEST_EPISODE = "only_test_in_latest_episode"
+    ONLY_NOT_VOID_TEST_IN_LATEST_EPISODE = "only_not_void_test_in_latest_episode"
+    LATEST_TEST_IN_LATEST_EPISODE = "latest_test_in_latest_episode"
+    LATEST_NOT_VOID_TEST_IN_LATEST_EPISODE = "latest_not_void_test_in_latest_episode"
+    EARLIEST_NOT_VOID_TEST_IN_LATEST_EPISODE = (
+        "earliest_not_void_test_in_latest_episode"
+    )
+    EARLIER_TEST_IN_LATEST_EPISODE = "earlier_test_in_latest_episode"
+    LATER_TEST_IN_LATEST_EPISODE = "later_test_in_latest_episode"
+
     _mapping = {
-        "booked": 2001,
-        "attended": 2002,
-        "cancelled": 2003,
-        "dna": 2004,  # Did Not Attend
+        "any_test_in_any_episode": ANY_TEST_IN_ANY_EPISODE,
+        "any_test_in_latest_episode": ANY_TEST_IN_LATEST_EPISODE,
+        "only_test_in_latest_episode": ONLY_TEST_IN_LATEST_EPISODE,
+        "only_not_void_test_in_latest_episode": ONLY_NOT_VOID_TEST_IN_LATEST_EPISODE,
+        "latest_test_in_latest_episode": LATEST_TEST_IN_LATEST_EPISODE,
+        "latest_not_void_test_in_latest_episode": LATEST_NOT_VOID_TEST_IN_LATEST_EPISODE,
+        "earliest_not_void_test_in_latest_episode": EARLIEST_NOT_VOID_TEST_IN_LATEST_EPISODE,
+        "earlier_test_in_latest_episode": EARLIER_TEST_IN_LATEST_EPISODE,
+        "later_test_in_latest_episode": LATER_TEST_IN_LATEST_EPISODE,
     }
 
     @classmethod
-    def get_id(cls, description: str) -> int:
+    def from_description(cls, description: str) -> str:
         key = description.strip().lower()
         if key not in cls._mapping:
-            raise ValueError(f"Unknown appointment status: {description}")
+            raise ValueError(f"Unknown diagnostic test type: {description}")
         return cls._mapping[key]
 
 
@@ -47,6 +64,7 @@ class MockSelectionBuilder:
         self.criteria_key_name = criteria_key.description
         self.criteria_value = criteria_value
         self.criteria_comparator = criteria_comparator
+        self.criteria_index: int = 0
         self.sql_where = []
         self.sql_from = []
 
@@ -74,21 +92,79 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_appointment_status(self) -> None:
-        """
-        Filters appointments by status (e.g. booked, attended).
-        Requires prior join to appointment_t as alias 'ap'.
-
-        Uses comparator and resolves status label to ID via AppointmentStatusType.
-        """
+    def _add_join_to_diagnostic_tests(self) -> None:
         try:
-            comparator = self.criteria_comparator
-            value = self.criteria_value.strip()
-            status_id = AppointmentStatusType.get_id(value)
+            which = WhichDiagnosticTest.from_description(self.criteria_value)
+            idx = getattr(self, "criteria_index", 0)
+            xt = f"xt{idx}"
+            xtp = f"xt{idx - 1}"
 
-            self.sql_where.append(
-                f"AND ap.appointment_status_id {comparator} {status_id}"
+            self.sql_from.append(
+                f"INNER JOIN external_tests_t {xt} ON {xt}.screening_subject_id = ss.screening_subject_id"
             )
+
+            if which == WhichDiagnosticTest.ANY_TEST_IN_ANY_EPISODE:
+                return
+
+            self._add_join_to_latest_episode()
+
+            handlers = {
+                WhichDiagnosticTest.ANY_TEST_IN_LATEST_EPISODE: self._handle_any_test_in_latest_episode,
+                WhichDiagnosticTest.ONLY_TEST_IN_LATEST_EPISODE: self._handle_only_test_in_latest_episode,
+                WhichDiagnosticTest.ONLY_NOT_VOID_TEST_IN_LATEST_EPISODE: self._handle_only_test_in_latest_episode,
+                WhichDiagnosticTest.LATEST_TEST_IN_LATEST_EPISODE: self._handle_latest_test_in_latest_episode,
+                WhichDiagnosticTest.LATEST_NOT_VOID_TEST_IN_LATEST_EPISODE: self._handle_latest_test_in_latest_episode,
+                WhichDiagnosticTest.EARLIEST_NOT_VOID_TEST_IN_LATEST_EPISODE: self._handle_earliest_test_in_latest_episode,
+                WhichDiagnosticTest.EARLIER_TEST_IN_LATEST_EPISODE: self._handle_earlier_or_later_test,
+                WhichDiagnosticTest.LATER_TEST_IN_LATEST_EPISODE: self._handle_earlier_or_later_test,
+            }
+
+            if which in handlers:
+                handlers[which](which, xt, xtp)
+            else:
+                raise ValueError(f"Unsupported diagnostic test type: {which}")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _handle_any_test_in_latest_episode(self, which, xt, _):
+        self.sql_from.append(f"AND {xt}.subject_epis_id = ep.subject_epis_id")
+
+    def _handle_only_test_in_latest_episode(self, which, xt, _):
+        self.sql_from.append(f"AND {xt}.subject_epis_id = ep.subject_epis_id")
+        if which == WhichDiagnosticTest.ONLY_NOT_VOID_TEST_IN_LATEST_EPISODE:
+            self.sql_from.append(f"AND {xt}.void = 'N'")
+        self.sql_from.append(
+            f"""AND NOT EXISTS (
+        SELECT 'xto' FROM external_tests_t xto
+        WHERE xto.screening_subject_id = ss.screening_subject_id
+        {'AND xto.void = \'N\'' if which == WhichDiagnosticTest.ONLY_NOT_VOID_TEST_IN_LATEST_EPISODE else ''}
+        AND xto.subject_epis_id = ep.subject_epis_id
+        AND xto.ext_test_id != {xt}.ext_test_id )"""
+        )
+
+    def _handle_latest_test_in_latest_episode(self, which, xt, _):
+        self.sql_from.append(
+            f"""AND {xt}.ext_test_id = (
+        SELECT MAX(xtx.ext_test_id) FROM external_tests_t xtx
+        WHERE xtx.screening_subject_id = ss.screening_subject_id
+        {'AND xtx.void = \'N\'' if which == WhichDiagnosticTest.LATEST_NOT_VOID_TEST_IN_LATEST_EPISODE else ''}
+        AND xtx.subject_epis_id = ep.subject_epis_id )"""
+        )
+
+    def _handle_earliest_test_in_latest_episode(self, which, xt, _):
+        self.sql_from.append(
+            f"""AND {xt}.ext_test_id = (
+        SELECT MIN(xtn.ext_test_id) FROM external_tests_t xtn
+        WHERE xtn.screening_subject_id = ss.screening_subject_id
+        AND xtn.void = 'N'
+        AND xtn.subject_epis_id = ep.subject_epis_id )"""
+        )
+
+    def _handle_earlier_or_later_test(self, which, xt, xtp):
+        if getattr(self, "criteria_index", 0) == 0:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+        comparator = (
+            "<" if which == WhichDiagnosticTest.EARLIER_TEST_IN_LATEST_EPISODE else ">"
+        )
+        self.sql_from.append(f"AND {xt}.ext_test_id {comparator} {xtp}.ext_test_id")
