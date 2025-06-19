@@ -5,34 +5,28 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 from classes.selection_builder_exception import SelectionBuilderException
 from classes.subject_selection_criteria_key import SubjectSelectionCriteriaKey
+from classes.intended_extent_type import IntendedExtentType
 
 
 # Add helper class stubs below
-class LatestEpisodeLatestInvestigationDataset:
-    NONE = "none"
-    COLONOSCOPY_NEW = "colonoscopy_new"
-    LIMITED_COLONOSCOPY_NEW = "limited_colonoscopy_new"
-    FLEXIBLE_SIGMOIDOSCOPY_NEW = "flexible_sigmoidoscopy_new"
-    CT_COLONOGRAPHY_NEW = "ct_colonography_new"
-    ENDOSCOPY_INCOMPLETE = "endoscopy_incomplete"
-    RADIOLOGY_INCOMPLETE = "radiology_incomplete"
+class SurveillanceReviewStatusType:
+    """
+    Maps descriptive surveillance review statuses to valid value IDs.
+    """
 
-    _mapping = {
-        "none": NONE,
-        "colonoscopy_new": COLONOSCOPY_NEW,
-        "limited_colonoscopy_new": LIMITED_COLONOSCOPY_NEW,
-        "flexible_sigmoidoscopy_new": FLEXIBLE_SIGMOIDOSCOPY_NEW,
-        "ct_colonography_new": CT_COLONOGRAPHY_NEW,
-        "endoscopy_incomplete": ENDOSCOPY_INCOMPLETE,
-        "radiology_incomplete": RADIOLOGY_INCOMPLETE,
+    _label_to_id = {
+        "awaiting review": 9301,
+        "in progress": 9302,
+        "completed": 9303,
+        # Extend as needed
     }
 
     @classmethod
-    def from_description(cls, description: str) -> str:
+    def get_id(cls, description: str) -> int:
         key = description.strip().lower()
-        if key not in cls._mapping:
-            raise ValueError(f"Unknown investigation dataset filter: '{description}'")
-        return cls._mapping[key]
+        if key not in cls._label_to_id:
+            raise ValueError(f"Unknown review status: '{description}'")
+        return cls._label_to_id[key]
 
 
 class MockSelectionBuilder:
@@ -94,77 +88,24 @@ class MockSelectionBuilder:
             return {"table": "ds_mdt_t", "alias": "mdt"}
         raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
+    def _add_join_to_surveillance_review(self):
+        self.sql_from.append("-- JOIN to surveillance review placeholder")
+
     # === Example testable method below ===
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_latest_episode_latest_investigation_dataset(self) -> None:
+    def _add_criteria_surveillance_review_status(self) -> None:
         """
-        Filters subjects based on their latest investigation dataset in their latest episode.
-        Supports colonoscopy and radiology variations.
+        Filters subjects based on the review_status_id in their surveillance review dataset.
         """
         try:
-            self._add_join_to_latest_episode()
-            value = LatestEpisodeLatestInvestigationDataset.from_description(self.criteria_value)
+            self._add_join_to_surveillance_review()
+            status_id = SurveillanceReviewStatusType.get_id(self.criteria_value)
 
-            if value == "none":
-                self.sql_where.append(
-                    "AND NOT EXISTS (SELECT 'dsc1' FROM v_ds_colonoscopy dsc1 "
-                    "WHERE dsc1.episode_id = ep.subject_epis_id "
-                    "AND dsc1.confirmed_type_id = 16002)"
-                )
-            elif value == "colonoscopy_new":
-                self.sql_where.append(
-                    "AND EXISTS (SELECT 'dsc2' FROM v_ds_colonoscopy dsc2 "
-                    "WHERE dsc2.episode_id = ep.subject_epis_id "
-                    "AND dsc2.confirmed_type_id = 16002 "
-                    "AND dsc2.deleted_flag = 'N' "
-                    "AND dsc2.dataset_new_flag = 'Y')"
-                )
-            elif value == "limited_colonoscopy_new":
-                self.sql_where.append(
-                    "AND EXISTS (SELECT 'dsc3' FROM v_ds_colonoscopy dsc3 "
-                    "WHERE dsc3.episode_id = ep.subject_epis_id "
-                    "AND dsc3.confirmed_type_id = 17996 "
-                    "AND dsc3.deleted_flag = 'N' "
-                    "AND dsc3.dataset_new_flag = 'Y')"
-                )
-            elif value == "flexible_sigmoidoscopy_new":
-                self.sql_where.append(
-                    "AND EXISTS (SELECT 'dsc4' FROM v_ds_colonoscopy dsc4 "
-                    "WHERE dsc4.episode_id = ep.subject_epis_id "
-                    "AND dsc4.confirmed_type_id = 16004 "
-                    "AND dsc4.deleted_flag = 'N' "
-                    "AND dsc4.dataset_new_flag = 'Y')"
-                )
-            elif value == "ct_colonography_new":
-                self.sql_where.append(
-                    "AND EXISTS (SELECT 'dsr1' FROM v_ds_radiology dsr1 "
-                    "WHERE dsr1.episode_id = ep.subject_epis_id "
-                    "AND dsr1.confirmed_type_id = 16087 "
-                    "AND dsr1.deleted_flag = 'N' "
-                    "AND dsr1.dataset_new_flag = 'Y')"
-                )
-            elif value == "endoscopy_incomplete":
-                self.sql_where.append(
-                    "AND EXISTS (SELECT 'dsei' FROM v_ds_colonoscopy dsei "
-                    "WHERE dsei.episode_id = ep.subject_epis_id "
-                    "AND dsei.deleted_flag = 'N' "
-                    "AND dsei.dataset_completed_flag = 'N' "
-                    "AND dsei.dataset_new_flag = 'N' "
-                    "AND dsei.confirmed_test_date >= TO_DATE('01/01/2020','dd/mm/yyyy'))"
-                )
-            elif value == "radiology_incomplete":
-                self.sql_where.append(
-                    "AND EXISTS (SELECT 'dsri' FROM v_ds_radiology dsri "
-                    "WHERE dsri.episode_id = ep.subject_epis_id "
-                    "AND dsri.deleted_flag = 'N' "
-                    "AND dsri.dataset_completed_flag = 'N' "
-                    "AND dsri.dataset_new_flag = 'N' "
-                    "AND dsri.confirmed_test_date >= TO_DATE('01/01/2020','dd/mm/yyyy'))"
-                )
-            else:
-                raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+            self.sql_where.append(
+                f"AND sr.review_status_id {self.criteria_comparator} {status_id}"
+            )
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

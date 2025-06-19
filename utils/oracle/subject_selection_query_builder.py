@@ -39,6 +39,7 @@ from classes.latest_episode_has_dataset import LatestEpisodeHasDataset
 from classes.latest_episode_latest_investigation_dataset import (
     LatestEpisodeLatestInvestigationDataset,
 )
+from classes.surveillance_review_status_type import SurveillanceReviewStatusType 
 
 
 class SubjectSelectionQueryBuilder:
@@ -1965,6 +1966,46 @@ class SubjectSelectionQueryBuilder:
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_latest_episode_intended_extent(self) -> None:
+        """
+        Filters subjects based on presence of a colonoscopy dataset with a specific intended_extent_id
+        in their latest episode.
+        """
+        try:
+            self._add_join_to_latest_episode()
+            extent_id = IntendedExtentType.get_id(self.criteria_value)
+
+            self.sql_where.append(
+                "AND EXISTS (SELECT 'dsc' FROM v_ds_colonoscopy dsc "
+                "WHERE dsc.episode_id = ep.subject_epis_id "
+                f"AND dsc.intended_extent_id = {extent_id})"
+            )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_surveillance_review_status(self) -> None:
+        """
+        Filters subjects based on the review_status_id in their surveillance review dataset.
+        """
+        try:
+            self._add_join_to_surveillance_review()
+            status_id = SurveillanceReviewStatusType.get_id(self.criteria_value)
+
+            self.sql_where.append(
+                f"AND sr.review_status_id {self.criteria_comparator} {status_id}"
+            )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+    
+    def _add_join_to_surveillance_review(self) -> None:
+        """
+        Internal helper. Adds the necessary join to the surveillance review dataset for filtering.
+        """
+        self.sql_from.append("-- JOIN to surveillance review placeholder")
+
 
     # ------------------------------------------------------------------------
     # 🧬 CADS Clinical Dataset Filters

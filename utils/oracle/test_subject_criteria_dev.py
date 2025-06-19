@@ -31,46 +31,20 @@ from classes.subject_selection_criteria_key import SubjectSelectionCriteriaKey
 
 
 # Helper for mock sequencing
-def make_builder(key, value, index=0):
-    b = MockSelectionBuilder(key, value)
+def make_builder(key, value, index=0, comparator="="):
+    b = MockSelectionBuilder(key, value, comparator)
+    b.criteria_key = key
+    b.criteria_key_name = key.name
+    b.criteria_value = value
     b.criteria_index = index
+    b.criteria_comparator = comparator
     return b
 
 
-# === Test: LATEST_EPISODE_LATEST_INVESTIGATION_DATASET (none) ===
+# === Test: SURVEILLANCE_REVIEW_STATUS (completed) ===
 b = make_builder(
-    SubjectSelectionCriteriaKey.LATEST_EPISODE_LATEST_INVESTIGATION_DATASET, "none"
+    SubjectSelectionCriteriaKey.SURVEILLANCE_REVIEW_STATUS, "completed", comparator=">="
 )
-b._add_criteria_latest_episode_latest_investigation_dataset()
-print("=== LATEST_EPISODE_LATEST_INVESTIGATION_DATASET (none) ===")
-print(b.dump_sql(), end="\n\n")
-
-# === Test: LATEST_EPISODE_LATEST_INVESTIGATION_DATASET (colonoscopy_new) ===
-b = make_builder(
-    SubjectSelectionCriteriaKey.LATEST_EPISODE_LATEST_INVESTIGATION_DATASET,
-    "colonoscopy_new",
-    index=1,
-)
-b._add_criteria_latest_episode_latest_investigation_dataset()
-print("=== LATEST_EPISODE_LATEST_INVESTIGATION_DATASET (colonoscopy_new) ===")
-print(b.dump_sql(), end="\n\n")
-
-# === Test: LATEST_EPISODE_LATEST_INVESTIGATION_DATASET (ct_colonography_new) ===
-b = make_builder(
-    SubjectSelectionCriteriaKey.LATEST_EPISODE_LATEST_INVESTIGATION_DATASET,
-    "ct_colonography_new",
-    index=2,
-)
-b._add_criteria_latest_episode_latest_investigation_dataset()
-print("=== LATEST_EPISODE_LATEST_INVESTIGATION_DATASET (ct_colonography_new) ===")
-print(b.dump_sql(), end="\n\n")
-
-# === Test: LATEST_EPISODE_LATEST_INVESTIGATION_DATASET (endoscopy_incomplete) ===
-b = make_builder(
-    SubjectSelectionCriteriaKey.LATEST_EPISODE_LATEST_INVESTIGATION_DATASET,
-    "endoscopy_incomplete",
-    index=3,
-)
-b._add_criteria_latest_episode_latest_investigation_dataset()
-print("=== LATEST_EPISODE_LATEST_INVESTIGATION_DATASET (endoscopy_incomplete) ===")
+b._add_criteria_surveillance_review_status()
+print("=== SURVEILLANCE_REVIEW_STATUS (completed) ===")
 print(b.dump_sql(), end="\n\n")
