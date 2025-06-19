@@ -39,7 +39,10 @@ from classes.latest_episode_has_dataset import LatestEpisodeHasDataset
 from classes.latest_episode_latest_investigation_dataset import (
     LatestEpisodeLatestInvestigationDataset,
 )
-from classes.surveillance_review_status_type import SurveillanceReviewStatusType 
+from classes.surveillance_review_status_type import SurveillanceReviewStatusType
+from classes.does_subject_have_surveillance_review_case import (
+    DoesSubjectHaveSurveillanceReviewCase,
+)
 
 
 class SubjectSelectionQueryBuilder:
@@ -1999,13 +2002,31 @@ class SubjectSelectionQueryBuilder:
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
-    
+
     def _add_join_to_surveillance_review(self) -> None:
         """
         Internal helper. Adds the necessary join to the surveillance review dataset for filtering.
         """
         self.sql_from.append("-- JOIN to surveillance review placeholder")
 
+    def _add_criteria_does_subject_have_surveillance_review_case(self) -> None:
+        """
+        Filters subjects based on presence or absence of a surveillance review case.
+        """
+        try:
+            value = DoesSubjectHaveSurveillanceReviewCase.from_description(
+                self.criteria_value
+            )
+
+            clause = "AND EXISTS" if value == "yes" else "AND NOT EXISTS"
+
+            self.sql_where.append(
+                f"{clause} (SELECT 'sr' FROM surveillance_review sr "
+                "WHERE sr.subject_id = ss.screening_subject_id)"
+            )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
     # ------------------------------------------------------------------------
     # 🧬 CADS Clinical Dataset Filters

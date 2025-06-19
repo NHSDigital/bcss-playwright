@@ -9,24 +9,23 @@ from classes.intended_extent_type import IntendedExtentType
 
 
 # Add helper class stubs below
-class SurveillanceReviewStatusType:
-    """
-    Maps descriptive surveillance review statuses to valid value IDs.
-    """
+class DoesSubjectHaveSurveillanceReviewCase:
+    YES = "yes"
+    NO = "no"
 
-    _label_to_id = {
-        "awaiting review": 9301,
-        "in progress": 9302,
-        "completed": 9303,
-        # Extend as needed
+    _mapping = {
+        "yes": YES,
+        "no": NO,
     }
 
     @classmethod
-    def get_id(cls, description: str) -> int:
+    def from_description(cls, description: str) -> str:
         key = description.strip().lower()
-        if key not in cls._label_to_id:
-            raise ValueError(f"Unknown review status: '{description}'")
-        return cls._label_to_id[key]
+        if key not in cls._mapping:
+            raise ValueError(
+                f"Unknown surveillance review case presence: '{description}'"
+            )
+        return cls._mapping[key]
 
 
 class MockSelectionBuilder:
@@ -95,16 +94,18 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_surveillance_review_status(self) -> None:
+    def _add_criteria_does_subject_have_surveillance_review_case(self) -> None:
         """
-        Filters subjects based on the review_status_id in their surveillance review dataset.
+        Filters subjects based on presence or absence of a surveillance review case.
         """
         try:
-            self._add_join_to_surveillance_review()
-            status_id = SurveillanceReviewStatusType.get_id(self.criteria_value)
+            value = DoesSubjectHaveSurveillanceReviewCase.from_description(self.criteria_value)
+
+            clause = "AND EXISTS" if value == "yes" else "AND NOT EXISTS"
 
             self.sql_where.append(
-                f"AND sr.review_status_id {self.criteria_comparator} {status_id}"
+                f"{clause} (SELECT 'sr' FROM surveillance_review sr "
+                "WHERE sr.subject_id = ss.screening_subject_id)"
             )
 
         except Exception:
