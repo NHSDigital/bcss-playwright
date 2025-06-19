@@ -37,20 +37,14 @@ def make_builder(key, value, index=0):
     return b
 
 
-# === Test: DIAGNOSTIC_TEST_CONFIRMED_TYPE (valid value) ===
-b = make_builder(SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_CONFIRMED_TYPE, "PCR")
-b._add_criteria_diagnostic_test_type("confirmed")
-print("=== DIAGNOSTIC_TEST_CONFIRMED_TYPE (valid value) ===")
+# === Test: DIAGNOSTIC_TEST_IS_VOID ===
+b = make_builder(SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_IS_VOID, "yes")
+b._add_criteria_diagnostic_test_is_void()
+print("=== DIAGNOSTIC_TEST_IS_VOID ===")
 print(b.dump_sql(), end="\n\n")
 
-# === Test: DIAGNOSTIC_TEST_PROPOSED_TYPE (null) ===
-b = make_builder(SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_PROPOSED_TYPE, "null")
-b._add_criteria_diagnostic_test_type("proposed")
-print("=== DIAGNOSTIC_TEST_PROPOSED_TYPE (null) ===")
-print(b.dump_sql(), end="\n\n")
-
-# === Test: DIAGNOSTIC_TEST_PROPOSED_TYPE (not null) ===
-b = make_builder(SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_PROPOSED_TYPE, "not null")
-b._add_criteria_diagnostic_test_type("proposed")
-print("=== DIAGNOSTIC_TEST_PROPOSED_TYPE (not null) ===")
+# === Test: DIAGNOSTIC_TEST_IS_VOID (not void) ===
+b = make_builder(SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_IS_VOID, "no", index=1)
+b._add_criteria_diagnostic_test_is_void()
+print("=== DIAGNOSTIC_TEST_IS_VOID (not void) ===")
 print(b.dump_sql(), end="\n\n")

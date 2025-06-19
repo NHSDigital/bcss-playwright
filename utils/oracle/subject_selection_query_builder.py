@@ -29,6 +29,7 @@ from classes.appointments_slot_type import AppointmentSlotType
 from classes.appointment_status_type import AppointmentStatusType
 from classes.which_diagnostic_test import WhichDiagnosticTest
 from classes.diagnostic_test_type import DiagnosticTestType
+from classes.diagnostic_test_is_void import DiagnosticTestIsVoid
 
 
 class SubjectSelectionQueryBuilder:
@@ -1720,6 +1721,28 @@ class SubjectSelectionQueryBuilder:
                 comparator = self.criteria_comparator
                 type_id = DiagnosticTestType.get_valid_value_id(self.criteria_value)
                 self.sql_where.append(f"{comparator} {type_id}")
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_diagnostic_test_is_void(self) -> None:
+        """
+        Adds WHERE clause to check whether diagnostic test is voided ('Y' or 'N').
+        Requires prior join to external_tests_t using alias xtN.
+        """
+        try:
+            idx = getattr(self, "criteria_index", 0)
+            xt = f"xt{idx}"
+            value = DiagnosticTestIsVoid.from_description(self.criteria_value)
+
+            if value == DiagnosticTestIsVoid.YES:
+                self.sql_where.append(f"AND {xt}.void = 'Y'")
+            elif value == DiagnosticTestIsVoid.NO:
+                self.sql_where.append(f"AND {xt}.void = 'N'")
+            else:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

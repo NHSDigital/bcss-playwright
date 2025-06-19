@@ -7,22 +7,24 @@ from classes.selection_builder_exception import SelectionBuilderException
 
 
 # Add helper class stubs below
-class DiagnosticTestType:
+class DiagnosticTestIsVoid:
     """
-    Mock mapping of diagnostic test type names to valid value IDs.
+    Maps yes/no descriptions to boolean flags for test void criteria.
     """
 
+    YES = "yes"
+    NO = "no"
+
     _mapping = {
-        "pcr": 3001,
-        "antigen": 3002,
-        "lateral flow": 3003,
+        "yes": YES,
+        "no": NO,
     }
 
     @classmethod
-    def get_valid_value_id(cls, description: str) -> int:
+    def from_description(cls, description: str) -> str:
         key = description.strip().lower()
         if key not in cls._mapping:
-            raise ValueError(f"Unknown diagnostic test type: {description}")
+            raise ValueError(f"Unknown void flag: {description}")
         return cls._mapping[key]
 
 
@@ -73,35 +75,22 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_diagnostic_test_type(self, proposed_or_confirmed: str) -> None:
+    def _add_criteria_diagnostic_test_is_void(self) -> None:
         """
-        Filters diagnostic tests by type—proposed or confirmed.
-        Requires prior join to external_tests_t (xt aliasing assumed).
+        Adds WHERE clause to check whether diagnostic test is voided ('Y' or 'N').
+        Requires prior join to external_tests_t using alias xtN.
         """
         try:
             idx = getattr(self, "criteria_index", 0)
             xt = f"xt{idx}"
+            value = DiagnosticTestIsVoid.from_description(self.criteria_value)
 
-            if proposed_or_confirmed == "proposed":
-                column = f"{xt}.proposed_type_id"
-            elif proposed_or_confirmed == "confirmed":
-                column = f"{xt}.confirmed_type_id"
+            if value == DiagnosticTestIsVoid.YES:
+                self.sql_where.append(f"AND {xt}.void = 'Y'")
+            elif value == DiagnosticTestIsVoid.NO:
+                self.sql_where.append(f"AND {xt}.void = 'N'")
             else:
-                raise SelectionBuilderException(
-                    self.criteria_key_name, self.criteria_value
-                )
-
-            self.sql_where.append(f"AND {column} ")
-
-            value = self.criteria_value.strip().lower()
-            if value == "null":
-                self.sql_where.append("IS NULL")
-            elif value == "not null":
-                self.sql_where.append("IS NOT NULL")
-            else:
-                comparator = self.criteria_comparator
-                type_id = DiagnosticTestType.get_valid_value_id(self.criteria_value)
-                self.sql_where.append(f"{comparator} {type_id}")
+                raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
