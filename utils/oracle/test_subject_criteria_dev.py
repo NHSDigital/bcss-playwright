@@ -29,14 +29,18 @@ from classes.subject_selection_criteria_key import SubjectSelectionCriteriaKey
 # === Example usage ===
 # Replace the examples below with your tests for the method you want to test
 
-# === Test: SUBJECT_HAS_KIT_NOTES — yes ===
-builder = MockSelectionBuilder(SubjectSelectionCriteriaKey.SUBJECT_HAS_KIT_NOTES, "yes")
-builder._add_criteria_subject_has_kit_notes()
-print("=== SUBJECT_HAS_KIT_NOTES — yes ===")
+# === Test: KIT_HAS_ANALYSER_RESULT_CODE — yes ===
+builder = MockSelectionBuilder(
+    SubjectSelectionCriteriaKey.KIT_HAS_ANALYSER_RESULT_CODE, "yes"
+)
+builder._add_criteria_kit_has_analyser_result_code()
+print("=== KIT_HAS_ANALYSER_RESULT_CODE — yes ===")
 print(builder.dump_sql(), end="\n\n")
 
-# === Test: SUBJECT_HAS_KIT_NOTES — no ===
-builder = MockSelectionBuilder(SubjectSelectionCriteriaKey.SUBJECT_HAS_KIT_NOTES, "no")
-builder._add_criteria_subject_has_kit_notes()
-print("=== SUBJECT_HAS_KIT_NOTES — no ===")
+# === Test: KIT_HAS_ANALYSER_RESULT_CODE — no ===
+builder = MockSelectionBuilder(
+    SubjectSelectionCriteriaKey.KIT_HAS_ANALYSER_RESULT_CODE, "no"
+)
+builder._add_criteria_kit_has_analyser_result_code()
+print("=== KIT_HAS_ANALYSER_RESULT_CODE — no ===")
 print(builder.dump_sql(), end="\n\n")

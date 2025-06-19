@@ -31,40 +31,37 @@ class MockSelectionBuilder:
     # Don't delete this method; it is used to inspect the SQL fragments
     def dump_sql(self):
         return "\n".join(self.sql_where)
+    
+    def _add_join_to_latest_episode(self) -> None:
+        """
+        Mock stub for adding latest episode join. No-op for test harness.
+        """
+        self.sql_from.append("-- JOIN to latest episode placeholder")
+
 
     # === Example testable method below ===
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_subject_has_kit_notes(self) -> None:
+    def _add_criteria_kit_has_analyser_result_code(self) -> None:
         """
-        Filters subjects based on presence of active kit-related notes.
-        Accepts values: 'yes' or 'no'.
+        Filters kits based on whether they have an analyser error code.
+        Requires prior join to tk_items_t as alias 'tk' (via WHICH_TEST_KIT).
+
+        Accepts values:
+            - "yes" → analyser_error_code IS NOT NULL
+            - "no"  → analyser_error_code IS NULL
         """
         try:
             value = self.criteria_value.strip().lower()
 
             if value == "yes":
-                prefix = "AND EXISTS"
+                self.sql_where.append("AND tk.analyser_error_code IS NOT NULL")
             elif value == "no":
-                prefix = "AND NOT EXISTS"
+                self.sql_where.append("AND tk.analyser_error_code IS NULL")
             else:
-                raise ValueError(f"Invalid value for kit notes: {value}")
-
-            self.sql_where.append(
-                f"""{prefix} (
-    SELECT 1
-    FROM supporting_notes_t sn
-    WHERE sn.screening_subject_id = ss.screening_subject_id
-        AND (
-        sn.type_id = '308015'
-        OR sn.promote_pio_id IS NOT NULL
-        )
-        AND sn.status_id = 4100
-    )
-    AND ss.number_of_invitations > 0
-    AND rownum = 1"""
-            )
+                raise ValueError(f"Invalid value for analyser result code presence: {value}")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+

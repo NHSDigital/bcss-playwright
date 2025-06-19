@@ -513,6 +513,9 @@ class SubjectSelectionQueryBuilder:
                             self._add_criteria_date_field(
                                 subject, "ALL_PATHWAYS", "SEVENTY_FIFTH_BIRTHDAY"
                             )
+                        # ------------------------------------------------------------------------
+                        # 🧬 CADS Clinical Dataset Filters
+                        # ------------------------------------------------------------------------
                         case SubjectSelectionCriteriaKey.CADS_ASA_GRADE:
                             self._add_criteria_cads_asa_grade()
                         case SubjectSelectionCriteriaKey.CADS_STAGING_SCANS:
@@ -1111,8 +1114,6 @@ class SubjectSelectionQueryBuilder:
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
-    # TODO: Add methods below for other criteria keys as needed
-
     def _add_criteria_has_diagnosis_date(self) -> None:
         """
         Adds a filter to check if the latest episode has a diagnosis_date set,
@@ -1361,6 +1362,293 @@ class SubjectSelectionQueryBuilder:
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_subject_has_lynch_diagnosis(self) -> None:
+        """
+        Adds a filter to check if a subject has an active Lynch diagnosis.
+        Accepts:
+            - "yes" → subject must have active diagnosis ('Y')
+            - "no"  → subject must not have active diagnosis ('N')
+        """
+        try:
+            value = self.criteria_value.strip().lower()
+
+            if value == "yes":
+                self.sql_where.append(
+                    "AND pkg_lynch.f_subject_has_active_lynch_diagnosis (ss.screening_subject_id) = 'Y'"
+                )
+            elif value == "no":
+                self.sql_where.append(
+                    "AND pkg_lynch.f_subject_has_active_lynch_diagnosis (ss.screening_subject_id) = 'N'"
+                )
+            else:
+                raise ValueError(f"Invalid value for Lynch diagnosis: {value}")
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_join_to_test_kits(self) -> None:
+        """
+        Adds joins to the tk_items_t table based on test kit selection criteria.
+        Handles whether any kit is considered, or a specific one from the latest episode.
+
+        Expected values (case-insensitive):
+            - "any_kit_in_any_episode"
+            - "only_kit_issued_in_latest_episode"
+            - "first_kit_issued_in_latest_episode"
+            - "latest_kit_issued_in_latest_episode"
+            - "only_kit_logged_in_latest_episode"
+            - "first_kit_logged_in_latest_episode"
+            - "latest_kit_logged_in_latest_episode"
+        """
+        try:
+            value = self.criteria_value.strip().lower()
+            tk_alias = "tk"  # You can extend this if you need multiple joins
+
+            # Base join for all paths (only FIT kits)
+            self.sql_from.append(
+                f"INNER JOIN tk_items_t {tk_alias} ON {tk_alias}.screening_subject_id = ss.screening_subject_id "
+                f"AND {tk_alias}.tk_type_id > 1"
+            )
+
+            if value == "any_kit_in_any_episode":
+                return
+
+            if "issued_in_latest_episode" in value:
+                self._add_join_to_latest_episode()
+                self.sql_from.append(
+                    f"AND {tk_alias}.subject_epis_id = ep.subject_epis_id "
+                    f"AND NOT EXISTS ("
+                    f" SELECT 'tko1' FROM tk_items_t tko "
+                    f" WHERE tko.screening_subject_id = ss.screening_subject_id "
+                    f" AND tko.subject_epis_id = ep.subject_epis_id "
+                )
+                if value.startswith("only"):
+                    comparator = "!="
+                elif value.startswith("first"):
+                    comparator = "<"
+                else:  # latest
+                    comparator = ">"
+                self.sql_from.append(f" AND tko.kitid {comparator} {tk_alias}.kitid)")
+
+            elif "logged_in_latest_episode" in value:
+                self._add_join_to_latest_episode()
+                self.sql_from.append(
+                    f"AND {tk_alias}.logged_subject_epis_id = ep.subject_epis_id "
+                    f"AND NOT EXISTS ("
+                    f" SELECT 'tko2' FROM tk_items_t tko "
+                    f" WHERE tko.screening_subject_id = ss.screening_subject_id "
+                    f" AND tko.logged_subject_epis_id = ep.subject_epis_id"
+                )
+                if value.startswith("only"):
+                    self.sql_from.append(f" AND tko.kitid != {tk_alias}.kitid")
+                elif value.startswith("first"):
+                    self.sql_from.append(
+                        f" AND tko.logged_in_on < {tk_alias}.logged_in_on"
+                    )
+                else:  # latest
+                    self.sql_from.append(
+                        f" AND tko.logged_in_on > {tk_alias}.logged_in_on"
+                    )
+                self.sql_from.append(")")
+
+            else:
+                raise ValueError(f"Invalid test kit selection value: {value}")
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_kit_has_been_read(self) -> None:
+        """
+        Filters test kits based on whether they have been read.
+        Requires prior join to tk_items_t as alias 'tk' (via WHICH_TEST_KIT).
+
+        Accepts values:
+            - "yes" → reading_flag = 'Y'
+            - "no"  → reading_flag = 'N'
+        """
+        try:
+            value = self.criteria_value.strip().lower()
+
+            if value == "yes":
+                self.sql_where.append("AND tk.reading_flag = 'Y'")
+            elif value == "no":
+                self.sql_where.append("AND tk.reading_flag = 'N'")
+            else:
+                raise ValueError(f"Invalid value for kit has been read: {value}")
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_kit_result(self) -> None:
+        """
+        Filters based on the result associated with the selected test kit.
+        Requires prior join to tk_items_t as alias 'tk' (via WHICH_TEST_KIT).
+        Uses comparator and uppercase value.
+        """
+        try:
+            comparator = self.criteria_comparator
+            value = self.criteria_value.strip().upper()
+            self.sql_where.append(f"AND tk.test_results {comparator} '{value}'")
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_kit_has_analyser_result_code(self) -> None:
+        """
+        Filters kits based on whether they have an analyser error code.
+        Requires prior join to tk_items_t as alias 'tk' (via WHICH_TEST_KIT).
+
+        Accepts values:
+            - "yes" → analyser_error_code IS NOT NULL
+            - "no"  → analyser_error_code IS NULL
+        """
+        try:
+            value = self.criteria_value.strip().lower()
+
+            if value == "yes":
+                self.sql_where.append("AND tk.analyser_error_code IS NOT NULL")
+            elif value == "no":
+                self.sql_where.append("AND tk.analyser_error_code IS NULL")
+            else:
+                raise ValueError(
+                    f"Invalid value for analyser result code presence: {value}"
+                )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    # ------------------------------------------------------------------------
+    # 🧬 CADS Clinical Dataset Filters
+    # ------------------------------------------------------------------------
+
+    def _add_criteria_cads_asa_grade(self) -> None:
+        self._add_join_to_latest_episode()
+        self._add_join_to_cancer_audit_dataset()
+        self.sql_where.append(
+            f"AND cads.asa_grade_id = ASAGradeType.by_description_case_insensitive(self.criteria_value).id"
+        )
+
+    def _add_criteria_cads_staging_scans(self) -> None:
+        self._add_join_to_latest_episode()
+        self._add_join_to_cancer_audit_dataset()
+        self._add_join_to_cancer_audit_dataset_staging_scan()
+        self.sql_where.append(
+            f"AND cads.staging_scans_done_id = YesNoType.by_description_case_insensitive(self.criteria_value).id"
+        )
+
+    def _add_criteria_cads_type_of_scan(self) -> None:
+        self._add_join_to_latest_episode()
+        self._add_join_to_cancer_audit_dataset()
+        self._add_join_to_cancer_audit_dataset_staging_scan()
+        self.sql_where.append(
+            f"AND dcss.type_of_scan_id = ScanType.by_description_case_insensitive(self.criteria_value).id"
+        )
+
+    def _add_criteria_cads_metastases_present(self) -> None:
+        self._add_join_to_latest_episode()
+        self._add_join_to_cancer_audit_dataset()
+        self.sql_where.append(
+            f"AND cads.metastases_found_id = MetastasesPresentType.by_description_case_insensitive(self.criteria_value).id"
+        )
+
+    def _add_criteria_cads_metastases_location(self) -> None:
+        self._add_join_to_latest_episode()
+        self._add_join_to_cancer_audit_dataset()
+        self._add_join_to_cancer_audit_dataset_metastasis()
+        self.sql_where.append(
+            f"AND dcm.location_of_metastasis_id = MetastasesLocationType.by_description_case_insensitive(self.criteria_value).id"
+        )
+
+    def _add_criteria_cads_metastases_other_location(self, other_location: str) -> None:
+        self._add_join_to_latest_episode()
+        self._add_join_to_cancer_audit_dataset()
+        self._add_join_to_cancer_audit_dataset_metastasis()
+        self.sql_where.append(
+            f"AND dcm.other_location_of_metastasis = '{other_location}'"
+        )
+
+    def _add_criteria_cads_final_pre_treatment_t_category(self) -> None:
+        self._add_join_to_latest_episode()
+        self._add_join_to_cancer_audit_dataset()
+        self.sql_where.append(
+            f"AND cads.final_pre_treat_t_category_id = FinalPretreatmentTCategoryType.by_description_case_insensitive(self.criteria_value).id"
+        )
+
+    def _add_criteria_cads_final_pre_treatment_n_category(self) -> None:
+        self._add_join_to_latest_episode()
+        self._add_join_to_cancer_audit_dataset()
+        self.sql_where.append(
+            f"AND cads.final_pre_treat_n_category_id = FinalPretreatmentNCategoryType.by_description_case_insensitive(self.criteria_value).id"
+        )
+
+    def _add_criteria_cads_final_pre_treatment_m_category(self) -> None:
+        self._add_join_to_latest_episode()
+        self._add_join_to_cancer_audit_dataset()
+        self.sql_where.append(
+            f"AND cads.final_pre_treat_m_category_id = FinalPretreatmentMCategoryType.by_description_case_insensitive(self.criteria_value).id"
+        )
+
+    def _add_criteria_cads_treatment_received(self) -> None:
+        self._add_join_to_latest_episode()
+        self._add_join_to_cancer_audit_dataset()
+        self.sql_where.append(
+            f"AND cads.treatment_received_id = YesNoType.by_description_case_insensitive(self.criteria_value).id"
+        )
+
+    def _add_criteria_cads_reason_no_treatment_received(self) -> None:
+        self._add_join_to_latest_episode()
+        self._add_join_to_cancer_audit_dataset()
+        self.sql_where.append(
+            f"AND cads.reason_no_treatment_id = ReasonNoTreatmentReceivedType.by_description_case_insensitive(self.criteria_value).id"
+        )
+
+    def _add_criteria_cads_tumour_location(self) -> None:
+        self._add_join_to_latest_episode()
+        self._add_join_to_cancer_audit_dataset()
+        self._add_join_to_cancer_audit_dataset_tumour()
+        self.sql_where.append(
+            f"AND dctu.location_id = LocationType.by_description_case_insensitive(self.criteria_value).id"
+        )
+
+    def _add_criteria_cads_tumour_height_of_tumour_above_anal_verge(self) -> None:
+        self._add_join_to_latest_episode()
+        self._add_join_to_cancer_audit_dataset()
+        self._add_join_to_cancer_audit_dataset_tumour()
+        self.sql_where.append(
+            f"AND dctu.height_above_anal_verge = {self.criteria_value}"
+        )
+
+    def _add_criteria_cads_tumour_previously_excised_tumour(self) -> None:
+        self._add_join_to_latest_episode()
+        self._add_join_to_cancer_audit_dataset()
+        self._add_join_to_cancer_audit_dataset_tumour()
+        self.sql_where.append(
+            f"AND dctu.recurrence_id = PreviouslyExcisedTumourType.by_description_case_insensitive(self.criteria_value).id"
+        )
+
+    def _add_criteria_cads_treatment_type(self) -> None:
+        self._add_join_to_latest_episode()
+        self._add_join_to_cancer_audit_dataset()
+        self._add_join_to_cancer_audit_dataset_treatment()
+        self.sql_where.append(
+            f"AND dctr.treatment_category_id = TreatmentType.by_description_case_insensitive(self.criteria_value).id"
+        )
+
+    def _add_criteria_cads_treatment_given(self) -> None:
+        self._add_join_to_latest_episode()
+        self._add_join_to_cancer_audit_dataset()
+        self._add_join_to_cancer_audit_dataset_treatment()
+        self.sql_where.append(
+            f"AND dctr.treatment_procedure_id = TreatmentGiven.by_description_case_insensitive(self.criteria_value).id"
+        )
+
+    def _add_criteria_cads_cancer_treatment_intent(self) -> None:
+        self._add_join_to_latest_episode()
+        self._add_join_to_cancer_audit_dataset()
+        self._add_join_to_cancer_audit_dataset_treatment()
+        self.sql_where.append(
+            f"AND dctr.treatment_intent_id = CancerTreatmentIntent.by_description_case_insensitive(self.criteria_value).id"
+        )
 
     def _add_criteria_subject_hub_code(self, user: "User") -> None:
         hub_code = None
