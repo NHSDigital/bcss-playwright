@@ -41,11 +41,18 @@ def make_builder(key, value, index=0, comparator="="):
     return b
 
 
-# === Test: LATEST_EPISODE_ACCUMULATED_RESULT (any_surveillance_non_participation) ===
+# === Test: SYMPTOMATIC_PROCEDURE_RESULT (cancer detected) ===
 b = make_builder(
-    SubjectSelectionCriteriaKey.LATEST_EPISODE_ACCUMULATED_RESULT,
-    "any_surveillance_non_participation",
+    SubjectSelectionCriteriaKey.SYMPTOMATIC_PROCEDURE_RESULT,
+    "cancer detected",
+    comparator="=",
 )
-b._add_criteria_latest_episode_accumulated_episode_result()
-print("=== LATEST_EPISODE_ACCUMULATED_RESULT (any_surveillance_non_participation) ===")
+b._add_criteria_symptomatic_procedure_result()
+print("=== SYMPTOMATIC_PROCEDURE_RESULT (cancer detected) ===")
+print(b.dump_sql(), end="\n\n")
+
+# === Test: SYMPTOMATIC_PROCEDURE_RESULT (null) ===
+b = make_builder(SubjectSelectionCriteriaKey.SYMPTOMATIC_PROCEDURE_RESULT, "null")
+b._add_criteria_symptomatic_procedure_result()
+print("=== SYMPTOMATIC_PROCEDURE_RESULT (null) ===")
 print(b.dump_sql(), end="\n\n")

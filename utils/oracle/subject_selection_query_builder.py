@@ -47,6 +47,7 @@ from classes.surveillance_review_case_type import SurveillanceReviewCaseType
 from classes.has_date_of_death_removal import HasDateOfDeathRemoval
 from classes.invited_since_age_extension import InvitedSinceAgeExtension
 from classes.episode_result_type import EpisodeResultType
+from classes.symptomatic_procedure_result_type import SymptomaticProcedureResultType
 
 
 class SubjectSelectionQueryBuilder:
@@ -496,7 +497,7 @@ class SubjectSelectionQueryBuilder:
                         ):
                             self._add_criteria_latest_episode_accumulated_episode_result()
                         case SubjectSelectionCriteriaKey.SYMPTOMATIC_PROCEDURE_RESULT:
-                            self._add_criteria_symmetric_procedure_result()
+                            self._add_criteria_symptomatic_procedure_result()
                         case SubjectSelectionCriteriaKey.SYMPTOMATIC_PROCEDURE_DATE:
                             self._add_criteria_date_field(
                                 subject, "ALL_PATHWAYS", "SYMPTOMATIC_PROCEDURE_DATE"
@@ -2121,6 +2122,25 @@ class SubjectSelectionQueryBuilder:
                 )
             else:
                 self.sql_where.append(f"AND ep.episode_result_id = {value}")
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_symptomatic_procedure_result(self) -> None:
+        """
+        Filters based on symptomatic surgery result value or presence.
+        """
+        try:
+            column = "xt.surgery_result_id"
+            value = self.criteria_value.strip().lower()
+
+            if value == "null":
+                self.sql_where.append(f"AND {column} IS NULL")
+            else:
+                result_id = SymptomaticProcedureResultType.get_id(self.criteria_value)
+                self.sql_where.append(
+                    f"AND {column} {self.criteria_comparator} {result_id}"
+                )
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

@@ -8,31 +8,24 @@ from classes.subject_selection_criteria_key import SubjectSelectionCriteriaKey
 
 
 # Add helper class stubs below
-class EpisodeResultType:
+class SymptomaticProcedureResultType:
     """
-    Represents various episode result types including special symbolic values.
+    Maps symptom-driven surgery result descriptions to valid value IDs.
     """
-
-    NULL = "null"
-    NOT_NULL = "not_null"
-    ANY_SURVEILLANCE_NON_PARTICIPATION = "any_surveillance_non_participation"
 
     _label_to_id = {
-        # Add actual mappings here, for example:
-        "normal": 9501,
-        "abnormal": 9502,
-        "surveillance offered": 9503,
-        # etc.
+        "normal": 9601,
+        "inconclusive": 9602,
+        "cancer detected": 9603,
+        # Extend as needed
     }
 
     @classmethod
-    def from_description(cls, description: str):
+    def get_id(cls, description: str) -> int:
         key = description.strip().lower()
-        if key in {cls.NULL, cls.NOT_NULL, cls.ANY_SURVEILLANCE_NON_PARTICIPATION}:
-            return key
-        if key in cls._label_to_id:
-            return cls._label_to_id[key]
-        raise ValueError(f"Unknown episode result type: '{description}'")
+        if key not in cls._label_to_id:
+            raise ValueError(f"Unknown symptomatic procedure result: '{description}'")
+        return cls._label_to_id[key]
 
 
 class MockSelectionBuilder:
@@ -101,27 +94,21 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_latest_episode_accumulated_episode_result(self) -> None:
+    def _add_criteria_symptomatic_procedure_result(self) -> None:
         """
-        Filters subjects based on the result of their latest episode.
+        Filters based on symptomatic surgery result value or presence.
         """
         try:
-            self._add_join_to_latest_episode()
-            value = EpisodeResultType.from_description(self.criteria_value)
+            column = "xt.surgery_result_id"
+            value = self.criteria_value.strip().lower()
 
-            if value == EpisodeResultType.NULL:
-                self.sql_where.append("AND ep.episode_result_id IS NULL")
-            elif value == EpisodeResultType.NOT_NULL:
-                self.sql_where.append("AND ep.episode_result_id IS NOT NULL")
-            elif value == EpisodeResultType.ANY_SURVEILLANCE_NON_PARTICIPATION:
-                self.sql_where.append(
-                    "AND ep.episode_result_id IN ("
-                    "SELECT snp.valid_value_id FROM valid_values snp "
-                    "WHERE snp.domain = 'OTHER_EPISODE_RESULT' "
-                    "AND LOWER(snp.description) LIKE '%surveillance non-participation')"
-                )
+            if value == "null":
+                self.sql_where.append(f"AND {column} IS NULL")
             else:
-                self.sql_where.append(f"AND ep.episode_result_id = {value}")
+                result_id = SymptomaticProcedureResultType.get_id(self.criteria_value)
+                self.sql_where.append(
+                    f"AND {column} {self.criteria_comparator} {result_id}"
+                )
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
