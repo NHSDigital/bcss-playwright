@@ -7,27 +7,27 @@ from classes.selection_builder_exception import SelectionBuilderException
 
 
 # Add helper class stubs below
-class DiagnosticTestHasOutcomeOfResult:
+class IntendedExtentType:
     """
-    Maps outcome-of-result criteria values to either flags or valid value IDs.
+    Resolves intended extent descriptions to valid value IDs or null-check constants.
     """
 
-    YES = "yes"
-    NO = "no"
+    NULL = "null"
+    NOT_NULL = "not null"
 
     _mapping = {
-        "yes": YES,
-        "no": NO,
-        "referred": 9101,
-        "treated": 9102,
-        "not required": 9103,
+        "null": NULL,
+        "not null": NOT_NULL,
+        "full": 9201,
+        "partial": 9202,
+        "none": 9203,
     }
 
     @classmethod
     def from_description(cls, description: str):
         key = description.strip().lower()
         if key not in cls._mapping:
-            raise ValueError(f"Unknown outcome description: '{description}'")
+            raise ValueError(f"Unknown intended extent: '{description}'")
         return cls._mapping[key]
 
     @classmethod
@@ -35,7 +35,15 @@ class DiagnosticTestHasOutcomeOfResult:
         val = cls.from_description(description)
         if isinstance(val, int):
             return val
-        raise ValueError(f"No ID associated with outcome: '{description}'")
+        raise ValueError(f"No ID associated with extent: '{description}'")
+
+    @classmethod
+    def get_description(cls, sentinel: str) -> str:
+        if sentinel == cls.NULL:
+            return "NULL"
+        if sentinel == cls.NOT_NULL:
+            return "NOT NULL"
+        raise ValueError(f"Unknown null sentinel: {sentinel}")
 
 
 class MockSelectionBuilder:
@@ -85,25 +93,22 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_diagnostic_test_has_outcome_of_result(self) -> None:
+    def _add_criteria_diagnostic_test_intended_extent(self) -> None:
         """
-        Adds WHERE clause filtering on whether the diagnostic test has an outcome-of-result.
+        Adds WHERE clause filtering diagnostic tests by intended_extent_id.
+        Supports null checks and value comparisons.
         """
         try:
             idx = getattr(self, "criteria_index", 0)
             xt = f"xt{idx}"
-            value = self.criteria_value.strip().lower()
-            outcome = DiagnosticTestHasOutcomeOfResult.from_description(value)
+            extent = IntendedExtentType.from_description(self.criteria_value)
 
-            self.sql_where.append(f"AND {xt}.outcome_of_result_id ")
+            self.sql_where.append(f"AND {xt}.intended_extent_id ")
 
-            if outcome == DiagnosticTestHasOutcomeOfResult.YES:
-                self.sql_where.append("IS NOT NULL")
-            elif outcome == DiagnosticTestHasOutcomeOfResult.NO:
-                self.sql_where.append("IS NULL")
+            if extent in (IntendedExtentType.NULL, IntendedExtentType.NOT_NULL):
+                self.sql_where.append(f"IS {IntendedExtentType.get_description(extent)}")
             else:
-                outcome_id = DiagnosticTestHasOutcomeOfResult.get_id(value)
-                self.sql_where.append(f"= {outcome_id}")
+                self.sql_where.append(f"{self.criteria_comparator} {IntendedExtentType.get_id(self.criteria_value)}")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

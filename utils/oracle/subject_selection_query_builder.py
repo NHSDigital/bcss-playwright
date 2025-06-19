@@ -34,6 +34,7 @@ from classes.diagnostic_test_has_result import DiagnosticTestHasResult
 from classes.diagnostic_test_has_outcome_of_result import (
     DiagnosticTestHasOutcomeOfResult,
 )
+from classes.intended_extent_type import IntendedExtentType
 
 
 class SubjectSelectionQueryBuilder:
@@ -1793,6 +1794,30 @@ class SubjectSelectionQueryBuilder:
             else:
                 outcome_id = DiagnosticTestHasOutcomeOfResult.get_id(value)
                 self.sql_where.append(f"= {outcome_id}")
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_diagnostic_test_intended_extent(self) -> None:
+        """
+        Adds WHERE clause filtering diagnostic tests by intended_extent_id.
+        Supports null checks and value comparisons.
+        """
+        try:
+            idx = getattr(self, "criteria_index", 0)
+            xt = f"xt{idx}"
+            extent = IntendedExtentType.from_description(self.criteria_value)
+
+            self.sql_where.append(f"AND {xt}.intended_extent_id ")
+
+            if extent in (IntendedExtentType.NULL, IntendedExtentType.NOT_NULL):
+                self.sql_where.append(
+                    f"IS {IntendedExtentType.get_description(extent)}"
+                )
+            else:
+                self.sql_where.append(
+                    f"{self.criteria_comparator} {IntendedExtentType.get_id(self.criteria_value)}"
+                )
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

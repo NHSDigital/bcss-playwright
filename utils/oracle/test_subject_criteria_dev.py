@@ -37,22 +37,24 @@ def make_builder(key, value, index=0):
     return b
 
 
-# === Test: DIAGNOSTIC_TEST_HAS_OUTCOME (yes) ===
-b = make_builder(SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_HAS_OUTCOME, "yes")
-b._add_criteria_diagnostic_test_has_outcome_of_result()
-print("=== DIAGNOSTIC_TEST_HAS_OUTCOME (yes) ===")
+# === Test: DIAGNOSTIC_TEST_INTENDED_EXTENT (null) ===
+b = make_builder(SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_INTENDED_EXTENT, "null")
+b._add_criteria_diagnostic_test_intended_extent()
+print("=== DIAGNOSTIC_TEST_INTENDED_EXTENT (null) ===")
 print(b.dump_sql(), end="\n\n")
 
-# === Test: DIAGNOSTIC_TEST_HAS_OUTCOME (no) ===
-b = make_builder(SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_HAS_OUTCOME, "no", index=1)
-b._add_criteria_diagnostic_test_has_outcome_of_result()
-print("=== DIAGNOSTIC_TEST_HAS_OUTCOME (no) ===")
-print(b.dump_sql(), end="\n\n")
-
-# === Test: DIAGNOSTIC_TEST_HAS_OUTCOME (treated) ===
+# === Test: DIAGNOSTIC_TEST_INTENDED_EXTENT (not null) ===
 b = make_builder(
-    SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_HAS_OUTCOME, "treated", index=2
+    SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_INTENDED_EXTENT, "not null", index=1
 )
-b._add_criteria_diagnostic_test_has_outcome_of_result()
-print("=== DIAGNOSTIC_TEST_HAS_OUTCOME (treated) ===")
+b._add_criteria_diagnostic_test_intended_extent()
+print("=== DIAGNOSTIC_TEST_INTENDED_EXTENT (not null) ===")
+print(b.dump_sql(), end="\n\n")
+
+# === Test: DIAGNOSTIC_TEST_INTENDED_EXTENT (partial) ===
+b = make_builder(
+    SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_INTENDED_EXTENT, "partial", index=2
+)
+b._add_criteria_diagnostic_test_intended_extent()
+print("=== DIAGNOSTIC_TEST_INTENDED_EXTENT (partial) ===")
 print(b.dump_sql(), end="\n\n")
