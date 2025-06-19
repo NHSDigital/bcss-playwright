@@ -41,18 +41,12 @@ def make_builder(key, value, index=0, comparator="="):
     return b
 
 
-# === Test: HAS_EXISTING_SURVEILLANCE_REVIEW_CASE (yes) ===
+# === Test: SURVEILLANCE_REVIEW_CASE_TYPE (escalation) ===
 b = make_builder(
-    SubjectSelectionCriteriaKey.HAS_EXISTING_SURVEILLANCE_REVIEW_CASE, "yes"
+    SubjectSelectionCriteriaKey.SURVEILLANCE_REVIEW_CASE_TYPE,
+    "escalation",
+    comparator="=",
 )
-b._add_criteria_does_subject_have_surveillance_review_case()
-print("=== HAS_EXISTING_SURVEILLANCE_REVIEW_CASE (yes) ===")
-print(b.dump_sql(), end="\n\n")
-
-# === Test: HAS_EXISTING_SURVEILLANCE_REVIEW_CASE (no) ===
-b = make_builder(
-    SubjectSelectionCriteriaKey.HAS_EXISTING_SURVEILLANCE_REVIEW_CASE, "no", index=1
-)
-b._add_criteria_does_subject_have_surveillance_review_case()
-print("=== HAS_EXISTING_SURVEILLANCE_REVIEW_CASE (no) ===")
+b._add_criteria_surveillance_review_type()
+print("=== SURVEILLANCE_REVIEW_CASE_TYPE (escalation) ===")
 print(b.dump_sql(), end="\n\n")

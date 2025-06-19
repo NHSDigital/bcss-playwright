@@ -9,23 +9,24 @@ from classes.intended_extent_type import IntendedExtentType
 
 
 # Add helper class stubs below
-class DoesSubjectHaveSurveillanceReviewCase:
-    YES = "yes"
-    NO = "no"
+class SurveillanceReviewCaseType:
+    """
+    Maps surveillance review case type labels to valid value IDs.
+    """
 
-    _mapping = {
-        "yes": YES,
-        "no": NO,
+    _label_to_id = {
+        "routine": 9401,
+        "escalation": 9402,
+        "clinical discussion": 9403,
+        # Extend as needed
     }
 
     @classmethod
-    def from_description(cls, description: str) -> str:
+    def get_id(cls, description: str) -> int:
         key = description.strip().lower()
-        if key not in cls._mapping:
-            raise ValueError(
-                f"Unknown surveillance review case presence: '{description}'"
-            )
-        return cls._mapping[key]
+        if key not in cls._label_to_id:
+            raise ValueError(f"Unknown surveillance review case type: '{description}'")
+        return cls._label_to_id[key]
 
 
 class MockSelectionBuilder:
@@ -94,18 +95,16 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_does_subject_have_surveillance_review_case(self) -> None:
+    def _add_criteria_surveillance_review_type(self) -> None:
         """
-        Filters subjects based on presence or absence of a surveillance review case.
+        Filters subjects based on review_case_type_id in the surveillance review dataset.
         """
         try:
-            value = DoesSubjectHaveSurveillanceReviewCase.from_description(self.criteria_value)
-
-            clause = "AND EXISTS" if value == "yes" else "AND NOT EXISTS"
+            self._add_join_to_surveillance_review()
+            type_id = SurveillanceReviewCaseType.get_id(self.criteria_value)
 
             self.sql_where.append(
-                f"{clause} (SELECT 'sr' FROM surveillance_review sr "
-                "WHERE sr.subject_id = ss.screening_subject_id)"
+                f"AND sr.review_case_type_id {self.criteria_comparator} {type_id}"
             )
 
         except Exception:
