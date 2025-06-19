@@ -44,6 +44,7 @@ from classes.does_subject_have_surveillance_review_case import (
     DoesSubjectHaveSurveillanceReviewCase,
 )
 from classes.surveillance_review_case_type import SurveillanceReviewCaseType
+from classes.has_date_of_death_removal import HasDateOfDeathRemoval
 
 
 class SubjectSelectionQueryBuilder:
@@ -2039,6 +2040,23 @@ class SubjectSelectionQueryBuilder:
 
             self.sql_where.append(
                 f"AND sr.review_case_type_id {self.criteria_comparator} {type_id}"
+            )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_has_date_of_death_removal(self) -> None:
+        """
+        Filters subjects based on presence or absence of a date-of-death removal record.
+        """
+        try:
+            value = HasDateOfDeathRemoval.from_description(self.criteria_value)
+            clause = "EXISTS" if value == "yes" else "NOT EXISTS"
+
+            self.sql_where.append(
+                f"AND {clause} (SELECT 'dodr' FROM report_additional_data_t dodr "
+                "WHERE dodr.rad_type_id = 15901 "
+                "AND dodr.entity_id = c.contact_id)"
             )
 
         except Exception:

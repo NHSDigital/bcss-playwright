@@ -41,12 +41,14 @@ def make_builder(key, value, index=0, comparator="="):
     return b
 
 
-# === Test: SURVEILLANCE_REVIEW_CASE_TYPE (escalation) ===
-b = make_builder(
-    SubjectSelectionCriteriaKey.SURVEILLANCE_REVIEW_CASE_TYPE,
-    "escalation",
-    comparator="=",
-)
-b._add_criteria_surveillance_review_type()
-print("=== SURVEILLANCE_REVIEW_CASE_TYPE (escalation) ===")
+# === Test: HAS_HAD_A_DATE_OF_DEATH_REMOVAL (yes) ===
+b = make_builder(SubjectSelectionCriteriaKey.HAS_HAD_A_DATE_OF_DEATH_REMOVAL, "yes")
+b._add_criteria_has_date_of_death_removal()
+print("=== HAS_HAD_A_DATE_OF_DEATH_REMOVAL (yes) ===")
+print(b.dump_sql(), end="\n\n")
+
+# === Test: HAS_HAD_A_DATE_OF_DEATH_REMOVAL (no) ===
+b = make_builder(SubjectSelectionCriteriaKey.HAS_HAD_A_DATE_OF_DEATH_REMOVAL, "no")
+b._add_criteria_has_date_of_death_removal()
+print("=== HAS_HAD_A_DATE_OF_DEATH_REMOVAL (no) ===")
 print(b.dump_sql(), end="\n\n")

@@ -9,24 +9,23 @@ from classes.intended_extent_type import IntendedExtentType
 
 
 # Add helper class stubs below
-class SurveillanceReviewCaseType:
-    """
-    Maps surveillance review case type labels to valid value IDs.
-    """
+class HasDateOfDeathRemoval:
+    YES = "yes"
+    NO = "no"
 
-    _label_to_id = {
-        "routine": 9401,
-        "escalation": 9402,
-        "clinical discussion": 9403,
-        # Extend as needed
+    _mapping = {
+        "yes": YES,
+        "no": NO,
     }
 
     @classmethod
-    def get_id(cls, description: str) -> int:
+    def from_description(cls, description: str) -> str:
         key = description.strip().lower()
-        if key not in cls._label_to_id:
-            raise ValueError(f"Unknown surveillance review case type: '{description}'")
-        return cls._label_to_id[key]
+        if key not in cls._mapping:
+            raise ValueError(
+                f"Unknown input for HasDateOfDeathRemoval: '{description}'"
+            )
+        return cls._mapping[key]
 
 
 class MockSelectionBuilder:
@@ -95,16 +94,18 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_surveillance_review_type(self) -> None:
+    def _add_criteria_has_date_of_death_removal(self) -> None:
         """
-        Filters subjects based on review_case_type_id in the surveillance review dataset.
+        Filters subjects based on presence or absence of a date-of-death removal record.
         """
         try:
-            self._add_join_to_surveillance_review()
-            type_id = SurveillanceReviewCaseType.get_id(self.criteria_value)
+            value = HasDateOfDeathRemoval.from_description(self.criteria_value)
+            clause = "EXISTS" if value == "yes" else "NOT EXISTS"
 
             self.sql_where.append(
-                f"AND sr.review_case_type_id {self.criteria_comparator} {type_id}"
+                f"AND {clause} (SELECT 'dodr' FROM report_additional_data_t dodr "
+                "WHERE dodr.rad_type_id = 15901 "
+                "AND dodr.entity_id = c.contact_id)"
             )
 
         except Exception:
