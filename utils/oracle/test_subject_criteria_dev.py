@@ -41,14 +41,14 @@ def make_builder(key, value, index=0, comparator="="):
     return b
 
 
-# === Test: HAS_HAD_A_DATE_OF_DEATH_REMOVAL (yes) ===
-b = make_builder(SubjectSelectionCriteriaKey.HAS_HAD_A_DATE_OF_DEATH_REMOVAL, "yes")
-b._add_criteria_has_date_of_death_removal()
-print("=== HAS_HAD_A_DATE_OF_DEATH_REMOVAL (yes) ===")
+# === Test: INVITED_SINCE_AGE_EXTENSION (yes) ===
+b = make_builder(SubjectSelectionCriteriaKey.INVITED_SINCE_AGE_EXTENSION, "yes")
+b._add_criteria_invited_since_age_extension()
+print("=== INVITED_SINCE_AGE_EXTENSION (yes) ===")
 print(b.dump_sql(), end="\n\n")
 
-# === Test: HAS_HAD_A_DATE_OF_DEATH_REMOVAL (no) ===
-b = make_builder(SubjectSelectionCriteriaKey.HAS_HAD_A_DATE_OF_DEATH_REMOVAL, "no")
-b._add_criteria_has_date_of_death_removal()
-print("=== HAS_HAD_A_DATE_OF_DEATH_REMOVAL (no) ===")
+# === Test: INVITED_SINCE_AGE_EXTENSION (no) ===
+b = make_builder(SubjectSelectionCriteriaKey.INVITED_SINCE_AGE_EXTENSION, "no")
+b._add_criteria_invited_since_age_extension()
+print("=== INVITED_SINCE_AGE_EXTENSION (no) ===")
 print(b.dump_sql(), end="\n\n")

@@ -45,6 +45,7 @@ from classes.does_subject_have_surveillance_review_case import (
 )
 from classes.surveillance_review_case_type import SurveillanceReviewCaseType
 from classes.has_date_of_death_removal import HasDateOfDeathRemoval
+from classes.invited_since_age_extension import InvitedSinceAgeExtension
 
 
 class SubjectSelectionQueryBuilder:
@@ -2059,6 +2060,25 @@ class SubjectSelectionQueryBuilder:
                 "AND dodr.entity_id = c.contact_id)"
             )
 
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_invited_since_age_extension(self) -> None:
+        """
+        Filters subjects based on whether they were invited since age extension began.
+        """
+        try:
+            self._add_join_to_latest_episode()
+            value = InvitedSinceAgeExtension.from_description(self.criteria_value)
+            clause = "EXISTS" if value == "yes" else "NOT EXISTS"
+
+            self.sql_where.append(
+                f"AND {clause} (SELECT 'sagex' FROM screening_subject_attribute_t sagex "
+                "INNER JOIN valid_values vvagex ON vvagex.valid_value_id = sagex.attribute_id "
+                "AND vvagex.domain = 'FOBT_AGEX_LOWER_AGE' "
+                "WHERE sagex.screening_subject_id = ep.screening_subject_id "
+                "AND sagex.start_date < ep.episode_start_date)"
+            )
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 

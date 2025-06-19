@@ -9,23 +9,24 @@ from classes.intended_extent_type import IntendedExtentType
 
 
 # Add helper class stubs below
-class HasDateOfDeathRemoval:
+class InvitedSinceAgeExtension:
+    """
+    Maps input describing whether subject was invited since age extension.
+    """
+
     YES = "yes"
     NO = "no"
 
-    _mapping = {
-        "yes": YES,
-        "no": NO,
-    }
+    _valid_values = {YES, NO}
 
     @classmethod
     def from_description(cls, description: str) -> str:
         key = description.strip().lower()
-        if key not in cls._mapping:
+        if key not in cls._valid_values:
             raise ValueError(
-                f"Unknown input for HasDateOfDeathRemoval: '{description}'"
+                f"Unknown invited-since-age-extension flag: '{description}'"
             )
-        return cls._mapping[key]
+        return key
 
 
 class MockSelectionBuilder:
@@ -94,19 +95,22 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_has_date_of_death_removal(self) -> None:
+    def _add_criteria_invited_since_age_extension(self) -> None:
         """
-        Filters subjects based on presence or absence of a date-of-death removal record.
+        Filters subjects based on whether they were invited since age extension began.
         """
         try:
-            value = HasDateOfDeathRemoval.from_description(self.criteria_value)
+            self._add_join_to_latest_episode()
+            value = InvitedSinceAgeExtension.from_description(self.criteria_value)
             clause = "EXISTS" if value == "yes" else "NOT EXISTS"
 
             self.sql_where.append(
-                f"AND {clause} (SELECT 'dodr' FROM report_additional_data_t dodr "
-                "WHERE dodr.rad_type_id = 15901 "
-                "AND dodr.entity_id = c.contact_id)"
+                f"AND {clause} (SELECT 'sagex' FROM screening_subject_attribute_t sagex "
+                "INNER JOIN valid_values vvagex ON vvagex.valid_value_id = sagex.attribute_id "
+                "AND vvagex.domain = 'FOBT_AGEX_LOWER_AGE' "
+                "WHERE sagex.screening_subject_id = ep.screening_subject_id "
+                "AND sagex.start_date < ep.episode_start_date)"
             )
-
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
