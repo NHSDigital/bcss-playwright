@@ -1,6 +1,7 @@
 from typing import Dict, Union, Tuple, Optional
 import logging
 from datetime import datetime, date
+from utils.notify_criteria_parser import parse_notify_criteria
 from classes.bowel_scope_dd_reason_for_change_type import (
     BowelScopeDDReasonForChangeType,
 )
@@ -54,6 +55,7 @@ from classes.lynch_incident_episode_type import (
     LynchIncidentEpisodeType,
 )
 from classes.prevalent_incident_status_type import PrevalentIncidentStatusType
+from classes.notify_event_status import NotifyEventStatus
 
 
 class SubjectSelectionQueryBuilder:
@@ -2243,6 +2245,41 @@ class SubjectSelectionQueryBuilder:
                 self.sql_where.append(f"AND {column} IS NULL")
             elif value == PrevalentIncidentStatusType.INCIDENT:
                 self.sql_where.append(f"AND {column} IS NOT NULL")
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_notify_queued_message_status(self) -> None:
+        """
+        Filters subjects based on Notify queued message status, e.g. 'S1 (S1w) - new'.
+        """
+        try:
+            parts = parse_notify_criteria(self.criteria_value)
+            status = parts["status"]
+
+            if status == "none":
+                clause = "NOT EXISTS"
+            else:
+                clause = "EXISTS"
+
+            self.sql_where.append(f"AND {clause} (")
+            self.sql_where.append(
+                "SELECT 1 FROM notify_message_queue nmq "
+                "INNER JOIN notify_message_definition nmd ON nmd.message_definition_id = nmq.message_definition_id "
+                "WHERE nmq.nhs_number = c.nhs_number "
+            )
+
+            # Simulate getNotifyMessageEventStatusIdFromCriteria()
+            event_status_id = NotifyEventStatus.get_id(parts["type"])
+            self.sql_where.append(f"AND nmd.event_status_id = {event_status_id} ")
+
+            if status != "none":
+                self.sql_where.append(f"AND nmq.message_status = '{status}' ")
+
+            if "code" in parts and parts["code"]:
+                self.sql_where.append(f"AND nmd.message_code = '{parts['code']}' ")
+
+            self.sql_where.append(")")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

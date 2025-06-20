@@ -41,8 +41,7 @@ def make_builder(key, value, index=0, comparator="="):
     return b
 
 
-# === Test: FOBT_PREVALENT_INCIDENT_STATUS (incident) ===
-b = make_builder(SubjectSelectionCriteriaKey.FOBT_PREVALENT_INCIDENT_STATUS, "incident")
-b._add_criteria_fobt_prevalent_incident_status()
-print("=== FOBT_PREVALENT_INCIDENT_STATUS (incident) ===")
-print(b.dump_sql(), end="\n\n")
+# === Test: Notify message (S1 - new) ===
+b = make_builder(SubjectSelectionCriteriaKey.NOTIFY_QUEUED_MESSAGE_STATUS, "S1 - new")
+b._add_criteria_notify_queued_message_status()
+print(b.dump_sql())
