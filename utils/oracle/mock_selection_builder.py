@@ -8,15 +8,15 @@ from classes.subject_selection_criteria_key import SubjectSelectionCriteriaKey
 
 
 # Add helper class stubs below
-class SymptomaticProcedureResultType:
+class ScreeningReferralType:
     """
-    Maps symptom-driven surgery result descriptions to valid value IDs.
+    Maps screening referral descriptions to valid value IDs.
     """
 
     _label_to_id = {
-        "normal": 9601,
-        "inconclusive": 9602,
-        "cancer detected": 9603,
+        "gp": 9701,
+        "self referral": 9702,
+        "hospital": 9703,
         # Extend as needed
     }
 
@@ -24,7 +24,7 @@ class SymptomaticProcedureResultType:
     def get_id(cls, description: str) -> int:
         key = description.strip().lower()
         if key not in cls._label_to_id:
-            raise ValueError(f"Unknown symptomatic procedure result: '{description}'")
+            raise ValueError(f"Unknown screening referral type: '{description}'")
         return cls._label_to_id[key]
 
 
@@ -94,21 +94,19 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_symptomatic_procedure_result(self) -> None:
+    def _add_criteria_screening_referral_type(self) -> None:
         """
-        Filters based on symptomatic surgery result value or presence.
+        Filters based on screening referral type ID or null presence.
         """
         try:
-            column = "xt.surgery_result_id"
+            column = "xt.screening_referral_type_id"
             value = self.criteria_value.strip().lower()
 
             if value == "null":
                 self.sql_where.append(f"AND {column} IS NULL")
             else:
-                result_id = SymptomaticProcedureResultType.get_id(self.criteria_value)
-                self.sql_where.append(
-                    f"AND {column} {self.criteria_comparator} {result_id}"
-                )
+                type_id = ScreeningReferralType.get_id(self.criteria_value)
+                self.sql_where.append(f"AND {column} {self.criteria_comparator} {type_id}")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

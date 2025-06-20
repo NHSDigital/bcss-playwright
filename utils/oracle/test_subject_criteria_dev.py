@@ -41,18 +41,16 @@ def make_builder(key, value, index=0, comparator="="):
     return b
 
 
-# === Test: SYMPTOMATIC_PROCEDURE_RESULT (cancer detected) ===
+# === Test: SCREENING_REFERRAL_TYPE (self referral) ===
 b = make_builder(
-    SubjectSelectionCriteriaKey.SYMPTOMATIC_PROCEDURE_RESULT,
-    "cancer detected",
-    comparator="=",
+    SubjectSelectionCriteriaKey.SCREENING_REFERRAL_TYPE, "self referral", comparator="="
 )
-b._add_criteria_symptomatic_procedure_result()
-print("=== SYMPTOMATIC_PROCEDURE_RESULT (cancer detected) ===")
+b._add_criteria_screening_referral_type()
+print("=== SCREENING_REFERRAL_TYPE (self referral) ===")
 print(b.dump_sql(), end="\n\n")
 
-# === Test: SYMPTOMATIC_PROCEDURE_RESULT (null) ===
-b = make_builder(SubjectSelectionCriteriaKey.SYMPTOMATIC_PROCEDURE_RESULT, "null")
-b._add_criteria_symptomatic_procedure_result()
-print("=== SYMPTOMATIC_PROCEDURE_RESULT (null) ===")
+# === Test: SCREENING_REFERRAL_TYPE (null) ===
+b = make_builder(SubjectSelectionCriteriaKey.SCREENING_REFERRAL_TYPE, "null")
+b._add_criteria_screening_referral_type()
+print("=== SCREENING_REFERRAL_TYPE (null) ===")
 print(b.dump_sql(), end="\n\n")

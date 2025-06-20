@@ -48,6 +48,7 @@ from classes.has_date_of_death_removal import HasDateOfDeathRemoval
 from classes.invited_since_age_extension import InvitedSinceAgeExtension
 from classes.episode_result_type import EpisodeResultType
 from classes.symptomatic_procedure_result_type import SymptomaticProcedureResultType
+from classes.screening_referral_type import ScreeningReferralType
 
 
 class SubjectSelectionQueryBuilder:
@@ -2140,6 +2141,25 @@ class SubjectSelectionQueryBuilder:
                 result_id = SymptomaticProcedureResultType.get_id(self.criteria_value)
                 self.sql_where.append(
                     f"AND {column} {self.criteria_comparator} {result_id}"
+                )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_screening_referral_type(self) -> None:
+        """
+        Filters based on screening referral type ID or null presence.
+        """
+        try:
+            column = "xt.screening_referral_type_id"
+            value = self.criteria_value.strip().lower()
+
+            if value == "null":
+                self.sql_where.append(f"AND {column} IS NULL")
+            else:
+                type_id = ScreeningReferralType.get_id(self.criteria_value)
+                self.sql_where.append(
+                    f"AND {column} {self.criteria_comparator} {type_id}"
                 )
 
         except Exception:
