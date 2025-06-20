@@ -49,6 +49,10 @@ from classes.invited_since_age_extension import InvitedSinceAgeExtension
 from classes.episode_result_type import EpisodeResultType
 from classes.symptomatic_procedure_result_type import SymptomaticProcedureResultType
 from classes.screening_referral_type import ScreeningReferralType
+from classes.lynch_due_date_reason_type import LynchDueDateReasonType
+from classes.lynch_incident_episode_type import (
+    LynchIncidentEpisodeType,
+)
 
 
 class SubjectSelectionQueryBuilder:
@@ -2161,6 +2165,67 @@ class SubjectSelectionQueryBuilder:
                 self.sql_where.append(
                     f"AND {column} {self.criteria_comparator} {type_id}"
                 )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_lynch_due_date_reason(
+        self, subject: Optional[Subject] = None
+    ) -> None:
+        """
+        Filters based on Lynch due date change reason. Supports symbolic types and subject comparison.
+        """
+        try:
+            column = "ss.lynch_sdd_reason_for_change_id"
+            reason = LynchDueDateReasonType.from_description(self.criteria_value)
+
+            if reason == LynchDueDateReasonType.NULL:
+                self.sql_where.append(f"AND {column} IS NULL")
+
+            elif reason == LynchDueDateReasonType.NOT_NULL:
+                self.sql_where.append(f"AND {column} IS NOT NULL")
+
+            elif reason == LynchDueDateReasonType.UNCHANGED:
+                if subject is None:
+                    raise SelectionBuilderException(
+                        self.criteria_key_name,
+                        "No subject provided for 'unchanged' logic",
+                    )
+                elif getattr(subject, "lynch_due_date_change_reason_id", None) is None:
+                    self.sql_where.append(f"AND {column} IS NULL")
+                else:
+                    self.sql_where.append(
+                        f"AND {column} = {subject.lynch_due_date_change_reason_id}"
+                    )
+
+            else:
+                self.sql_where.append(
+                    f"AND {column} {self.criteria_comparator} {reason}"
+                )
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_lynch_incident_episode(self) -> None:
+        """
+        Filters based on linkage to a Lynch incident episode.
+        """
+        try:
+            self._add_join_to_latest_episode()
+            column = "ss.lynch_incident_subject_epis_id"
+            value = LynchIncidentEpisodeType.from_description(self.criteria_value)
+
+            if value == LynchIncidentEpisodeType.NULL:
+                self.sql_where.append(f"AND {column} IS NULL")
+
+            elif value == LynchIncidentEpisodeType.NOT_NULL:
+                self.sql_where.append(f"AND {column} IS NOT NULL")
+
+            elif value == LynchIncidentEpisodeType.LATEST_EPISODE:
+                self.sql_where.append(f"AND {column} = ep.subject_epis_id")
+
+            elif value == LynchIncidentEpisodeType.EARLIER_EPISODE:
+                self.sql_where.append(f"AND {column} < ep.subject_epis_id")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

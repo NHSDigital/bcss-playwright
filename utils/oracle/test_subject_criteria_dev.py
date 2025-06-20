@@ -41,16 +41,8 @@ def make_builder(key, value, index=0, comparator="="):
     return b
 
 
-# === Test: SCREENING_REFERRAL_TYPE (self referral) ===
-b = make_builder(
-    SubjectSelectionCriteriaKey.SCREENING_REFERRAL_TYPE, "self referral", comparator="="
-)
-b._add_criteria_screening_referral_type()
-print("=== SCREENING_REFERRAL_TYPE (self referral) ===")
-print(b.dump_sql(), end="\n\n")
-
-# === Test: SCREENING_REFERRAL_TYPE (null) ===
-b = make_builder(SubjectSelectionCriteriaKey.SCREENING_REFERRAL_TYPE, "null")
-b._add_criteria_screening_referral_type()
-print("=== SCREENING_REFERRAL_TYPE (null) ===")
+# === Test: LYNCH_INCIDENT_EPISODE (earlier_episode) ===
+b = make_builder(SubjectSelectionCriteriaKey.LYNCH_INCIDENT_EPISODE, "earlier_episode")
+b._add_criteria_lynch_incident_episode()
+print("=== LYNCH_INCIDENT_EPISODE (earlier_episode) ===")
 print(b.dump_sql(), end="\n\n")

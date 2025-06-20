@@ -1,6 +1,7 @@
 # mock_selection_builder.py — Development-only testing harness for criteria logic
 import sys
 import os
+from typing import Optional
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 from classes.selection_builder_exception import SelectionBuilderException
@@ -8,24 +9,31 @@ from classes.subject_selection_criteria_key import SubjectSelectionCriteriaKey
 
 
 # Add helper class stubs below
-class ScreeningReferralType:
+class Subject:
+    def __init__(self, lynch_due_date_change_reason_id):
+        self.lynch_due_date_change_reason_id = lynch_due_date_change_reason_id
+
+
+class LynchIncidentEpisodeType:
     """
-    Maps screening referral descriptions to valid value IDs.
+    Maps symbolic criteria values for Lynch incident episode linkage.
     """
 
-    _label_to_id = {
-        "gp": 9701,
-        "self referral": 9702,
-        "hospital": 9703,
-        # Extend as needed
-    }
+    NULL = "null"
+    NOT_NULL = "not_null"
+    LATEST_EPISODE = "latest_episode"
+    EARLIER_EPISODE = "earlier_episode"
+
+    _symbolics = {NULL, NOT_NULL, LATEST_EPISODE, EARLIER_EPISODE}
 
     @classmethod
-    def get_id(cls, description: str) -> int:
+    def from_description(cls, description: str) -> str:
         key = description.strip().lower()
-        if key not in cls._label_to_id:
-            raise ValueError(f"Unknown screening referral type: '{description}'")
-        return cls._label_to_id[key]
+        if key not in cls._symbolics:
+            raise ValueError(
+                f"Unknown Lynch incident episode criteria: '{description}'"
+            )
+        return key
 
 
 class MockSelectionBuilder:
@@ -71,6 +79,10 @@ class MockSelectionBuilder:
         """
         self.sql_from.append("-- JOIN to latest episode placeholder")
 
+    def _force_not_modifier_is_invalid(self):
+        # Placeholder for rule enforcement. No-op in mock builder.
+        pass
+
     def _dataset_source_for_criteria_key(self) -> dict:
         """
         Maps criteria key to dataset table and alias.
@@ -94,19 +106,26 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_screening_referral_type(self) -> None:
+    def _add_criteria_lynch_incident_episode(self) -> None:
         """
-        Filters based on screening referral type ID or null presence.
+        Filters based on linkage to a Lynch incident episode.
         """
         try:
-            column = "xt.screening_referral_type_id"
-            value = self.criteria_value.strip().lower()
+            self._add_join_to_latest_episode()
+            column = "ss.lynch_incident_subject_epis_id"
+            value = LynchIncidentEpisodeType.from_description(self.criteria_value)
 
-            if value == "null":
+            if value == LynchIncidentEpisodeType.NULL:
                 self.sql_where.append(f"AND {column} IS NULL")
-            else:
-                type_id = ScreeningReferralType.get_id(self.criteria_value)
-                self.sql_where.append(f"AND {column} {self.criteria_comparator} {type_id}")
+
+            elif value == LynchIncidentEpisodeType.NOT_NULL:
+                self.sql_where.append(f"AND {column} IS NOT NULL")
+
+            elif value == LynchIncidentEpisodeType.LATEST_EPISODE:
+                self.sql_where.append(f"AND {column} = ep.subject_epis_id")
+
+            elif value == LynchIncidentEpisodeType.EARLIER_EPISODE:
+                self.sql_where.append(f"AND {column} < ep.subject_epis_id")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
