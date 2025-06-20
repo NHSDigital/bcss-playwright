@@ -203,6 +203,8 @@ class SubjectSelectionQueryBuilder:
                             self._add_criteria_subject_age()
                         case SubjectSelectionCriteriaKey.SUBJECT_HUB_CODE:
                             self._add_criteria_subject_hub_code(user)
+                        case SubjectSelectionCriteriaKey.DEMOGRAPHICS_TEMPORARY_ADDRESS:
+                            self._add_criteria_has_temporary_address()
                         # ------------------------------------------------------------------------
                         # 🏥 Screening Centre & GP Linkage Criteria
                         # ------------------------------------------------------------------------
@@ -481,12 +483,9 @@ class SubjectSelectionQueryBuilder:
                             SubjectSelectionCriteriaKey.LATEST_EPISODE_DATASET_INTENDED_EXTENT
                         ):
                             self._add_criteria_latest_episode_intended_extent()
-                        case SubjectSelectionCriteriaKey.SURVEILLANCE_REVIEW_STATUS:
-                            self._add_criteria_surveillance_review_status()
-                        case (
-                            SubjectSelectionCriteriaKey.HAS_EXISTING_SURVEILLANCE_REVIEW_CASE
-                        ):
-                            self._add_criteria_does_subject_have_surveillance_review_case()
+                        # ------------------------------------------------------------------------
+                        # 📆 Clinical Milestones, Dates & Case History
+                        # ------------------------------------------------------------------------
                         case SubjectSelectionCriteriaKey.SURVEILLANCE_REVIEW_CASE_TYPE:
                             self._add_criteria_surveillance_review_type()
                         case SubjectSelectionCriteriaKey.DATE_OF_DEATH:
@@ -501,6 +500,19 @@ class SubjectSelectionQueryBuilder:
                             self._add_criteria_invited_since_age_extension()
                         case SubjectSelectionCriteriaKey.NOTE_COUNT:
                             self._add_criteria_note_count()
+                        case SubjectSelectionCriteriaKey.SURVEILLANCE_REVIEW_STATUS:
+                            self._add_criteria_surveillance_review_status()
+                        case (
+                            SubjectSelectionCriteriaKey.HAS_EXISTING_SURVEILLANCE_REVIEW_CASE
+                        ):
+                            self._add_criteria_does_subject_have_surveillance_review_case()
+                        case SubjectSelectionCriteriaKey.SUBJECT_75TH_BIRTHDAY:
+                            self._add_criteria_date_field(
+                                subject, "ALL_PATHWAYS", "SEVENTY_FIFTH_BIRTHDAY"
+                            )
+                        # ------------------------------------------------------------------------
+                        # 🧪 Latest Episode Results & Symptomatic Pathway
+                        # ------------------------------------------------------------------------
                         case (
                             SubjectSelectionCriteriaKey.LATEST_EPISODE_ACCUMULATED_RESULT
                         ):
@@ -519,6 +531,9 @@ class SubjectSelectionQueryBuilder:
                             )
                         case SubjectSelectionCriteriaKey.SCREENING_REFERRAL_TYPE:
                             self._add_criteria_screening_referral_type()
+                        # ------------------------------------------------------------------------
+                        # 🧬 Lynch Pathway Due Dates & Diagnosis Tracking
+                        # ------------------------------------------------------------------------
                         case SubjectSelectionCriteriaKey.CALCULATED_LYNCH_DUE_DATE:
                             self._add_criteria_date_field(
                                 subject, "LYNCH", "CALCULATED_DUE_DATE"
@@ -540,10 +555,6 @@ class SubjectSelectionQueryBuilder:
                         case SubjectSelectionCriteriaKey.LYNCH_LAST_COLONOSCOPY_DATE:
                             self._add_criteria_date_field(
                                 subject, "LYNCH", "LAST_COLONOSCOPY_DATE"
-                            )
-                        case SubjectSelectionCriteriaKey.SUBJECT_75TH_BIRTHDAY:
-                            self._add_criteria_date_field(
-                                subject, "ALL_PATHWAYS", "SEVENTY_FIFTH_BIRTHDAY"
                             )
                         # ------------------------------------------------------------------------
                         # 🧬 CADS Clinical Dataset Filters
@@ -604,16 +615,23 @@ class SubjectSelectionQueryBuilder:
                             self._add_criteria_cads_treatment_given()
                         case SubjectSelectionCriteriaKey.CADS_CANCER_TREATMENT_INTENT:
                             self._add_criteria_cads_cancer_treatment_intent()
+                        case SubjectSelectionCriteriaKey.HAS_PREVIOUSLY_HAD_CANCER:
+                            self._add_criteria_has_previously_had_cancer()
+                        # ------------------------------------------------------------------------
+                        # 🧪 Screening Flow & Pathway Classification
+                        # ------------------------------------------------------------------------
                         case SubjectSelectionCriteriaKey.FOBT_PREVALENT_INCIDENT_STATUS:
                             self._add_criteria_fobt_prevalent_incident_status()
+                        # ------------------------------------------------------------------------
+                        # 📨 Notify Message Status Filters
+                        # ------------------------------------------------------------------------
                         case SubjectSelectionCriteriaKey.NOTIFY_QUEUED_MESSAGE_STATUS:
                             self._add_criteria_notify_queued_message_status()
                         case SubjectSelectionCriteriaKey.NOTIFY_ARCHIVED_MESSAGE_STATUS:
                             self._add_criteria_notify_archived_message_status()
-                        case SubjectSelectionCriteriaKey.HAS_PREVIOUSLY_HAD_CANCER:
-                            self._add_criteria_has_previously_had_cancer()
-                        case SubjectSelectionCriteriaKey.DEMOGRAPHICS_TEMPORARY_ADDRESS:
-                            self._add_criteria_has_temporary_address()
+                        # ------------------------------------------------------------------------
+                        # 🛑 Fallback: Unmatched Criteria Key
+                        # ------------------------------------------------------------------------
                         case _:
                             raise SelectionBuilderException(
                                 f"Invalid subject selection criteria key: {self.criteria_key_name}"
@@ -1631,10 +1649,6 @@ class SubjectSelectionQueryBuilder:
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
-
-    # ------------------------------------------------------------------------
-    # 🧪 Diagnostic Test Selection & Join Logic
-    # ------------------------------------------------------------------------
 
     def _add_join_to_diagnostic_tests(self) -> None:
         try:

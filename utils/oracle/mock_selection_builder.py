@@ -130,30 +130,6 @@ class MockSelectionBuilder:
     def _add_join_to_surveillance_review(self):
         self.sql_from.append("-- JOIN to surveillance review placeholder")
 
-
-    # === Example testable method below ===
-    # Replace this with the one you want to test,
+    # === Add your testable method below ===
+    # e.g., def _add_criteria_example_filter(self): ...
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
-
-    def _add_criteria_has_temporary_address(self) -> None:
-        """
-        Filters subjects based on whether they have a temporary address on record.
-        """
-        try:
-            answer = YesNoType.from_description(self.criteria_value)
-
-            # INNER JOIN on sd_address_t with address type 13043 (temporary)
-            self.sql_from.append(
-                "INNER JOIN sd_address_t adds ON adds.contact_id = c.contact_id "
-                "AND adds.ADDRESS_TYPE = 13043"
-            )
-
-            # Apply logic for EFFECTIVE_FROM based on yes/no
-            if answer == YesNoType.YES:
-                self.sql_from.append("AND adds.EFFECTIVE_FROM IS NOT NULL")
-            elif answer == YesNoType.NO:
-                self.sql_where.append("AND adds.EFFECTIVE_FROM IS NULL")
-            else:
-                raise ValueError()
-        except Exception:
-            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
