@@ -26,9 +26,6 @@ print("PYTHONPATH set to:", sys.path[0])
 from mock_selection_builder import MockSelectionBuilder
 from classes.subject_selection_criteria_key import SubjectSelectionCriteriaKey
 
-# === Example usage ===
-# Replace the examples below with your tests for the method you want to test
-
 
 # Helper for mock sequencing
 def make_builder(key, value, index=0, comparator="="):
@@ -40,14 +37,16 @@ def make_builder(key, value, index=0, comparator="="):
     b.criteria_comparator = comparator
     return b
 
+# === Example usage ===
+# Replace the examples below with your tests for the method you want to test
 
-# === Test: DEMOGRAPHICS_TEMPORARY_ADDRESS (yes) ===
-b = make_builder(SubjectSelectionCriteriaKey.DEMOGRAPHICS_TEMPORARY_ADDRESS, "yes")
-b._add_criteria_has_temporary_address()
-print(b.dump_sql())
+# # === Test: DEMOGRAPHICS_TEMPORARY_ADDRESS (yes) ===
+# b = make_builder(SubjectSelectionCriteriaKey.DEMOGRAPHICS_TEMPORARY_ADDRESS, "yes")
+# b._add_criteria_has_temporary_address()
+# print(b.dump_sql())
 
-# === Test: DEMOGRAPHICS_TEMPORARY_ADDRESS (no) ===
-b = make_builder(SubjectSelectionCriteriaKey.DEMOGRAPHICS_TEMPORARY_ADDRESS, "no")
-b._add_criteria_has_temporary_address()
-print("=== DEMOGRAPHICS_TEMPORARY_ADDRESS (no) ===")
-print(b.dump_sql(), end="\n\n")
+# # === Test: DEMOGRAPHICS_TEMPORARY_ADDRESS (no) ===
+# b = make_builder(SubjectSelectionCriteriaKey.DEMOGRAPHICS_TEMPORARY_ADDRESS, "no")
+# b._add_criteria_has_temporary_address()
+# print("=== DEMOGRAPHICS_TEMPORARY_ADDRESS (no) ===")
+# print(b.dump_sql(), end="\n\n")
