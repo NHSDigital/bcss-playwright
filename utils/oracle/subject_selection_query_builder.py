@@ -2362,7 +2362,7 @@ class SubjectSelectionQueryBuilder:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
         self.sql_where.append(
-            f"AND cads.asa_grade_id = ASAGradeType.by_description_case_insensitive(self.criteria_value).id"
+            "AND cads.asa_grade_id = ASAGradeType.by_description_case_insensitive(self.criteria_value).id"
         )
 
     def _add_criteria_cads_staging_scans(self) -> None:
@@ -2370,7 +2370,7 @@ class SubjectSelectionQueryBuilder:
         self._add_join_to_cancer_audit_dataset()
         self._add_join_to_cancer_audit_dataset_staging_scan()
         self.sql_where.append(
-            f"AND cads.staging_scans_done_id = YesNoType.by_description_case_insensitive(self.criteria_value).id"
+            "AND cads.staging_scans_done_id = YesNoType.by_description_case_insensitive(self.criteria_value).id"
         )
 
     def _add_criteria_cads_type_of_scan(self) -> None:
@@ -2378,14 +2378,14 @@ class SubjectSelectionQueryBuilder:
         self._add_join_to_cancer_audit_dataset()
         self._add_join_to_cancer_audit_dataset_staging_scan()
         self.sql_where.append(
-            f"AND dcss.type_of_scan_id = ScanType.by_description_case_insensitive(self.criteria_value).id"
+            "AND dcss.type_of_scan_id = ScanType.by_description_case_insensitive(self.criteria_value).id"
         )
 
     def _add_criteria_cads_metastases_present(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
         self.sql_where.append(
-            f"AND cads.metastases_found_id = MetastasesPresentType.by_description_case_insensitive(self.criteria_value).id"
+            "AND cads.metastases_found_id = MetastasesPresentType.by_description_case_insensitive(self.criteria_value).id"
         )
 
     def _add_criteria_cads_metastases_location(self) -> None:
@@ -2393,7 +2393,7 @@ class SubjectSelectionQueryBuilder:
         self._add_join_to_cancer_audit_dataset()
         self._add_join_to_cancer_audit_dataset_metastasis()
         self.sql_where.append(
-            f"AND dcm.location_of_metastasis_id = MetastasesLocationType.by_description_case_insensitive(self.criteria_value).id"
+            "AND dcm.location_of_metastasis_id = MetastasesLocationType.by_description_case_insensitive(self.criteria_value).id"
         )
 
     def _add_criteria_cads_metastases_other_location(self, other_location: str) -> None:
@@ -2408,35 +2408,35 @@ class SubjectSelectionQueryBuilder:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
         self.sql_where.append(
-            f"AND cads.final_pre_treat_t_category_id = FinalPretreatmentTCategoryType.by_description_case_insensitive(self.criteria_value).id"
+            "AND cads.final_pre_treat_t_category_id = FinalPretreatmentTCategoryType.by_description_case_insensitive(self.criteria_value).id"
         )
 
     def _add_criteria_cads_final_pre_treatment_n_category(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
         self.sql_where.append(
-            f"AND cads.final_pre_treat_n_category_id = FinalPretreatmentNCategoryType.by_description_case_insensitive(self.criteria_value).id"
+            "AND cads.final_pre_treat_n_category_id = FinalPretreatmentNCategoryType.by_description_case_insensitive(self.criteria_value).id"
         )
 
     def _add_criteria_cads_final_pre_treatment_m_category(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
         self.sql_where.append(
-            f"AND cads.final_pre_treat_m_category_id = FinalPretreatmentMCategoryType.by_description_case_insensitive(self.criteria_value).id"
+            "AND cads.final_pre_treat_m_category_id = FinalPretreatmentMCategoryType.by_description_case_insensitive(self.criteria_value).id"
         )
 
     def _add_criteria_cads_treatment_received(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
         self.sql_where.append(
-            f"AND cads.treatment_received_id = YesNoType.by_description_case_insensitive(self.criteria_value).id"
+            "AND cads.treatment_received_id = YesNoType.by_description_case_insensitive(self.criteria_value).id"
         )
 
     def _add_criteria_cads_reason_no_treatment_received(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
         self.sql_where.append(
-            f"AND cads.reason_no_treatment_id = ReasonNoTreatmentReceivedType.by_description_case_insensitive(self.criteria_value).id"
+            "AND cads.reason_no_treatment_id = ReasonNoTreatmentReceivedType.by_description_case_insensitive(self.criteria_value).id"
         )
 
     def _add_criteria_cads_tumour_location(self) -> None:
@@ -2444,7 +2444,7 @@ class SubjectSelectionQueryBuilder:
         self._add_join_to_cancer_audit_dataset()
         self._add_join_to_cancer_audit_dataset_tumour()
         self.sql_where.append(
-            f"AND dctu.location_id = LocationType.by_description_case_insensitive(self.criteria_value).id"
+            "AND dctu.location_id = LocationType.by_description_case_insensitive(self.criteria_value).id"
         )
 
     def _add_criteria_cads_tumour_height_of_tumour_above_anal_verge(self) -> None:
@@ -2452,7 +2452,7 @@ class SubjectSelectionQueryBuilder:
         self._add_join_to_cancer_audit_dataset()
         self._add_join_to_cancer_audit_dataset_tumour()
         self.sql_where.append(
-            f"AND dctu.height_above_anal_verge = {self.criteria_value}"
+            "AND dctu.height_above_anal_verge = {self.criteria_value}"
         )
 
     def _add_criteria_cads_tumour_previously_excised_tumour(self) -> None:
@@ -2460,7 +2460,7 @@ class SubjectSelectionQueryBuilder:
         self._add_join_to_cancer_audit_dataset()
         self._add_join_to_cancer_audit_dataset_tumour()
         self.sql_where.append(
-            f"AND dctu.recurrence_id = PreviouslyExcisedTumourType.by_description_case_insensitive(self.criteria_value).id"
+            "AND dctu.recurrence_id = PreviouslyExcisedTumourType.by_description_case_insensitive(self.criteria_value).id"
         )
 
     def _add_criteria_cads_treatment_type(self) -> None:
@@ -2468,7 +2468,7 @@ class SubjectSelectionQueryBuilder:
         self._add_join_to_cancer_audit_dataset()
         self._add_join_to_cancer_audit_dataset_treatment()
         self.sql_where.append(
-            f"AND dctr.treatment_category_id = TreatmentType.by_description_case_insensitive(self.criteria_value).id"
+            "AND dctr.treatment_category_id = TreatmentType.by_description_case_insensitive(self.criteria_value).id"
         )
 
     def _add_criteria_cads_treatment_given(self) -> None:
@@ -2476,7 +2476,7 @@ class SubjectSelectionQueryBuilder:
         self._add_join_to_cancer_audit_dataset()
         self._add_join_to_cancer_audit_dataset_treatment()
         self.sql_where.append(
-            f"AND dctr.treatment_procedure_id = TreatmentGiven.by_description_case_insensitive(self.criteria_value).id"
+            "AND dctr.treatment_procedure_id = TreatmentGiven.by_description_case_insensitive(self.criteria_value).id"
         )
 
     def _add_criteria_cads_cancer_treatment_intent(self) -> None:
@@ -2484,7 +2484,22 @@ class SubjectSelectionQueryBuilder:
         self._add_join_to_cancer_audit_dataset()
         self._add_join_to_cancer_audit_dataset_treatment()
         self.sql_where.append(
-            f"AND dctr.treatment_intent_id = CancerTreatmentIntent.by_description_case_insensitive(self.criteria_value).id"
+            "AND dctr.treatment_intent_id = CancerTreatmentIntent.by_description_case_insensitive(self.criteria_value).id"
+        )
+
+    def _add_join_to_cancer_audit_dataset_staging_scan(self) -> None:
+        self.sql_from.append(
+            "INNER JOIN data_cancer_audit_dataset_staging_scan dcss ON dcss.cancer_audit_dataset_id = cads.cancer_audit_dataset_id"
+        )
+
+    def _add_join_to_cancer_audit_dataset_metastasis(self) -> None:
+        self.sql_from.append(
+            "INNER JOIN data_cancer_audit_dataset_metastasis dcm ON dcm.cancer_audit_dataset_id = cads.cancer_audit_dataset_id"
+        )
+
+    def _add_join_to_cancer_audit_dataset_tumour(self) -> None:
+        self.sql_from.append(
+            "INNER JOIN data_cancer_audit_dataset_tumour dctu ON dctu.cancer_audit_dataset_id = cads.cancer_audit_dataset_id"
         )
 
     def _add_criteria_subject_hub_code(self, user: "User") -> None:
