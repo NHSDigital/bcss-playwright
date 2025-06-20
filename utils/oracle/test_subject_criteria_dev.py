@@ -41,10 +41,13 @@ def make_builder(key, value, index=0, comparator="="):
     return b
 
 
-# === Test: NOTIFY_ARCHIVED_MESSAGE_STATUS (S1 (S1w) - sending) ===
-b = make_builder(
-    SubjectSelectionCriteriaKey.NOTIFY_ARCHIVED_MESSAGE_STATUS, "S1 (S1w) - sending"
-)
-b._add_criteria_notify_archived_message_status()
-print("=== NOTIFY_ARCHIVED_MESSAGE_STATUS (S1 (S1w) - sending) ===")
+# === Test: DEMOGRAPHICS_TEMPORARY_ADDRESS (yes) ===
+b = make_builder(SubjectSelectionCriteriaKey.DEMOGRAPHICS_TEMPORARY_ADDRESS, "yes")
+b._add_criteria_has_temporary_address()
+print(b.dump_sql())
+
+# === Test: DEMOGRAPHICS_TEMPORARY_ADDRESS (no) ===
+b = make_builder(SubjectSelectionCriteriaKey.DEMOGRAPHICS_TEMPORARY_ADDRESS, "no")
+b._add_criteria_has_temporary_address()
+print("=== DEMOGRAPHICS_TEMPORARY_ADDRESS (no) ===")
 print(b.dump_sql(), end="\n\n")

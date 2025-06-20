@@ -31,6 +31,20 @@ class NotifyEventStatus:
         return cls._label_to_id[key]
 
 
+class YesNoType:
+    YES = "yes"
+    NO = "no"
+
+    _valid = {YES, NO}
+
+    @classmethod
+    def from_description(cls, description: str) -> str:
+        key = description.strip().lower()
+        if key not in cls._valid:
+            raise ValueError(f"Expected 'yes' or 'no', got: '{description}'")
+        return key
+
+
 def parse_notify_criteria(criteria: str) -> dict:
     """
     Parses criteria strings like 'S1 - new' or 'S1 (S1w) - sending' into parts.
@@ -121,34 +135,25 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_notify_archived_message_status(self) -> None:
+    def _add_criteria_has_temporary_address(self) -> None:
         """
-        Filters subjects based on archived Notify message criteria, e.g. 'S1 (S1w) - sending'.
+        Filters subjects based on whether they have a temporary address on record.
         """
         try:
-            parts = parse_notify_criteria(self.criteria_value)
-            status = parts["status"]
+            answer = YesNoType.from_description(self.criteria_value)
 
-            clause = "NOT EXISTS" if status == "none" else "EXISTS"
-
-            self.sql_where.append(f"AND {clause} (")
-            self.sql_where.append(
-                "SELECT 1 FROM notify_message_record nmr "
-                "INNER JOIN notify_message_batch nmb ON nmb.batch_id = nmr.batch_id "
-                "INNER JOIN notify_message_definition nmd ON nmd.message_definition_id = nmb.message_definition_id "
-                "WHERE nmr.subject_id = ss.screening_subject_id "
+            # INNER JOIN on sd_address_t with address type 13043 (temporary)
+            self.sql_from.append(
+                "INNER JOIN sd_address_t adds ON adds.contact_id = c.contact_id "
+                "AND adds.ADDRESS_TYPE = 13043"
             )
 
-            event_status_id = NotifyEventStatus.get_id(parts["type"])
-            self.sql_where.append(f"AND nmd.event_status_id = {event_status_id} ")
-
-            if "code" in parts and parts["code"]:
-                self.sql_where.append(f"AND nmd.message_code = '{parts['code']}' ")
-
-            if status != "none":
-                self.sql_where.append(f"AND nmr.message_status = '{status}' ")
-
-            self.sql_where.append(")")
-
+            # Apply logic for EFFECTIVE_FROM based on yes/no
+            if answer == YesNoType.YES:
+                self.sql_from.append("AND adds.EFFECTIVE_FROM IS NOT NULL")
+            elif answer == YesNoType.NO:
+                self.sql_where.append("AND adds.EFFECTIVE_FROM IS NULL")
+            else:
+                raise ValueError()
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

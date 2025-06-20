@@ -56,6 +56,7 @@ from classes.lynch_incident_episode_type import (
 )
 from classes.prevalent_incident_status_type import PrevalentIncidentStatusType
 from classes.notify_event_status import NotifyEventStatus
+from classes.yes_no_type import YesNoType
 
 
 class SubjectSelectionQueryBuilder:
@@ -2313,6 +2314,43 @@ class SubjectSelectionQueryBuilder:
 
             self.sql_where.append(")")
 
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_has_previously_had_cancer(self) -> None:
+        """
+        Filters based on whether the subject previously had cancer.
+        """
+        try:
+            answer = YesNoType.from_description(self.criteria_value)
+            condition = "'Y'" if answer == YesNoType.YES else "'N'"
+
+            self.sql_where.append(
+                f"AND pkg_letters.f_subj_prev_diagnosed_cancer(pi_subject_id => ss.screening_subject_id) = {condition}"
+            )
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_has_temporary_address(self) -> None:
+        """
+        Filters subjects based on whether they have a temporary address on record.
+        """
+        try:
+            answer = YesNoType.from_description(self.criteria_value)
+
+            # INNER JOIN on sd_address_t with address type 13043 (temporary)
+            self.sql_from.append(
+                "INNER JOIN sd_address_t adds ON adds.contact_id = c.contact_id "
+                "AND adds.ADDRESS_TYPE = 13043"
+            )
+
+            # Apply logic for EFFECTIVE_FROM based on yes/no
+            if answer == YesNoType.YES:
+                self.sql_from.append("AND adds.EFFECTIVE_FROM IS NOT NULL")
+            elif answer == YesNoType.NO:
+                self.sql_where.append("AND adds.EFFECTIVE_FROM IS NULL")
+            else:
+                raise ValueError()
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
