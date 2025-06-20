@@ -2,17 +2,24 @@
 import sys
 import os
 import re
-from typing import Optional
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 from classes.selection_builder_exception import SelectionBuilderException
 from classes.subject_selection_criteria_key import SubjectSelectionCriteriaKey
 
+# ------------------------------------------------------------------------
+# 🧰 Stubbed Data Classes (for symbolic mapping or subject context)
+# ------------------------------------------------------------------------
 
-# Add helper class stubs below
+
 class Subject:
     def __init__(self, lynch_due_date_change_reason_id):
         self.lynch_due_date_change_reason_id = lynch_due_date_change_reason_id
+
+
+# ------------------------------------------------------------------------
+# 🧪 Enum-Like Mocks (for symbolic value resolution)
+# ------------------------------------------------------------------------
 
 
 class NotifyEventStatus:
@@ -45,6 +52,11 @@ class YesNoType:
         return key
 
 
+# ------------------------------------------------------------------------
+# 🧠 Utility Functions (reused parsing helpers)
+# ------------------------------------------------------------------------
+
+
 def parse_notify_criteria(criteria: str) -> dict:
     """
     Parses criteria strings like 'S1 - new' or 'S1 (S1w) - sending' into parts.
@@ -64,6 +76,10 @@ def parse_notify_criteria(criteria: str) -> dict:
         "status": match.group("status").lower(),
     }
 
+
+# ------------------------------------------------------------------------
+# 🧪 Mock Query Builder Scaffolding (extend with testable methods)
+# ------------------------------------------------------------------------
 class MockSelectionBuilder:
     """
     Lightweight test harness that mimics SubjectSelectionQueryBuilder behavior.
@@ -87,7 +103,9 @@ class MockSelectionBuilder:
         self.sql_where = []
         self.sql_from = []
 
-    # Don't delete this method; it is used to inspect the SQL fragments
+    # ------------------------------------------------------------------------
+    # 🖨️ SQL Inspection Utility (used to inspect the SQL fragments - do not remove)
+    # ------------------------------------------------------------------------
     def dump_sql(self):
         parts = []
 
@@ -101,6 +119,9 @@ class MockSelectionBuilder:
 
         return "\n".join(parts)
 
+    # ------------------------------------------------------------------------
+    # 🔌 Required Internal Stubs (builder compatibility - do not remove)
+    # ------------------------------------------------------------------------
     def _add_join_to_latest_episode(self) -> None:
         """
         Mock stub for adding latest episode join. No-op for test harness.
@@ -130,6 +151,9 @@ class MockSelectionBuilder:
     def _add_join_to_surveillance_review(self):
         self.sql_from.append("-- JOIN to surveillance review placeholder")
 
-    # === Add your testable method below ===
-    # e.g., def _add_criteria_example_filter(self): ...
-    # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
+
+# ------------------------------------------------------------------------
+# 🧪 Add Your Custom _add_criteria_* Test Methods Below
+# ------------------------------------------------------------------------
+# e.g., def _add_criteria_example_filter(self): ...
+# then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
