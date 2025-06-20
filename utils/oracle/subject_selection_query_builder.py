@@ -64,6 +64,14 @@ class SubjectSelectionQueryBuilder:
     Builds dynamic SQL queries for selecting screening subjects based on various criteria.
     """
 
+    _SQL_IS_NULL = " IS NULL "
+    _SQL_IS_NOT_NULL = " IS NOT NULL "
+    _SQL_NOT_EXISTS = " NOT EXISTS "
+    _SQL_AND_NOT_EXISTS = "AND NOT EXISTS"
+    _SQL_AND_EXISTS = "AND EXISTS"
+    _TRUNC_SYSDATE = "TRUNC(SYSDATE)"
+    _REASON_NO_EXISTING_SUBJECT = "no existing subject"
+
     def __init__(self):
         """
         Initialise the query builder with empty SQL clause lists and bind variable dictionary.
@@ -691,7 +699,9 @@ class SubjectSelectionQueryBuilder:
             age_criteria = self.criteria_value.split("/")
             self.sql_where.append(" AND c.date_of_birth = ")
             self.sql_where.append(
-                self._subtract_years_from_oracle_date("TRUNC(SYSDATE)", age_criteria[0])
+                self._subtract_years_from_oracle_date(
+                    self._TRUNC_SYSDATE, age_criteria[0]
+                )
             )
             self.sql_where.append(" - ")
             self.sql_where.append(age_criteria[1])
@@ -1028,7 +1038,7 @@ class SubjectSelectionQueryBuilder:
 
             event_code_id = event_code_map[code]
 
-            exists_clause = "EXISTS" if event_is_included else "NOT EXISTS"
+            exists_clause = "EXISTS" if event_is_included else self._SQL_NOT_EXISTS
 
             self.sql_where.append(
                 f"""AND {exists_clause} (
@@ -1063,7 +1073,7 @@ class SubjectSelectionQueryBuilder:
                 raise ValueError(f"Unknown event status code: {code}")
 
             status_id = event_status_code_map[code]
-            exists_clause = "EXISTS" if event_is_included else "NOT EXISTS"
+            exists_clause = "EXISTS" if event_is_included else self._SQL_NOT_EXISTS
 
             self.sql_where.append(
                 f"""AND {exists_clause} (
@@ -1121,7 +1131,7 @@ class SubjectSelectionQueryBuilder:
             if value == "yes":
                 exists_clause = "EXISTS"
             elif value == "no":
-                exists_clause = "NOT EXISTS"
+                exists_clause = self._SQL_NOT_EXISTS
             else:
                 raise ValueError(
                     f"Unknown response for significant kit result: {value}"
@@ -1260,9 +1270,9 @@ class SubjectSelectionQueryBuilder:
             value = self.criteria_value.strip().lower()
 
             if value == "yes":
-                exists_prefix = "AND NOT EXISTS"
+                exists_prefix = self._SQL_AND_NOT_EXISTS
             elif value == "no":
-                exists_prefix = "AND EXISTS"
+                exists_prefix = self._SQL_AND_EXISTS
             else:
                 raise ValueError(f"Invalid completion flag: {value}")
 
@@ -1296,7 +1306,7 @@ class SubjectSelectionQueryBuilder:
                     "INNER JOIN ds_polyp_t dst ON ext.ext_test_id = dst.ext_test_id"
                 )
                 self.sql_where.append(
-                    "AND ext.void = 'N'\n" "AND dst.deleted_flag = 'N'"
+                    """AND ext.void = 'N'\n" "AND dst.deleted_flag = 'N'"""
                 )
             elif value == "no":
                 self.sql_where.append(
@@ -1327,9 +1337,9 @@ class SubjectSelectionQueryBuilder:
             value = self.criteria_value.strip().lower()
 
             if value in ("yes", "yes_latest_episode"):
-                prefix = "AND EXISTS"
+                prefix = self._SQL_AND_EXISTS
             elif value == "no":
-                prefix = "AND NOT EXISTS"
+                prefix = self._SQL_AND_NOT_EXISTS
             else:
                 raise ValueError(f"Unknown value for unlogged kits: {value}")
 
@@ -1361,9 +1371,9 @@ class SubjectSelectionQueryBuilder:
             value = self.criteria_value.strip().lower()
 
             if value == "yes":
-                prefix = "AND EXISTS"
+                prefix = self._SQL_AND_EXISTS
             elif value == "no":
-                prefix = "AND NOT EXISTS"
+                prefix = self._SQL_AND_NOT_EXISTS
             else:
                 raise ValueError(f"Invalid value for logged FIT kits: {value}")
 
@@ -1389,9 +1399,9 @@ class SubjectSelectionQueryBuilder:
             value = self.criteria_value.strip().lower()
 
             if value == "yes":
-                prefix = "AND EXISTS"
+                prefix = self._SQL_AND_EXISTS
             elif value == "no":
-                prefix = "AND NOT EXISTS"
+                prefix = self._SQL_AND_NOT_EXISTS
             else:
                 raise ValueError(f"Invalid value for kit notes: {value}")
 
@@ -1755,9 +1765,9 @@ class SubjectSelectionQueryBuilder:
 
             value = self.criteria_value.strip().lower()
             if value == "null":
-                self.sql_where.append("IS NULL")
+                self.sql_where.append(self._SQL_IS_NULL)
             elif value == "not null":
-                self.sql_where.append("IS NOT NULL")
+                self.sql_where.append(self._SQL_IS_NOT_NULL)
             else:
                 comparator = self.criteria_comparator
                 type_id = DiagnosticTestType.get_valid_value_id(self.criteria_value)
@@ -2046,7 +2056,9 @@ class SubjectSelectionQueryBuilder:
                 self.criteria_value
             )
 
-            clause = "AND EXISTS" if value == "yes" else "AND NOT EXISTS"
+            clause = (
+                self._SQL_AND_EXISTS if value == "yes" else self._SQL_AND_NOT_EXISTS
+            )
 
             self.sql_where.append(
                 f"{clause} (SELECT 'sr' FROM surveillance_review sr "
@@ -2077,7 +2089,7 @@ class SubjectSelectionQueryBuilder:
         """
         try:
             value = HasDateOfDeathRemoval.from_description(self.criteria_value)
-            clause = "EXISTS" if value == "yes" else "NOT EXISTS"
+            clause = "EXISTS" if value == "yes" else self._SQL_NOT_EXISTS
 
             self.sql_where.append(
                 f"AND {clause} (SELECT 'dodr' FROM report_additional_data_t dodr "
@@ -2095,7 +2107,7 @@ class SubjectSelectionQueryBuilder:
         try:
             self._add_join_to_latest_episode()
             value = InvitedSinceAgeExtension.from_description(self.criteria_value)
-            clause = "EXISTS" if value == "yes" else "NOT EXISTS"
+            clause = "EXISTS" if value == "yes" else self._SQL_NOT_EXISTS
 
             self.sql_where.append(
                 f"AND {clause} (SELECT 'sagex' FROM screening_subject_attribute_t sagex "
@@ -2273,7 +2285,7 @@ class SubjectSelectionQueryBuilder:
             status = parts["status"]
 
             if status == "none":
-                clause = "NOT EXISTS"
+                clause = self._SQL_NOT_EXISTS
             else:
                 clause = "EXISTS"
 
@@ -2307,7 +2319,7 @@ class SubjectSelectionQueryBuilder:
             parts = parse_notify_criteria(self.criteria_value)
             status = parts["status"]
 
-            clause = "NOT EXISTS" if status == "none" else "EXISTS"
+            clause = self._SQL_NOT_EXISTS if status == "none" else "EXISTS"
 
             self.sql_where.append(f"AND {clause} (")
             self.sql_where.append(
@@ -2629,7 +2641,7 @@ class SubjectSelectionQueryBuilder:
             self._force_not_modifier_is_invalid_for_criteria_value()
             if subject is None:
                 raise self.invalid_use_of_unchanged_exception(
-                    self.criteria_key_name, "no existing subject"
+                    self.criteria_key_name, self._REASON_NO_EXISTING_SUBJECT
                 )
             self.sql_where.append(" = ")
             self.sql_where.append(subject.get_screening_status_id())
@@ -2662,9 +2674,9 @@ class SubjectSelectionQueryBuilder:
 
         match screening_status_type:
             case ScreeningStatusType.NULL:
-                self.sql_where.append(" IS NULL ")
+                self.sql_where.append(self._SQL_IS_NULL)
             case ScreeningStatusType.NOT_NULL:
-                self.sql_where.append(" IS NOT NULL ")
+                self.sql_where.append(self._SQL_IS_NOT_NULL)
             case _:
                 self.sql_where.append(
                     f"{self.criteria_comparator}{screening_status_type.valid_value_id}"
@@ -2675,7 +2687,7 @@ class SubjectSelectionQueryBuilder:
             self._force_not_modifier_is_invalid_for_criteria_value()
             if subject is None:
                 raise self.invalid_use_of_unchanged_exception(
-                    self.criteria_key_name, "no existing subject"
+                    self.criteria_key_name, self._REASON_NO_EXISTING_SUBJECT
                 )
             elif subject.get_screening_status_change_reason_id() is None:
                 self.sql_where.append(" AND ss.ss_reason_for_change_id IS NULL")
@@ -2706,19 +2718,7 @@ class SubjectSelectionQueryBuilder:
         self, subject: "Subject", pathway: str, date_type: str
     ) -> None:
         date_column_name = self._get_date_field_column_name(pathway, date_type)
-
-        if date_column_name.startswith("TRUNC(ep."):
-            self._add_join_to_latest_episode()
-        elif date_column_name.startswith("TRUNC(gcd."):
-            self._add_join_to_genetic_condition_diagnosis()
-        elif date_column_name.startswith("TRUNC(dctu."):
-            self._add_join_to_latest_episode()
-            self._add_join_to_cancer_audit_dataset()
-            self._add_join_to_cancer_audit_dataset_tumor()
-        elif date_column_name.startswith("TRUNC(dctr."):
-            self._add_join_to_latest_episode()
-            self._add_join_to_cancer_audit_dataset()
-            self._add_join_to_cancer_audit_dataset_treatment()
+        self._add_date_field_required_joins(date_column_name)
 
         criteria_words = self.criteria_value.split(" ")
 
@@ -2732,7 +2732,7 @@ class SubjectSelectionQueryBuilder:
         elif (
             self.criteria_value.lower() != "last birthday"
             and self.criteria_value.lower().endswith(" birthday")
-            and len(self.criteria_value.split()) == 2
+            and len(criteria_words) == 2
         ):
             self._add_check_comparing_one_date_with_another(
                 date_column_name,
@@ -2763,7 +2763,7 @@ class SubjectSelectionQueryBuilder:
             len(criteria_words) == 3
             or (
                 len(criteria_words) == 4
-                and self.criteria_value.startswith(("> ", "< ", "<= ", ">= "))
+                and self.criteria_value.startswith(("> ", "< ", "<= ", ">="))
             )
             or (
                 len(criteria_words) == 5
@@ -2777,6 +2777,24 @@ class SubjectSelectionQueryBuilder:
             self._add_criteria_date_field_special_cases(
                 self.criteria_value, subject, pathway, date_type, date_column_name
             )
+
+    def _add_date_field_required_joins(self, column: str) -> None:
+        """Used by: _add_criteria_date_field
+        Determines which joins are needed based on the resolved date_column_name.
+        Keeps the main method focused on value handling, not join logic.
+        """
+        if column.startswith("TRUNC(ep."):
+            self._add_join_to_latest_episode()
+        elif column.startswith("TRUNC(gcd."):
+            self._add_join_to_genetic_condition_diagnosis()
+        elif column.startswith("TRUNC(dctu."):
+            self._add_join_to_latest_episode()
+            self._add_join_to_cancer_audit_dataset()
+            self._add_join_to_cancer_audit_dataset_tumor()
+        elif column.startswith("TRUNC(dctr."):
+            self._add_join_to_latest_episode()
+            self._add_join_to_cancer_audit_dataset()
+            self._add_join_to_cancer_audit_dataset_treatment()
 
     def _add_criteria_screening_due_date_reason(self, subject: "Subject"):
         due_date_reason = "ss.sdd_reason_for_change_id"
@@ -2795,17 +2813,17 @@ class SubjectSelectionQueryBuilder:
 
             match screening_due_date_change_reason_type:
                 case SDDReasonForChangeType.NULL:
-                    self.sql_where.append(f"{due_date_reason}{" IS NULL "}")
+                    self.sql_where.append(f"{due_date_reason}_SQL_IS_NULL")
                 case SDDReasonForChangeType.NOT_NULL:
-                    self.sql_where.append(f"{due_date_reason}{" IS NOT NULL "}")
+                    self.sql_where.append(f"{due_date_reason}_SQL_IS_NOT_NULL")
                 case SDDReasonForChangeType.UNCHANGED:
                     self._force_not_modifier_is_invalid_for_criteria_value()
                     if subject is None:
                         raise self.invalid_use_of_unchanged_exception(
-                            self.criteria_key_name, "no existing subject"
+                            self.criteria_key_name, self._REASON_NO_EXISTING_SUBJECT
                         )
                     elif subject.get_screening_due_date_change_reason_id() is None:
-                        self.sql_where.append(f"{due_date_reason}{" IS NULL "}")
+                        self.sql_where.append(f"{due_date_reason}_SQL_IS_NULL")
                     else:
                         self.sql_where.append(
                             f"{due_date_reason}{" = "}{subject.get_screening_due_date_change_reason_id()}"
@@ -2842,10 +2860,10 @@ class SubjectSelectionQueryBuilder:
                     self._force_not_modifier_is_invalid_for_criteria_value()
                     if subject is None:
                         raise self.invalid_use_of_unchanged_exception(
-                            self.criteria_key_name, "no existing subject"
+                            self.criteria_key_name, self._REASON_NO_EXISTING_SUBJECT
                         )
                     elif subject.get_surveillance_due_date_change_reason_id() is None:
-                        self.sql_where.append(" IS NULL ")
+                        self.sql_where.append(self._SQL_IS_NULL)
                     else:
                         self.sql_where.append(
                             f" = {subject.get_surveillance_due_date_change_reason_id()}"
@@ -2892,9 +2910,9 @@ class SubjectSelectionQueryBuilder:
 
             match criterion:
                 case ManualCeaseRequested.NO:
-                    self.sql_where.append(" IS NULL ")
+                    self.sql_where.append(self._SQL_IS_NULL)
                 case ManualCeaseRequested.YES:
-                    self.sql_where.append(" IS NOT NULL ")
+                    self.sql_where.append(self._SQL_IS_NOT_NULL)
                 case ManualCeaseRequested.DISCLAIMER_LETTER_REQUIRED:
                     self.sql_where.append("= 35")  # C1
                 case ManualCeaseRequested.DISCLAIMER_LETTER_SENT:
@@ -2940,9 +2958,9 @@ class SubjectSelectionQueryBuilder:
                     self.sql_where.append(self.criteria_comparator)
                     self.sql_where.append(" 2 ")
                 elif enum_value == CeasedConfirmationUserId.NOT_NULL:
-                    self.sql_where.append(" IS NOT NULL ")
+                    self.sql_where.append(self._SQL_IS_NOT_NULL)
                 elif enum_value == CeasedConfirmationUserId.NULL:
-                    self.sql_where.append(" IS NULL ")
+                    self.sql_where.append(self._SQL_IS_NULL)
                 elif enum_value == CeasedConfirmationUserId.USER_ID:
                     self.sql_where.append(self.criteria_comparator)
                     self.sql_where.append(str(user.user_id) + " ")
@@ -3228,90 +3246,69 @@ class SubjectSelectionQueryBuilder:
     def _add_check_date_is_a_period_ago_or_later(
         self, date_column_name: str, value: str
     ) -> None:
-        criteria_words = value.split(" ")
-        numerator = criteria_words[0]
-        denominator = criteria_words[1]
-        ago_or_later = criteria_words[-1]
+        criteria_words = value.strip().lower().split()
+        comparator, numerator, denominator, ago_or_later = (
+            self._extract_date_comparison_components(criteria_words)
+        )
 
-        if ago_or_later == "ago":
-            if value.startswith("> "):
-                comparator = " < "
-                numerator = criteria_words[1]
-                denominator = criteria_words[2]
-            elif value.startswith(">= "):
-                comparator = " <= "
-                numerator = criteria_words[1]
-                denominator = criteria_words[2]
-            elif value.lower().startswith("more than "):
-                comparator = " < "
-                numerator = criteria_words[2]
-                denominator = criteria_words[3]
-            elif value.startswith("< "):
-                comparator = " > "
-                numerator = criteria_words[1]
-                denominator = criteria_words[2]
-            elif value.startswith("<= "):
-                comparator = " >= "
-                numerator = criteria_words[1]
-                denominator = criteria_words[2]
-            elif value.lower().startswith("less than "):
-                comparator = " > "
-                numerator = criteria_words[2]
-                denominator = criteria_words[3]
-            else:
-                comparator = " = "
-        else:
-            if value.startswith("> "):
-                comparator = " > "
-                numerator = criteria_words[1]
-                denominator = criteria_words[2]
-            elif value.startswith(">= "):
-                comparator = " >= "
-                numerator = criteria_words[1]
-                denominator = criteria_words[2]
-            elif value.lower().startswith("more than "):
-                comparator = " > "
-                numerator = criteria_words[2]
-                denominator = criteria_words[3]
-            elif value.startswith("< "):
-                comparator = " < "
-                numerator = criteria_words[1]
-                denominator = criteria_words[2]
-            elif value.startswith("<= "):
-                comparator = " <= "
-                numerator = criteria_words[1]
-                denominator = criteria_words[2]
-            elif value.lower().startswith("less than "):
-                comparator = " < "
-                numerator = criteria_words[2]
-                denominator = criteria_words[3]
-            else:
-                comparator = " = "
+        compound = f"{denominator} {ago_or_later}"
 
-        compound_denominator = denominator + " " + ago_or_later
+        getter_map = {
+            "year ago": self._get_x_years_ago,
+            "years ago": self._get_x_years_ago,
+            "year later": self._get_x_years_later,
+            "years later": self._get_x_years_later,
+            "month ago": self._get_x_months_ago,
+            "months ago": self._get_x_months_ago,
+            "month later": self._get_x_months_later,
+            "months later": self._get_x_months_later,
+            "day ago": self._get_x_days_ago,
+            "days ago": self._get_x_days_ago,
+            "day later": self._get_x_days_later,
+            "days later": self._get_x_days_later,
+        }
 
-        if compound_denominator in ("year ago", "years ago"):
-            self._get_x_years_ago(date_column_name, comparator, numerator)
-        elif compound_denominator in ("year later", "years later"):
-            self._get_x_years_later(date_column_name, comparator, numerator)
-        elif compound_denominator in ("month ago", "months ago"):
-            self._get_x_months_ago(date_column_name, comparator, numerator)
-        elif compound_denominator in ("month later", "months later"):
-            self._get_x_months_later(date_column_name, comparator, numerator)
-        elif compound_denominator in ("day ago", "days ago"):
-            self._get_x_days_ago(date_column_name, comparator, numerator)
-        elif compound_denominator in ("day later", "days later"):
-            self._get_x_days_later(date_column_name, comparator, numerator)
+        if compound in getter_map:
+            getter_map[compound](date_column_name, comparator, numerator)
 
         if comparator == " > ":
-            if ago_or_later == "ago":
-                self._add_check_comparing_one_date_with_another(
-                    date_column_name, " <= ", "TRUNC(SYSDATE)", False
-                )
-            else:
-                self._add_check_comparing_one_date_with_another(
-                    date_column_name, " > ", "TRUNC(SYSDATE)", False
-                )
+            post_condition = " <= " if ago_or_later == "ago" else " > "
+            self._add_check_comparing_one_date_with_another(
+                date_column_name, post_condition, self._TRUNC_SYSDATE, False
+            )
+
+    def _extract_date_comparison_components(
+        self, words: list[str]
+    ) -> tuple[str, str, str, str]:
+        value = " ".join(words)
+        default_comp = " = "
+        mappings = {
+            "ago": {
+                ">": (" < ", 1),
+                ">=": (" <= ", 1),
+                "more than": (" < ", 2),
+                "<": (" > ", 1),
+                "<=": (" >= ", 1),
+                "less than": (" > ", 2),
+            },
+            "later": {
+                ">": (" > ", 1),
+                ">=": (" >= ", 1),
+                "more than": (" > ", 2),
+                "<": (" < ", 1),
+                "<=": (" <= ", 1),
+                "less than": (" < ", 2),
+            },
+        }
+
+        for direction in ("ago", "later"):
+            if words[-1] == direction:
+                for prefix, (comp, offset) in mappings[direction].items():
+                    if value.startswith(prefix):
+                        return comp, words[offset], words[offset + 1], direction
+                return default_comp, words[0], words[1], direction
+
+        return default_comp, words[0], words[1], words[-1]
 
     def _add_criteria_date_field_special_cases(
         self,
@@ -3360,15 +3357,15 @@ class SubjectSelectionQueryBuilder:
                     )
                 case DateDescription.LESS_THAN_TODAY | DateDescription.BEFORE_TODAY:
                     self._add_check_comparing_one_date_with_another(
-                        date_column_name, " < ", "TRUNC(SYSDATE)", False
+                        date_column_name, " < ", self._TRUNC_SYSDATE, False
                     )
                 case DateDescription.GREATER_THAN_TODAY | DateDescription.AFTER_TODAY:
                     self._add_check_comparing_one_date_with_another(
-                        date_column_name, " > ", "TRUNC(SYSDATE)", False
+                        date_column_name, " > ", self._TRUNC_SYSDATE, False
                     )
                 case DateDescription.TODAY:
                     self._add_check_comparing_one_date_with_another(
-                        date_column_name, " = ", "TRUNC(SYSDATE)", False
+                        date_column_name, " = ", self._TRUNC_SYSDATE, False
                     )
                 case DateDescription.TOMORROW:
                     self._add_check_comparing_one_date_with_another(
@@ -3399,7 +3396,7 @@ class SubjectSelectionQueryBuilder:
                         False,
                     )
                     self._add_check_comparing_one_date_with_another(
-                        date_column_name, " <= ", "TRUNC(SYSDATE)", False
+                        date_column_name, " <= ", self._TRUNC_SYSDATE, False
                     )
                 case DateDescription.LYNCH_DIAGNOSIS_DATE:
                     self._add_join_to_genetic_condition_diagnosis()
@@ -3537,8 +3534,10 @@ class SubjectSelectionQueryBuilder:
                             False,
                         )
 
-        except Exception:
-            raise Exception
+        except Exception as e:
+            raise SelectionBuilderException(
+                self.criteria_key_name, self.criteria_value
+            ) from e
 
     def _add_check_comparing_date_with_earliest_or_latest_event_date(
         self,
@@ -3564,9 +3563,9 @@ class SubjectSelectionQueryBuilder:
     def _add_check_column_is_null_or_not(self, column_name: str, is_null: bool) -> None:
         self.sql_where.append(f" AND {column_name} ")
         if is_null:
-            self.sql_where.append(" IS NULL ")
+            self.sql_where.append(self._SQL_IS_NULL)
         else:
-            self.sql_where.append(" IS NOT NULL ")
+            self.sql_where.append(self._SQL_IS_NOT_NULL)
 
     def _get_date_field_existing_value(
         self, subject: "Subject", pathway: str, date_type: str
