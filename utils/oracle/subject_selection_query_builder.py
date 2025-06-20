@@ -1,4 +1,4 @@
-from typing import Dict, Union, Tuple, Optional
+from typing import Dict, Optional
 import logging
 from datetime import datetime, date
 from utils.notify_criteria_parser import parse_notify_criteria
@@ -154,6 +154,8 @@ class SubjectSelectionQueryBuilder:
     def _end_where_clause(self, subject_count: int) -> None:
         self.sql_where.append(f" FETCH FIRST {subject_count} ROWS ONLY ")
 
+    # TODO: Address Sonarqube error: Refactor this function to reduce its
+    # Cognitive Complexity from 19 to the 15 allowed.
     def _add_variable_selection_criteria(
         self,
         criteria: Dict[str, str],
