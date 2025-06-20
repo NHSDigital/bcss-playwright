@@ -53,6 +53,7 @@ from classes.lynch_due_date_reason_type import LynchDueDateReasonType
 from classes.lynch_incident_episode_type import (
     LynchIncidentEpisodeType,
 )
+from classes.prevalent_incident_status_type import PrevalentIncidentStatusType
 
 
 class SubjectSelectionQueryBuilder:
@@ -2226,6 +2227,22 @@ class SubjectSelectionQueryBuilder:
 
             elif value == LynchIncidentEpisodeType.EARLIER_EPISODE:
                 self.sql_where.append(f"AND {column} < ep.subject_epis_id")
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_fobt_prevalent_incident_status(self) -> None:
+        """
+        Filters subjects by whether their FOBT episode is prevalent or incident.
+        """
+        try:
+            value = PrevalentIncidentStatusType.from_description(self.criteria_value)
+            column = "ss.fobt_incident_subject_epis_id"
+
+            if value == PrevalentIncidentStatusType.PREVALENT:
+                self.sql_where.append(f"AND {column} IS NULL")
+            elif value == PrevalentIncidentStatusType.INCIDENT:
+                self.sql_where.append(f"AND {column} IS NOT NULL")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

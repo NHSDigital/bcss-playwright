@@ -41,8 +41,8 @@ def make_builder(key, value, index=0, comparator="="):
     return b
 
 
-# === Test: LYNCH_INCIDENT_EPISODE (earlier_episode) ===
-b = make_builder(SubjectSelectionCriteriaKey.LYNCH_INCIDENT_EPISODE, "earlier_episode")
-b._add_criteria_lynch_incident_episode()
-print("=== LYNCH_INCIDENT_EPISODE (earlier_episode) ===")
+# === Test: FOBT_PREVALENT_INCIDENT_STATUS (incident) ===
+b = make_builder(SubjectSelectionCriteriaKey.FOBT_PREVALENT_INCIDENT_STATUS, "incident")
+b._add_criteria_fobt_prevalent_incident_status()
+print("=== FOBT_PREVALENT_INCIDENT_STATUS (incident) ===")
 print(b.dump_sql(), end="\n\n")

@@ -14,25 +14,21 @@ class Subject:
         self.lynch_due_date_change_reason_id = lynch_due_date_change_reason_id
 
 
-class LynchIncidentEpisodeType:
+class PrevalentIncidentStatusType:
     """
-    Maps symbolic criteria values for Lynch incident episode linkage.
+    Maps symbolic values for FOBT prevalent/incident episode classification.
     """
 
-    NULL = "null"
-    NOT_NULL = "not_null"
-    LATEST_EPISODE = "latest_episode"
-    EARLIER_EPISODE = "earlier_episode"
+    PREVALENT = "prevalent"
+    INCIDENT = "incident"
 
-    _symbolics = {NULL, NOT_NULL, LATEST_EPISODE, EARLIER_EPISODE}
+    _valid_values = {PREVALENT, INCIDENT}
 
     @classmethod
     def from_description(cls, description: str) -> str:
         key = description.strip().lower()
-        if key not in cls._symbolics:
-            raise ValueError(
-                f"Unknown Lynch incident episode criteria: '{description}'"
-            )
+        if key not in cls._valid_values:
+            raise ValueError(f"Unknown FOBT episode status: '{description}'")
         return key
 
 
@@ -106,26 +102,18 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_lynch_incident_episode(self) -> None:
+    def _add_criteria_fobt_prevalent_incident_status(self) -> None:
         """
-        Filters based on linkage to a Lynch incident episode.
+        Filters subjects by whether their FOBT episode is prevalent or incident.
         """
         try:
-            self._add_join_to_latest_episode()
-            column = "ss.lynch_incident_subject_epis_id"
-            value = LynchIncidentEpisodeType.from_description(self.criteria_value)
+            value = PrevalentIncidentStatusType.from_description(self.criteria_value)
+            column = "ss.fobt_incident_subject_epis_id"
 
-            if value == LynchIncidentEpisodeType.NULL:
+            if value == PrevalentIncidentStatusType.PREVALENT:
                 self.sql_where.append(f"AND {column} IS NULL")
-
-            elif value == LynchIncidentEpisodeType.NOT_NULL:
+            elif value == PrevalentIncidentStatusType.INCIDENT:
                 self.sql_where.append(f"AND {column} IS NOT NULL")
-
-            elif value == LynchIncidentEpisodeType.LATEST_EPISODE:
-                self.sql_where.append(f"AND {column} = ep.subject_epis_id")
-
-            elif value == LynchIncidentEpisodeType.EARLIER_EPISODE:
-                self.sql_where.append(f"AND {column} < ep.subject_epis_id")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
