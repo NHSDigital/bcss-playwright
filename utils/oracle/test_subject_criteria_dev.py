@@ -41,7 +41,10 @@ def make_builder(key, value, index=0, comparator="="):
     return b
 
 
-# === Test: Notify message (S1 - new) ===
-b = make_builder(SubjectSelectionCriteriaKey.NOTIFY_QUEUED_MESSAGE_STATUS, "S1 - new")
-b._add_criteria_notify_queued_message_status()
-print(b.dump_sql())
+# === Test: NOTIFY_ARCHIVED_MESSAGE_STATUS (S1 (S1w) - sending) ===
+b = make_builder(
+    SubjectSelectionCriteriaKey.NOTIFY_ARCHIVED_MESSAGE_STATUS, "S1 (S1w) - sending"
+)
+b._add_criteria_notify_archived_message_status()
+print("=== NOTIFY_ARCHIVED_MESSAGE_STATUS (S1 (S1w) - sending) ===")
+print(b.dump_sql(), end="\n\n")

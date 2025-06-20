@@ -121,35 +121,32 @@ class MockSelectionBuilder:
     # Replace this with the one you want to test,
     # then use utils/oracle/test_subject_criteria_dev.py to run your scenarios
 
-    def _add_criteria_notify_queued_message_status(self) -> None:
+    def _add_criteria_notify_archived_message_status(self) -> None:
         """
-        Filters subjects based on Notify queued message status, e.g. 'S1 (S1w) - new'.
+        Filters subjects based on archived Notify message criteria, e.g. 'S1 (S1w) - sending'.
         """
         try:
             parts = parse_notify_criteria(self.criteria_value)
             status = parts["status"]
 
-            if status == "none":
-                clause = "NOT EXISTS"
-            else:
-                clause = "EXISTS"
+            clause = "NOT EXISTS" if status == "none" else "EXISTS"
 
             self.sql_where.append(f"AND {clause} (")
             self.sql_where.append(
-                "SELECT 1 FROM notify_message_queue nmq "
-                "INNER JOIN notify_message_definition nmd ON nmd.message_definition_id = nmq.message_definition_id "
-                "WHERE nmq.nhs_number = c.nhs_number "
+                "SELECT 1 FROM notify_message_record nmr "
+                "INNER JOIN notify_message_batch nmb ON nmb.batch_id = nmr.batch_id "
+                "INNER JOIN notify_message_definition nmd ON nmd.message_definition_id = nmb.message_definition_id "
+                "WHERE nmr.subject_id = ss.screening_subject_id "
             )
 
-            # Simulate getNotifyMessageEventStatusIdFromCriteria()
             event_status_id = NotifyEventStatus.get_id(parts["type"])
             self.sql_where.append(f"AND nmd.event_status_id = {event_status_id} ")
 
-            if status != "none":
-                self.sql_where.append(f"AND nmq.message_status = '{status}' ")
-
             if "code" in parts and parts["code"]:
                 self.sql_where.append(f"AND nmd.message_code = '{parts['code']}' ")
+
+            if status != "none":
+                self.sql_where.append(f"AND nmr.message_status = '{status}' ")
 
             self.sql_where.append(")")
 

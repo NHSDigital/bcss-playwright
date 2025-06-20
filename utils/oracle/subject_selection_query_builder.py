@@ -2284,6 +2284,38 @@ class SubjectSelectionQueryBuilder:
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
+    def _add_criteria_notify_archived_message_status(self) -> None:
+        """
+        Filters subjects based on archived Notify message criteria, e.g. 'S1 (S1w) - sending'.
+        """
+        try:
+            parts = parse_notify_criteria(self.criteria_value)
+            status = parts["status"]
+
+            clause = "NOT EXISTS" if status == "none" else "EXISTS"
+
+            self.sql_where.append(f"AND {clause} (")
+            self.sql_where.append(
+                "SELECT 1 FROM notify_message_record nmr "
+                "INNER JOIN notify_message_batch nmb ON nmb.batch_id = nmr.batch_id "
+                "INNER JOIN notify_message_definition nmd ON nmd.message_definition_id = nmb.message_definition_id "
+                "WHERE nmr.subject_id = ss.screening_subject_id "
+            )
+
+            event_status_id = NotifyEventStatus.get_id(parts["type"])
+            self.sql_where.append(f"AND nmd.event_status_id = {event_status_id} ")
+
+            if "code" in parts and parts["code"]:
+                self.sql_where.append(f"AND nmd.message_code = '{parts['code']}' ")
+
+            if status != "none":
+                self.sql_where.append(f"AND nmr.message_status = '{status}' ")
+
+            self.sql_where.append(")")
+
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
     # ------------------------------------------------------------------------
     # 🧬 CADS Clinical Dataset Filters
     # ------------------------------------------------------------------------
