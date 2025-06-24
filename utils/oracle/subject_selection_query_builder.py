@@ -91,6 +91,9 @@ class SubjectSelectionQueryBuilder:
         self.xt = "xt"
         self.ap = "ap"
 
+        # Repeated Strings:
+        self.c_dob = "c.date_of_birth"
+
     def build_subject_selection_query(
         self,
         criteria: Dict[str, str],
@@ -98,6 +101,18 @@ class SubjectSelectionQueryBuilder:
         subject: "Subject",
         subjects_to_retrieve: Optional[int] = None,
     ) -> tuple[str, dict]:
+        # Clear previous state to avoid duplicate SQL fragments
+        self.sql_select = []
+        self.sql_from = []
+        self.sql_where = []
+        self.sql_from_episode = []
+        self.sql_from_genetic_condition_diagnosis = []
+        self.sql_from_cancer_audit_datasets = []
+        self.bind_vars = {}
+        self.criteria_value_count = 0
+        self.xt = "xt"
+        self.ap = "ap"
+
         self._build_select_clause()
         self._build_main_from_clause()
         self._start_where_clause()
@@ -108,39 +123,42 @@ class SubjectSelectionQueryBuilder:
             self._end_where_clause(1)
 
         query = " ".join(
-            self.sql_select
-            + self.sql_from
-            + self.sql_from_episode
-            + self.sql_from_genetic_condition_diagnosis
-            + self.sql_from_cancer_audit_datasets
-            + self.sql_where
+            str(part)
+            for part in (
+                self.sql_select
+                + self.sql_from
+                + self.sql_from_episode
+                + self.sql_from_genetic_condition_diagnosis
+                + self.sql_from_cancer_audit_datasets
+                + self.sql_where
+            )
         )
         logging.info("Final query: %s", query)
         return query, self.bind_vars
 
     def _build_select_clause(self) -> None:
         columns: list[str] = [
-            "ss.screening_subject_id,",
-            "ss.subject_nhs_number,",
-            "c.person_family_name,",
-            "c.person_given_name,",
-            "ss.datestamp,",
-            "ss.screening_status_id,",
-            "ss.ss_reason_for_change_id,",
-            "ss.screening_status_change_date,",
-            "ss.screening_due_date,",
-            "ss.sdd_reason_for_change_id,",
-            "ss.sdd_change_date,",
-            "ss.calculated_sdd,",
-            "ss.surveillance_screen_due_date,",
-            "ss.calculated_ssdd,",
-            "ss.surveillance_sdd_rsn_change_id,",
-            "ss.surveillance_sdd_change_date,",
-            "ss.lynch_screening_due_date,",
-            "ss.lynch_sdd_reason_for_change_id,",
-            "ss.lynch_sdd_change_date,",
-            "ss.lynch_calculated_sdd,",
-            "c.date_of_birth,",
+            "ss.screening_subject_id",
+            "ss.subject_nhs_number",
+            "c.person_family_name",
+            "c.person_given_name",
+            "ss.datestamp",
+            "ss.screening_status_id",
+            "ss.ss_reason_for_change_id",
+            "ss.screening_status_change_date",
+            "ss.screening_due_date",
+            "ss.sdd_reason_for_change_id",
+            "ss.sdd_change_date",
+            "ss.calculated_sdd",
+            "ss.surveillance_screen_due_date",
+            "ss.calculated_ssdd",
+            "ss.surveillance_sdd_rsn_change_id",
+            "ss.surveillance_sdd_change_date",
+            "ss.lynch_screening_due_date",
+            "ss.lynch_sdd_reason_for_change_id",
+            "ss.lynch_sdd_change_date",
+            "ss.lynch_calculated_sdd",
+            self.c_dob,
             "c.date_of_death ",
         ]
         self.sql_select.append("SELECT " + ", ".join(columns))
@@ -649,7 +667,7 @@ class SubjectSelectionQueryBuilder:
             )
 
     def _add_criteria_nhs_number(self) -> None:
-        self.sql_where.append(" c.nhs_number = ':nhs_number' ")
+        self.sql_where.append(" AND c.nhs_number = :nhs_number ")
         self.bind_vars["nhs_number"] = self.criteria_value
 
     def _add_criteria_subject_age(self) -> None:
@@ -2684,7 +2702,7 @@ class SubjectSelectionQueryBuilder:
             self._add_check_comparing_one_date_with_another(
                 date_column_name,
                 " = ",
-                self._add_years_to_oracle_date("c.date_of_birth", self.criteria_value),
+                self._add_years_to_oracle_date(self.c_dob, self.criteria_value),
                 False,
             )
         elif (
@@ -2695,9 +2713,7 @@ class SubjectSelectionQueryBuilder:
             self._add_check_comparing_one_date_with_another(
                 date_column_name,
                 " = ",
-                self._add_years_to_oracle_date(
-                    "c.date_of_birth", criteria_words[0][:-2]
-                ),
+                self._add_years_to_oracle_date(self.c_dob, criteria_words[0][:-2]),
                 False,
             )
         elif self._is_valid_date(self.criteria_value):
