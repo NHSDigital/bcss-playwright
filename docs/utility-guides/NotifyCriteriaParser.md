@@ -1,4 +1,5 @@
 # Utility Guide: Notify Criteria Parser
+
 **Source:** [`utils/notify_criteria_parser.py`](../../utils/notify_criteria_parser.py)
 
 The Notify Criteria Parser is a lightweight utility that extracts structured values from compact Notify message criteria strings. It is used by selection builders to support Notify filter logic—like `"S1 - new"` or `"S1 (S1w) - sending"` — by parsing these inputs into cleanly separated parts: `message type`, `message code (optional)`, and `status`.
@@ -40,6 +41,7 @@ parts = parse_notify_criteria("S1 (S1w) - sending")
 ```
 
 ## Expected Input Formats
+
 The parser supports the following input patterns:
 
 | Format                    | Meaning                                        |
@@ -49,6 +51,7 @@ The parser supports the following input patterns:
 | `none` (case-insensitive) | Special case meaning “no message should exist” |
 
 ## Example Usage
+
 Here are a few examples of what the parser returns. Think of it like splitting a sentence into parts so each part can be used in a database search:
 
 ```python
@@ -63,6 +66,7 @@ parse_notify_criteria("None")
 ```
 
 ## Output Structure
+
 The returned value is a dictionary containing:
 
 ```python
@@ -72,23 +76,29 @@ The returned value is a dictionary containing:
     "status": str             # the message’s progress, such as "new", "sending", or "none"
 }
 ```
+
 ## Edge Case: none
+
 If someone enters `none` as the criteria, it means "we're looking for subjects who do not have a matching message." The parser handles this specially, and the SQL builder will write `NOT EXISTS` logic behind the scenes to exclude those cases, so the parser returns:
 
 ```python
 {'status': 'none'}
 ```
+
 This signals `NOT EXISTS` logic for Notify message filtering.
 
 ## Error Handling
+
 If the input doesn’t match an expected pattern, the parser raises:
 
 ```python
 ValueError("Invalid Notify criteria format: 'your_input'")
 ```
+
 e.g. If a tester or user types something like `S1 - banana` or forgets the - status bit, the parser will throw an error. This helps catch typos or unsupported formats early.
 
 ## Integration Points
+
 These are the parts of the system that use the parser to decide whether to include or exclude Notify messages from a search:
 `SubjectSelectionQueryBuilder._add_criteria_notify_queued_message_status()` – for messages currently in the system
 
