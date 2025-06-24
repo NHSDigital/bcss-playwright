@@ -2,10 +2,7 @@ from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBu
 from utils.oracle.oracle import OracleDB
 from classes.user import User
 from classes.subject import Subject
-from classes.screening_status_type import ScreeningStatusType
-from classes.subject_selection_criteria_key import SubjectSelectionCriteriaKey
 import logging
-import pytest
 
 
 def test_subject_selection_query_builder():
