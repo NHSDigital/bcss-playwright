@@ -23,7 +23,7 @@ import os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 print("PYTHONPATH set to:", sys.path[0])
-from mock_selection_builder import MockSelectionBuilder
+from utils.oracle.query_builder_test_harness.mock_selection_builder import MockSelectionBuilder
 from classes.subject_selection_criteria_key import SubjectSelectionCriteriaKey
 
 
