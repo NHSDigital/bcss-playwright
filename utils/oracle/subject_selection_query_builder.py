@@ -164,9 +164,9 @@ class SubjectSelectionQueryBuilder:
         This method extracts and sets internal state needed to evaluate a subject selection criterion,
         including the criteria key name, modifier flags, value, and comparator. It also performs initial
         checks such as:
-          - Ignoring commented-out criteria (those starting with "#")
-          - Rejecting "unchanged" values if no subject is supplied
-          - Preventing invalid use of "not" modifiers with NULL values
+            - Ignoring commented-out criteria (those starting with "#")
+            - Rejecting "unchanged" values if no subject is supplied
+            - Preventing invalid use of "not" modifiers with NULL values
 
         Parameters:
             key (str): The criteria key name (e.g. "subject age", "screening status")

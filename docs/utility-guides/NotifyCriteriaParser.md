@@ -20,7 +20,7 @@ The Notify Criteria Parser is a lightweight utility that extracts structured val
 
 ## Overview
 
-Notify message filters are written as short text descriptions like "S1 - new" or "S1 (S1w) - sending". 
+Notify message filters are written as short text descriptions like "S1 - new" or "S1 (S1w) - sending".
 The parser splits them into meaningful parts so that the system knows what message type to look for, whether there's a specific message code, and the message's status (like "new", "sending", etc). This parser breaks those strings into usable components for SQL query builders.
 
 - `"S1 - new"`
