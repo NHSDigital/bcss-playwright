@@ -3,7 +3,7 @@ from utils.user_tools import UserTools
 from playwright.sync_api import Page, expect
 from pages.organisations.organisations_page import OrganisationSwitchPage
 
-@pytest.mark.wip
+
 @pytest.mark.regression
 @pytest.mark.organisation_switch
 def test_user_can_switch_between_organisations(page: Page):
