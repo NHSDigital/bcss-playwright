@@ -3,6 +3,29 @@ from typing import Optional
 
 
 class EventStatusType(Enum):
+    """
+    Enum representing various event status types for screening and diagnostic events.
+
+    Each member contains:
+        - id (int): The unique identifier for the event status.
+        - code (str): The event status code.
+        - description (str): A human-readable description of the event status.
+
+    Example members:
+        A100: Suitable for Radiological Test
+        A101: Pending decision to proceed with Endoscopic Test
+        ...
+        U98: Weak Positive, Waiting for Programme Hub Assistance
+
+    Methods:
+        id: Returns the unique identifier for the event status.
+        code: Returns the event status code.
+        description: Returns the human-readable description of the event status.
+        get_by_id(id_: int) -> Optional[EventStatusType]: Returns the enum member matching the given id.
+        get_by_code(code: str) -> Optional[EventStatusType]: Returns the enum member matching the given code.
+        get_by_description(description: str) -> Optional[EventStatusType]: Returns the enum member matching the given description.
+    """
+
     A100 = (11101, "A100", "Suitable for Radiological Test")
     A101 = (11102, "A101", "Pending decision to proceed with Endoscopic Test")
     A103 = (11103, "A103", "No Decision Received to Proceed with Diagnostic Tests")
@@ -1000,30 +1023,83 @@ class EventStatusType(Enum):
     U98 = (11285, "U98", "Weak Positive, Waiting for Programme Hub Assistance")
 
     def __init__(self, valid_value_id: int, allowed_value: str, description: str):
+        """
+        Initialize an EventStatusType enum member.
+
+        Args:
+            valid_value_id (int): The unique identifier for the event status.
+            allowed_value (str): The event status code.
+            description (str): The human-readable description of the event status.
+        """
         self._id = valid_value_id
         self._code = allowed_value
         self._description = description
 
     @property
     def id(self) -> int:
+        """
+        Returns the unique identifier for the event status.
+
+        Returns:
+            int: The event status ID.
+        """
         return self._id
 
     @property
     def code(self) -> str:
+        """
+        Returns the event status code.
+
+        Returns:
+            str: The event status code.
+        """
         return self._code
 
     @property
     def description(self) -> str:
+        """
+        Returns the human-readable description of the event status.
+
+        Returns:
+            str: The description.
+        """
         return self._description
 
     @classmethod
     def get_by_id(cls, id_: int) -> Optional["EventStatusType"]:
+        """
+        Returns the enum member matching the given id.
+
+        Args:
+            id_ (int): The event status ID to search for.
+
+        Returns:
+            Optional[EventStatusType]: The matching enum member, or None if not found.
+        """
         return next((e for e in cls if e.id == id_), None)
 
     @classmethod
     def get_by_code(cls, code: str) -> Optional["EventStatusType"]:
+        """
+        Returns the enum member matching the given code.
+
+        Args:
+            code (str): The event status code to search for.
+
+        Returns:
+            Optional[EventStatusType]: The matching enum member, or None if not found.
+        """
         return next((e for e in cls if e.code == code), None)
 
     @classmethod
     def get_by_description(cls, description: str) -> Optional["EventStatusType"]:
+        """
+        Returns the enum member matching the given description.
+
+        Args:
+            description (str): The event status description to search for.
+
+        Returns:
+            Optional[EventStatusType]: The matching enum member, or None if not found.
+        """
         return next((e for e in cls if e.description == description), None)

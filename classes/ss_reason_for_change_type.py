@@ -3,6 +3,17 @@ from typing import Optional
 
 
 class SSReasonForChangeType(Enum):
+    """
+    Enum representing reasons for change to SS (Screening Status).
+
+    Methods:
+        valid_value_id: Returns the unique identifier for the reason.
+        description: Returns the string description of the reason.
+        by_valid_value_id(valid_value_id: int) -> Optional[SSReasonForChangeType]: Returns the enum member matching the given valid value ID.
+        by_description(description: str) -> Optional[SSReasonForChangeType]: Returns the enum member matching the given description.
+        by_description_case_insensitive(description: str) -> Optional[SSReasonForChangeType]: Returns the enum member matching the given description (case-insensitive).
+    """
+
     AGE_EXTENSION_FIRST_CALL = (20415, "Age Extension First Call")
     AGE_EXTENSION_FIRST_CALL_MAY_SELF_REFER = (
         20413,
@@ -92,33 +103,79 @@ class SSReasonForChangeType(Enum):
     BOWEL_SCOPE_DECOMMISSIONED = (307051, "Bowel scope decommissioned")
 
     def __init__(self, valid_value_id: int, description: str):
+        """
+        Initialize an SSReasonForChangeType enum member.
+
+        Args:
+            valid_value_id (int): The unique identifier for the reason.
+            description (str): The string description of the reason.
+        """
         self._value_id = valid_value_id
         self._description = description
 
     @property
     def valid_value_id(self) -> int:
+        """
+        Returns the unique identifier for the reason.
+
+        Returns:
+            int: The valid value ID.
+        """
         return self._value_id
 
     @property
     def description(self) -> str:
+        """
+        Returns the string description of the reason.
+
+        Returns:
+            str: The description.
+        """
         return self._description
 
     @classmethod
     def by_valid_value_id(
         cls, valid_value_id: int
     ) -> Optional["SSReasonForChangeType"]:
+        """
+        Returns the enum member matching the given valid value ID.
+
+        Args:
+            valid_value_id (int): The valid value ID to search for.
+
+        Returns:
+            Optional[SSReasonForChangeType]: The matching enum member, or None if not found.
+        """
         return next(
             (item for item in cls if item.valid_value_id == valid_value_id), None
         )
 
     @classmethod
     def by_description(cls, description: str) -> Optional["SSReasonForChangeType"]:
+        """
+        Returns the enum member matching the given description.
+
+        Args:
+            description (str): The description to search for.
+
+        Returns:
+            Optional[SSReasonForChangeType]: The matching enum member, or None if not found.
+        """
         return next((item for item in cls if item.description == description), None)
 
     @classmethod
     def by_description_case_insensitive(
         cls, description: str
     ) -> Optional["SSReasonForChangeType"]:
+        """
+        Returns the enum member matching the given description (case-insensitive).
+
+        Args:
+            description (str): The description to search for.
+
+        Returns:
+            Optional[SSReasonForChangeType]: The matching enum member, or None if not found.
+        """
         return next(
             (item for item in cls if item.description.lower() == description.lower()),
             None,

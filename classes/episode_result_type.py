@@ -1,6 +1,16 @@
 class EpisodeResultType:
     """
-    Maps description labels to episode result types and valid value IDs.
+    Utility class for mapping episode result type descriptions to logical flags or valid value IDs.
+
+    This class provides:
+        - Logical flags for "null", "not_null", and "any_surveillance_non_participation".
+        - A mapping from descriptive result labels (e.g., "normal", "abnormal", "surveillance offered") to internal valid value IDs.
+        - A method to convert descriptions to flags or IDs.
+
+    Methods:
+        from_description(description: str) -> str | int:
+            Returns the logical flag or the valid value ID for a given description.
+            Raises ValueError if the description is not recognized.
     """
 
     NULL = "null"
@@ -16,6 +26,18 @@ class EpisodeResultType:
 
     @classmethod
     def from_description(cls, description: str):
+        """
+        Returns the logical flag or the valid value ID for a given description.
+
+        Args:
+            description (str): The episode result type description.
+
+        Returns:
+            str | int: The logical flag or the valid value ID.
+
+        Raises:
+            ValueError: If the description is not recognized.
+        """
         key = description.strip().lower()
         if key in {cls.NULL, cls.NOT_NULL, cls.ANY_SURVEILLANCE_NON_PARTICIPATION}:
             return key

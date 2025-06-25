@@ -3,6 +3,26 @@ from typing import Dict, Optional
 
 
 class SubjectSelectionCriteriaKey(Enum):
+    """
+    Enum representing all possible subject selection criteria keys.
+
+    Each member is a tuple:
+        (description: str, allow_not_modifier: bool, allow_more_than_one_value: bool)
+
+    Members:
+        Each member represents a subject selection criteria key, its description, and flags indicating
+        if the "not" modifier is allowed and if more than one value is allowed.
+
+    Properties:
+        description: Returns the string description of the criteria key.
+        allow_not_modifier: Returns True if the "not" modifier is allowed for this key.
+        allow_more_than_one_value: Returns True if more than one value is allowed for this key.
+
+    Methods:
+        by_description(description: str) -> Optional[SubjectSelectionCriteriaKey]:
+            Returns the enum member matching the given description, or None if not found.
+    """
+
     APPOINTMENT_DATE = ("appointment date", False, True)
     APPOINTMENT_STATUS = ("appointment status", True, True)
     APPOINTMENT_TYPE = ("appointment type", False, True)
@@ -285,24 +305,59 @@ class SubjectSelectionCriteriaKey(Enum):
         allow_not_modifier: bool,
         allow_more_than_one_value: bool,
     ):
+        """
+        Initialize a SubjectSelectionCriteriaKey enum member.
+
+        Args:
+            description (str): The string description of the criteria key.
+            allow_not_modifier (bool): Whether the "not" modifier is allowed.
+            allow_more_than_one_value (bool): Whether more than one value is allowed.
+        """
         self._description = description
         self._allow_not_modifier = allow_not_modifier
         self._allow_more_than_one_value = allow_more_than_one_value
 
     @property
     def description(self) -> str:
+        """
+        Returns the string description of the criteria key.
+
+        Returns:
+            str: The description.
+        """
         return self._description
 
     @property
     def allow_not_modifier(self) -> bool:
+        """
+        Returns True if the "not" modifier is allowed for this key.
+
+        Returns:
+            bool: True if allowed, False otherwise.
+        """
         return self._allow_not_modifier
 
     @property
     def allow_more_than_one_value(self) -> bool:
+        """
+        Returns True if more than one value is allowed for this key.
+
+        Returns:
+            bool: True if allowed, False otherwise.
+        """
         return self._allow_more_than_one_value
 
     @staticmethod
     def by_description(description: str) -> Optional["SubjectSelectionCriteriaKey"]:
+        """
+        Returns the enum member matching the given description.
+
+        Args:
+            description (str): The description to search for.
+
+        Returns:
+            Optional[SubjectSelectionCriteriaKey]: The matching enum member, or None if not found.
+        """
         return _description_map.get(description)
 
 

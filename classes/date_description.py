@@ -5,6 +5,23 @@ import random
 
 
 class DateDescription(Enum):
+    """
+    Enum representing various date descriptions and their associated logic.
+
+    Each member contains:
+        - description (str): A human-readable description of the date logic.
+        - number_of_months (int): The number of months relevant to the date logic.
+        - suitable_date (Optional[date]): A calculated or representative date, if applicable.
+
+    Example members:
+        AFTER_TODAY: A date after today, randomly chosen up to 1000 days in the future.
+        BEFORE_TODAY: A date before today, randomly chosen up to 1000 days in the past.
+        TODAY: Today's date.
+        YESTERDAY: Yesterday's date.
+        NULL: Represents a null value.
+        NOT_NULL: Represents a non-null value.
+    """
+
     AFTER_TODAY = (
         "after today",
         0,
@@ -128,26 +145,70 @@ class DateDescription(Enum):
     def __init__(
         self, description: str, number_of_months: int, suitable_date: Optional[date]
     ):
+        """
+        Initialize a DateDescription enum member.
+
+        Args:
+            description (str): The human-readable description of the date logic.
+            number_of_months (int): The number of months relevant to the date logic.
+            suitable_date (Optional[date]): A calculated or representative date, if applicable.
+        """
         self._description = description
         self._number_of_months = number_of_months
         self._suitable_date = suitable_date
 
     @property
     def description(self) -> str:
+        """
+        Returns the human-readable description of the date logic.
+
+        Returns:
+            str: The description.
+        """
         return self._description
 
     @property
     def number_of_months(self) -> int:
+        """
+        Returns the number of months relevant to the date logic.
+
+        Returns:
+            int: The number of months.
+        """
         return self._number_of_months
 
     @property
     def suitable_date(self) -> Optional[date]:
+        """
+        Returns a calculated or representative date, if applicable.
+
+        Returns:
+            Optional[date]: The suitable date, or None if not applicable.
+        """
         return self._suitable_date
 
     @classmethod
     def by_description(cls, desc: str) -> Optional["DateDescription"]:
+        """
+        Returns the enum member matching the given description.
+
+        Args:
+            desc (str): The description to search for.
+
+        Returns:
+            Optional[DateDescription]: The matching enum member, or None if not found.
+        """
         return next((d for d in cls if d.description == desc), None)
 
     @classmethod
     def by_description_case_insensitive(cls, desc: str) -> Optional["DateDescription"]:
+        """
+        Returns the enum member matching the given description (case-insensitive).
+
+        Args:
+            desc (str): The description to search for.
+
+        Returns:
+            Optional[DateDescription]: The matching enum member, or None if not found.
+        """
         return next((d for d in cls if d.description.lower() == desc.lower()), None)

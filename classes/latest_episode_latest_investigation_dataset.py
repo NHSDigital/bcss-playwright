@@ -1,7 +1,22 @@
 class LatestEpisodeLatestInvestigationDataset:
     """
-    Maps descriptive investigation filter criteria to internal constants.
-    Used to drive investigation dataset filtering in latest episode.
+    Utility class for mapping descriptive investigation filter criteria to internal constants.
+
+    This class is used to drive investigation dataset filtering in the latest episode.
+
+    Members:
+        NONE: No investigation dataset.
+        COLONOSCOPY_NEW: New colonoscopy dataset.
+        LIMITED_COLONOSCOPY_NEW: New limited colonoscopy dataset.
+        FLEXIBLE_SIGMOIDOSCOPY_NEW: New flexible sigmoidoscopy dataset.
+        CT_COLONOGRAPHY_NEW: New CT colonography dataset.
+        ENDOSCOPY_INCOMPLETE: Incomplete endoscopy dataset.
+        RADIOLOGY_INCOMPLETE: Incomplete radiology dataset.
+
+    Methods:
+        from_description(description: str) -> str:
+            Returns the internal constant for a given description.
+            Raises ValueError if the description is not recognized.
     """
 
     NONE = "none"
@@ -24,6 +39,18 @@ class LatestEpisodeLatestInvestigationDataset:
 
     @classmethod
     def from_description(cls, description: str) -> str:
+        """
+        Returns the internal constant for a given description.
+
+        Args:
+            description (str): The description to check.
+
+        Returns:
+            str: The internal constant matching the description.
+
+        Raises:
+            ValueError: If the description is not recognized.
+        """
         key = description.strip().lower()
         if key not in cls._valid_values:
             raise ValueError(f"Unknown investigation dataset filter: '{description}'")
