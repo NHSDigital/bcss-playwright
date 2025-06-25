@@ -152,7 +152,7 @@ It allows the builder to determine if a subject's current value matches a previo
 If you want to filter subjects based on their current screening status, for example, you would need to provide a `Subject` object.
 To know if you need to populate an attribute like `screening_status_id`, you can do so by looking if the method requires the Subject class.
 
-For example, if you look at the following python code for a screening status, you can see that the Subject class is required.
+For example, if you look at the following code for a screening status, you can see that the Subject class is required.
 
 ```python
 case SubjectSelectionCriteriaKey.SCREENING_STATUS:
