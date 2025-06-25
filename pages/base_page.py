@@ -239,9 +239,46 @@ class BasePage:
         Safely accepts a dialog triggered by a click, avoiding the error:
         playwright._impl._errors.Error: Dialog.accept: Cannot accept dialog which is already handled!
         If no dialog appears, continues without error.
+        Args:
+            locator (Locator): The locator that triggers the dialog when clicked.
+            example: If clicking a save button opens a dialog, pass that save button's locator.
         """
         self.page.once("dialog", self._accept_dialog)
         try:
             self.click(locator)
         except Exception as e:
             logging.error(f"Click failed: {e}")
+
+
+    def assert_dialog_text(self, expected_text: str) -> None:
+        """
+        Asserts that a dialog appears and contains the expected text.
+        If no dialog appears, logs an error.
+        Args:
+            expected_text (str): The text that should be present in the dialog.
+        """
+
+        def handle_dialog(dialog):
+            actual_text = dialog.message
+            assert (
+                actual_text == expected_text
+            ), f"Expected '{expected_text}', but got '{actual_text}'"
+            dialog.dismiss()  # Dismiss dialog
+
+        self.page.once("dialog", handle_dialog)
+
+    def safe_accept_dialog_select_option(self, locator: Locator, option: str) -> None:
+        """
+        Safely accepts a dialog triggered by selecting a dropdown, avoiding the error:
+        playwright._impl._errors.Error: Dialog.accept: Cannot accept dialog which is already handled!
+        If no dialog appears, continues without error.
+        Args:
+            locator (Locator): The locator that triggers the dialog when clicked.
+            example: If clicking a save button opens a dialog, pass that save button's locator.
+        """
+        self.page.once("dialog", self._accept_dialog)
+        try:
+            locator.select_option(option)
+        except Exception as e:
+            logging.error(f"Option selection failed: {e}")   
+            

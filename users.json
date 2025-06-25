@@ -7,6 +7,12 @@
       "Hub Manager State Registered, Midlands and North West"
     ]
   },
+  "Hub Manager at BCS01": {
+    "username": "BCSS402",
+    "roles": [
+      "Hub Manager, Midlands and North West"
+    ]
+  },
   "Screening Centre Manager at BCS001": {
     "username": "BCSS118",
     "roles": [
@@ -24,5 +30,17 @@
     "roles": [
       "Team Leader"
     ]
-}
+},
+  "Hub Manager State Registered at BCS02": {
+    "username": "BCSS408",
+    "roles": [
+      "Hub Manager State Registered, Southern Bowel Cancer Screening Programme Hub"
+    ]
+  },
+  "Hub Manager at BCS02": {
+    "username": "BCSS409",
+    "roles": [
+      "Hub Manager, Southern Bowel Cancer Screening Programme Hub"
+    ]
+  }
 }

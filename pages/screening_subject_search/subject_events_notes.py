@@ -27,7 +27,7 @@ class SubjectEventsNotes(BasePage):
         self.update_notes_button = self.page.get_by_role("button", name="Update Notes")
         self.note_type = self.page.locator("#UI_ADDITIONAL_CARE_NEED_FILTER")
         self.note_status = self.page.locator(
-            "select[name^='UI_SUPPORTING_NOTE_STATUS_']"
+            "//table[@id='displayRS']/tbody/tr[2]/td[3]/select"
         )
 
     def select_additional_care_note(self) -> None:
@@ -87,47 +87,27 @@ class SubjectEventsNotes(BasePage):
         """Fills the notes field with the provided text."""
         self.notes_upto_500_char.fill(notes)
 
-    def dismiss_dialog_and_update_notes(self) -> None:
+    def accept_dialog_and_update_notes(self) -> None:
         """Clicks the 'Update Notes' button and handles the dialog by clicking 'OK'."""
         self.page.once("dialog", lambda dialog: dialog.accept())
         self.update_notes_button.click()
 
-    def dismiss_dialog_and_add_replacement_note(self) -> None:
+    def accept_dialog_and_add_replacement_note(self) -> None:
         """
         Dismisses the dialog and clicks the 'Add Replacement Note' button.
         """
-        self.page.once("dialog", lambda dialog: dialog.dismiss())
+        self.page.once("dialog", lambda dialog: dialog.accept())
         self.page.get_by_role("button", name="Add Replacement Note").click()
-
-    def dismiss_dialog(self) -> None:
-        """
-        Dismisses a dialog when it appears.
-        """
-        self.page.once("dialog", lambda dialog: dialog.dismiss())
 
     def get_title_and_note_from_row(self, row_number: int = 0) -> dict:
         """
         Extracts title and note from a specific row's 'Notes' column using dynamic column index.
         """
-        row_count = self.table_utils.get_row_count()
-        if row_count == 0:
-            raise ValueError("The table is empty.")
-
-        # Find the 'Notes' column index (1-based)
-        notes_col_index = self.table_utils.get_column_index("Notes")
-        if notes_col_index == -1:
-            raise ValueError("The 'Notes' column was not found in the table.")
-
-        # Locate the cell at the specific row and column
-        cell = self.page.locator(
-            f"{self.table_utils} > tbody > tr:nth-child({row_number + 1}) > td:nth-child({notes_col_index})"
-        )
-        cell_text = cell.inner_text().strip()
-
-        lines = cell_text.split("\n")
+        cell_text= self.table_utils.get_cell_value("Notes", row_number)
+        lines = cell_text.split("\n\n")
         title = lines[0].strip() if len(lines) > 0 else ""
         note = lines[1].strip() if len(lines) > 1 else ""
-
+        logging.info(f"Extracted title: '{title}' and note: '{note}' from row {row_number}")    
         return {"title": title, "note": note}
 
 
