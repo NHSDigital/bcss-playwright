@@ -12,13 +12,14 @@ The `SubjectSelectionQueryBuilder` is a flexible utility for constructing SQL qu
 - Lynch pathway logic and Notify message status
 
 For example:
+
 - NHS number
 - Subject age
 - Hub code
 - Screening centre code
 - GP practice linkage
 - Screening status
-- and many more, (including date-based and status-based filters). 
+- and many more, (including date-based and status-based filters).
 
 It also handles special cases such as `unchanged` values and supports modifiers like `NOT:` for negation.
 
@@ -44,10 +45,11 @@ Using `build_subject_selection_query`:
 query, bind_vars = builder.build_subject_selection_query(
     criteria=criteria_dict,     # Dict[str, str] of selection criteria
     user=test_user,             # User object
-    subject=test_subject,       # Subject object (can be None)
+    subject=test_subject,       # Subject object
     subjects_to_retrieve=100    # Optional limit
 )
 ```
+
 When you call `build_subject_selection_query(...)`, it returns a tuple containing:
 
 `query` — a complete SQL string with placeholders like :nhs_number, ready to be run against the database.
@@ -62,11 +64,11 @@ This approach ensures injection-safe execution (defending against SQL injection 
 
 ```python
 criteria = {
-    "NHS_NUMBER": "1234567890",
-    "SCREENING_STATUS": "invited"
+    "nhs_number": "1234567890",
+    "screening_status": "invited"
 }
 
-user = User(user_id=42, organisation=None)     # Simulated user
+user = User(user_id=42, organisation=None)     # Optional; used for 'unchanged' logic
 subject = Subject()                            # Optional; used for 'unchanged' logic
 
 builder = SubjectSelectionQueryBuilder()
@@ -86,6 +88,7 @@ WHERE 1=1
   AND ss.screening_status_id = 1001
 FETCH FIRST 1 ROWS ONLY
 ```
+
 (Note: 1001 would be the resolved ID for "invited" in ScreeningStatusType.)
 
 #### bind_vars
@@ -101,7 +104,8 @@ FETCH FIRST 1 ROWS ONLY
 You can pass both values directly into your DB layer or test stub:
 
 ```python
-cursor.execute(query, bind_vars)
+from utils.oracle.oracle import OracleDB
+df = OracleDB().execute_query(query, bind_vars)
 ```
 
 ## Supported Inputs
@@ -118,11 +122,12 @@ Example:
 
 ```python
 {
-  "SUBJECT_HAS_EVENT_STATUS": "ES01",
-  "SUBJECT_AGE": "> 60",
-  "DATE_OF_DEATH": "null"
+  "subject_has_event_status": "ES01",
+  "subject_age": "> 60",
+  "date_of_death": "null"
 }
 ```
+
 Each of those triggers a different clause in the generated SQL.
 
 ### 2. user (User)
@@ -136,9 +141,11 @@ Example:
 ```python
 "SUBJECT_HUB_CODE": "USER_HUB"
 ```
+
 This means “filter by the hub assigned to this user’s organisation,” not a fixed hub like ABC.
 
 ### 3. subject (Subject)
+
 This is used when a filter wants to compare the current value in the database to an existing value on file—often represented by the "UNCHANGED" keyword.
 
 Example:
@@ -146,6 +153,7 @@ Example:
 ```python
 "SCREENING_STATUS": "unchanged"
 ```
+
 That’s saying: “Only return subjects whose screening status has not changed compared to what’s currently recorded on the subject object.”
 
 Without a subject, "unchanged" logic isn’t possible and will raise a validation error.
@@ -163,7 +171,6 @@ Most enums (like `YesNoType`, `ScreeningStatusType`, etc.) are resolved by descr
 Joins to related datasets are added dynamically only when required (e.g. latest episode, diagnostic test joins).
 
 All dates are handled via Oracle `TRUNC(SYSDATE)` and `TO_DATE()` expressions to ensure consistent date logic.
-
 
 ## Reference
 
