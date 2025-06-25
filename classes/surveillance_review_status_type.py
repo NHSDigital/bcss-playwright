@@ -3,8 +3,7 @@ class SurveillanceReviewStatusType:
     Utility class for mapping surveillance review status descriptions to valid value IDs.
 
     This class provides:
-        - A mapping from human-readable surveillance review status descriptions (e.g., "awaiting review", "in progress", "completed")
-          to their corresponding internal valid value IDs.
+        - A mapping from human-readable surveillance review status descriptions (e.g., "awaiting review", "in progress", "completed") to their corresponding internal valid value IDs.
         - A method to retrieve the valid value ID for a given description.
 
     Methods:

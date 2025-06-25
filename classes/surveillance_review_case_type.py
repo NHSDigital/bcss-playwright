@@ -3,8 +3,7 @@ class SurveillanceReviewCaseType:
     Utility class for mapping surveillance review case type descriptions to valid value IDs.
 
     This class provides:
-        - A mapping from human-readable surveillance review case type descriptions (e.g., "routine", "escalation", "clinical discussion")
-          to their corresponding internal valid value IDs.
+        - A mapping from human-readable surveillance review case type descriptions (e.g., "routine", "escalation", "clinical discussion") to their corresponding internal valid value IDs.
         - A method to retrieve the valid value ID for a given description.
 
     Methods:

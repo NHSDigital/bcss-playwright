@@ -3,8 +3,7 @@ class SymptomaticProcedureResultType:
     Utility class for mapping symptomatic surgery result descriptions to valid value IDs.
 
     This class provides:
-        - A mapping from human-readable symptomatic surgery result descriptions (e.g., "normal", "inconclusive", "cancer detected")
-          to their corresponding internal valid value IDs.
+        - A mapping from human-readable symptomatic surgery result descriptions (e.g., "normal", "inconclusive", "cancer detected") to their corresponding internal valid value IDs.
         - A method to retrieve the valid value ID for a given description.
 
     Methods:

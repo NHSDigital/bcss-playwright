@@ -3,9 +3,8 @@ class DiagnosticTestType:
     Utility class for mapping descriptive diagnostic test types to valid value IDs.
 
     This class provides:
-        - A mapping between human-readable diagnostic test type descriptions (e.g., "pcr", "antigen", "lateral flow")
-          and their corresponding internal valid value IDs.
-        - A method to retrieve the valid value ID for a given description.
+    - A mapping between human-readable diagnostic test type descriptions (e.g., "pcr", "antigen", "lateral flow") and their corresponding internal valid value IDs.
+    - A method to retrieve the valid value ID for a given description.
 
     Methods:
         get_valid_value_id(description: str) -> int:

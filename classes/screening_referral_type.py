@@ -3,8 +3,7 @@ class ScreeningReferralType:
     Utility class for mapping screening referral descriptions to valid value IDs.
 
     This class provides:
-        - A mapping from human-readable screening referral descriptions (e.g., "gp", "self referral", "hospital")
-          to their corresponding internal valid value IDs.
+        - A mapping from human-readable screening referral descriptions (e.g., "gp", "self referral", "hospital") to their corresponding internal valid value IDs.
         - A method to retrieve the valid value ID for a given description.
 
     Methods:
