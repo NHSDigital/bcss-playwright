@@ -6,7 +6,6 @@ import logging
 import pytest
 
 
-@pytest.mark.wip3
 def test_subject_selection_query_builder():
     """
     This function demonstrates how to use the builder to create a query
