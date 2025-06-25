@@ -2340,17 +2340,23 @@ class SubjectSelectionQueryBuilder:
         try:
             answer = YesNoType.from_description(self.criteria_value)
 
-            # INNER JOIN on sd_address_t with address type 13043 (temporary)
-            self.sql_from.append(
-                "INNER JOIN sd_address_t adds ON adds.contact_id = c.contact_id "
-                "AND adds.ADDRESS_TYPE = 13043"
-            )
-
-            # Apply logic for EFFECTIVE_FROM based on yes/no
             if answer == YesNoType.YES:
-                self.sql_from.append("AND adds.EFFECTIVE_FROM IS NOT NULL")
+                self.sql_from.append(
+                    " INNER JOIN sd_address_t adds ON adds.contact_id = c.contact_id "
+                    " AND adds.ADDRESS_TYPE = 13043 "
+                    " AND adds.EFFECTIVE_FROM IS NOT NULL "
+                )
             elif answer == YesNoType.NO:
-                self.sql_where.append("AND adds.EFFECTIVE_FROM IS NULL")
+                self.sql_from.append(
+                    " LEFT JOIN sd_address_t  adds ON adds.contact_id = c.contact_id "
+                )
+                self.sql_where.append(
+                    " AND NOT EXISTS ("
+                    " SELECT 1 "
+                    " FROM sd_address_t x "
+                    " WHERE x.contact_id  = c.contact_id "
+                    " AND x.address_type = 13043) "
+                )
             else:
                 raise ValueError()
         except Exception:
