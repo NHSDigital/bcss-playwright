@@ -146,17 +146,28 @@ This means “filter by the hub assigned to this user’s organisation,” not a
 
 ### 3. subject (Subject)
 
-This is used when a filter wants to compare the current value in the database to an existing value on file—often represented by the "UNCHANGED" keyword.
+This is an optional parameter that provides context about the subject being queried. It’s particularly important for criteria that require comparison against existing values in the database, such as "unchanged" logic.
+It allows the builder to determine if a subject's current value matches a previously recorded value.
 
-Example:
+If you want to filter subjects based on their current screening status, for example, you would need to provide a `Subject` object.
+To know if you need to populate an attribute like `screening_status_id`, you can do so by looking if the method requires the Subject class.
+
+For example, if you look at the following python code for a screening status, you can see that the Subject class is required.
 
 ```python
-"SCREENING_STATUS": "unchanged"
+case SubjectSelectionCriteriaKey.SCREENING_STATUS:
+    self._add_criteria_screening_status(subject)
 ```
 
-That’s saying: “Only return subjects whose screening status has not changed compared to what’s currently recorded on the subject object.”
+You can set attributes on the `Subject` object like this:
 
-Without a subject, "unchanged" logic isn’t possible and will raise a validation error.
+```python
+subject = Subject()
+subject.set_nhs_number("1234567890")
+subject.set_screening_status_id(1001)
+```
+
+This allows the builder to use the subject's current screening status in the query.
 
 Together, these three inputs give the builder all it needs to translate human-friendly selection criteria into valid, safe, dynamic SQL.
 
