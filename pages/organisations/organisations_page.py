@@ -1,4 +1,4 @@
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 
 
@@ -50,3 +50,45 @@ class OrganisationsPage(BasePage):
     def go_to_bureau_page(self) -> None:
         """Clicks the 'Bureau' link."""
         self.click(self.bureau_page)
+
+
+class OrganisationSwitchPage(BasePage):
+    """
+    Page Object Model for Organisation Switch functionality.
+    """
+
+    CONTINUE_BUTTON = "button:has-text('Continue')"
+    SELECT_ORG_LINK_TEXT = "Select Org"
+    RADIO_SELECTOR = "input[type='radio']"
+
+    def __init__(self, page: Page):
+        self.page = page
+
+    def get_available_organisation_ids(self):
+        """
+        Returns a list of all available organisation radio button IDs.
+        """
+        radios = self.page.locator(self.RADIO_SELECTOR)
+        org_ids = []
+        for i in range(radios.count()):
+            org_id = radios.nth(i).get_attribute("id")
+            if org_id:
+                org_ids.append(org_id)
+        return org_ids
+
+    def select_organisation_by_id_and_navigate_home(self, org_id):
+        """
+        Selects the organisation radio button by its id, clicks Continue,
+        and it navigates to the BCSS Home page after which then clicks the 'Select Org' link & it returns back to the change of organisation ids page.
+        """
+        self.page.locator(f'#{org_id}').check()
+        self.page.get_by_role('button', name='Continue').click()
+        self.page.get_by_role('link', name=self.SELECT_ORG_LINK_TEXT).click()
+
+    def switch_between_organisations(self):
+        """
+        Switches between all available organisations by their ids.
+        """
+        org_ids = self.get_available_organisation_ids()
+        for org_id in org_ids:
+            self.select_organisation_by_id_and_navigate_home(org_id)
