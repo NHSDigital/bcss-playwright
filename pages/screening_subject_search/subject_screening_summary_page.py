@@ -58,6 +58,7 @@ class SubjectScreeningSummaryPage(BasePage):
             "link", name="The person has a current"
         )
         self.temporary_address_popup = self.page.locator("#idTempAddress")
+        self.close_button = self.page.get_by_role("img", name="close")
 
     def wait_for_page_title(self) -> None:
         """Waits for the page to be the Subject Screening Summary"""
@@ -212,7 +213,19 @@ class SubjectScreeningSummaryPage(BasePage):
             expect(self.temporary_address_icon).to_be_visible()
             logging.info("Temporary address icon is visible")
         except Exception as e:
-            pytest.fail(f"Temporary address icon is not visible: {e}")
+            pytest.fail(f"Temporary address icon is not visible when it should be: {e}")
+
+    def verify_temporary_address_icon_not_visible(self) -> None:
+        """Verify that the temporary address icon is not visible."""
+        try:
+            expect(self.temporary_address_icon).not_to_be_visible()
+            logging.info("Temporary address icon is not visible as expected")
+        except Exception as e:
+            pytest.fail(f"Temporary address icon is visible when it should not be: {e}")
+
+    def click_close_button(self) -> None:
+        """Click on the close button in the temporary address popup."""
+        self.click(self.close_button)
 
 
 class ChangeScreeningStatusOptions(Enum):

@@ -50,9 +50,9 @@ class SubjectDemographicPage(BasePage):
         self.temporary_address_address_line_5 = self.page.locator(
             "#UI_SUBJECT_ALT_ADDR5_0"
         )
-        self.temporary_address_postcode = self.page.get_by_role(
-            "row", name="Postcode", exact=True
-        ).get_by_label("Postcode")
+        self.temporary_address_postcode = self.page.locator(
+            "#UI_SUBJECT_ALT_POSTCODE_0"
+        )
 
     def is_forename_filled(self) -> bool:
         """
@@ -154,16 +154,18 @@ class SubjectDemographicPage(BasePage):
             if dict["valid_from"] is None:
                 self.temporary_address_valid_from_text_box.fill("")
             else:
-                self.temporary_address_valid_from_calendar_button.click()
-                CalendarPicker(self.page).v1_calender_picker(dict["valid_from"])
+                CalendarPicker(self.page).calendar_picker_ddmmyyyy(
+                    dict["valid_from"], self.temporary_address_valid_from_text_box
+                )
 
         # Update the valid to date
         if "valid_to" in dict:
             if dict["valid_to"] is None:
                 self.temporary_address_valid_to_text_box.fill("")
             else:
-                self.temporary_address_valid_to_calendar_button.click()
-                CalendarPicker(self.page).v1_calender_picker(dict["valid_to"])
+                CalendarPicker(self.page).calendar_picker_ddmmyyyy(
+                    dict["valid_to"], self.temporary_address_valid_to_text_box
+                )
 
         # Fill in the address lines
         if "address_line_1" in dict:
