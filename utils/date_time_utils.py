@@ -152,3 +152,21 @@ class DateTimeUtils:
             base_date += timedelta(days=1)
 
         return base_date.strftime("%d/%m/%Y")
+
+    @staticmethod
+    def random_offset(start_date: datetime, end_date: datetime) -> int:
+        """
+        Returns a random integer offset (in days) between the given start and end dates.
+
+        This can be used to shift a date within a range, e.g., when generating birthdates
+        to ensure subject age aligns with eligibility criteria.
+
+        Args:
+            start_date (datetime): The beginning of the valid date range.
+            end_date (datetime): The end of the valid date range.
+
+        Returns:
+            int: A random offset in days between start_date and end_date.
+        """
+        delta_days = (end_date - start_date).days
+        return random.randint(0, max(delta_days, 0))
