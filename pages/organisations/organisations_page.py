@@ -64,31 +64,41 @@ class OrganisationSwitchPage(BasePage):
     def __init__(self, page: Page):
         self.page = page
 
-    def get_available_organisation_ids(self):
+    def get_available_organisation_ids(self)-> list[str]:
         """
         Returns a list of all available organisation radio button IDs.
         """
         radios = self.page.locator(self.RADIO_SELECTOR)
         org_ids = []
-        for i in range(radios.count()):
-            org_id = radios.nth(i).get_attribute("id")
+        for int in range(radios.count()):
+            org_id = radios.nth(int).get_attribute("id")
             if org_id:
                 org_ids.append(org_id)
         return org_ids
 
-    def select_organisation_by_id_and_navigate_home(self, org_id):
+    def select_organisation_by_id_and_navigate_home(self, org_id)-> None:
         """
-        Selects the organisation radio button by its id, clicks Continue,
-        and it navigates to the BCSS Home page after which then clicks the 'Select Org' link & it returns back to the change of organisation ids page.
+        Selects the organisation radio button by its ID, clicks Continue,
+        navigates to the BCSS Home page, then clicks the 'Select Org' link to return to the organisation selection page.
+        Args:
+        organisation_id (str): The id of the organisation to be selected.
         """
         self.page.locator(f'#{org_id}').check()
         self.page.get_by_role('button', name='Continue').click()
         self.page.get_by_role('link', name=self.SELECT_ORG_LINK_TEXT).click()
 
-    def switch_between_organisations(self):
+    def switch_between_organisations(self)-> None:
         """
         Switches between all available organisations by their ids.
         """
         org_ids = self.get_available_organisation_ids()
         for org_id in org_ids:
             self.select_organisation_by_id_and_navigate_home(org_id)
+
+
+
+
+
+
+
+
