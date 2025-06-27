@@ -423,7 +423,9 @@ def get_subjects_for_investigation_dataset_updates(
     return subjects_df
 
 
-def get_subjects_by_note_count(type_id: int, note_status: int, note_count: int = 0) -> pd.DataFrame:
+def get_subjects_by_note_count(
+    type_id: int, note_status: int, note_count: int = 0
+) -> pd.DataFrame:
     """
     Retrieves subjects based on the number of additional care notes of the specified type.
 
@@ -466,7 +468,9 @@ def get_subjects_by_note_count(type_id: int, note_status: int, note_count: int =
     return subjects_df
 
 
-def get_supporting_notes(screening_subject_id: int, type_id: int,note_status:int) -> pd.DataFrame:
+def get_supporting_notes(
+    screening_subject_id: int, type_id: int, note_status: int
+) -> pd.DataFrame:
     """
     Retrieves supporting notes for a given screening subject ID and type ID.
 
@@ -485,7 +489,11 @@ def get_supporting_notes(screening_subject_id: int, type_id: int,note_status:int
     AND sn.status_id = :note_status
     ORDER BY NVL(sn.updated_datestamp, sn.created_datestamp) DESC
     """
-    params = {"screening_subject_id": screening_subject_id, "type_id": type_id,"note_status": note_status}
+    params = {
+        "screening_subject_id": screening_subject_id,
+        "type_id": type_id,
+        "note_status": note_status,
+    }
     notes_df = OracleDB().execute_query(query, params)
     return notes_df
 

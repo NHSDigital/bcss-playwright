@@ -1,4 +1,5 @@
 import logging
+from re import A
 import pytest
 from playwright.sync_api import Page, expect
 from pages import screening_subject_search
@@ -27,7 +28,10 @@ from utils.oracle.oracle_specific_functions import (
     get_supporting_notes,
 )
 
-def test_subject_does_not_have_an_additional_care_note(page: Page, general_properties: dict) -> None:
+
+def test_subject_does_not_have_an_additional_care_note(
+    page: Page, general_properties: dict
+) -> None:
     """
     Test to check if I can identify if a subject does not have a Additional Care note
     """
@@ -67,8 +71,10 @@ def test_subject_does_not_have_an_additional_care_note(page: Page, general_prope
         general_properties["additional_care_note_name"]
     )
 
+
 def test_add_an_additional_care_note_for_a_subject_without_a_note(
-    page: Page, general_properties: dict) -> None:
+    page: Page, general_properties: dict
+) -> None:
     """
     Test to add a note for a subject without an additional care note.
     """
@@ -84,8 +90,11 @@ def test_add_an_additional_care_note_for_a_subject_without_a_note(
     BasePage(page).go_to_screening_subject_search_page()
 
     # Get a subject with no notes of the specified type
-    subjects_df = get_subjects_by_note_count(general_properties["additional_care_note_type_value"],
-        general_properties["note_status_active"], 0)
+    subjects_df = get_subjects_by_note_count(
+        general_properties["additional_care_note_type_value"],
+        general_properties["note_status_active"],
+        0,
+    )
     if subjects_df.empty:
         pytest.fail(
             f"No subjects found for note type {general_properties["additional_care_note_type_value"]}."
@@ -149,10 +158,7 @@ def test_add_an_additional_care_note_for_a_subject_without_a_note(
 
 
 def test_add_additional_care_note_for_subject_with_existing_note(
-    page: Page,
-    note_type_name: str = "Additional Care Note",
-    note_type_value: int = 4112,
-    note_status=4100,
+    page: Page, general_properties: dict
 ) -> None:
     """
     Test to add an additional care note for a subject who already has an existing note.
@@ -169,7 +175,11 @@ def test_add_additional_care_note_for_subject_with_existing_note(
     BasePage(page).go_to_screening_subject_search_page()
 
     # Get a subject with existing additional care notes
-    subjects_df = get_subjects_by_note_count(note_type_value, note_status, 1)
+    subjects_df = get_subjects_by_note_count(
+        general_properties["additional_care_note_type_value"],
+        general_properties["note_status_active"],
+        1,
+    )
     nhs_no = subjects_df["subject_nhs_number"].iloc[0]
     logging.info(f"Searching for subject with NHS Number: {nhs_no}")
     SubjectScreeningPage(page).fill_nhs_number(nhs_no)
@@ -209,19 +219,17 @@ def test_add_additional_care_note_for_subject_with_existing_note(
         subjects_df["note_status"].iloc[0]
     )  # Get the note status from the DataFrame
     notes_df = get_supporting_notes(screening_subject_id, type_id, note_status)
-    # Filter the DataFrame to only include rows where type_id == 4112
-    filtered_notes_df = notes_df[notes_df["type_id"] == note_type_value]
 
     # Verify title and note match the provided values
     logging.info(
         f"Verifying that the title and note match the provided values for type_id: {type_id}."
     )
     assert (
-        filtered_notes_df["title"].iloc[0].strip() == note_title
-    ), f"Title does not match. Expected: '{note_title}', Found: '{filtered_notes_df['title'].iloc[0].strip()}'."
+        notes_df["title"].iloc[0].strip() == note_title
+    ), f"Title does not match. Expected: '{note_title}', Found: '{notes_df['title'].iloc[0].strip()}'."
     assert (
-        filtered_notes_df["note"].iloc[0].strip() == note_text
-    ), f"Note does not match. Expected: '{note_text}', Found: '{filtered_notes_df['note'].iloc[0].strip()}'."
+        notes_df["note"].iloc[0].strip() == note_text
+    ), f"Note does not match. Expected: '{note_text}', Found: '{notes_df['note'].iloc[0].strip()}'."
 
     logging.info(
         f"Verification successful: Additional care note added for the subject with NHS Number: {nhs_no}. "
@@ -230,10 +238,7 @@ def test_add_additional_care_note_for_subject_with_existing_note(
 
 
 def test_identify_subject_with_additional_care_note(
-    page: Page,
-    note_type_name: str = "Additional Care Note",
-    note_type_value: int = 4112,
-    note_status=4100,
+    page: Page, general_properties: dict
 ) -> None:
     """
     Test to identify if a subject has an Additional Care note.
@@ -249,7 +254,11 @@ def test_identify_subject_with_additional_care_note(
     BasePage(page).go_to_screening_subject_search_page()
 
     # Search for the subject by NHS Number.")
-    subjects_df = get_subjects_by_note_count(note_type_value, note_status, 1)
+    subjects_df = get_subjects_by_note_count(
+        general_properties["additional_care_note_type_value"],
+        general_properties["note_status_active"],
+        1,
+    )
     nhs_no = subjects_df["subject_nhs_number"].iloc[0]
     SubjectScreeningPage(page).fill_nhs_number(nhs_no)
     SubjectScreeningPage(page).select_search_area_option("07")
@@ -257,15 +266,12 @@ def test_identify_subject_with_additional_care_note(
     # Verify subject has additional care notes  present
     logging.info("Verified: Aadditional care notes are present for the subject.")
     # logging.info("Verifying that  additional care notes are present for the subject.")
-    SubjectScreeningSummaryPage(page).verify_additional_care_note_visible()
+    SubjectScreeningSummaryPage(page).verify_note_link_present(
+        general_properties["additional_care_note_name"]
+    )
 
 
-def test_view_active_additional_care_note(
-    page: Page,
-    note_type_name: str = "Additional Care Note",
-    note_type_value: int = 4112,
-    note_status=4100,
-) -> None:
+def test_view_active_additional_care_note(page: Page, general_properties: dict) -> None:
     """
     Test to verify if an active Additional Care note is visible for a subject.
     """
@@ -280,7 +286,9 @@ def test_view_active_additional_care_note(
     BasePage(page).go_to_screening_subject_search_page()
 
     # Search for the subject by NHS Number.")
-    subjects_df = get_subjects_by_note_count(note_type_value, 1)
+    subjects_df = get_subjects_by_note_count(
+        general_properties["additional_care_note_type_value"], 1
+    )
     nhs_no = subjects_df["subject_nhs_number"].iloc[0]
     SubjectScreeningPage(page).fill_nhs_number(nhs_no)
     SubjectScreeningPage(page).select_search_area_option("07")
@@ -291,7 +299,9 @@ def test_view_active_additional_care_note(
     logging.info(
         f"Verifying that the Additional Care Note is visible for the subject with NHS Number: {nhs_no}."
     )
-    SubjectScreeningSummaryPage(page).verify_additional_care_note_visible()
+    SubjectScreeningSummaryPage(page).verify_note_link_present(
+        general_properties["additional_care_note_name"]
+    )
     logging.info(
         f"Clicking on the 'Additional Care Note' link for the subject with NHS Number: {nhs_no}."
     )
@@ -306,17 +316,17 @@ def test_view_active_additional_care_note(
     screening_subject_id = int(subjects_df["screening_subject_id"].iloc[0])
     logging.info(f"Screening Subject ID retrieved: {screening_subject_id}")
     type_id = int(subjects_df["type_id"].iloc[0])
-    notes_df = get_supporting_notes(screening_subject_id, type_id, note_status)
-    # Filter the DataFrame to only include rows where type_id == 4112
-    filtered_notes_df = notes_df[notes_df["type_id"] == note_type_value]
+    notes_df = get_supporting_notes(
+        screening_subject_id, type_id, general_properties["note_status_active"]
+    )
     # Get the title and note from the first row of the UI table
     ui_data = SubjectEventsNotes(page).get_title_and_note_from_row(2)
     logging.info(f"Data from UI: {ui_data}")
 
     # Get the title and note from the database
     db_data = {
-        "title": filtered_notes_df["title"].iloc[0].strip(),
-        "note": filtered_notes_df["note"].iloc[0].strip(),
+        "title": notes_df["title"].iloc[0].strip(),
+        "note": notes_df["note"].iloc[0].strip(),
     }
     logging.info(f"Data from DB: {db_data}")
 
@@ -330,41 +340,36 @@ def test_view_active_additional_care_note(
 
 
 def test_update_existing_additional_care_note(
-    page: Page,
-    note_type_name: str = "Additional Care Note",
-    note_type_value: int = 4112,
-    note_status=4100,
+    page: Page, general_properties: dict
 ) -> None:
     """
     Test to verify if an existing Additional Care note can be updated successfully.
     """
     logging.info("Starting test: Verify subject has an additional care note.")
-    logging.info("Logging in as 'ScreeningAssistant at BCS02'.")
     # user login
-    logging.info("Logging in as 'ScreeningAssistant at BCS02'.")
-    UserTools.user_login(page, "ScreeningAssistant at BCS02")
+    logging.info("Logging in as 'TeamLeader at BCS01'.")
+    UserTools.user_login(page, "Team Leader at BCS01")
 
     # Navigate to the Screening Subject Search Page
     logging.info("Navigating to the Screening Subject Search Page.")
     BasePage(page).go_to_screening_subject_search_page()
-
     # Search for the subject by NHS Number.")
-    subjects_df = get_subjects_by_note_count(note_type_value, note_status, 1)
+    subjects_df = get_subjects_by_note_count(
+        general_properties["additional_care_note_type_value"],
+        general_properties["note_status_active"],
+        1,
+    )
     nhs_no = subjects_df["subject_nhs_number"].iloc[0]
     SubjectScreeningPage(page).fill_nhs_number(nhs_no)
     SubjectScreeningPage(page).select_search_area_option("07")
     SubjectScreeningPage(page).click_search_button()
     # Verify subject has additional care notes  present
-    logging.info("Verified: Additional care notes are present for the subject.")
-    # logging.info("Verifying that  additional care notes are present for the subject.")
     logging.info(
         f"Verifying that the Additional Care Note is visible for the subject with NHS Number: {nhs_no}."
     )
-    SubjectScreeningSummaryPage(page).verify_additional_care_note_visible()
-    logging.info(
-        f"Clicking on the 'Additional Care Note' link for the subject with NHS Number: {nhs_no}."
+    SubjectScreeningSummaryPage(page).verify_note_link_present(
+        general_properties["additional_care_note_name"]
     )
-
     SubjectScreeningSummaryPage(page).click_subjects_events_notes()
     SubjectEventsNotes(page).select_note_type(NotesOptions.ADDITIONAL_CARE_NOTE)
     BasePage(page).safe_accept_dialog_select_option(
@@ -384,12 +389,9 @@ def test_update_existing_additional_care_note(
     screening_subject_id = int(subjects_df["screening_subject_id"].iloc[0])
     logging.info(f"Screening Subject ID retrieved: {screening_subject_id}")
     type_id = int(subjects_df["type_id"].iloc[0])
-    note_status = int(
-        subjects_df["note_status"].iloc[0]
-    )  # Get the note status from the DataFrame
-    notes_df = get_supporting_notes(screening_subject_id, type_id, note_status)
-    # Filter the DataFrame to only include rows where type_id == 4112
-    filtered_notes_df = notes_df[notes_df["type_id"] == note_type_value]
+    notes_df = get_supporting_notes(
+        screening_subject_id, type_id, general_properties["note_status_active"]
+    )
     # Verify title and note match the provided values
     logging.info("Verifying that the updated title and note match the provided values.")
 
@@ -398,9 +400,9 @@ def test_update_existing_additional_care_note(
     note_text = "updated additional care note"
 
     # Ensure the filtered DataFrame is not empty
-    if filtered_notes_df.empty:
+    if notes_df.empty:
         pytest.fail(
-            f"No notes found for type_id: {type_id}. Expected at least one updated note."
+            f"No notes found for type_id: {general_properties["additional_care_note_type_value"]}. Expected at least one updated note."
         )
 
     # Verify title and note match the provided values
@@ -408,11 +410,11 @@ def test_update_existing_additional_care_note(
         f"Verifying that the title and note match the provided values for type_id: {type_id}."
     )
     assert (
-        filtered_notes_df["title"].iloc[0].strip() == note_title
-    ), f"Title does not match. Expected: '{note_title}', Found: '{filtered_notes_df['title'].iloc[0].strip()}'."
+        notes_df["title"].iloc[0].strip() == note_title
+    ), f"Title does not match. Expected: '{note_title}', Found: '{notes_df['title'].iloc[0].strip()}'."
     assert (
-        filtered_notes_df["note"].iloc[0].strip() == note_text
-    ), f"Note does not match. Expected: '{note_text}', Found: '{filtered_notes_df['note'].iloc[0].strip()}'."
+        notes_df["note"].iloc[0].strip() == note_text
+    ), f"Note does not match. Expected: '{note_text}', Found: '{notes_df['note'].iloc[0].strip()}'."
 
     logging.info(
         f"Verification successful: Additional care note added for the subject with NHS Number: {nhs_no}. "

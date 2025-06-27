@@ -193,19 +193,24 @@ class SubjectScreeningSummaryPage(BasePage):
         except Exception as e:
             pytest.fail(f"Unable to advance the episode: {e}")
 
-    def verify_subject_has_additional_care_note(self) -> bool:
-        """
-        Checks if the subject has an additional care note (AN).
-
-        Returns:
-            bool: True if the subject has an additional care note, False otherwise.
-        """
-        elements = self.page.locator('a:has-text("(AN)")')
-        return elements.count() > 0
-
     def verify_additional_care_note_visible(self) -> None:
         """Verifies that the '(AN)' link is visible."""
         expect(self.additional_care_note_link).to_be_visible()
+
+    def verify_note_link_present(self, note_type_name: str) -> None:
+        """
+        Verifies that the link for the specified note type is visible on the page.
+
+        Args:
+            note_type_name (str): The name of the note type to check (e.g., 'Additional Care Note', 'Episode Note').
+
+        Raises:
+            AssertionError: If the link is not visible on the page.
+        """
+        logging.info(f"Checking if the '{note_type_name}' link is visible.")
+        note_link_locator = self.page.get_by_role("link", name=f"({note_type_name})")  # Dynamic locator for the note type link
+        assert note_link_locator.is_visible(), f"'{note_type_name}' link is not visible, but it should be."
+        logging.info(f"Verified: '{note_type_name}' link is visible.")    
 
     def verify_note_link_not_present(self, note_type_name: str) -> None:
         """

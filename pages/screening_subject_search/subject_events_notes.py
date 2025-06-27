@@ -29,6 +29,9 @@ class SubjectEventsNotes(BasePage):
         self.note_status = self.page.locator(
             "//table[@id='displayRS']/tbody/tr[2]/td[3]/select"
         )
+        self.episode_note_status = self.page.locator(
+            "//table[@id='displayRS']/tbody/tr[2]/td[4]/select"
+        )
 
     def select_additional_care_note(self) -> None:
         """Selects the 'Additional Care Needs Note' checkbox."""
@@ -131,6 +134,7 @@ class NotesOptions(StrEnum):
     SUBJECT_NOTE = "4111"
     KIT_NOTE = "308015"
     ADDITIONAL_CARE_NOTE = "4112"
+    EPISODE_NOTE= "4110"
 
 
 class NotesStatusOptions(StrEnum):
