@@ -76,7 +76,7 @@ class OrganisationSwitchPage(BasePage):
                 org_ids.append(org_id)
         return org_ids
 
-    def select_organisation_by_id_and_navigate_home(self, org_id)-> None:
+    def select_organisation_by_id_and_navigate_home(self, org_id: str)-> None:
         """
         Selects the organisation radio button by its ID, clicks Continue,
         navigates to the BCSS Home page, then clicks the 'Select Org' link to return to the organisation selection page.
