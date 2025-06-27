@@ -106,11 +106,13 @@ class SubjectEventsNotes(BasePage):
         """
         Extracts title and note from a specific row's 'Notes' column using dynamic column index.
         """
-        cell_text= self.table_utils.get_cell_value("Notes", row_number)
+        cell_text = self.table_utils.get_cell_value("Notes", row_number)
         lines = cell_text.split("\n\n")
         title = lines[0].strip() if len(lines) > 0 else ""
         note = lines[1].strip() if len(lines) > 1 else ""
-        logging.info(f"Extracted title: '{title}' and note: '{note}' from row {row_number}")    
+        logging.info(
+            f"Extracted title: '{title}' and note: '{note}' from row {row_number}"
+        )
         return {"title": title, "note": note}
 
 
@@ -134,7 +136,7 @@ class NotesOptions(StrEnum):
     SUBJECT_NOTE = "4111"
     KIT_NOTE = "308015"
     ADDITIONAL_CARE_NOTE = "4112"
-    EPISODE_NOTE= "4110"
+    EPISODE_NOTE = "4110"
 
 
 class NotesStatusOptions(StrEnum):

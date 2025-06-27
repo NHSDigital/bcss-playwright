@@ -517,15 +517,15 @@ def get_subjects_with_multiple_notes(note_type: int) -> pd.DataFrame:
         SELECT COUNT(sn.screening_subject_id)
         FROM supporting_notes_t sn
         WHERE sn.screening_subject_id = ss.screening_subject_id
-          AND sn.type_id = :note_type
-          AND sn.status_id = 4100
+        AND sn.type_id = :note_type
+        AND sn.status_id = 4100
         GROUP BY sn.screening_subject_id
     )
     AND 200 > (SELECT COUNT(sn.screening_subject_id)
         FROM supporting_notes_t sn
         WHERE sn.screening_subject_id = ss.screening_subject_id
-          AND sn.type_id = :note_type
-          AND sn.status_id = 4100
+        AND sn.type_id = :note_type
+        AND sn.status_id = 4100
         GROUP BY sn.screening_subject_id
     )
     AND ROWNUM = 1

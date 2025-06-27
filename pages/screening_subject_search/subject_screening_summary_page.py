@@ -72,9 +72,7 @@ class SubjectScreeningSummaryPage(BasePage):
 
     def verify_subject_search_results_title_subject_search_results(self) -> None:
         """Verify that the subject search results title contains 'Subject Search Results'."""
-        self.bowel_cancer_screening_page_title_contains_text(
-            "Subject Search Results"
-        )
+        self.bowel_cancer_screening_page_title_contains_text("Subject Search Results")
 
     def get_latest_event_status_cell(self, latest_event_status: str) -> Locator:
         """Get the latest event status cell by its name."""
@@ -208,24 +206,33 @@ class SubjectScreeningSummaryPage(BasePage):
             AssertionError: If the link is not visible on the page.
         """
         logging.info(f"Checking if the '{note_type_name}' link is visible.")
-        note_link_locator = self.page.get_by_role("link", name=f"({note_type_name})")  # Dynamic locator for the note type link
-        assert note_link_locator.is_visible(), f"'{note_type_name}' link is not visible, but it should be."
-        logging.info(f"Verified: '{note_type_name}' link is visible.")    
+        note_link_locator = self.page.get_by_role(
+            "link", name=f"({note_type_name})"
+        )  # Dynamic locator for the note type link
+        assert (
+            note_link_locator.is_visible()
+        ), f"'{note_type_name}' link is not visible, but it should be."
+        logging.info(f"Verified: '{note_type_name}' link is visible.")
 
     def verify_note_link_not_present(self, note_type_name: str) -> None:
         """
-    Verifies that the link for the specified note type is not visible on the page.
+        Verifies that the link for the specified note type is not visible on the page.
 
-    Args:
-        note_type_name (str): The name of the note type to check (e.g., 'Additional Care Note', 'Episode Note').
+        Args:
+            note_type_name (str): The name of the note type to check (e.g., 'Additional Care Note', 'Episode Note').
 
-    Raises:
-        AssertionError: If the link is visible on the page.
-    """
+        Raises:
+            AssertionError: If the link is visible on the page.
+        """
         logging.info(f"Checking if the '{note_type_name}' link is not visible.")
-        note_link_locator = self.page.get_by_role("link", name=f"({note_type_name})")  # Dynamic locator for the note type link
-        assert not note_link_locator.is_visible(), f"'{note_type_name}' link is visible, but it should not be."
+        note_link_locator = self.page.get_by_role(
+            "link", name=f"({note_type_name})"
+        )  # Dynamic locator for the note type link
+        assert (
+            not note_link_locator.is_visible()
+        ), f"'{note_type_name}' link is visible, but it should not be."
         logging.info(f"Verified: '{note_type_name}' link is not visible.")
+
 
 class ChangeScreeningStatusOptions(Enum):
     """Enum for Change Screening Status options."""

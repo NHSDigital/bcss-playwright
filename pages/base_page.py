@@ -249,7 +249,6 @@ class BasePage:
         except Exception as e:
             logging.error(f"Click failed: {e}")
 
-
     def assert_dialog_text(self, expected_text: str) -> None:
         """
         Asserts that a dialog appears and contains the expected text.
@@ -280,5 +279,4 @@ class BasePage:
         try:
             locator.select_option(option)
         except Exception as e:
-            logging.error(f"Option selection failed: {e}")   
-            
+            logging.error(f"Option selection failed: {e}")
