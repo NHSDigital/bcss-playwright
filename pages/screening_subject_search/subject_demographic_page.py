@@ -143,11 +143,10 @@ class SubjectDemographicPage(BasePage):
                           Expected keys: 'valid_from', 'valid_to', 'address_line_1',
                           'address_line_2', 'address_line_3', 'address_line_4', 'address_line_5'.
         """
-        if not dict:
-            raise ValueError("The 'dict' argument cannot be None or empty")
-
         # Click the link to show the temporary address fields
-        self.click(self.temporary_address_show_link)
+        if self.temporary_address_show_link.is_visible():
+            # If the link is visible, click it to show the temporary address fields
+            self.click(self.temporary_address_show_link)
 
         # Update the valid from date
         if "valid_from" in dict:

@@ -10,6 +10,7 @@ from pages.screening_subject_search.subject_demographic_page import (
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
+from pages.logout.log_out_page import LogoutPage
 from utils.screening_subject_page_searcher import (
     search_subject_demographics_by_nhs_number,
     search_subject_episode_by_nhs_number,
@@ -21,9 +22,10 @@ from faker import Faker
 from datetime import datetime, timedelta
 
 
+@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.subject_tests
-def test_not_amending_temporary_address(page: Page):
+def test_not_amending_temporary_address(page: Page) -> None:
     """
     Scenario: If not amending a temporary address, no need to validate it
 
@@ -31,7 +33,6 @@ def test_not_amending_temporary_address(page: Page):
     and the subject's postcode is updated.
     That the subject does not have a temporary address added to them.
     """
-
     criteria = {
         "subject age": "<= 80",
         "subject has temporary address": "no",
@@ -49,28 +50,24 @@ def test_not_amending_temporary_address(page: Page):
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"Selected NHS Number: {nhs_no}")
 
-    # Screening Centre Manager - State Registered (England)
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
-
-    # Navigate to the Subject Search Criteria Page
     BasePage(page).go_to_screening_subject_search_page()
-
-    # Search for a subject's demographics by NHS Number
     search_subject_demographics_by_nhs_number(page, nhs_no)
 
-    # Update the subject's postcode
     fake = Faker("en_GB")
     random_postcode = fake.postcode()
     SubjectDemographicPage(page).fill_postcode_input(random_postcode)
     SubjectDemographicPage(page).postcode_field.press("Tab")
     SubjectDemographicPage(page).click_update_subject_data_button()
 
-    check_subject_has_temporary_address(page, nhs_no, temporary_address=False)
+    check_subject_has_temporary_address(nhs_no, temporary_address=False)
+    LogoutPage(page).log_out()
 
 
+@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.subject_tests
-def test_add_temporyay_address_then_delete(page: Page):
+def test_add_temporyay_address_then_delete(page: Page) -> None:
     """
     Add a temporary address, then delete it.
 
@@ -94,14 +91,10 @@ def test_add_temporyay_address_then_delete(page: Page):
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"Selected NHS Number: {nhs_no}")
 
-    # Screening Centre Manager - State Registered (England)
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
-
-    # Navigate to the
     BasePage(page).go_to_screening_subject_search_page()
-    # Search for a subject's demographics by NHS Number
     search_subject_demographics_by_nhs_number(page, nhs_no)
-    # Add a temporary address
+
     temp_address = {
         "valid_from": datetime.today(),
         "valid_to": datetime.today() + timedelta(days=31),
@@ -113,12 +106,8 @@ def test_add_temporyay_address_then_delete(page: Page):
         "postcode": "AB12 3CD",
     }
     SubjectDemographicPage(page).update_temporary_address(temp_address)
+    check_subject_has_temporary_address(nhs_no, temporary_address=True)
 
-    check_subject_has_temporary_address(page, nhs_no, temporary_address=True)
-
-    SubjectScreeningSummaryPage(page).click_subject_demographics()
-
-    # Delete the temporary address
     temp_address = {
         "valid_from": None,
         "valid_to": None,
@@ -131,29 +120,331 @@ def test_add_temporyay_address_then_delete(page: Page):
     }
     SubjectDemographicPage(page).update_temporary_address(temp_address)
 
-    check_subject_has_temporary_address(page, nhs_no, temporary_address=False)
+    check_subject_has_temporary_address(nhs_no, temporary_address=False)
+    LogoutPage(page).log_out()
 
 
-def check_subject_has_temporary_address(
-    page: Page, nhs_no: str, temporary_address: bool
-) -> None:
+@pytest.mark.wip
+@pytest.mark.regression
+@pytest.mark.subject_tests
+def test_validation_regarding_dates(page: Page) -> None:
     """
-    Check if a subject has a temporary address in the database.
+    Checks the validation regarding the temporary address date fields works as expected.
+
+    This test is checking that the validation for the temporary address date fields
+    works correctly when the user tries to enter a temporary address with invalid dates.
+    It ensures that the user is prompted with appropriate error messages when the dates are not valid.
+    """
+    criteria = {
+        "subject age (y/d)": "<= 80",
+        "subject has temporary address": "no",
+    }
+    user = User()
+    subject = Subject()
+
+    builder = SubjectSelectionQueryBuilder()
+
+    query, bind_vars = builder.build_subject_selection_query(
+        criteria=criteria, user=user, subject=subject, subjects_to_retrieve=1
+    )
+
+    df = OracleDB().execute_query(query, bind_vars)
+    nhs_no = df.iloc[0]["subject_nhs_number"]
+    logging.info(f"Selected NHS Number: {nhs_no}")
+
+    UserTools.user_login(page, "Screening Centre Manager at BCS001")
+    BasePage(page).go_to_screening_subject_search_page()
+    search_subject_demographics_by_nhs_number(page, nhs_no)
+
+    temp_address = {
+        "valid_from": None,
+        "valid_to": None,
+        "address_line_1": "Line 1",
+        "address_line_2": "Line 2",
+        "address_line_3": "Line 3",
+        "address_line_4": "Line 4",
+        "address_line_5": "Line 5",
+        "postcode": "EX2 5SE",
+    }
+    subject_page = SubjectDemographicPage(page)
+
+    subject_page.assert_dialog_text(
+        "If entering a temporary address, please specify the From-date"
+    )
+    subject_page.update_temporary_address(temp_address)
+    dialog_error = getattr(subject_page, "_dialog_assertion_error", None)
+    if dialog_error is not None:
+        raise dialog_error
+    logging.info("Temporary address validation for 'From-date' passed.")
+
+    temp_address["valid_from"] = datetime(1900, 1, 1)
+    subject_page.assert_dialog_text(
+        "If entering a temporary address, please specify the To-date"
+    )
+    subject_page.update_temporary_address(temp_address)
+    dialog_error = getattr(subject_page, "_dialog_assertion_error", None)
+    if dialog_error is not None:
+        raise dialog_error
+    logging.info("Temporary address validation for 'To-date' passed.")
+
+    temp_address["valid_to"] = datetime(1900, 1, 2)
+    subject_page.assert_dialog_text(
+        "The From-date of the Subject's temporary address must not be before the Date of Birth"
+    )
+    subject_page.update_temporary_address(temp_address)
+    dialog_error = getattr(subject_page, "_dialog_assertion_error", None)
+    if dialog_error is not None:
+        raise dialog_error
+    logging.info("Temporary address validation for 'From-date before DOB' passed.")
+
+    # Reset to valid state before next test
+    temp_address["valid_from"] = datetime.today()
+    temp_address["valid_to"] = datetime.today() + timedelta(days=1)
+    subject_page.update_temporary_address(temp_address)
+
+    temp_address["valid_from"] = datetime.today() + timedelta(days=1)
+    temp_address["valid_to"] = datetime.today()
+    subject_page.assert_dialog_text(
+        "The From-date of the Subject's temporary address must not be after the To-date"
+    )
+    subject_page.update_temporary_address(temp_address)
+    dialog_error = getattr(subject_page, "_dialog_assertion_error", None)
+    if dialog_error is not None:
+        raise dialog_error
+    logging.info("Temporary address validation for 'From-date after To-date' passed.")
+
+    LogoutPage(page).log_out()
+
+
+@pytest.mark.wip
+@pytest.mark.regression
+@pytest.mark.subject_tests
+def test_ammending_temporary_address(page: Page) -> None:
+    """
+    Scenario: If amending a temporary address, it should be validated.
+
+    This test checks that if a temporary address is being amended,
+    and the subject's postcode is updated.
+    That the subject has a temporary address added to them.
+    """
+    criteria = {
+        "subject age": "<= 80",
+        "subject has temporary address": "no",
+    }
+    user = User()
+    subject = Subject()
+
+    builder = SubjectSelectionQueryBuilder()
+
+    query, bind_vars = builder.build_subject_selection_query(
+        criteria=criteria, user=user, subject=subject, subjects_to_retrieve=1
+    )
+
+    df = OracleDB().execute_query(query, bind_vars)
+    nhs_no = df.iloc[0]["subject_nhs_number"]
+    logging.info(f"Selected NHS Number: {nhs_no}")
+
+    UserTools.user_login(page, "Screening Centre Manager at BCS001")
+    BasePage(page).go_to_screening_subject_search_page()
+    search_subject_demographics_by_nhs_number(page, nhs_no)
+
+    temp_address = {
+        "valid_from": datetime(2000, 1, 1),
+        "valid_to": datetime(2000, 1, 2),
+        "address_line_1": "Line 1",
+        "address_line_2": "Line 2",
+        "address_line_3": "Line 3",
+        "address_line_4": "Line 4",
+        "address_line_5": "Line 5",
+        "postcode": "EX2 5SE",
+    }
+    SubjectDemographicPage(page).update_temporary_address(temp_address)
+    check_subject_has_temporary_address(nhs_no, temporary_address=True)
+
+    temp_address = {
+        "valid_from": datetime(3000, 1, 1),
+        "valid_to": datetime(3000, 1, 2),
+        "address_line_1": "Line 1.1",
+        "address_line_2": "Line 2.1",
+        "address_line_3": "Line 3.1",
+        "address_line_4": "Line 4.1",
+        "address_line_5": "Line 5.1",
+        "postcode": "EX2 5SE",
+    }
+    SubjectDemographicPage(page).update_temporary_address(temp_address)
+    check_subject_has_temporary_address(nhs_no, temporary_address=True)
+
+    temp_address = {
+        "valid_from": None,
+        "valid_to": None,
+        "address_line_1": "",
+        "address_line_2": "",
+        "address_line_3": "",
+        "address_line_4": "",
+        "address_line_5": "",
+        "postcode": "",
+    }
+    SubjectDemographicPage(page).update_temporary_address(temp_address)
+    check_subject_has_temporary_address(nhs_no, temporary_address=False)
+
+    LogoutPage(page).log_out()
+
+
+@pytest.mark.wip
+@pytest.mark.regression
+@pytest.mark.subject_tests
+def test_validating_minimum_information(page: Page) -> None:
+    criteria = {
+        "subject age": "<= 80",
+        "subject has temporary address": "no",
+    }
+    user = User()
+    subject = Subject()
+
+    builder = SubjectSelectionQueryBuilder()
+
+    query, bind_vars = builder.build_subject_selection_query(
+        criteria=criteria, user=user, subject=subject, subjects_to_retrieve=1
+    )
+
+    df = OracleDB().execute_query(query, bind_vars)
+    nhs_no = df.iloc[0]["subject_nhs_number"]
+    logging.info(f"Selected NHS Number: {nhs_no}")
+
+    UserTools.user_login(page, "Screening Centre Manager at BCS001")
+    BasePage(page).go_to_screening_subject_search_page()
+    search_subject_demographics_by_nhs_number(page, nhs_no)
+
+    temp_address = {
+        "valid_from": datetime.today(),
+        "valid_to": datetime.today() + timedelta(days=1),
+        "address_line_1": "",
+        "address_line_2": "",
+        "address_line_3": "",
+        "address_line_4": "",
+        "address_line_5": "",
+        "postcode": "",
+    }
+
+    subject_page = SubjectDemographicPage(page)
+    subject_page.assert_dialog_text(
+        "If entering a temporary address, please specify at least the first two lines and the postcode"
+    )
+    subject_page.update_temporary_address(temp_address)
+    dialog_error = getattr(subject_page, "_dialog_assertion_error", None)
+    if dialog_error is not None:
+        raise dialog_error
+    logging.info("Temporary address validation for minimum information passed.")
+
+    temp_address["address_line_1"] = "min1"
+    temp_address["address_line_2"] = "min2"
+    subject_page.assert_dialog_text(
+        "If entering a temporary address, please specify at least the first two lines and the postcode"
+    )
+    subject_page.update_temporary_address(temp_address)
+    dialog_error = getattr(subject_page, "_dialog_assertion_error", None)
+    if dialog_error is not None:
+        raise dialog_error
+    logging.info("Temporary address validation for minimum information passed.")
+
+    temp_address["address_line_1"] = "min1"
+    temp_address["address_line_2"] = ""
+    temp_address["postcode"] = "pc"
+    subject_page.assert_dialog_text(
+        "If entering a temporary address, please specify at least the first two lines and the postcode"
+    )
+    subject_page.update_temporary_address(temp_address)
+    dialog_error = getattr(subject_page, "_dialog_assertion_error", None)
+    if dialog_error is not None:
+        raise dialog_error
+    logging.info("Temporary address validation for minimum information passed.")
+
+    temp_address["address_line_1"] = ""
+    temp_address["address_line_2"] = "min2"
+    subject_page.assert_dialog_text(
+        "If entering a temporary address, please specify at least the first two lines and the postcode"
+    )
+    subject_page.update_temporary_address(temp_address)
+    dialog_error = getattr(subject_page, "_dialog_assertion_error", None)
+    if dialog_error is not None:
+        raise dialog_error
+    logging.info("Temporary address validation for minimum information passed.")
+
+    temp_address["address_line_1"] = "min1"
+    temp_address["address_line_2"] = "min2"
+    temp_address["postcode"] = "pc"
+    subject_page.update_temporary_address(temp_address)
+    check_subject_has_temporary_address(nhs_no, temporary_address=True)
+
+    temp_address = {
+        "valid_from": None,
+        "valid_to": None,
+        "address_line_1": "",
+        "address_line_2": "",
+        "address_line_3": "",
+        "address_line_4": "",
+        "address_line_5": "",
+        "postcode": "",
+    }
+    subject_page = SubjectDemographicPage(page)
+    subject_page.update_temporary_address(temp_address)
+    check_subject_has_temporary_address(nhs_no, temporary_address=False)
+
+
+def check_subject_has_temporary_address(nhs_no: str, temporary_address: bool) -> None:
+    """
+    Checks if the subject has a temporary address in the database.
     Args:
         nhs_no (str): The NHS number of the subject.
+        temporary_address (bool): True if checking for a temporary address, False otherwise.
+    Raises:
+        AssertionError: If the expected address status does not match the actual status in the database.
+    This function queries the database to determine if the subject has a temporary address
+    and asserts the result against the expected value.
+    It uses the OracleDB class to execute the query and retrieve the address status.
+    The query checks for the existence of a temporary address by looking for a record
+    in the screening_subject_t, sd_contact_t, and sd_address_t tables where the address
+    type is 13043 (temporary address) and the effective_from date is not null.
+    The result is then compared to the expected status, and an assertion is raised if they do not match.
     """
 
-    BasePage(page).click_main_menu_link()
-    BasePage(page).go_to_screening_subject_search_page()
-    search_subject_episode_by_nhs_number(page, nhs_no)
+    query = """
+        SELECT
+        CASE
+            WHEN EXISTS (
+            SELECT 1
+            FROM screening_subject_t ss
+            INNER JOIN sd_contact_t c ON c.nhs_number = ss.subject_nhs_number
+            INNER JOIN sd_address_t a ON a.contact_id = c.contact_id
+            WHERE ss.subject_nhs_number = :nhs_no
+                AND a.address_type = 13043
+                AND a.effective_from IS NOT NULL
+            )
+            THEN 'Subject has a temporary address'
+            ELSE 'Subject doesn''t have a temporary address'
+        END AS address_status
+        FROM DUAL
+    """
+    bind_vars = {"nhs_no": nhs_no}
+    df = OracleDB().execute_query(query, bind_vars)
+
     if temporary_address:
-        SubjectScreeningSummaryPage(page).verify_temporary_address_icon_visible()
-        SubjectScreeningSummaryPage(page).click_temporary_address_icon()
-        SubjectScreeningSummaryPage(page).verify_temporary_address_popup_visible()
-        SubjectScreeningSummaryPage(page).click_close_button()
         logging.info(
-            "Temporary address icon is visible and popup is displayed, as expected."
+            "Checking if the subject has an active temporary address in the database."
+        )
+        assert (
+            df.iloc[0]["address_status"] == "Subject has a temporary address"
+        ), "Temporary address not found in the database."
+        logging.info(
+            "Assertion passed: Active temporary address found in the database."
         )
     else:
-        SubjectScreeningSummaryPage(page).verify_temporary_address_icon_not_visible()
-        logging.info("Temporary address icon is not visible, as expected.")
+        logging.info(
+            "Checking if the subject does not have an active temporary address in the database."
+        )
+        assert (
+            df.iloc[0]["address_status"] == "Subject doesn't have a temporary address"
+        ), "Temporary address found in the database when it shouldn't be."
+        logging.info(
+            "Assertion passed: No active temporary address found in the database."
+        )
