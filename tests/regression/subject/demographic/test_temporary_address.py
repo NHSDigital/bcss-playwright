@@ -67,7 +67,7 @@ def test_not_amending_temporary_address(page: Page) -> None:
 @pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.subject_tests
-def test_add_temporyay_address_then_delete(page: Page) -> None:
+def test_add_temporary_address_then_delete(page: Page) -> None:
     """
     Add a temporary address, then delete it.
 
