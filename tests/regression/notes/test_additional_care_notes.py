@@ -423,7 +423,8 @@ def test_update_existing_additional_care_note(
 
 
 def test_remove_existing_additional_care_note(
-    page: Page, general_properties: dict) -> None:
+    page: Page, general_properties: dict
+) -> None:
     """
     Test to verify if an existing Additional Care note can be removed for a subject with one Additional Care note.
     """
@@ -439,7 +440,11 @@ def test_remove_existing_additional_care_note(
     BasePage(page).go_to_screening_subject_search_page()
 
     # Search for the subject by NHS Number.")
-    subjects_df = get_subjects_by_note_count(general_properties["additional_care_note_type_value"], general_properties["note_status_active"], 1)
+    subjects_df = get_subjects_by_note_count(
+        general_properties["additional_care_note_type_value"],
+        general_properties["note_status_active"],
+        1,
+    )
     nhs_no = subjects_df["subject_nhs_number"].iloc[0]
     SubjectScreeningPage(page).fill_nhs_number(nhs_no)
     SubjectScreeningPage(page).select_search_area_option("07")
@@ -451,7 +456,7 @@ def test_remove_existing_additional_care_note(
     SubjectScreeningSummaryPage(page).verify_note_link_not_present(
         general_properties["additional_care_note_name"]
     )
-    
+
     SubjectScreeningSummaryPage(page).click_subjects_events_notes()
     SubjectEventsNotes(page).select_note_type(NotesOptions.ADDITIONAL_CARE_NOTE)
     logging.info(
@@ -466,7 +471,9 @@ def test_remove_existing_additional_care_note(
     screening_subject_id = int(subjects_df["screening_subject_id"].iloc[0])
     logging.info(f"Screening Subject ID retrieved: {screening_subject_id}")
     type_id = int(subjects_df["type_id"].iloc[0])
-    notes_df = get_supporting_notes(screening_subject_id, type_id,general_properties["note_status_active"])
+    notes_df = get_supporting_notes(
+        screening_subject_id, type_id, general_properties["note_status_active"]
+    )
     # Verify that the DataFrame is not empty
     if not notes_df.empty:
         pytest.fail(
@@ -496,11 +503,11 @@ def test_remove_existing_additional_care_note_for_subject_with_multiple_notes(
     BasePage(page).go_to_screening_subject_search_page()
 
     # Get a subject with multiple additional care notes
-    subjects_df = get_subjects_with_multiple_notes(general_properties["additional_care_note_type_value"])
+    subjects_df = get_subjects_with_multiple_notes(
+        general_properties["additional_care_note_type_value"]
+    )
     if subjects_df.empty:
-        logging.info(
-            "No subjects found with multiple Additional Care Notes."
-        )
+        logging.info("No subjects found with multiple Additional Care Notes.")
         pytest.fail("No subjects found with multiple Additional Care Notes.")
     nhs_no = subjects_df["subject_nhs_number"].iloc[0]
     logging.info(f"Searching for subject with NHS Number: {nhs_no}")
@@ -530,7 +537,11 @@ def test_remove_existing_additional_care_note_for_subject_with_multiple_notes(
     logging.info(f"Screening Subject ID retrieved: {screening_subject_id}")
 
     # Get the notes from the database
-    notes_df = get_supporting_notes(screening_subject_id, general_properties["additional_care_note_type_value"],general_properties["note_status_active"])
+    notes_df = get_supporting_notes(
+        screening_subject_id,
+        general_properties["additional_care_note_type_value"],
+        general_properties["note_status_active"],
+    )
     # Loop through the list of active notes and check if the removed note is still present
     logging.info(
         "Looping through active notes to verify the removed note is not present."
@@ -557,7 +568,9 @@ def test_remove_existing_additional_care_note_for_subject_with_multiple_notes(
 
     # Get the notes from the database
     notes_df = get_supporting_notes(
-        screening_subject_id, general_properties["additional_care_note_type_value"],general_properties["note_status_obsolete"]
+        screening_subject_id,
+        general_properties["additional_care_note_type_value"],
+        general_properties["note_status_obsolete"],
     )
     # Verify that the removed note is present among obsolete notes
     logging.info("Verifying that the removed note is present among obsolete notes.")
