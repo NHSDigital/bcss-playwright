@@ -423,18 +423,13 @@ def test_update_existing_additional_care_note(
 
 
 def test_remove_existing_additional_care_note(
-    page: Page,
-    note_type_name: str = "Additional Care Note",
-    note_type_value: int = 4112,
-    note_status=4100,
-) -> None:
+    page: Page, general_properties: dict) -> None:
     """
     Test to verify if an existing Additional Care note can be removed for a subject with one Additional Care note.
     """
     logging.info(
         "Starting test: Verify if an existing Additional Care note can be removed for a subject with one Additional Care note"
     )
-    logging.info("Logging in as 'Team Leader at BCS01'.")
     # user login
     logging.info("Logging in as 'Team Leader at BCS01'.")
     UserTools.user_login(page, "Team Leader at BCS01")
@@ -444,22 +439,19 @@ def test_remove_existing_additional_care_note(
     BasePage(page).go_to_screening_subject_search_page()
 
     # Search for the subject by NHS Number.")
-    subjects_df = get_subjects_by_note_count(note_type_value, note_status, 1)
+    subjects_df = get_subjects_by_note_count(general_properties["additional_care_note_type_value"], general_properties["note_status_active"], 1)
     nhs_no = subjects_df["subject_nhs_number"].iloc[0]
     SubjectScreeningPage(page).fill_nhs_number(nhs_no)
     SubjectScreeningPage(page).select_search_area_option("07")
     SubjectScreeningPage(page).click_search_button()
     # Verify subject has additional care notes  present
-    logging.info("Verified: Aadditional care notes are present for the subject.")
-    # logging.info("Verifying that  additional care notes are present for the subject.")
     logging.info(
         f"Verifying that the Additional Care Note is visible for the subject with NHS Number: {nhs_no}."
     )
-    SubjectScreeningSummaryPage(page).verify_additional_care_note_visible()
-    logging.info(
-        f"Clicking on the 'Additional Care Note' link for the subject with NHS Number: {nhs_no}."
+    SubjectScreeningSummaryPage(page).verify_note_link_not_present(
+        general_properties["additional_care_note_name"]
     )
-
+    
     SubjectScreeningSummaryPage(page).click_subjects_events_notes()
     SubjectEventsNotes(page).select_note_type(NotesOptions.ADDITIONAL_CARE_NOTE)
     logging.info(
@@ -474,15 +466,11 @@ def test_remove_existing_additional_care_note(
     screening_subject_id = int(subjects_df["screening_subject_id"].iloc[0])
     logging.info(f"Screening Subject ID retrieved: {screening_subject_id}")
     type_id = int(subjects_df["type_id"].iloc[0])
-    # type_id = 4112  # Type ID for Additional Care Notes
-    # note_status = 4100  # Status ID for Active Notes
-    notes_df = get_supporting_notes(screening_subject_id, type_id, note_status)
-    # Filter the DataFrame to only include rows where type_id == 4112
-    filtered_notes_df = notes_df[notes_df["type_id"] == note_type_value]
-    # Verify that the filtered DataFrame is empty
-    if not filtered_notes_df.empty:
+    notes_df = get_supporting_notes(screening_subject_id, type_id,general_properties["note_status_active"])
+    # Verify that the DataFrame is not empty
+    if not notes_df.empty:
         pytest.fail(
-            f"Subject has Additional Care Notes. Expected none, but found: {filtered_notes_df}"
+            f"Subject has Additional Care Notes. Expected none, but found: {notes_df}"
         )
 
     logging.info(
@@ -491,11 +479,7 @@ def test_remove_existing_additional_care_note(
 
 
 def test_remove_existing_additional_care_note_for_subject_with_multiple_notes(
-    page: Page,
-    note_type_name: str = "Additional Care Note",
-    note_type_value: int = 4112,
-    note_status=4100,
-    note_status_obsolete=4101,
+    page: Page, general_properties: dict
 ) -> None:
     """
     Test to verify if an existing Additional Care note can be removed for a subject with multiple Additional Care notes.
@@ -512,10 +496,10 @@ def test_remove_existing_additional_care_note_for_subject_with_multiple_notes(
     BasePage(page).go_to_screening_subject_search_page()
 
     # Get a subject with multiple additional care notes
-    subjects_df = get_subjects_with_multiple_notes(note_type_value)
+    subjects_df = get_subjects_with_multiple_notes(general_properties["additional_care_note_type_value"])
     if subjects_df.empty:
         logging.info(
-            "No subjects found with multiple Additional Care Notes. Skipping test."
+            "No subjects found with multiple Additional Care Notes."
         )
         pytest.fail("No subjects found with multiple Additional Care Notes.")
     nhs_no = subjects_df["subject_nhs_number"].iloc[0]
@@ -546,7 +530,7 @@ def test_remove_existing_additional_care_note_for_subject_with_multiple_notes(
     logging.info(f"Screening Subject ID retrieved: {screening_subject_id}")
 
     # Get the notes from the database
-    notes_df = get_supporting_notes(screening_subject_id, note_type_value, note_status)
+    notes_df = get_supporting_notes(screening_subject_id, general_properties["additional_care_note_type_value"],general_properties["note_status_active"])
     # Loop through the list of active notes and check if the removed note is still present
     logging.info(
         "Looping through active notes to verify the removed note is not present."
@@ -573,7 +557,7 @@ def test_remove_existing_additional_care_note_for_subject_with_multiple_notes(
 
     # Get the notes from the database
     notes_df = get_supporting_notes(
-        screening_subject_id, note_type_value, note_status_obsolete
+        screening_subject_id, general_properties["additional_care_note_type_value"],general_properties["note_status_obsolete"]
     )
     # Verify that the removed note is present among obsolete notes
     logging.info("Verifying that the removed note is present among obsolete notes.")

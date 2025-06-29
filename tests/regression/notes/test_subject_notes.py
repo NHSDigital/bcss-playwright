@@ -154,83 +154,6 @@ def test_add_a_subject_note_for_a_subject_without_a_note(
         f"Title and note matched the provided values. Title: '{note_title}', Note: '{note_text}'."
     )
 
-
-def test_add_subject_note_for_subject_with_existing_note(
-    page: Page, general_properties: dict
-) -> None:
-    """
-    Test to add an additional subject note for a subject who already has an existing note.
-    """
-    # User login
-    logging.info(
-        "Starting test: Add an additional subject note for a subject who already has a note."
-    )
-    logging.info("Logging in as 'Team Leader at BCS01'.")
-    UserTools.user_login(page, "Team Leader at BCS01")
-
-    # Navigate to the Screening Subject Search Page
-    logging.info("Navigating to the Screening Subject Search Page.")
-    BasePage(page).go_to_screening_subject_search_page()
-
-    # Get a subject with existing additional care notes
-    subjects_df = get_subjects_by_note_count(
-        general_properties["subject_note_type_value"],
-        general_properties["note_status_active"],
-        1,
-    )
-    nhs_no = subjects_df["subject_nhs_number"].iloc[0]
-    logging.info(f"Searching for subject with NHS Number: {nhs_no}")
-    SubjectScreeningPage(page).fill_nhs_number(nhs_no)
-    SubjectScreeningPage(page).select_search_area_option("07")
-    SubjectScreeningPage(page).click_search_button()
-    # Navigate to Subject Events & Notes
-    logging.info("Navigating to 'Subject Events & Notes' for the selected subject.")
-    SubjectScreeningSummaryPage(page).click_subjects_events_notes()
-
-    # add an Additional subject Note if the subject already has one
-    logging.info("Selecting 'Subject Note'.")
-    SubjectEventsNotes(page).select_subject_note()
-    # Set the note title
-    note_title = "Subject Note - General observation title2"
-    logging.info(f"Filling in notes: '{note_title}'.")
-    SubjectEventsNotes(page).fill_note_title(note_title)
-    # Set the note type for verification
-    note_text = "Subject Note - General observation2"
-    logging.info(f"Filling in notes: '{note_text}'.")
-    SubjectEventsNotes(page).fill_notes(note_text)
-    # Dismiss dialog and update notes
-    logging.info("Accepting dialog and clicking 'Update Notes'.")
-    SubjectEventsNotes(page).accept_dialog_and_update_notes()
-
-    # Get supporting notes for the subject from DB
-    logging.info(
-        "Retrieving supporting notes for the subject with NHS Number: {nhs_no}."
-    )
-    screening_subject_id = int(subjects_df["screening_subject_id"].iloc[0])
-    logging.info(f"Screening Subject ID retrieved: {screening_subject_id}")
-    type_id = int(subjects_df["type_id"].iloc[0])
-    note_status = int(
-        subjects_df["note_status"].iloc[0]
-    )  # Get the note status from the DataFrame
-    notes_df = get_supporting_notes(screening_subject_id, type_id, note_status)
-
-    # Verify title and note match the provided values
-    logging.info(
-        f"Verifying that the title and note match the provided values for type_id: {type_id}."
-    )
-    assert (
-        notes_df["title"].iloc[0].strip() == note_title
-    ), f"Title does not match. Expected: '{note_title}', Found: '{notes_df['title'].iloc[0].strip()}'."
-    assert (
-        notes_df["note"].iloc[0].strip() == note_text
-    ), f"Note does not match. Expected: '{note_text}', Found: '{notes_df['note'].iloc[0].strip()}'."
-
-    logging.info(
-        f"Verification successful:kit note added for the subject with NHS Number: {nhs_no}. "
-        f"Title and note matched the provided values. Title: '{note_title}', Note: '{note_text}'."
-    )
-
-
 def test_identify_subject_with_subject_note(
     page: Page, general_properties: dict
 ) -> None:
@@ -405,4 +328,185 @@ def test_update_existing_subject_note(page: Page, general_properties: dict) -> N
     logging.info(
         f"Verification successful:Subject note added for the subject with NHS Number: {nhs_no}. "
         f"Title and note matched the provided values. Title: '{note_title}', Note: '{note_text}'."
+    )
+
+
+def test_remove_existing_subject_note(
+    page: Page, general_properties: dict
+) -> None:
+    """
+    Test to verify if an existing Subject note can be removed for a subject with one Subject note.
+    """
+    logging.info(
+        "Starting test: Verify if an existing Subject note can be removed for a subject with one Subject note"
+    )
+    # user login
+    logging.info("Logging in as 'Team Leader at BCS01'.")
+    UserTools.user_login(page, "Team Leader at BCS01")
+
+    # Navigate to the Screening Subject Search Page
+    logging.info("Navigating to the Screening Subject Search Page.")
+    BasePage(page).go_to_screening_subject_search_page()
+
+    # Search for the subject by NHS Number.")
+    subjects_df = get_subjects_by_note_count(
+        general_properties["subject_note_type_value"],
+        general_properties["note_status_active"],
+        1,
+    )
+    nhs_no = subjects_df["subject_nhs_number"].iloc[0]
+    SubjectScreeningPage(page).fill_nhs_number(nhs_no)
+    SubjectScreeningPage(page).select_search_area_option("07")
+    SubjectScreeningPage(page).click_search_button()
+    # Verify subject has subject notes  present
+    logging.info(
+        f"Verifying that the Subject Note is visible for the subject with NHS Number: {nhs_no}."
+    )
+    SubjectScreeningSummaryPage(page).verify_note_link_present(
+        general_properties["subject_note_name"]
+    )
+    SubjectScreeningSummaryPage(page).click_subjects_events_notes()
+    SubjectEventsNotes(page).select_note_type(NotesOptions.SUBJECT_NOTE)
+    logging.info(
+        "Selecting the 'Obsolete' option for the existing Subject Note."
+    )
+    BasePage(page).safe_accept_dialog_select_option(
+        SubjectEventsNotes(page).note_status, NotesStatusOptions.OBSOLETE
+    )
+    logging.info("Verifying that the subject does not have any Subject Notes.")
+
+    # Retrieve the Screening Subject ID
+    screening_subject_id = int(subjects_df["screening_subject_id"].iloc[0])
+    logging.info(f"Screening Subject ID retrieved: {screening_subject_id}")
+    type_id = int(subjects_df["type_id"].iloc[0])
+    notes_df = get_supporting_notes(
+        screening_subject_id, type_id, general_properties["note_status_active"]
+    )
+    # Verify that the DataFrame is not empty
+    if not notes_df.empty:
+        pytest.fail(
+            f"Subject has Subject Notes. Expected none, but found: {notes_df}"
+        )
+
+    logging.info(
+        "Verification successful: Subject does not have any active Subject Notes."
+    )
+
+
+def test_remove_existing_subject_note_for_subject_with_multiple_notes(
+    page: Page, general_properties: dict
+) -> None:
+    """
+    Test to verify if an existing subject note can be removed for a subject with multiple Additional Care notes.
+    """
+    # User login
+    logging.info(
+        "Starting test: Remove a subject note for a subject who already has multiple additional care note."
+    )
+    logging.info("Logging in as 'Team Leader at BCS01'.")
+    UserTools.user_login(page, "Team Leader at BCS01")
+
+    # Navigate to the Screening Subject Search Page
+    logging.info("Navigating to the Screening Subject Search Page.")
+    BasePage(page).go_to_screening_subject_search_page()
+
+    # Get a subject with multiple additional care notes
+    subjects_df = get_subjects_with_multiple_notes(
+        general_properties["subject_note_type_value"]
+    )
+    if subjects_df.empty:
+        logging.info("No subjects found with multiple Subject Notes.")
+        pytest.fail("No subjects found with multiple Subject Notes.")
+    nhs_no = subjects_df["subject_nhs_number"].iloc[0]
+    logging.info(f"Searching for subject with NHS Number: {nhs_no}")
+    SubjectScreeningPage(page).fill_nhs_number(nhs_no)
+    SubjectScreeningPage(page).select_search_area_option("07")
+    SubjectScreeningPage(page).click_search_button()
+    # Navigate to Subject Events & Notes
+    logging.info("Navigating to 'Subject Events & Notes' for the selected subject.")
+    SubjectScreeningSummaryPage(page).click_subjects_events_notes()
+
+    SubjectEventsNotes(page).select_note_type(NotesOptions.SUBJECT_NOTE)
+    # Select the first Additional Care Note from the table for removal
+    logging.info("Selecting the first Subject Note from the table for removal.")
+    ui_data = SubjectEventsNotes(page).get_title_and_note_from_row(2)
+    logging.info(
+        "Removing one of the existing Subject Note by selecting 'Obsolete' option "
+    )
+    BasePage(page).safe_accept_dialog_select_option(
+        SubjectEventsNotes(page).note_status, NotesStatusOptions.OBSOLETE
+    )
+    logging.info(
+        "Verifying that the subject's removed subject note is removed from DB as well "
+    )
+
+    # Retrieve the Screening Subject ID
+    screening_subject_id = int(subjects_df["screening_subject_id"].iloc[0])
+    logging.info(f"Screening Subject ID retrieved: {screening_subject_id}")
+
+    # Get the notes from the database
+    notes_df = get_supporting_notes(
+        screening_subject_id,
+        general_properties["subject_note_type_value"],
+        general_properties["note_status_active"],
+    )
+    # Loop through the list of active notes and check if the removed note is still present
+    logging.info(
+        "Looping through active notes to verify the removed note is not present."
+    )
+    removed_note_title = ui_data["title"].strip()
+    removed_note_text = ui_data["note"].strip()
+    for index, row in notes_df.iterrows():
+        # Get the title and note from the database
+        db_title = row["title"].strip()
+        db_note = row["note"].strip()
+
+        logging.info(f"Checking note: Title='{db_title}', Note='{db_note}'")
+
+        # Assert that the removed note is not present among active notes
+        assert (
+            db_title != removed_note_title or db_note != removed_note_text
+        ), f"Removed note is still present in active notes. Title: '{db_title}', Note: '{db_note}'"
+
+        logging.info(
+            "Verification successful: Removed note is not present among active notes."
+        )
+    # query to retrieving obsolete notes of the same type for the subject.
+    logging.info("Retrieving obsolete notes of the same type for the subject.")
+
+    # Get the notes from the database
+    notes_df = get_supporting_notes(
+        screening_subject_id,
+        general_properties["subject_note_type_value"],
+        general_properties["note_status_obsolete"],
+    )
+    # Verify that the removed note is present among obsolete notes
+    logging.info("Verifying that the removed note is present among obsolete notes.")
+    logging.info(
+        f"Removed Note Title: '{removed_note_title}', Removed Note Text: '{removed_note_text}'"
+    )
+
+    # Flag to track if the removed note is found
+    found = False
+
+    # Loop through the list of obsolete notes
+    for index, row in notes_df.iterrows():
+        # Get the title and note from the database
+        db_title = row["title"].strip()
+        db_note = row["note"].strip()
+
+        logging.info(f"Checking obsolete note: Title='{db_title}', Note='{db_note}'")
+
+        # Check if the removed note matches any obsolete note
+        if db_title == removed_note_title and db_note == removed_note_text:
+            found = True
+        break
+
+    # Assert that the removed note is found in the obsolete list
+    assert (
+        found
+    ), f"Removed note is not present in the obsolete list. Title: '{removed_note_title}', Note: '{removed_note_text}'"
+
+    logging.info(
+        "Verification successful: Removed note is present in the obsolete list."
     )
