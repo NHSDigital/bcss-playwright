@@ -72,6 +72,8 @@ def test_subject_does_not_have_an_additional_care_note(
     )
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_add_an_additional_care_note_for_a_subject_without_a_note(
     page: Page, general_properties: dict
 ) -> None:
@@ -157,6 +159,8 @@ def test_add_an_additional_care_note_for_a_subject_without_a_note(
     )
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_add_additional_care_note_for_subject_with_existing_note(
     page: Page, general_properties: dict
 ) -> None:
@@ -237,6 +241,8 @@ def test_add_additional_care_note_for_subject_with_existing_note(
     )
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_identify_subject_with_additional_care_note(
     page: Page, general_properties: dict
 ) -> None:
@@ -271,6 +277,8 @@ def test_identify_subject_with_additional_care_note(
     )
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_view_active_additional_care_note(page: Page, general_properties: dict) -> None:
     """
     Test to verify if an active Additional Care note is visible for a subject.
@@ -339,6 +347,8 @@ def test_view_active_additional_care_note(page: Page, general_properties: dict) 
     ), f"Note does not match. UI: '{ui_data['note']}', DB: '{db_data['note']}'"
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_update_existing_additional_care_note(
     page: Page, general_properties: dict
 ) -> None:
@@ -422,6 +432,8 @@ def test_update_existing_additional_care_note(
     )
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_remove_existing_additional_care_note(
     page: Page, general_properties: dict
 ) -> None:
@@ -453,7 +465,7 @@ def test_remove_existing_additional_care_note(
     logging.info(
         f"Verifying that the Additional Care Note is visible for the subject with NHS Number: {nhs_no}."
     )
-    SubjectScreeningSummaryPage(page).verify_note_link_not_present(
+    SubjectScreeningSummaryPage(page).verify_note_link_present(
         general_properties["additional_care_note_name"]
     )
 
@@ -485,6 +497,8 @@ def test_remove_existing_additional_care_note(
     )
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_remove_existing_additional_care_note_for_subject_with_multiple_notes(
     page: Page, general_properties: dict
 ) -> None:

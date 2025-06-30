@@ -28,6 +28,8 @@ from utils.oracle.oracle_specific_functions import (
 )
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_subject_does_not_have_a_kit_note(page: Page, general_properties: dict) -> None:
     """
     Test to check if I can identify if a subject does not have a kit note
@@ -68,6 +70,8 @@ def test_subject_does_not_have_a_kit_note(page: Page, general_properties: dict) 
     )
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_add_a_kit_note_for_a_subject_without_a_note(
     page: Page, general_properties: dict
 ) -> None:
@@ -151,6 +155,9 @@ def test_add_a_kit_note_for_a_subject_without_a_note(
         f"Title and note matched the provided values. Title: '{note_title}', Note: '{note_text}'."
     )
 
+
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_identify_subject_with_kit_note(page: Page, general_properties: dict) -> None:
     """
     Test to identify if a subject has a kit note.
@@ -183,6 +190,8 @@ def test_identify_subject_with_kit_note(page: Page, general_properties: dict) ->
     )
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_view_active_kit_note(page: Page, general_properties: dict) -> None:
     """
     Test to verify if an active kit note is visible for a subject.
@@ -251,6 +260,8 @@ def test_view_active_kit_note(page: Page, general_properties: dict) -> None:
     ), f"Note does not match. UI: '{ui_data['note']}', DB: '{db_data['note']}'"
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_update_existing_kit_note(page: Page, general_properties: dict) -> None:
     """
     Test to verify if an existing kit note can be updated successfully.

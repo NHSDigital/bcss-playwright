@@ -28,6 +28,8 @@ from utils.oracle.oracle_specific_functions import (
 )
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_subject_does_not_have_a_subject_note(
     page: Page, general_properties: dict
 ) -> None:
@@ -71,6 +73,8 @@ def test_subject_does_not_have_a_subject_note(
     )
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_add_a_subject_note_for_a_subject_without_a_note(
     page: Page, general_properties: dict
 ) -> None:
@@ -155,6 +159,8 @@ def test_add_a_subject_note_for_a_subject_without_a_note(
     )
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_identify_subject_with_subject_note(
     page: Page, general_properties: dict
 ) -> None:
@@ -189,6 +195,8 @@ def test_identify_subject_with_subject_note(
     )
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_view_active_subject_note(page: Page, general_properties: dict) -> None:
     """
     Test to verify if an active subject note is visible for a subject.
@@ -254,6 +262,8 @@ def test_view_active_subject_note(page: Page, general_properties: dict) -> None:
     ), f"Note does not match. UI: '{ui_data['note']}', DB: '{db_data['note']}'"
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_update_existing_subject_note(page: Page, general_properties: dict) -> None:
     """
     Test to verify if an existing subject note can be updated successfully.
@@ -286,7 +296,7 @@ def test_update_existing_subject_note(page: Page, general_properties: dict) -> N
     SubjectScreeningSummaryPage(page).click_subjects_events_notes()
     SubjectEventsNotes(page).select_note_type(NotesOptions.SUBJECT_NOTE)
     BasePage(page).safe_accept_dialog_select_option(
-        SubjectEventsNotes(page).episode_note_status, NotesStatusOptions.INVALID
+        SubjectEventsNotes(page).note_status, NotesStatusOptions.INVALID
     )
     SubjectEventsNotes(page).fill_note_title("updated subject title")
     SubjectEventsNotes(page).fill_notes("updated subject note")
@@ -332,6 +342,8 @@ def test_update_existing_subject_note(page: Page, general_properties: dict) -> N
     )
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_remove_existing_subject_note(page: Page, general_properties: dict) -> None:
     """
     Test to verify if an existing Subject note can be removed for a subject with one Subject note.
@@ -388,6 +400,8 @@ def test_remove_existing_subject_note(page: Page, general_properties: dict) -> N
     )
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_remove_existing_subject_note_for_subject_with_multiple_notes(
     page: Page, general_properties: dict
 ) -> None:

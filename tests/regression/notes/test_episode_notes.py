@@ -28,6 +28,8 @@ from utils.oracle.oracle_specific_functions import (
 )
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_subject_does_not_have_a_episode_note(
     page: Page, general_properties: dict
 ) -> None:
@@ -70,6 +72,8 @@ def test_subject_does_not_have_a_episode_note(
     )
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_add_a_episode_note_for_a_subject_without_a_note(
     page: Page, general_properties: dict
 ) -> None:
@@ -150,6 +154,9 @@ def test_add_a_episode_note_for_a_subject_without_a_note(
         f"Title and note matched the provided values. Title: '{note_title}', Note: '{note_text}'."
     )
 
+
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_identify_subject_with_episode_note(
     page: Page, general_properties: dict
 ) -> None:
@@ -183,6 +190,8 @@ def test_identify_subject_with_episode_note(
     )
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_view_active_episode_note(page: Page, general_properties: dict) -> None:
     """
     Test to verify if an active episode note is visible for a subject.
@@ -250,6 +259,8 @@ def test_view_active_episode_note(page: Page, general_properties: dict) -> None:
     ), f"Note does not match. UI: '{ui_data['note']}', DB: '{db_data['note']}'"
 
 
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_update_existing_episode_note(page: Page, general_properties: dict) -> None:
     """
     Test to verify if an existing episode note can be updated successfully.
