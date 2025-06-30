@@ -12,15 +12,34 @@ from utils.screening_subject_page_searcher import (
     search_subject_demographics_by_nhs_number,
 )
 from utils.oracle.oracle import OracleDB
+from utils.oracle.oracle_specific_functions import (
+    check_if_subject_has_temporary_address,
+)
 from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
 import logging
 from faker import Faker
 from datetime import datetime, timedelta
 
 
+@pytest.fixture(scope="function", autouse=True)
+def before_each(page: Page) -> str:
+    """
+    Before every test is executed, this fixture:
+    - Logs into BCSS as a Screening Centre Manager at BCS001
+    - Navigates to the screening subject search page
+    """
+    nhs_no = obtain_test_data_nhs_no()
+    logging.info(f"Selected NHS Number: {nhs_no}")
+    UserTools.user_login(page, "Screening Centre Manager at BCS001")
+    BasePage(page).go_to_screening_subject_search_page()
+    search_subject_demographics_by_nhs_number(page, nhs_no)
+    return nhs_no
+
+
+@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.subject_tests
-def test_not_amending_temporary_address(page: Page) -> None:
+def test_not_amending_temporary_address(page: Page, before_each) -> None:
     """
     Scenario: If not amending a temporary address, no need to validate it
 
@@ -28,13 +47,7 @@ def test_not_amending_temporary_address(page: Page) -> None:
     and the subject's postcode is updated.
     That the subject does not have a temporary address added to them.
     """
-    nhs_no = obtain_test_data_nhs_no()
-    logging.info(f"Selected NHS Number: {nhs_no}")
-
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).go_to_screening_subject_search_page()
-    search_subject_demographics_by_nhs_number(page, nhs_no)
-
+    nhs_no = before_each
     fake = Faker("en_GB")
     random_postcode = fake.postcode()
     SubjectDemographicPage(page).fill_postcode_input(random_postcode)
@@ -45,21 +58,17 @@ def test_not_amending_temporary_address(page: Page) -> None:
     LogoutPage(page).log_out()
 
 
+@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.subject_tests
-def test_add_temporary_address_then_delete(page: Page) -> None:
+def test_add_temporary_address_then_delete(page: Page, before_each) -> None:
     """
     Add a temporary address, then delete it.
 
     This test is checking that a temporary address can be added to a subject,
     and then deleted successfully, ensuring the temporary address icon behaves as expected.
     """
-    nhs_no = obtain_test_data_nhs_no()
-    logging.info(f"Selected NHS Number: {nhs_no}")
-
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).go_to_screening_subject_search_page()
-    search_subject_demographics_by_nhs_number(page, nhs_no)
+    nhs_no = before_each
 
     temp_address = {
         "valid_from": datetime.today(),
@@ -90,6 +99,7 @@ def test_add_temporary_address_then_delete(page: Page) -> None:
     LogoutPage(page).log_out()
 
 
+@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.subject_tests
 def test_validation_regarding_dates(page: Page) -> None:
@@ -100,12 +110,6 @@ def test_validation_regarding_dates(page: Page) -> None:
     works correctly when the user tries to enter a temporary address with invalid dates.
     It ensures that the user is prompted with appropriate error messages when the dates are not valid.
     """
-    nhs_no = obtain_test_data_nhs_no()
-    logging.info(f"Selected NHS Number: {nhs_no}")
-
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).go_to_screening_subject_search_page()
-    search_subject_demographics_by_nhs_number(page, nhs_no)
 
     temp_address = {
         "valid_from": None,
@@ -167,9 +171,10 @@ def test_validation_regarding_dates(page: Page) -> None:
     LogoutPage(page).log_out()
 
 
+@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.subject_tests
-def test_ammending_temporary_address(page: Page) -> None:
+def test_ammending_temporary_address(page: Page, before_each) -> None:
     """
     Scenario: If amending a temporary address, it should be validated.
 
@@ -177,12 +182,7 @@ def test_ammending_temporary_address(page: Page) -> None:
     and the subject's postcode is updated.
     That the subject has a temporary address added to them.
     """
-    nhs_no = obtain_test_data_nhs_no()
-    logging.info(f"Selected NHS Number: {nhs_no}")
-
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).go_to_screening_subject_search_page()
-    search_subject_demographics_by_nhs_number(page, nhs_no)
+    nhs_no = before_each
 
     temp_address = {
         "valid_from": datetime(2000, 1, 1),
@@ -226,15 +226,17 @@ def test_ammending_temporary_address(page: Page) -> None:
     LogoutPage(page).log_out()
 
 
+@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.subject_tests
-def test_validating_minimum_information(page: Page) -> None:
-    nhs_no = obtain_test_data_nhs_no()
-    logging.info(f"Selected NHS Number: {nhs_no}")
-
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).go_to_screening_subject_search_page()
-    search_subject_demographics_by_nhs_number(page, nhs_no)
+def test_validating_minimum_information(page: Page, before_each) -> None:
+    """
+    Scenario: Validation regarding minimum information
+    This test checks that the validation for the temporary address fields
+    works correctly when the user tries to enter a temporary address with minimum information.
+    It ensures that the user is prompted with appropriate error messages when the minimum information is not provided
+    """
+    nhs_no = before_each
 
     temp_address = {
         "valid_from": datetime.today(),
@@ -322,32 +324,10 @@ def check_subject_has_temporary_address(nhs_no: str, temporary_address: bool) ->
         AssertionError: If the expected address status does not match the actual status in the database.
     This function queries the database to determine if the subject has a temporary address
     and asserts the result against the expected value.
-    It uses the OracleDB class to execute the query and retrieve the address status.
-    The query checks for the existence of a temporary address by looking for a record
-    in the screening_subject_t, sd_contact_t, and sd_address_t tables where the address
-    type is 13043 (temporary address) and the effective_from date is not null.
     The result is then compared to the expected status, and an assertion is raised if they do not match.
     """
 
-    query = """
-        SELECT
-        CASE
-            WHEN EXISTS (
-            SELECT 1
-            FROM screening_subject_t ss
-            INNER JOIN sd_contact_t c ON c.nhs_number = ss.subject_nhs_number
-            INNER JOIN sd_address_t a ON a.contact_id = c.contact_id
-            WHERE ss.subject_nhs_number = :nhs_no
-                AND a.address_type = 13043
-                AND a.effective_from IS NOT NULL
-            )
-            THEN 'Subject has a temporary address'
-            ELSE 'Subject doesn''t have a temporary address'
-        END AS address_status
-        FROM DUAL
-    """
-    bind_vars = {"nhs_no": nhs_no}
-    df = OracleDB().execute_query(query, bind_vars)
+    df = check_if_subject_has_temporary_address(nhs_no)
 
     if temporary_address:
         logging.info(
