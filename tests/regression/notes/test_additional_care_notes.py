@@ -27,8 +27,8 @@ from utils.oracle.oracle_specific_functions import (
     get_subjects_with_multiple_notes,
     get_supporting_notes,
 )
-
-
+@pytest.mark.regression
+@pytest.mark.note_tests
 def test_subject_does_not_have_an_additional_care_note(
     page: Page, general_properties: dict
 ) -> None:

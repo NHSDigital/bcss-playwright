@@ -154,6 +154,7 @@ def test_add_a_subject_note_for_a_subject_without_a_note(
         f"Title and note matched the provided values. Title: '{note_title}', Note: '{note_text}'."
     )
 
+
 def test_identify_subject_with_subject_note(
     page: Page, general_properties: dict
 ) -> None:
@@ -331,9 +332,7 @@ def test_update_existing_subject_note(page: Page, general_properties: dict) -> N
     )
 
 
-def test_remove_existing_subject_note(
-    page: Page, general_properties: dict
-) -> None:
+def test_remove_existing_subject_note(page: Page, general_properties: dict) -> None:
     """
     Test to verify if an existing Subject note can be removed for a subject with one Subject note.
     """
@@ -367,9 +366,7 @@ def test_remove_existing_subject_note(
     )
     SubjectScreeningSummaryPage(page).click_subjects_events_notes()
     SubjectEventsNotes(page).select_note_type(NotesOptions.SUBJECT_NOTE)
-    logging.info(
-        "Selecting the 'Obsolete' option for the existing Subject Note."
-    )
+    logging.info("Selecting the 'Obsolete' option for the existing Subject Note.")
     BasePage(page).safe_accept_dialog_select_option(
         SubjectEventsNotes(page).note_status, NotesStatusOptions.OBSOLETE
     )
@@ -384,9 +381,7 @@ def test_remove_existing_subject_note(
     )
     # Verify that the DataFrame is not empty
     if not notes_df.empty:
-        pytest.fail(
-            f"Subject has Subject Notes. Expected none, but found: {notes_df}"
-        )
+        pytest.fail(f"Subject has Subject Notes. Expected none, but found: {notes_df}")
 
     logging.info(
         "Verification successful: Subject does not have any active Subject Notes."
@@ -397,11 +392,11 @@ def test_remove_existing_subject_note_for_subject_with_multiple_notes(
     page: Page, general_properties: dict
 ) -> None:
     """
-    Test to verify if an existing subject note can be removed for a subject with multiple Additional Care notes.
+    Test to verify if an existing subject note can be removed for a subject with multiple Subject notes.
     """
     # User login
     logging.info(
-        "Starting test: Remove a subject note for a subject who already has multiple additional care note."
+        "Starting test: Remove a subject note for a subject who already has multiple Subject note."
     )
     logging.info("Logging in as 'Team Leader at BCS01'.")
     UserTools.user_login(page, "Team Leader at BCS01")
@@ -410,7 +405,7 @@ def test_remove_existing_subject_note_for_subject_with_multiple_notes(
     logging.info("Navigating to the Screening Subject Search Page.")
     BasePage(page).go_to_screening_subject_search_page()
 
-    # Get a subject with multiple additional care notes
+    # Get a subject with multiple subject notes
     subjects_df = get_subjects_with_multiple_notes(
         general_properties["subject_note_type_value"]
     )
@@ -427,7 +422,7 @@ def test_remove_existing_subject_note_for_subject_with_multiple_notes(
     SubjectScreeningSummaryPage(page).click_subjects_events_notes()
 
     SubjectEventsNotes(page).select_note_type(NotesOptions.SUBJECT_NOTE)
-    # Select the first Additional Care Note from the table for removal
+    # Select the first Subject Note from the table for removal
     logging.info("Selecting the first Subject Note from the table for removal.")
     ui_data = SubjectEventsNotes(page).get_title_and_note_from_row(2)
     logging.info(
