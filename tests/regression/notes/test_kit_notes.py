@@ -1,7 +1,7 @@
 import logging
 import pytest
 from playwright.sync_api import Page, expect
-from pages import screening_subject_search
+from pages import login, screening_subject_search
 from pages.logout.log_out_page import LogoutPage
 from pages.base_page import BasePage
 from pages.screening_subject_search import subject_screening_search_page
@@ -30,20 +30,16 @@ from utils.oracle.oracle_specific_functions import (
 
 @pytest.mark.regression
 @pytest.mark.note_tests
-def test_subject_does_not_have_a_kit_note(page: Page, general_properties: dict) -> None:
+def test_subject_does_not_have_a_kit_note(
+    page: Page, general_properties: dict, login_as
+) -> None:
     """
     Test to check if I can identify if a subject does not have a kit note
     """
     logging.info(
         f"Starting test: Verify subject does not have a '{general_properties["kit_note_name"]}'."
     )
-    # user login
-    logging.info("Logging in as 'ScreeningAssistant at BCS02'.")
-    UserTools.user_login(page, "ScreeningAssistant at BCS02")
-
-    # Navigate to the Screening Subject Search Page
-    logging.info("Navigating to the Screening Subject Search Page.")
-    BasePage(page).go_to_screening_subject_search_page()
+    login_as("ScreeningAssistant at BCS02")
 
     # Search for the subject by NHS Number.")
     subjects_df = get_subjects_by_note_count(
@@ -73,7 +69,7 @@ def test_subject_does_not_have_a_kit_note(page: Page, general_properties: dict) 
 @pytest.mark.regression
 @pytest.mark.note_tests
 def test_add_a_kit_note_for_a_subject_without_a_note(
-    page: Page, general_properties: dict
+    page: Page, general_properties: dict, login_as
 ) -> None:
     """
     Test to add a note for a subject without a kit note.
@@ -82,12 +78,7 @@ def test_add_a_kit_note_for_a_subject_without_a_note(
     logging.info(
         "Starting test: Add a '{general_properties['kit_note_name']}'  for a subject without a note."
     )
-    logging.info("Logging in as 'Team Leader at BCS01'.")
-    UserTools.user_login(page, "Team Leader at BCS01")
-
-    # Navigate to the Screening Subject Search Page
-    logging.info("Navigating to the Screening Subject Search Page.")
-    BasePage(page).go_to_screening_subject_search_page()
+    login_as("Team Leader at BCS01")
 
     # Get a subject with no notes of the specified type
     subjects_df = get_subjects_by_note_count(
@@ -158,19 +149,14 @@ def test_add_a_kit_note_for_a_subject_without_a_note(
 
 @pytest.mark.regression
 @pytest.mark.note_tests
-def test_identify_subject_with_kit_note(page: Page, general_properties: dict) -> None:
+def test_identify_subject_with_kit_note(
+    page: Page, general_properties: dict, login_as
+) -> None:
     """
     Test to identify if a subject has a kit note.
     """
     logging.info("Starting test: Verify subject has a kit note.")
-    logging.info("Logging in as 'ScreeningAssistant at BCS02'.")
-    # user login
-    logging.info("Logging in as 'ScreeningAssistant at BCS02'.")
-    UserTools.user_login(page, "ScreeningAssistant at BCS02")
-
-    # Navigate to the Screening Subject Search Page
-    logging.info("Navigating to the Screening Subject Search Page.")
-    BasePage(page).go_to_screening_subject_search_page()
+    login_as("ScreeningAssistant at BCS02")
 
     # Search for the subject by NHS Number.")
     subjects_df = get_subjects_by_note_count(
@@ -192,19 +178,12 @@ def test_identify_subject_with_kit_note(page: Page, general_properties: dict) ->
 
 @pytest.mark.regression
 @pytest.mark.note_tests
-def test_view_active_kit_note(page: Page, general_properties: dict) -> None:
+def test_view_active_kit_note(page: Page, general_properties: dict, login_as) -> None:
     """
     Test to verify if an active kit note is visible for a subject.
     """
     logging.info("Starting test: Verify subject has kit care note.")
-    logging.info("Logging in as 'ScreeningAssistant at BCS02'.")
-    # user login
-    logging.info("Logging in as 'ScreeningAssistant at BCS02'.")
-    UserTools.user_login(page, "ScreeningAssistant at BCS02")
-
-    # Navigate to the Screening Subject Search Page
-    logging.info("Navigating to the Screening Subject Search Page.")
-    BasePage(page).go_to_screening_subject_search_page()
+    login_as("ScreeningAssistant at BCS02")
 
     # Search for the subject by NHS Number.")
     subjects_df = get_subjects_by_note_count(
@@ -262,18 +241,14 @@ def test_view_active_kit_note(page: Page, general_properties: dict) -> None:
 
 @pytest.mark.regression
 @pytest.mark.note_tests
-def test_update_existing_kit_note(page: Page, general_properties: dict) -> None:
+def test_update_existing_kit_note(
+    page: Page, general_properties: dict, login_as
+) -> None:
     """
     Test to verify if an existing kit note can be updated successfully.
     """
     logging.info("Starting test: Verify subject has a kit note.")
-    # user login
-    logging.info("Logging in as 'TeamLeader at BCS01'.")
-    UserTools.user_login(page, "Team Leader at BCS01")
-
-    # Navigate to the Screening Subject Search Page
-    logging.info("Navigating to the Screening Subject Search Page.")
-    BasePage(page).go_to_screening_subject_search_page()
+    login_as("Team Leader at BCS01")
     # Search for the subject by NHS Number.")
     subjects_df = get_subjects_by_note_count(
         general_properties["kit_note_type_value"],

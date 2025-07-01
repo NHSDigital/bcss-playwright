@@ -1,8 +1,7 @@
 import logging
-from re import A
 import pytest
 from playwright.sync_api import Page, expect
-from pages import screening_subject_search
+from pages import login, screening_subject_search
 from pages.logout.log_out_page import LogoutPage
 from pages.base_page import BasePage
 from pages.screening_subject_search import subject_screening_search_page
@@ -27,12 +26,13 @@ from utils.oracle.oracle_specific_functions import (
     get_subjects_with_multiple_notes,
     get_supporting_notes,
 )
+import pandas as pd
 
 
 @pytest.mark.regression
 @pytest.mark.note_tests
 def test_subject_does_not_have_an_additional_care_note(
-    page: Page, general_properties: dict
+    page: Page, general_properties: dict, login_as
 ) -> None:
     """
     Test to check if I can identify if a subject does not have a Additional Care note
@@ -40,14 +40,8 @@ def test_subject_does_not_have_an_additional_care_note(
     logging.info(
         f"Starting test: Verify subject does not have a '{general_properties["additional_care_note_name"]}'."
     )
-    logging.info("Logging in as 'ScreeningAssistant at BCS02'.")
-    # user login
-    logging.info("Logging in as 'ScreeningAssistant at BCS02'.")
-    UserTools.user_login(page, "ScreeningAssistant at BCS02")
-
-    # Navigate to the Screening Subject Search Page
-    logging.info("Navigating to the Screening Subject Search Page.")
-    BasePage(page).go_to_screening_subject_search_page()
+    # Use the login fixture
+    login_as("ScreeningAssistant at BCS02")
 
     # Search for the subject by NHS Number.")
     subjects_df = get_subjects_by_note_count(
@@ -77,7 +71,7 @@ def test_subject_does_not_have_an_additional_care_note(
 @pytest.mark.regression
 @pytest.mark.note_tests
 def test_add_an_additional_care_note_for_a_subject_without_a_note(
-    page: Page, general_properties: dict
+    page: Page, general_properties: dict, login_as
 ) -> None:
     """
     Test to add a note for a subject without an additional care note.
@@ -86,12 +80,8 @@ def test_add_an_additional_care_note_for_a_subject_without_a_note(
     logging.info(
         "Starting test: Add a '{general_properties['additional_care_note_name']}'  for a subject without a note."
     )
-    logging.info("Logging in as 'Team Leader at BCS01'.")
-    UserTools.user_login(page, "Team Leader at BCS01")
-
-    # Navigate to the Screening Subject Search Page
-    logging.info("Navigating to the Screening Subject Search Page.")
-    BasePage(page).go_to_screening_subject_search_page()
+    # Use the login fixture
+    login_as("Team Leader at BCS01")
 
     # Get a subject with no notes of the specified type
     subjects_df = get_subjects_by_note_count(
@@ -144,27 +134,30 @@ def test_add_an_additional_care_note_for_a_subject_without_a_note(
     logging.info(
         f"Retrieved notes for Screening Subject ID: {screening_subject_id}, Type ID: {type_id}."
     )
-    # Verify title and note match the provided values
-    logging.info(
-        f"Verifying that the title and note match the provided values for type_id: {type_id}."
+    verify_note_content_matches_expected(
+        notes_df, note_title, note_text, nhs_no, type_id
     )
-    assert (
-        notes_df["title"].iloc[0].strip() == note_title
-    ), f"Title does not match. Expected: '{note_title}', Found: '{notes_df['title'].iloc[0].strip()}'."
-    assert (
-        notes_df["note"].iloc[0].strip() == note_text
-    ), f"Note does not match. Expected: '{note_text}', Found: '{notes_df['note'].iloc[0].strip()}'."
+    # # Verify title and note match the provided values
+    # logging.info(
+    #     f"Verifying that the title and note match the provided values for type_id: {type_id}."
+    # )
+    # assert (
+    #     notes_df["title"].iloc[0].strip() == note_title
+    # ), f"Title does not match. Expected: '{note_title}', Found: '{notes_df['title'].iloc[0].strip()}'."
+    # assert (
+    #     notes_df["note"].iloc[0].strip() == note_text
+    # ), f"Note does not match. Expected: '{note_text}', Found: '{notes_df['note'].iloc[0].strip()}'."
 
-    logging.info(
-        f"Verification successful: Additional care note added for the subject with NHS Number: {nhs_no}. "
-        f"Title and note matched the provided values. Title: '{note_title}', Note: '{note_text}'."
-    )
+    # logging.info(
+    #     f"Verification successful: Additional care note added for the subject with NHS Number: {nhs_no}. "
+    #     f"Title and note matched the provided values. Title: '{note_title}', Note: '{note_text}'."
+    # )
 
 
 @pytest.mark.regression
 @pytest.mark.note_tests
 def test_add_additional_care_note_for_subject_with_existing_note(
-    page: Page, general_properties: dict
+    page: Page, general_properties: dict, login_as
 ) -> None:
     """
     Test to add an additional care note for a subject who already has an existing note.
@@ -173,12 +166,7 @@ def test_add_additional_care_note_for_subject_with_existing_note(
     logging.info(
         "Starting test: Add an additional care note for a subject who already has additional care note."
     )
-    logging.info("Logging in as 'Team Leader at BCS01'.")
-    UserTools.user_login(page, "Team Leader at BCS01")
-
-    # Navigate to the Screening Subject Search Page
-    logging.info("Navigating to the Screening Subject Search Page.")
-    BasePage(page).go_to_screening_subject_search_page()
+    login_as("Team Leader at BCS01")
 
     # Get a subject with existing additional care notes
     subjects_df = get_subjects_by_note_count(
@@ -211,8 +199,8 @@ def test_add_additional_care_note_for_subject_with_existing_note(
     logging.info(f"Filling in notes: '{note_text}'.")
     SubjectEventsNotes(page).fill_notes(note_text)
 
-    # Dismiss dialog and update notes
-    logging.info("Dismissing dialog and clicking 'Update Notes'.")
+    # Accept dialog and update notes
+    logging.info("Accept dialog and clicking 'Update Notes'.")
     SubjectEventsNotes(page).accept_dialog_and_update_notes()
     # Get supporting notes for the subject
     logging.info(
@@ -246,20 +234,13 @@ def test_add_additional_care_note_for_subject_with_existing_note(
 @pytest.mark.regression
 @pytest.mark.note_tests
 def test_identify_subject_with_additional_care_note(
-    page: Page, general_properties: dict
+    page: Page, general_properties: dict, login_as
 ) -> None:
     """
     Test to identify if a subject has an Additional Care note.
     """
     logging.info("Starting test: Verify subject has an additional care note.")
-    logging.info("Logging in as 'ScreeningAssistant at BCS02'.")
-    # user login
-    logging.info("Logging in as 'ScreeningAssistant at BCS02'.")
-    UserTools.user_login(page, "ScreeningAssistant at BCS02")
-
-    # Navigate to the Screening Subject Search Page
-    logging.info("Navigating to the Screening Subject Search Page.")
-    BasePage(page).go_to_screening_subject_search_page()
+    login_as("ScreeningAssistant at BCS02")
 
     # Search for the subject by NHS Number.")
     subjects_df = get_subjects_by_note_count(
@@ -281,19 +262,14 @@ def test_identify_subject_with_additional_care_note(
 
 @pytest.mark.regression
 @pytest.mark.note_tests
-def test_view_active_additional_care_note(page: Page, general_properties: dict) -> None:
+def test_view_active_additional_care_note(
+    page: Page, general_properties: dict, login_as
+) -> None:
     """
     Test to verify if an active Additional Care note is visible for a subject.
     """
     logging.info("Starting test: Verify subject has an additional care note.")
-    logging.info("Logging in as 'ScreeningAssistant at BCS02'.")
-    # user login
-    logging.info("Logging in as 'ScreeningAssistant at BCS02'.")
-    UserTools.user_login(page, "ScreeningAssistant at BCS02")
-
-    # Navigate to the Screening Subject Search Page
-    logging.info("Navigating to the Screening Subject Search Page.")
-    BasePage(page).go_to_screening_subject_search_page()
+    login_as("ScreeningAssistant at BCS02")
 
     # Search for the subject by NHS Number.")
     subjects_df = get_subjects_by_note_count(
@@ -352,19 +328,13 @@ def test_view_active_additional_care_note(page: Page, general_properties: dict) 
 @pytest.mark.regression
 @pytest.mark.note_tests
 def test_update_existing_additional_care_note(
-    page: Page, general_properties: dict
+    page: Page, general_properties: dict, login_as
 ) -> None:
     """
     Test to verify if an existing Additional Care note can be updated successfully.
     """
     logging.info("Starting test: Verify subject has an additional care note.")
-    # user login
-    logging.info("Logging in as 'TeamLeader at BCS01'.")
-    UserTools.user_login(page, "Team Leader at BCS01")
-
-    # Navigate to the Screening Subject Search Page
-    logging.info("Navigating to the Screening Subject Search Page.")
-    BasePage(page).go_to_screening_subject_search_page()
+    login_as("Team Leader at BCS01")
     # Search for the subject by NHS Number.")
     subjects_df = get_subjects_by_note_count(
         general_properties["additional_care_note_type_value"],
@@ -437,7 +407,7 @@ def test_update_existing_additional_care_note(
 @pytest.mark.regression
 @pytest.mark.note_tests
 def test_remove_existing_additional_care_note(
-    page: Page, general_properties: dict
+    page: Page, general_properties: dict, login_as
 ) -> None:
     """
     Test to verify if an existing Additional Care note can be removed for a subject with one Additional Care note.
@@ -445,13 +415,7 @@ def test_remove_existing_additional_care_note(
     logging.info(
         "Starting test: Verify if an existing Additional Care note can be removed for a subject with one Additional Care note"
     )
-    # user login
-    logging.info("Logging in as 'Team Leader at BCS01'.")
-    UserTools.user_login(page, "Team Leader at BCS01")
-
-    # Navigate to the Screening Subject Search Page
-    logging.info("Navigating to the Screening Subject Search Page.")
-    BasePage(page).go_to_screening_subject_search_page()
+    login_as("Team Leader at BCS01")
 
     # Search for the subject by NHS Number.")
     subjects_df = get_subjects_by_note_count(
@@ -502,7 +466,7 @@ def test_remove_existing_additional_care_note(
 @pytest.mark.regression
 @pytest.mark.note_tests
 def test_remove_existing_additional_care_note_for_subject_with_multiple_notes(
-    page: Page, general_properties: dict
+    page: Page, general_properties: dict, login_as
 ) -> None:
     """
     Test to verify if an existing Additional Care note can be removed for a subject with multiple Additional Care notes.
@@ -511,12 +475,7 @@ def test_remove_existing_additional_care_note_for_subject_with_multiple_notes(
     logging.info(
         "Starting test: Remove an additional care note for a subject who already has multiple additional care note."
     )
-    logging.info("Logging in as 'Team Leader at BCS01'.")
-    UserTools.user_login(page, "Team Leader at BCS01")
-
-    # Navigate to the Screening Subject Search Page
-    logging.info("Navigating to the Screening Subject Search Page.")
-    BasePage(page).go_to_screening_subject_search_page()
+    login_as("Team Leader at BCS01")
 
     # Get a subject with multiple additional care notes
     subjects_df = get_subjects_with_multiple_notes(
@@ -617,4 +576,41 @@ def test_remove_existing_additional_care_note_for_subject_with_multiple_notes(
 
     logging.info(
         "Verification successful: Removed note is present in the obsolete list."
+    )
+
+
+def verify_note_content_matches_expected(
+    notes_df: pd.DataFrame,
+    expected_title: str,
+    expected_note: str,
+    nhs_no: str,
+    type_id: int,
+) -> None:
+    """
+    Verifies that the title and note fields from the DataFrame match the expected values.
+
+    :param notes_df: DataFrame containing the actual note data.
+    :param expected_title: Expected note title.
+    :param expected_note: Expected note content.
+    :param nhs_no: NHS Number of the subject (for logging).
+    :param type_id: Note type ID (for logging).
+    """
+    logging.info(
+        f"Verifying that the title and note match the provided values for type_id: {type_id}."
+    )
+
+    actual_title = notes_df["title"].iloc[0].strip()
+    actual_note = notes_df["note"].iloc[0].strip()
+
+    assert actual_title == expected_title, (
+        f"Title does not match. Expected: '{expected_title}', "
+        f"Found: '{actual_title}'."
+    )
+    assert actual_note == expected_note, (
+        f"Note does not match. Expected: '{expected_note}', " f"Found: '{actual_note}'."
+    )
+
+    logging.info(
+        f"Verification successful: Additional care note added for the subject with NHS Number: {nhs_no}. "
+        f"Title and note matched the provided values. Title: '{expected_title}', Note: '{expected_note}'."
     )
