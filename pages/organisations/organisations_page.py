@@ -1,6 +1,7 @@
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
+from playwright.sync_api import sync_playwright
 from pages.base_page import BasePage
-
+from typing import List
 
 class OrganisationsPage(BasePage):
     """Organisations Page locators, and methods for interacting with the page."""
@@ -51,54 +52,65 @@ class OrganisationsPage(BasePage):
         """Clicks the 'Bureau' link."""
         self.click(self.bureau_page)
 
+class NoOrganisationAvailableError(Exception):
+    pass
 
-class OrganisationSwitchPage(BasePage):
-    """
-    Page Object Model for Organisation Switch functionality.
-    """
+class OrganisationNotSelectedError(Exception):
+    pass
 
-    CONTINUE_BUTTON = "button:has-text('Continue')"
-    SELECT_ORG_LINK_TEXT = "Select Org"
-    RADIO_SELECTOR = "input[type='radio']"
+class ContinueButtonNotFoundError(Exception):
+    pass
 
+
+class OrganisationSwitchPage:
     def __init__(self, page: Page):
         self.page = page
+        self.radio_selector = "input[name='organisation']"
+        self.select_org_link = "a:has-text('Select Organisation')"
 
-    def get_available_organisation_ids(self)-> list[str]:
-        """
-        Returns a list of all available organisation radio button IDs.
-        """
-        radios = self.page.locator(self.RADIO_SELECTOR)
-        org_ids = []
-        for int in range(radios.count()):
-            org_id = radios.nth(int).get_attribute("id")
-            if org_id:
-                org_ids.append(org_id)
+    def get_available_organisation_ids(self) -> List[str]:
+        self.page.wait_for_selector(self.radio_selector, timeout=10000)
+        radios = self.page.locator(self.radio_selector)
+        org_ids = [
+            org_id for i in range(radios.count())
+            if (org_id := radios.nth(i).get_attribute("id")) is not None
+        ]
+        if len(org_ids) < 2:
+            raise NoOrganisationAvailableError("Fewer than two organisations available.")
         return org_ids
 
-    def select_organisation_by_id_and_navigate_home(self, org_id: str)-> None:
-        """
-        Selects the organisation radio button by its ID, clicks Continue,
-        navigates to the BCSS Home page, then clicks the 'Select Org' link to return to the organisation selection page.
-        Args:
-        organisation_id (str): The id of the organisation to be selected.
-        """
-        self.page.locator(f'#{org_id}').check()
-        self.page.get_by_role('button', name='Continue').click()
-        self.page.get_by_role('link', name=self.SELECT_ORG_LINK_TEXT).click()
+    def select_organisation_by_id(self, org_id: str) -> None:
+        radio = self.page.locator(f"{self.radio_selector}#{org_id}")
+        radio.wait_for(state="visible", timeout=5000)
+        radio.check(force=True)
 
-    def switch_between_organisations(self)-> None:
-        """
-        Switches between all available organisations by their ids.
-        """
-        org_ids = self.get_available_organisation_ids()
-        for org_id in org_ids:
-            self.select_organisation_by_id_and_navigate_home(org_id)
+    def select_first_available_organisation(self) -> None:
+        for selector in ['#BCS009', '#BCS001']:
+            radio = self.page.locator(selector)
+            if radio.is_enabled():
+                radio.check()
+                return
+        raise OrganisationNotSelectedError("No available organisation radio buttons to select.")
 
+    def get_selected_organisation_id(self) -> str:
+        selected = self.page.locator(f"{self.radio_selector}:checked")
+        try:
+            selected.wait_for(state="attached", timeout=5000)
+        except Exception:
+            raise OrganisationNotSelectedError("No organisation is currently selected.")
+        org_id = selected.get_attribute("id")
+        if not org_id:
+            raise OrganisationNotSelectedError("No organisation is currently selected.")
+        return org_id
 
+    def click_continue_button(self) -> None:
+        try:
+            self.page.get_by_role("button", name="Continue").click()
+            self.page.wait_for_load_state("networkidle")
+        except Exception:
+            raise ContinueButtonNotFoundError("Could not find or click the 'Continue' button.")
 
-
-
-
-
-
+    def return_to_change_org_page(self) -> None:
+        self.page.get_by_role("link", name="Select Org").click()
+        self.page.wait_for_url("**/changeorg**", timeout=10000)
+        self.page.wait_for_selector(self.radio_selector, timeout=10000)
