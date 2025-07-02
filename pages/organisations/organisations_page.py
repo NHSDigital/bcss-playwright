@@ -81,7 +81,7 @@ class OrganisationSwitchPage:
 
     def get_available_organisation_ids(self) -> List[str]:
         """
-        Retrieves the list of available organisation IDs from the radio buttons on the page.
+        Retrieves the list of available organisation IDs from the radio button on the page.
 
         Returns:
             List[str]: A list of organisation ID strings.
