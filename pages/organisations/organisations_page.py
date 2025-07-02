@@ -53,7 +53,7 @@ class OrganisationsPage(BasePage):
 
 
 class OrganisationSwitchPage:
-    """Organisation Switch Page locators and methods for interacting with the page."""
+    """Organisation Switch Page locators and methods for interacting with the page"""
 
     def __init__(self, page: Page):
         self.page = page
@@ -67,8 +67,8 @@ class OrganisationSwitchPage:
     def get_available_organisation_ids(self) -> list[str]:
         radios = self.page.locator(self.RADIO_SELECTOR)
         org_ids = []
-        for i in range(radios.count()):
-            org_id = radios.nth(i).get_attribute("id")
+        for int in range(radios.count()):
+            org_id = radios.nth(int).get_attribute("id")
             if org_id:
                 org_ids.append(org_id)
         return org_ids

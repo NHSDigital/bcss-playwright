@@ -6,7 +6,6 @@ from pages.organisations.organisations_page import OrganisationSwitchPage
 
 
 @pytest.mark.regression
-@pytest.mark.organisation_switch
 def test_user_can_switch_between_organisations(page: Page) -> None:
     """
     Feature: Change Organisation
@@ -17,7 +16,7 @@ def test_user_can_switch_between_organisations(page: Page) -> None:
       Then I will be logged in as the alternative organisation.
     """
     # Log in as a user with multiple organisations
-    UserTools.user_login(page, "Specialist Screening Practitioner at BCS009")
+    UserTools.user_login(page, "Specialist Screening Practitioner at BCS009 & BCS001")
     org_switch_page = OrganisationSwitchPage(page)
 
     # Get the list of available organisation IDs
