@@ -40,7 +40,6 @@ def before_each(page: Page):
 #     And I prepare the Pre-Invitation FIT letter batch
 # Then The Pre-Invitation FIT letter batch is no longer listed
 
-@pytest.mark.wip
 @pytest.mark.regression
 def test_headings_on_active_batch_list_screen(page: Page) -> None:
     """
