@@ -119,7 +119,7 @@ def test_add_a_kit_note_for_a_subject_without_a_note(
     SubjectEventsNotes(page).accept_dialog_and_update_notes()
 
     # Get supporting notes for the subject from DB
-    screening_subject_id, type_id, notes_df = fetch_supporting_notes_from_db(
+    _, type_id, notes_df = fetch_supporting_notes_from_db(
         subjects_df, nhs_no, general_properties["note_status_active"]
     )
     # Verify title and note match the provided values
@@ -189,7 +189,7 @@ def test_view_active_kit_note(page: Page, general_properties: dict, login_as) ->
     SubjectEventsNotes(page).select_note_type(NotesOptions.KIT_NOTE)
 
     # Get supporting notes for the subject
-    screening_subject_id, type_id, notes_df = fetch_supporting_notes_from_db(
+    _,_, notes_df = fetch_supporting_notes_from_db(
         subjects_df, nhs_no, general_properties["note_status_active"]
     )
     verify_note_content_ui_vs_db(
@@ -232,7 +232,7 @@ def test_update_existing_kit_note(
     SubjectEventsNotes(page).accept_dialog_and_add_replacement_note()
 
     # Get updated supporting notes for the subject
-    screening_subject_id, type_id, notes_df = fetch_supporting_notes_from_db(
+    _, type_id, notes_df = fetch_supporting_notes_from_db(
         subjects_df, nhs_no, general_properties["note_status_active"]
     )
     # Verify title and note match the provided values

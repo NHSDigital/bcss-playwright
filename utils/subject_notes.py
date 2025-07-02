@@ -91,9 +91,9 @@ def verify_note_content_matches_expected(
         f"Title does not match. Expected: '{expected_title}', "
         f"Found: '{actual_title}'."
     )
-    assert actual_note == expected_note, (
-        f"Note does not match. Expected: '{expected_note}', " f"Found: '{actual_note}'."
-    )
+    assert (
+        actual_note == expected_note
+    ), f"Note does not match. Expected: '{expected_note}', Found: '{actual_note}'."
 
 
 def verify_note_content_ui_vs_db(

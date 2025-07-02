@@ -227,7 +227,6 @@ class TableUtils:
         if column_index == -1:
             raise ValueError(f"Column '{column_name}' not found in table")
 
-        cell_locator = f"{self.table_id} tbody tr:nth-child({row_index}) td:nth-child({column_index})"
         # Locate all <td> elements in the specified row and column
         cell_locator = (
             f"{self.table_id} tbody tr:nth-child({row_index}) td:nth-child({column_index})"

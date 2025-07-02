@@ -110,7 +110,7 @@ def test_add_an_additional_care_note_for_a_subject_without_a_note(
         f"Selecting note type based on value: '{general_properties["additional_care_note_type_value"]}'."
     )
     SubjectEventsNotes(page).select_additional_care_note()
-    logging.info(f"Selecting Additional Care Note Type")
+    logging.info("Selecting Additional Care Note Type")
     note_title = "Additional Care Need - Learning disability"
     SubjectEventsNotes(page).select_additional_care_note_type(
         AdditionalCareNoteTypeOptions.LEARNING_DISABILITY
@@ -124,7 +124,7 @@ def test_add_an_additional_care_note_for_a_subject_without_a_note(
     SubjectEventsNotes(page).accept_dialog_and_update_notes()
 
     # Get supporting notes for the subject from DB
-    screening_subject_id, type_id, notes_df = fetch_supporting_notes_from_db(
+    _, type_id, notes_df = fetch_supporting_notes_from_db(
         subjects_df, nhs_no, general_properties["note_status_active"]
     )
 
@@ -184,7 +184,7 @@ def test_add_additional_care_note_for_subject_with_existing_note(
     logging.info("Accept dialog and clicking 'Update Notes'.")
     SubjectEventsNotes(page).accept_dialog_and_update_notes()
     # Get supporting notes for the subject
-    screening_subject_id, type_id, notes_df = fetch_supporting_notes_from_db(
+    _, type_id, notes_df = fetch_supporting_notes_from_db(
         subjects_df, nhs_no, general_properties["note_status_active"]
     )
 
@@ -259,7 +259,7 @@ def test_view_active_additional_care_note(
     SubjectEventsNotes(page).select_note_type(NotesOptions.ADDITIONAL_CARE_NOTE)
 
     # Get supporting notes for the subject
-    screening_subject_id, type_id, notes_df = fetch_supporting_notes_from_db(
+    _, _, notes_df = fetch_supporting_notes_from_db(
         subjects_df, nhs_no, general_properties["note_status_active"]
     )
 
@@ -304,7 +304,7 @@ def test_update_existing_additional_care_note(
     SubjectEventsNotes(page).accept_dialog_and_add_replacement_note()
 
     # Get updated supporting notes for the subject
-    screening_subject_id, type_id, notes_df = fetch_supporting_notes_from_db(
+    _, type_id, notes_df = fetch_supporting_notes_from_db(
         subjects_df, nhs_no, general_properties["note_status_active"]
     )
     # Verify title and note match the provided values
@@ -373,7 +373,7 @@ def test_remove_existing_additional_care_note(
     )
     logging.info("Verifying that the subject does not have any Additional Care Notes.")
 
-    screening_subject_id, type_id, notes_df = fetch_supporting_notes_from_db(
+    _,_, notes_df = fetch_supporting_notes_from_db(
         subjects_df, nhs_no, general_properties["note_status_active"]
     )
     # Verify that the DataFrame is not empty
