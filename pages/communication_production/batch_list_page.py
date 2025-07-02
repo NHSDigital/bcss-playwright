@@ -2,6 +2,7 @@ from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 from datetime import datetime
 from utils.calendar_picker import CalendarPicker
+from utils.table_util import TableUtils
 
 
 class BatchListPage(BasePage):
@@ -126,6 +127,34 @@ class ActiveBatchListPage(BatchListPage):
 
     def __init__(self, page):
         super().__init__(page)
+
+
+    def verify_sortable_and_filterable_columns(self) -> None:
+        """
+        Validates the presence of expected columns in the Active Batch List table.
+        """
+        table = TableUtils(
+            self.page, "table.active-batch-list"
+        )  # Adjust selector as needed
+        expected_columns = [
+            "ID",
+            "Type",
+            "Original",
+            "Event Code",
+            "Description",
+            "Batch Split By",
+            "Screening Centre",
+            "Status",
+            "Priority",
+            "Deadline",
+            "Count",
+        ]
+
+        for column in expected_columns:
+            column_index = table.get_column_index(column)
+            assert (
+                column_index != -1
+            ), f"Column '{column}' not found in the batch list table"
 
 
 class ArchivedBatchListPage(BatchListPage):

@@ -125,13 +125,40 @@ class TableUtils:
 
     def get_table_headers(self) -> dict:
         """
-        This retrieves the headers from the table.
-
+        Retrieves headers from a table, supporting both standard and legacy structures.
         Returns:
-            A dict with each column item from the header row identified with its position.
+            dict: A mapping of column index (1-based) to header text.
         """
-        headers = self.page.locator(f"{self.table_id} > thead tr").nth(0).inner_text()
-        return self._format_inner_text(headers)
+        # Strategy 1: Try <thead> with <tr><th><span class="dt-column-title">Header</span></th>
+        header_spans = self.page.locator(f"{self.table_id} > thead tr:first-child th span.dt-column-title")
+        if header_spans.count():
+            try:
+                header_texts = header_spans.evaluate_all("els => els.map(el => el.textContent.trim())")
+                return {idx + 1: text for idx, text in enumerate(header_texts)}
+            except Exception as e:
+                logging.warning(f"[get_table_headers] span.dt-column-title fallback failed: {e}")
+
+        # Strategy 2: Fallback to standard <thead> > tr > th inner text
+        header_cells = self.page.locator(f"{self.table_id} > thead tr").first.locator("th")
+        if header_cells.count():
+            try:
+                header_texts = header_cells.evaluate_all("els => els.map(th => th.innerText.trim())")
+                return {idx + 1: text for idx, text in enumerate(header_texts)}
+            except Exception as e:
+                logging.warning(f"[get_table_headers] basic <th> fallback failed: {e}")
+
+        # Strategy 3: Last resort — try to find header from tbody row (some old tables use <tbody> only)
+        fallback_row = self.table.locator("tbody tr").filter(has=self.page.locator("th")).first
+        if fallback_row.locator("th").count():
+            try:
+                header_texts = fallback_row.locator("th").evaluate_all("els => els.map(th => th.innerText.trim())")
+                return {idx + 1: text for idx, text in enumerate(header_texts)}
+            except Exception as e:
+                logging.warning(f"[get_table_headers] tbody fallback failed: {e}")
+
+        logging.warning(f"[get_table_headers] No headers found for table: {self.table_id}")
+        return {}
+
 
     def get_row_count(self) -> int:
         """
