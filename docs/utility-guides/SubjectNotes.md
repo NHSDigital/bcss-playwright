@@ -1,6 +1,6 @@
 # Utility Guide: Note Test Utilities
 
-The **Note Test Utility** module provides reusable helper functions for verifying and comparing note data during test automation of screening subjects in BCSS.  
+The **Note Test Utility** module provides reusable helper functions for verifying and comparing note data during test automation of screening subjects in BCSS.
 It includes helpers for:
 
 1. Searching for a subject by NHS number.
