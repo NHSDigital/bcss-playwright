@@ -51,19 +51,19 @@ class OrganisationsPage(BasePage):
         """Clicks the 'Bureau' link."""
         self.click(self.bureau_page)
 
-class OrganisationNotSelectedError(Exception):
-    """Raised when no organisation is selected on the organisation switch page."""
-    pass
-
 class OrganisationSwitchPage:
-    """Organisation Switch Page locators and reusable interactions"""
+    """Page Object Model for interacting with the Organisation Switch page."""
 
     SELECT_ORG_LINK_TEXT = "Select Org"
 
     def __init__(self, page: Page):
-        self.page = page
+        """
+        Initializes the OrganisationSwitchPage with locators for key elements.
 
-        # Locators initialized using Playwright's locator API
+        Args:
+            page (Page): The Playwright Page object representing the browser page.
+        """
+        self.page = page
         self.radio_buttons = self.page.locator("input[type='radio']")
         self.selected_radio = self.page.locator("input[name='organisation']:checked")
         self.continue_button = self.page.get_by_role("button", name="Continue")
@@ -71,9 +71,21 @@ class OrganisationSwitchPage:
         self.login_info = self.page.locator("td.loginInfo")
 
     def click(self, locator) -> None:
+        """
+        Clicks the given locator element.
+
+        Args:
+            locator: A Playwright Locator object to be clicked.
+        """
         locator.click()
 
     def get_available_organisation_ids(self) -> List[str]:
+        """
+        Retrieves the list of available organisation IDs from the radio buttons on the page.
+
+        Returns:
+            List[str]: A list of organisation ID strings.
+        """
         org_ids = []
         count = self.radio_buttons.count()
         for element in range(count):
@@ -83,15 +95,33 @@ class OrganisationSwitchPage:
         return org_ids
 
     def select_organisation_by_id(self, org_id: str) -> None:
+        """
+        Selects an organisation radio button by its ID.
+
+        Args:
+            org_id (str): The ID of the organisation to select.
+        """
         self.click(self.page.locator(f"#{org_id}"))
 
     def click_continue(self) -> None:
+        """
+        Clicks the 'Continue' button on the page.
+        """
         self.click(self.continue_button)
 
     def click_select_org_link(self) -> None:
+        """
+        Clicks the 'Select Org' link to return to the organisation selection page.
+        """
         self.click(self.select_org_link)
 
     def get_logged_in_text(self) -> str:
+        """
+        Retrieves the logged-in user information from the login info section.
+
+        Returns:
+            str: The text indicating the logged-in user's role or name.
+        """
         return self.login_info.inner_text()
 
 
