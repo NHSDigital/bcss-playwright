@@ -68,7 +68,6 @@ def verify_note_content_matches_expected(
     notes_df: pd.DataFrame,
     expected_title: str,
     expected_note: str,
-    nhs_no: str,
     type_id: int,
 ) -> None:
     """

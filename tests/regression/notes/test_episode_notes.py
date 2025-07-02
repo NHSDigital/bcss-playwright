@@ -123,7 +123,7 @@ def test_add_a_episode_note_for_a_subject_without_a_note(
 
     # Verify title and note match the provided values
     verify_note_content_matches_expected(
-        notes_df, note_title, note_text, nhs_no, type_id
+        notes_df, note_title, note_text,type_id
     )
 
     logging.info(
@@ -257,7 +257,7 @@ def test_update_existing_episode_note(
 
     # Verify title and note match the provided values
     verify_note_content_matches_expected(
-        notes_df, note_title, note_text, nhs_no, type_id
+        notes_df, note_title, note_text, type_id
     )
 
     logging.info(

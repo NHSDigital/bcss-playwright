@@ -129,7 +129,7 @@ def test_add_an_additional_care_note_for_a_subject_without_a_note(
     )
 
     verify_note_content_matches_expected(
-        notes_df, note_title, note_text, nhs_no, type_id
+        notes_df, note_title, note_text, type_id
     )
 
     logging.info(
@@ -189,7 +189,7 @@ def test_add_additional_care_note_for_subject_with_existing_note(
     )
 
     verify_note_content_matches_expected(
-        notes_df, note_title, note_text, nhs_no, type_id
+        notes_df, note_title, note_text, type_id
     )
 
     logging.info(
@@ -325,7 +325,7 @@ def test_update_existing_additional_care_note(
 
     # Verify title and note match the provided values
     verify_note_content_matches_expected(
-        notes_df, note_title, note_text, nhs_no, type_id
+        notes_df, note_title, note_text, type_id
     )
 
     logging.info(
