@@ -132,64 +132,6 @@ def verify_note_content_ui_vs_db(
     ), f"Note does not match. UI: '{ui_data['note']}', DB: '{db_data['note']}'"
 
 
-def verify_note_removed_and_archived(
-    page: Page, subjects_df: pd.DataFrame, ui_data: dict, general_properties: dict
-) -> None:
-    """
-    Verifies that a note has been removed from active notes and archived under obsolete notes.
-
-    :param page: The current Page object
-    :param subjects_df: DataFrame containing subject IDs
-    :param ui_data: Dict with keys 'title' and 'note' from UI
-    :param general_properties: Dictionary with system config (note type/status)
-    """
-    screening_subject_id = int(subjects_df["screening_subject_id"].iloc[0])
-    logging.info(f"Screening Subject ID retrieved: {screening_subject_id}")
-
-    removed_note_title = ui_data["title"].strip()
-    removed_note_text = ui_data["note"].strip()
-
-    # Validate removed note is NOT in active notes
-    notes_df_active = get_supporting_notes(
-        screening_subject_id,
-        general_properties["additional_care_note_type_value"],
-        general_properties["note_status_active"],
-    )
-    logging.info("Verifying removed note is not present in active notes.")
-    for _, row in notes_df_active.iterrows():
-        db_title = row["title"].strip()
-        db_note = row["note"].strip()
-        logging.info(f"Checking active note: Title='{db_title}', Note='{db_note}'")
-
-        assert (
-            db_title != removed_note_title or db_note != removed_note_text
-        ), f"Removed note is still present in active notes. Title: '{db_title}', Note: '{db_note}'"
-
-    logging.info("✔️ Removed note confirmed not present among active notes.")
-
-    # Validate removed note IS in obsolete notes
-    notes_df_obsolete = get_supporting_notes(
-        screening_subject_id,
-        general_properties["additional_care_note_type_value"],
-        general_properties["note_status_obsolete"],
-    )
-    logging.info("Verifying removed note is present among obsolete notes.")
-    found = False
-    for _, row in notes_df_obsolete.iterrows():
-        db_title = row["title"].strip()
-        db_note = row["note"].strip()
-        logging.info(f"Checking obsolete note: Title='{db_title}', Note='{db_note}'")
-        if db_title == removed_note_title and db_note == removed_note_text:
-            found = True
-            break
-
-    assert found, (
-        f"Removed note is not present in the obsolete list. "
-        f"Title: '{removed_note_title}', Note: '{removed_note_text}'"
-    )
-    logging.info("✅ Verification successful: Removed note is now archived.")
-
-
 def verify_note_removal_and_obsolete_transition(
     subjects_df: pd.DataFrame,
     ui_data: dict,
