@@ -2,7 +2,6 @@ import logging
 import pytest
 from playwright.sync_api import Page, expect
 from pages import login, screening_subject_search
-from pages.logout.log_out_page import LogoutPage
 from pages.base_page import BasePage
 from pages.screening_subject_search import subject_screening_search_page
 from pages.screening_subject_search import subject_screening_summary_page
@@ -25,6 +24,13 @@ from utils.oracle.oracle_specific_functions import (
     get_subjects_by_note_count,
     get_subjects_with_multiple_notes,
     get_supporting_notes,
+)
+from utils.subject_notes import (
+    search_subject_by_nhs,
+    fetch_supporting_notes_from_db,
+    verify_note_content_matches_expected,
+    verify_note_content_ui_vs_db,
+    verify_note_removal_and_obsolete_transition,
 )
 
 
@@ -53,9 +59,7 @@ def test_subject_does_not_have_a_kit_note(
         )
 
     nhs_no = subjects_df["subject_nhs_number"].iloc[0]
-    SubjectScreeningPage(page).fill_nhs_number(nhs_no)
-    SubjectScreeningPage(page).select_search_area_option("07")
-    SubjectScreeningPage(page).click_search_button()
+    search_subject_by_nhs(page, nhs_no)
     # Verify no kit notes are present
     logging.info(
         f"Verified that no '{general_properties['kit_note_name']}' link is visible for the subject."
@@ -91,10 +95,7 @@ def test_add_a_kit_note_for_a_subject_without_a_note(
             f"No subjects found for note type {general_properties["kit_note_type_value"]}."
         )
     nhs_no = subjects_df["subject_nhs_number"].iloc[0]
-    logging.info(f"Searching for subject with NHS Number: {nhs_no}")
-    SubjectScreeningPage(page).fill_nhs_number(nhs_no)
-    SubjectScreeningPage(page).select_search_area_option("07")
-    SubjectScreeningPage(page).click_search_button()
+    search_subject_by_nhs(page, nhs_no)
 
     # Navigate to Subject Events & Notes
     logging.info("Navigating to 'Subject Events & Notes' for the selected subject.")
@@ -118,28 +119,13 @@ def test_add_a_kit_note_for_a_subject_without_a_note(
     SubjectEventsNotes(page).accept_dialog_and_update_notes()
 
     # Get supporting notes for the subject from DB
-    logging.info(
-        "Retrieving supporting notes for the subject with NHS Number: {nhs_no}."
-    )
-    screening_subject_id = int(subjects_df["screening_subject_id"].iloc[0])
-    logging.info(f"Screening Subject ID retrieved: {screening_subject_id}")
-    type_id = int(subjects_df["type_id"].iloc[0])
-    notes_df = get_supporting_notes(
-        screening_subject_id, type_id, general_properties["note_status_active"]
-    )
-    logging.info(
-        f"Retrieved notes for Screening Subject ID: {screening_subject_id}, Type ID: {type_id}."
+    screening_subject_id, type_id, notes_df = fetch_supporting_notes_from_db(
+        subjects_df, nhs_no, general_properties["note_status_active"]
     )
     # Verify title and note match the provided values
-    logging.info(
-        f"Verifying that the title and note match the provided values for type_id: {type_id}."
+    verify_note_content_matches_expected(
+        notes_df, note_title, note_text, nhs_no, type_id
     )
-    assert (
-        notes_df["title"].iloc[0].strip() == note_title
-    ), f"Title does not match. Expected: '{note_title}', Found: '{notes_df['title'].iloc[0].strip()}'."
-    assert (
-        notes_df["note"].iloc[0].strip() == note_text
-    ), f"Note does not match. Expected: '{note_text}', Found: '{notes_df['note'].iloc[0].strip()}'."
 
     logging.info(
         f"Verification successful: Kit note added for the subject with NHS Number: {nhs_no}. "
@@ -165,9 +151,7 @@ def test_identify_subject_with_kit_note(
         1,
     )
     nhs_no = subjects_df["subject_nhs_number"].iloc[0]
-    SubjectScreeningPage(page).fill_nhs_number(nhs_no)
-    SubjectScreeningPage(page).select_search_area_option("07")
-    SubjectScreeningPage(page).click_search_button()
+    search_subject_by_nhs(page, nhs_no)
     # Verify subject has kit notes  present
     logging.info("Verified: kit notes are present for the subject.")
     # logging.info("Verifying that  kit notes are present for the subject.")
@@ -190,9 +174,7 @@ def test_view_active_kit_note(page: Page, general_properties: dict, login_as) ->
         general_properties["kit_note_type_value"], 1
     )
     nhs_no = subjects_df["subject_nhs_number"].iloc[0]
-    SubjectScreeningPage(page).fill_nhs_number(nhs_no)
-    SubjectScreeningPage(page).select_search_area_option("07")
-    SubjectScreeningPage(page).click_search_button()
+    search_subject_by_nhs(page, nhs_no)
     # Verify subject has kit notes  present
     logging.info("Verified: kit notes are present for the subject.")
     # logging.info("Verifying that  kit notes are present for the subject.")
@@ -207,36 +189,12 @@ def test_view_active_kit_note(page: Page, general_properties: dict, login_as) ->
     SubjectEventsNotes(page).select_note_type(NotesOptions.KIT_NOTE)
 
     # Get supporting notes for the subject
-    logging.info(
-        "Retrieving supporting notes for the subject with NHS Number: {nhs_no}."
+    screening_subject_id, type_id, notes_df = fetch_supporting_notes_from_db(
+        subjects_df, nhs_no, general_properties["note_status_active"]
     )
-    screening_subject_id = int(subjects_df["screening_subject_id"].iloc[0])
-    logging.info(f"Screening Subject ID retrieved: {screening_subject_id}")
-    type_id = int(subjects_df["type_id"].iloc[0])
-    notes_df = get_supporting_notes(
-        screening_subject_id, type_id, general_properties["note_status_active"]
+    verify_note_content_ui_vs_db(
+        page, notes_df, title_prefix_to_strip="Subject Kit Note -"
     )
-    # Get the title and note from the first row of the UI table
-    ui_data = SubjectEventsNotes(page).get_title_and_note_from_row(2)
-    logging.info(f"Data from UI: {ui_data}")
-    # Remove "Subject Kit Note -" from the title to match the DB data
-    ui_data["title"] = ui_data["title"].replace("Subject Kit Note -", "").strip()
-    logging.info(f"Data from UI after modification: {ui_data}")
-
-    # Get the title and note from the database
-    db_data = {
-        "title": notes_df["title"].iloc[0].strip(),
-        "note": notes_df["note"].iloc[0].strip(),
-    }
-    logging.info(f"Data from DB: {db_data}")
-
-    # Compare the data
-    assert (
-        ui_data["title"] == db_data["title"]
-    ), f"Title does not match. UI: '{ui_data['title']}', DB: '{db_data['title']}'"
-    assert (
-        ui_data["note"] == db_data["note"]
-    ), f"Note does not match. UI: '{ui_data['note']}', DB: '{db_data['note']}'"
 
 
 @pytest.mark.regression
@@ -256,9 +214,7 @@ def test_update_existing_kit_note(
         1,
     )
     nhs_no = subjects_df["subject_nhs_number"].iloc[0]
-    SubjectScreeningPage(page).fill_nhs_number(nhs_no)
-    SubjectScreeningPage(page).select_search_area_option("07")
-    SubjectScreeningPage(page).click_search_button()
+    search_subject_by_nhs(page, nhs_no)
     # Verify subject has additional care notes  present
     logging.info(
         f"Verifying that the kit Note is visible for the subject with NHS Number: {nhs_no}."
@@ -276,14 +232,8 @@ def test_update_existing_kit_note(
     SubjectEventsNotes(page).accept_dialog_and_add_replacement_note()
 
     # Get updated supporting notes for the subject
-    logging.info(
-        "Retrieving updated supporting notes for the subject with NHS Number: {nhs_no}."
-    )
-    screening_subject_id = int(subjects_df["screening_subject_id"].iloc[0])
-    logging.info(f"Screening Subject ID retrieved: {screening_subject_id}")
-    type_id = int(subjects_df["type_id"].iloc[0])
-    notes_df = get_supporting_notes(
-        screening_subject_id, type_id, general_properties["note_status_active"]
+    screening_subject_id, type_id, notes_df = fetch_supporting_notes_from_db(
+        subjects_df, nhs_no, general_properties["note_status_active"]
     )
     # Verify title and note match the provided values
     logging.info("Verifying that the updated title and note match the provided values.")
@@ -291,6 +241,9 @@ def test_update_existing_kit_note(
     # Define the expected title and note
     note_title = "updated kit title"
     note_text = "updated kit note"
+    # Log the expected title and note
+    logging.info(f"Expected title: '{note_title}'")
+    logging.info(f"Expected note: '{note_text}'")
 
     # Ensure the filtered DataFrame is not empty
     if notes_df.empty:
@@ -299,15 +252,9 @@ def test_update_existing_kit_note(
         )
 
     # Verify title and note match the provided values
-    logging.info(
-        f"Verifying that the title and note match the provided values for type_id: {type_id}."
+    verify_note_content_matches_expected(
+        notes_df, note_title, note_text, nhs_no, type_id
     )
-    assert (
-        notes_df["title"].iloc[0].strip() == note_title
-    ), f"Title does not match. Expected: '{note_title}', Found: '{notes_df['title'].iloc[0].strip()}'."
-    assert (
-        notes_df["note"].iloc[0].strip() == note_text
-    ), f"Note does not match. Expected: '{note_text}', Found: '{notes_df['note'].iloc[0].strip()}'."
 
     logging.info(
         f"Verification successful:Kit note added for the subject with NHS Number: {nhs_no}. "

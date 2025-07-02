@@ -3,7 +3,6 @@ import pytest
 from playwright.sync_api import Page, expect
 from conftest import login_as
 from pages import login, screening_subject_search
-from pages.logout.log_out_page import LogoutPage
 from pages.base_page import BasePage
 from pages.screening_subject_search import subject_screening_search_page
 from pages.screening_subject_search import subject_screening_summary_page
@@ -26,6 +25,13 @@ from utils.oracle.oracle_specific_functions import (
     get_subjects_by_note_count,
     get_subjects_with_multiple_notes,
     get_supporting_notes,
+)
+from utils.subject_notes import (
+    search_subject_by_nhs,
+    fetch_supporting_notes_from_db,
+    verify_note_content_matches_expected,
+    verify_note_content_ui_vs_db,
+    verify_note_removal_and_obsolete_transition,
 )
 
 
@@ -54,9 +60,7 @@ def test_subject_does_not_have_a_episode_note(
         )
 
     nhs_no = subjects_df["subject_nhs_number"].iloc[0]
-    SubjectScreeningPage(page).fill_nhs_number(nhs_no)
-    SubjectScreeningPage(page).select_search_area_option("07")
-    SubjectScreeningPage(page).click_search_button()
+    search_subject_by_nhs(page, nhs_no)
     # Verify no episode notes are present
     logging.info(
         f"Verified that no '{general_properties['episode_note_name']}' link is visible for the subject."
@@ -92,10 +96,7 @@ def test_add_a_episode_note_for_a_subject_without_a_note(
             f"No subjects found for note type {general_properties["episode_note_type_value"]}."
         )
     nhs_no = subjects_df["subject_nhs_number"].iloc[0]
-    logging.info(f"Searching for subject with NHS Number: {nhs_no}")
-    SubjectScreeningPage(page).fill_nhs_number(nhs_no)
-    SubjectScreeningPage(page).select_search_area_option("07")
-    SubjectScreeningPage(page).click_search_button()
+    search_subject_by_nhs(page, nhs_no)
     # Click on the Episode link
     SubjectScreeningSummaryPage(page).click_list_episodes()
     logging.info("Clicked on the list Episode link.")
@@ -116,28 +117,14 @@ def test_add_a_episode_note_for_a_subject_without_a_note(
     SubjectEventsNotes(page).accept_dialog_and_update_notes()
 
     # Get supporting notes for the subject from DB
-    logging.info(
-        "Retrieving supporting notes for the subject with NHS Number: {nhs_no}."
+    screening_subject_id, type_id, notes_df = fetch_supporting_notes_from_db(
+        subjects_df, nhs_no, general_properties["note_status_active"]
     )
-    screening_subject_id = int(subjects_df["screening_subject_id"].iloc[0])
-    logging.info(f"Screening Subject ID retrieved: {screening_subject_id}")
-    type_id = int(subjects_df["type_id"].iloc[0])
-    notes_df = get_supporting_notes(
-        screening_subject_id, type_id, general_properties["note_status_active"]
-    )
-    logging.info(
-        f"Retrieved notes for Screening Subject ID: {screening_subject_id}, Type ID: {type_id}."
-    )
+
     # Verify title and note match the provided values
-    logging.info(
-        f"Verifying that the title and note match the provided values for type_id: {type_id}."
+    verify_note_content_matches_expected(
+        notes_df, note_title, note_text, nhs_no, type_id
     )
-    assert (
-        notes_df["title"].iloc[0].strip() == note_title
-    ), f"Title does not match. Expected: '{note_title}', Found: '{notes_df['title'].iloc[0].strip()}'."
-    assert (
-        notes_df["note"].iloc[0].strip() == note_text
-    ), f"Note does not match. Expected: '{note_text}', Found: '{notes_df['note'].iloc[0].strip()}'."
 
     logging.info(
         f"Verification successful: episode note added for the subject with NHS Number: {nhs_no}. "
@@ -163,9 +150,7 @@ def test_identify_subject_with_episode_note(
         1,
     )
     nhs_no = subjects_df["subject_nhs_number"].iloc[0]
-    SubjectScreeningPage(page).fill_nhs_number(nhs_no)
-    SubjectScreeningPage(page).select_search_area_option("07")
-    SubjectScreeningPage(page).click_search_button()
+    search_subject_by_nhs(page, nhs_no)
     # Verify subject has episode notes  present
     logging.info("Verified: episode notes are present for the subject.")
     # logging.info("Verifying that  episode notes are present for the subject.")
@@ -190,9 +175,7 @@ def test_view_active_episode_note(
         general_properties["episode_note_type_value"], 1
     )
     nhs_no = subjects_df["subject_nhs_number"].iloc[0]
-    SubjectScreeningPage(page).fill_nhs_number(nhs_no)
-    SubjectScreeningPage(page).select_search_area_option("07")
-    SubjectScreeningPage(page).click_search_button()
+    search_subject_by_nhs(page, nhs_no)
     # Verify subject has episode notes  present
     logging.info("Verified: episode notes are present for the subject.")
     # logging.info("Verifying that  episode notes are present for the subject.")
@@ -210,33 +193,11 @@ def test_view_active_episode_note(
     SubjectEventsNotes(page).select_note_type(NotesOptions.EPISODE_NOTE)
 
     # Get supporting notes for the subject
-    logging.info(
-        "Retrieving supporting notes for the subject with NHS Number: {nhs_no}."
+    screening_subject_id, type_id, notes_df = fetch_supporting_notes_from_db(
+        subjects_df, nhs_no, general_properties["note_status_active"]
     )
-    screening_subject_id = int(subjects_df["screening_subject_id"].iloc[0])
-    logging.info(f"Screening Subject ID retrieved: {screening_subject_id}")
-    type_id = int(subjects_df["type_id"].iloc[0])
-    notes_df = get_supporting_notes(
-        screening_subject_id, type_id, general_properties["note_status_active"]
-    )
-    # Get the title and note from the first row of the UI table
-    ui_data = SubjectEventsNotes(page).get_title_and_note_from_row(2)
-    logging.info(f"Data from UI: {ui_data}")
 
-    # Get the title and note from the database
-    db_data = {
-        "title": notes_df["title"].iloc[0].strip(),
-        "note": notes_df["note"].iloc[0].strip(),
-    }
-    logging.info(f"Data from DB: {db_data}")
-
-    # Compare the data
-    assert (
-        ui_data["title"] == db_data["title"]
-    ), f"Title does not match. UI: '{ui_data['title']}', DB: '{db_data['title']}'"
-    assert (
-        ui_data["note"] == db_data["note"]
-    ), f"Note does not match. UI: '{ui_data['note']}', DB: '{db_data['note']}'"
+    verify_note_content_ui_vs_db(page, notes_df)
 
 
 @pytest.mark.regression
@@ -256,9 +217,7 @@ def test_update_existing_episode_note(
         1,
     )
     nhs_no = subjects_df["subject_nhs_number"].iloc[0]
-    SubjectScreeningPage(page).fill_nhs_number(nhs_no)
-    SubjectScreeningPage(page).select_search_area_option("07")
-    SubjectScreeningPage(page).click_search_button()
+    search_subject_by_nhs(page, nhs_no)
     # Verify subject has episode notes  present
     logging.info(
         f"Verifying that the subject Note is visible for the subject with NHS Number: {nhs_no}."
@@ -279,21 +238,16 @@ def test_update_existing_episode_note(
     SubjectEventsNotes(page).accept_dialog_and_add_replacement_note()
 
     # Get updated supporting notes for the subject
-    logging.info(
-        "Retrieving updated supporting notes for the subject with NHS Number: {nhs_no}."
+    screening_subject_id, type_id, notes_df = fetch_supporting_notes_from_db(
+        subjects_df, nhs_no, general_properties["note_status_active"]
     )
-    screening_subject_id = int(subjects_df["screening_subject_id"].iloc[0])
-    logging.info(f"Screening Subject ID retrieved: {screening_subject_id}")
-    type_id = int(subjects_df["type_id"].iloc[0])
-    notes_df = get_supporting_notes(
-        screening_subject_id, type_id, general_properties["note_status_active"]
-    )
-    # Verify title and note match the provided values
-    logging.info("Verifying that the updated title and note match the provided values.")
 
     # Define the expected title and note
     note_title = "updated episode title"
     note_text = "updated episode note"
+    # Log the expected title and note
+    logging.info(f"Expected title: '{note_title}'")
+    logging.info(f"Expected note: '{note_text}'")
 
     # Ensure the filtered DataFrame is not empty
     if notes_df.empty:
@@ -302,15 +256,9 @@ def test_update_existing_episode_note(
         )
 
     # Verify title and note match the provided values
-    logging.info(
-        f"Verifying that the title and note match the provided values for type_id: {type_id}."
+    verify_note_content_matches_expected(
+        notes_df, note_title, note_text, nhs_no, type_id
     )
-    assert (
-        notes_df["title"].iloc[0].strip() == note_title
-    ), f"Title does not match. Expected: '{note_title}', Found: '{notes_df['title'].iloc[0].strip()}'."
-    assert (
-        notes_df["note"].iloc[0].strip() == note_text
-    ), f"Note does not match. Expected: '{note_text}', Found: '{notes_df['note'].iloc[0].strip()}'."
 
     logging.info(
         f"Verification successful:Episode note added for the subject with NHS Number: {nhs_no}. "
