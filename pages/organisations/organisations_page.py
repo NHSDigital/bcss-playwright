@@ -54,8 +54,6 @@ class OrganisationsPage(BasePage):
 class OrganisationSwitchPage:
     """Page Object Model for interacting with the Organisation Switch page."""
 
-    SELECT_ORG_LINK_TEXT = "Select Org"
-
     def __init__(self, page: Page):
         """
         Initializes the OrganisationSwitchPage with locators for key elements.
@@ -67,7 +65,7 @@ class OrganisationSwitchPage:
         self.radio_buttons = self.page.locator("input[type='radio']")
         self.selected_radio = self.page.locator("input[name='organisation']:checked")
         self.continue_button = self.page.get_by_role("button", name="Continue")
-        self.select_org_link = self.page.get_by_role("link", name=self.SELECT_ORG_LINK_TEXT)
+        self.select_org_link = self.page.get_by_role("link", name="Select Org")
         self.login_info = self.page.locator("td.loginInfo")
 
     def click(self, locator) -> None:
