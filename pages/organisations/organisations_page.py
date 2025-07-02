@@ -53,6 +53,8 @@ class OrganisationsPage(BasePage):
 
 
 class OrganisationSwitchPage:
+    """Organisation Switch Page locators and methods for interacting with the page."""
+
     def __init__(self, page: Page):
         self.page = page
         self.radio_selector = "input[name='organisation']"

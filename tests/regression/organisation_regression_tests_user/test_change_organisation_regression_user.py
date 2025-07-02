@@ -4,13 +4,17 @@ from utils.user_tools import UserTools
 from playwright.sync_api import Page
 from pages.organisations.organisations_page import OrganisationSwitchPage
 
+
 @pytest.mark.regression
 @pytest.mark.organisation_switch
 def test_user_can_switch_between_organisations(page: Page) -> None:
     """
-    Scenario:
-    User switches from Org 1 → Continue → Home → 'Select Organisation' → Org 2 → Continue → Home → Return.
-    Verifies switch success using aria role-based 'Continue' button logic.
+    Feature: Change Organisation
+    Scenario: Check that an English user with multiple organisations
+      is able to switch between them
+      Given I log in to BCSS "England" as user role "MultiOrgUser"
+      When I change organisation
+      Then I will be logged in as the alternative organisation.
     """
     # Log in as a user with multiple organisations
     UserTools.user_login(page, "Specialist Screening Practitioner at BCS009")
