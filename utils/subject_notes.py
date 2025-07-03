@@ -18,11 +18,13 @@ def fetch_supporting_notes_from_db(
 ) -> tuple[int, int, pd.DataFrame]:
     """
     Retrieves supporting notes from the database using subject and note info.
+     Args:
+        subjects_df (pd.DataFrame): Dataframe containing subject information
+        nhs_no (str): NHS Number of the subject
+        note_status (str): Status of the note (e.g., active)
 
-    :param subjects_df: DataFrame containing subject information
-    :param nhs_no: NHS Number of the subject
-    :param note_status: Status of the note (e.g., active)
-    :return: Tuple of (screening_subject_id, type_id, notes_df)
+    Returns:
+        Tuple of (screening_subject_id, type_id, notes_df)
     """
     logging.info(
         f"Retrieving supporting notes for the subject with NHS Number: {nhs_no}."
