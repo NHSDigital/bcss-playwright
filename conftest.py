@@ -9,9 +9,6 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 from utils.load_properties_file import PropertiesFile
-import logging
-from utils.user_tools import UserTools
-from pages.base_page import BasePage
 
 LOCAL_ENV_PATH = Path(os.getcwd()) / "local.env"
 
