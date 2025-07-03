@@ -20,7 +20,7 @@ def fetch_supporting_notes_from_db(
 ) -> tuple[int, int, pd.DataFrame]:
     """
     Retrieves supporting notes from the database using subject and note info.
-     Args:
+    Args:
         subjects_df (pd.DataFrame): Dataframe containing subject information
         nhs_no (str): NHS Number of the subject
         note_status (str): Status of the note (e.g., active)
@@ -55,12 +55,14 @@ def verify_note_content_matches_expected(
 ) -> None:
     """
     Verifies that the title and note fields from the DataFrame match the expected values.
-
-    :param notes_df: DataFrame containing the actual note data.
-    :param expected_title: Expected note title.
-    :param expected_note: Expected note content.
-    :param nhs_no: NHS Number of the subject (for logging).
-    :param type_id: Note type ID (for logging).
+    Args:
+        notes_df (pd.DataFrame): DataFrame containing the actual note data.
+        expected_title (str): Expected note title.
+        expected_note (str): Expected note content.
+        nhs_no (str): NHS Number of the subject (for logging).
+        type_id (int): Note type ID (for logging).
+    Returns:
+        None
     """
     logging.info(
         f"Verifying that the title and note match the provided values for type_id: {type_id}."
@@ -85,12 +87,16 @@ def verify_note_content_ui_vs_db(
     title_prefix_to_strip: Optional[str] = None,
 ) -> None:
     """
-    Verifies that the note title and content from the UI match the database values.
+        Verifies that the note title and content from the UI match the database values.
 
-    :param page: The page object to interact with UI
-    :param notes_df: DataFrame containing note data from DB
-    :param row_index: The row index in the UI table to fetch data from (default is 2)
-    :param title_prefix_to_strip: Optional prefix to remove from UI title (e.g., "Subject Kit Note -")
+    Args:
+        page (Page): The page object to interact with the UI.
+        notes_df (pd.DataFrame): DataFrame containing note data from the database.
+        row_index (int): The row index in the UI table to fetch data from (default is 2).
+        title_prefix_to_strip (str, optional): Optional prefix to remove from the UI title (e.g., "Subject Kit Note -").
+
+    Returns:
+        None
     """
     ui_data = SubjectEventsNotes(page).get_title_and_note_from_row(row_index)
     logging.info(f"Data from UI: {ui_data}")
@@ -123,14 +129,18 @@ def verify_note_removal_and_obsolete_transition(
     status_obsolete_key: str,
 ) -> None:
     """
-    Verifies that a note was removed from active notes and appears in obsolete notes.
+        Verifies that a note was removed from active notes and appears in obsolete notes.
 
-    :param subjects_df: DataFrame with subject details
-    :param ui_data: Dict with 'title' and 'note' from UI
-    :param general_properties: Dictionary with environment settings
-    :param note_type_key: Key to access the note type from general_properties
-    :param status_active_key: Key for active status
-    :param status_obsolete_key: Key for obsolete status
+    Args:
+        subjects_df (pd.DataFrame): DataFrame with subject details.
+        ui_data (dict): Dictionary with 'title' and 'note' from the UI.
+        general_properties (dict): Dictionary with environment settings.
+        note_type_key (str): Key to access the note type from general_properties.
+        status_active_key (str): Key for active status.
+        status_obsolete_key (str): Key for obsolete status.
+
+    Returns:
+        None
     """
     screening_subject_id = int(subjects_df["screening_subject_id"].iloc[0])
     logging.info(f"Screening Subject ID retrieved: {screening_subject_id}")
