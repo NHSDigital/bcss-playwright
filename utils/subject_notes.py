@@ -12,6 +12,8 @@ from pages.screening_subject_search.subject_events_notes import (
 from utils.oracle.oracle_specific_functions import (
     get_supporting_notes,
 )
+
+
 # Get Supporting notes from DB
 def fetch_supporting_notes_from_db(
     subjects_df: pd.DataFrame, nhs_no: str, note_status: str
