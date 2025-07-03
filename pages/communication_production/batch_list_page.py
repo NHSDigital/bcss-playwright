@@ -128,33 +128,42 @@ class ActiveBatchListPage(BatchListPage):
     def __init__(self, page):
         super().__init__(page)
 
+    def assert_column_present(self, column_name: str) -> None:
+        """Asserts that the specified column is present in the table header."""
+        headers = list(
+            TableUtils(self.page, "table#batchList").get_table_headers().values()
+        )
+        assert (
+            column_name in headers
+        ), f"Column '{column_name}' not found in table headers"
 
-    def verify_sortable_and_filterable_columns(self) -> None:
-        """
-        Validates the presence of expected columns in the Active Batch List table.
-        """
-        table = TableUtils(
-            self.page, "table.active-batch-list"
-        )  # Adjust selector as needed
-        expected_columns = [
-            "ID",
-            "Type",
-            "Original",
-            "Event Code",
-            "Description",
-            "Batch Split By",
-            "Screening Centre",
-            "Status",
-            "Priority",
-            "Deadline",
-            "Count",
-        ]
+    def assert_column_sortable(self, column_name: str) -> None:
+        """Asserts that the specified column is marked as sortable in the UI."""
+        sort_locator = self.page.locator(
+            "table#batchList thead tr:first-child th span.dt-column-title",
+            has_text=column_name,
+        )
+        assert (
+            sort_locator.count() > 0
+        ), f"Sortable header not found for column '{column_name}'"
+        assert (
+            sort_locator.first.get_attribute("role") == "button"
+        ), f"Column '{column_name}' is not sortable"
 
-        for column in expected_columns:
-            column_index = table.get_column_index(column)
-            assert (
-                column_index != -1
-            ), f"Column '{column}' not found in the batch list table"
+    def assert_column_filterable(self, column_name: str) -> None:
+        """Asserts that the specified column has a filter control in the second header row."""
+        table = TableUtils(self.page, "table#batchList")
+        column_index = table.get_column_index(column_name) - 1  # Convert 1-based to 0-based
+
+        filter_locator = (
+            self.page.locator("table#batchList thead tr:nth-child(2) th")
+            .nth(column_index)
+            .locator("input, select, div.input-group")
+        )
+        assert (
+            filter_locator.count() > 0
+        ), f"Filter control not found for column '{column_name}'"
+
 
 
 class ArchivedBatchListPage(BatchListPage):

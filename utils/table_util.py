@@ -1,5 +1,4 @@
-from playwright.sync_api import Page, Locator, expect
-from pages.base_page import BasePage
+from playwright.sync_api import Page, Locator
 import logging
 import secrets
 
@@ -51,17 +50,21 @@ class TableUtils:
         header_texts = headers.evaluate_all("ths => ths.map(th => th.innerText.trim())")
         logging.info(f"First Row Headers Found: {header_texts}")
 
-        # Extract detailed second-row headers if first-row headers seem generic
+        # Attempt to extract a second row of headers (commonly used for filters or alternate titles)
         second_row_headers = self.table.locator(
             "thead tr:nth-child(2) th"
         ).evaluate_all("ths => ths.map(th => th.innerText.trim())")
-        # Merge both lists: Prioritize second-row headers if available
-        if second_row_headers:
-            header_texts = second_row_headers
 
-        logging.info(f"Second Row Headers Found: {header_texts}")
+        # Use the second row only if it contains meaningful text (not filters, dropdowns, or placeholder values)
+        if second_row_headers and all(
+            h and not any(c in h.lower() for c in ("input", "all", "select"))
+            for h in second_row_headers
+        ):
+            header_texts = second_row_headers
+        logging.info(f"Second Row Headers Found: {second_row_headers}")
+
         for index, header in enumerate(header_texts):
-            if column_name.lower() in header.lower():
+            if column_name.strip().lower() == header.strip().lower():
                 return index + 1  # Convert to 1-based index
         return -1  # Column not found
 
@@ -130,35 +133,51 @@ class TableUtils:
             dict: A mapping of column index (1-based) to header text.
         """
         # Strategy 1: Try <thead> with <tr><th><span class="dt-column-title">Header</span></th>
-        header_spans = self.page.locator(f"{self.table_id} > thead tr:first-child th span.dt-column-title")
+        header_spans = self.page.locator(
+            f"{self.table_id} > thead tr:first-child th span.dt-column-title"
+        )
         if header_spans.count():
             try:
-                header_texts = header_spans.evaluate_all("els => els.map(el => el.textContent.trim())")
+                header_texts = header_spans.evaluate_all(
+                    "els => els.map(el => el.textContent.trim())"
+                )
+                print("[DEBUG] Parsed header texts:", repr(header_texts))
                 return {idx + 1: text for idx, text in enumerate(header_texts)}
             except Exception as e:
-                logging.warning(f"[get_table_headers] span.dt-column-title fallback failed: {e}")
+                logging.warning(
+                    f"[get_table_headers] span.dt-column-title fallback failed: {e}"
+                )
 
         # Strategy 2: Fallback to standard <thead> > tr > th inner text
-        header_cells = self.page.locator(f"{self.table_id} > thead tr").first.locator("th")
+        header_cells = self.page.locator(f"{self.table_id} > thead tr").first.locator(
+            "th"
+        )
         if header_cells.count():
             try:
-                header_texts = header_cells.evaluate_all("els => els.map(th => th.innerText.trim())")
+                header_texts = header_cells.evaluate_all(
+                    "els => els.map(th => th.innerText.trim())"
+                )
                 return {idx + 1: text for idx, text in enumerate(header_texts)}
             except Exception as e:
                 logging.warning(f"[get_table_headers] basic <th> fallback failed: {e}")
 
         # Strategy 3: Last resort — try to find header from tbody row (some old tables use <tbody> only)
-        fallback_row = self.table.locator("tbody tr").filter(has=self.page.locator("th")).first
+        fallback_row = (
+            self.table.locator("tbody tr").filter(has=self.page.locator("th")).first
+        )
         if fallback_row.locator("th").count():
             try:
-                header_texts = fallback_row.locator("th").evaluate_all("els => els.map(th => th.innerText.trim())")
+                header_texts = fallback_row.locator("th").evaluate_all(
+                    "els => els.map(th => th.innerText.trim())"
+                )
                 return {idx + 1: text for idx, text in enumerate(header_texts)}
             except Exception as e:
                 logging.warning(f"[get_table_headers] tbody fallback failed: {e}")
 
-        logging.warning(f"[get_table_headers] No headers found for table: {self.table_id}")
+        logging.warning(
+            f"[get_table_headers] No headers found for table: {self.table_id}"
+        )
         return {}
-
 
     def get_row_count(self) -> int:
         """
