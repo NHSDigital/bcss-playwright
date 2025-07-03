@@ -1,41 +1,17 @@
 import logging
-import pytest
 from playwright.sync_api import Page
 import pandas as pd
 from typing import Optional
-from pages import login
 from pages.base_page import BasePage
 from pages.screening_subject_search.subject_screening_search_page import (
     SubjectScreeningPage,
 )
 from pages.screening_subject_search.subject_events_notes import (
-    NotesOptions,
-    NotesStatusOptions,
     SubjectEventsNotes,
-    AdditionalCareNoteTypeOptions,
 )
 from utils.oracle.oracle_specific_functions import (
-    get_subjects_by_note_count,
-    get_subjects_with_multiple_notes,
     get_supporting_notes,
 )
-
-
-# search for a subject by NHS number and area option
-def search_subject_by_nhs(page: Page, nhs_no: str, area_option: str = "07") -> None:
-    """
-    Searches for a subject using their NHS number and a specified area option.
-
-    :param page: The Page object for browser interaction
-    :param nhs_no: NHS number of the subject to search for
-    :param area_option: Search area option (default is "07")
-    """
-    logging.info(f"Searching for subject with NHS Number: {nhs_no}")
-    SubjectScreeningPage(page).fill_nhs_number(nhs_no)
-    SubjectScreeningPage(page).select_search_area_option(area_option)
-    SubjectScreeningPage(page).click_search_button()
-
-
 # Get Supporting notes from DB
 def fetch_supporting_notes_from_db(
     subjects_df: pd.DataFrame, nhs_no: str, note_status: str
@@ -51,6 +27,9 @@ def fetch_supporting_notes_from_db(
     logging.info(
         f"Retrieving supporting notes for the subject with NHS Number: {nhs_no}."
     )
+    # Check if the DataFrame is empty
+    if subjects_df.empty:
+        raise ValueError(f"No subject data found for NHS Number: {nhs_no}.")
     screening_subject_id = int(subjects_df["screening_subject_id"].iloc[0])
     logging.info(f"Screening Subject ID retrieved: {screening_subject_id}")
 

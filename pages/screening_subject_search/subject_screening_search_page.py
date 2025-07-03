@@ -82,15 +82,6 @@ class SubjectScreeningPage(BasePage):
         """Click the 'NHS Number' filter."""
         self.click(self.nhs_number_filter)
 
-    def fill_nhs_number(self, nhs_no: str) -> None:
-        """
-        Fills the NHS Number field with the provided NHS number.
-
-        Args:
-            nhs_no (str): The NHS number to fill in the input field.
-        """
-        self.nhs_number_input.fill(nhs_no)
-
     def click_surname_filter(self) -> None:
         """Click the 'Surname' filter."""
         self.click(self.surname_filter)

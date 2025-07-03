@@ -1,4 +1,4 @@
-from playwright.sync_api import Page, expect, Locator
+from playwright.sync_api import Page, Locator
 from pages.base_page import BasePage
 from enum import StrEnum
 import logging

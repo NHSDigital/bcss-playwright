@@ -38,19 +38,3 @@ def smokescreen_properties() -> dict:
 @pytest.fixture
 def general_properties() -> dict:
     return PropertiesFile().get_general_properties()
-
-
-@pytest.fixture
-def login_as(page):
-    """Fixture to log in as a specific role."""
-
-    def _login(role: str):
-        """Log in to the application as a specific role.
-        Args:
-            role (str): The role to log in as, e.g., "ScreeningAssistant at BCS02".
-        """
-        logging.info(f"Logging in as '{role}'.")
-        UserTools.user_login(page, role)
-        BasePage(page).go_to_screening_subject_search_page()
-
-    return _login
