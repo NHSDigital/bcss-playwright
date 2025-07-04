@@ -153,7 +153,9 @@ class ActiveBatchListPage(BatchListPage):
     def assert_column_filterable(self, column_name: str) -> None:
         """Asserts that the specified column has a filter control in the second header row."""
         table = TableUtils(self.page, "table#batchList")
-        column_index = table.get_column_index(column_name) - 1  # Convert 1-based to 0-based
+        column_index = (
+            table.get_column_index(column_name) - 1
+        )  # Convert 1-based to 0-based
 
         filter_locator = (
             self.page.locator("table#batchList thead tr:nth-child(2) th")
@@ -164,6 +166,35 @@ class ActiveBatchListPage(BatchListPage):
             filter_locator.count() > 0
         ), f"Filter control not found for column '{column_name}'"
 
+    def assert_batch_table_visible(self) -> None:
+        """Asserts that the batch list table is present and rendered."""
+        expect(self.page.locator("table#batchList")).to_be_visible()
+
+    def select_first_active_batch(self) -> None:
+        """Clicks the first batch ID link in the active batch list."""
+        first_batch_link = self.page.locator("table#batchList tbody tr td.id a").first
+        assert first_batch_link.count() > 0, "No active batch links found"
+        first_batch_link.click()
+
+    def is_batch_present(self, batch_type: str) -> bool:
+        """Checks if a batch of the given type exists in the active batch list."""
+        locator = self.page.locator(f"table#batchList tbody tr td", has_text=batch_type)
+        return locator.count() > 0
+
+    def prepare_batch(self, batch_type: str) -> None:
+        """Finds and clicks the Prepare button for the specified batch type."""
+        row = (
+            self.page.locator("table#batchList tbody tr")
+            .filter(has=self.page.locator("td", has_text=batch_type))
+            .first
+        )
+
+        prepare_button = row.locator("a", has_text="Prepare").first
+        expect(prepare_button).to_be_visible()
+        prepare_button.click()
+
+        # Optional: wait for row to disappear
+        expect(row).not_to_be_visible(timeout=5000)
 
 
 class ArchivedBatchListPage(BatchListPage):

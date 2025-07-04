@@ -1,5 +1,6 @@
 from playwright.sync_api import Page
 from pages.base_page import BasePage
+from playwright.sync_api import expect
 
 
 class ManageActiveBatchPage(BasePage):
@@ -29,3 +30,9 @@ class ManageActiveBatchPage(BasePage):
     def click_confirm_button(self) -> None:
         """Click the Confirm Printed button"""
         self.click(self.confirm_button)
+
+    def assert_batch_details_visible(self) -> None:
+        """Asserts that the Manage Active Batch screen has loaded by checking the page title."""
+        page_title = self.page.locator("#page-title")
+        expect(page_title).to_have_text("Manage Active Batch")
+
