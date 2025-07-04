@@ -35,4 +35,3 @@ class ManageActiveBatchPage(BasePage):
         """Asserts that the Manage Active Batch screen has loaded by checking the page title."""
         page_title = self.page.locator("#page-title")
         expect(page_title).to_have_text("Manage Active Batch")
-
