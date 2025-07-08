@@ -1,4 +1,4 @@
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page, expect, Locator
 from pages.base_page import BasePage
 from datetime import datetime
 from utils.calendar_picker import CalendarPicker
@@ -130,29 +130,36 @@ class BatchListPage(BasePage):
         expect(self.deadline_date_filter_with_input).to_have_value(expected_text)
 
     def open_letter_batch(
-        self, batch_type: str, status: str, level: str, description: str
+        self,
+        batch_type: str = "",
+        status: str = "",
+        level: str = "",
+        description: str = "",
     ) -> None:
         """
-        Finds and opens the batch row based on type, status, level, and description.
-        Args:
-            batch_type (str): The type of the batch (e.g., "Original").
-            status (str): The status of the batch (e.g., "Open").
-            level (str): The level of the batch (e.g., "S1").
-            description (str): The description of the batch (e.g., "Pre-invitation (FIT)").
+        Finds and opens the batch row based on non-empty filters.
         """
-        # Step 1: Match the row using nested filters, one per column value
-        row = (
-            self.page.locator("table tbody tr")
-            .filter(has=self.page.locator("td", has_text=batch_type))
-            .filter(has=self.page.locator("td", has_text=status))
-            .filter(has=self.page.locator("td", has_text=level))
-            .filter(has=self.page.locator("td", has_text=description))
-        )
+        row_locator = self.page.locator(f"{self.table_selector} tbody tr")
 
-        # Step 2: Click the "View" link in the matched row
-        view_link = row.locator(
-            "a"
-        )  # Click the first link in the row identified in step 1
+        if batch_type:
+            row_locator = row_locator.filter(
+                has=self.page.locator("td", has_text=batch_type)
+            )
+        if status:
+            row_locator = row_locator.filter(
+                has=self.page.locator("td", has_text=status)
+            )
+        if level:
+            row_locator = row_locator.filter(
+                has=self.page.locator("td", has_text=level)
+            )
+        if description:
+            row_locator = row_locator.filter(
+                has=self.page.locator("td", has_text=description)
+            )
+
+        row = row_locator.first
+        view_link = row.locator("a").first
         expect(view_link).to_be_visible()
         view_link.click()
 
@@ -188,6 +195,28 @@ class ActiveBatchListPage(BatchListPage):
         expect(prepare_button).to_be_visible()
         prepare_button.click()
         expect(row).not_to_be_visible(timeout=5000)
+
+    def get_open_original_batch_row(self) -> Locator | None:
+        """
+        Returns the first table row where:
+        - The 'Type' column contains 'Original'
+        - The 'Status' column contains 'Open'
+
+        Returns:
+            Locator of the matching <tr> element, or None if not found.
+        """
+        rows = self.page.locator(f"{self.table_selector} tbody tr")
+        for i in range(rows.count()):
+            row = rows.nth(i)
+            type_cell = row.locator("td").nth(1)  # Assuming Type is 2nd column
+            status_cell = row.locator("td").nth(8)  # Assuming Status is 9th column
+
+            if (
+                "Original" in type_cell.inner_text()
+                and "Open" in status_cell.inner_text()
+            ):
+                return row
+        return None
 
 
 class ArchivedBatchListPage(BatchListPage):
