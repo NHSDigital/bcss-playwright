@@ -55,7 +55,7 @@ See the docstrings in the code for details on each function.
 - **save_last_run_data(data: Dict[str, Any]) -> None**
   Saves the provided dictionary to the JSON file.
 
-- **has_test_run_today(test_name: str) -> boolean**
+- **has_test_run_today(test_name: str) -> `bool`**
   Checks if the given test has already run today. If not, updates the record to mark it as run today.
 
 ---

@@ -275,3 +275,18 @@ class BasePage:
     def go_to_log_in_page(self) -> None:
         """Click on the Log in button to navigate to the login page."""
         self.click(self.log_in_page)
+
+    def safe_accept_dialog_select_option(self, locator: Locator, option: str) -> None:
+        """
+        Safely accepts a dialog triggered by selecting a dropdown, avoiding the error:
+        playwright._impl._errors.Error: Dialog.accept: Cannot accept dialog which is already handled!
+        If no dialog appears, continues without error.
+        Args:
+            locator (Locator): The locator that triggers the dialog when clicked.
+            example: If clicking a save button opens a dialog, pass that save button's locator.
+        """
+        self.page.once("dialog", self._accept_dialog)
+        try:
+            locator.select_option(option)
+        except Exception as e:
+            logging.error(f"Option selection failed: {e}")
