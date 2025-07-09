@@ -1,6 +1,6 @@
 from playwright.sync_api import Page
 from pages.base_page import BasePage
-from enum import Enum
+from enum import StrEnum
 from utils.calendar_picker import CalendarPicker
 from datetime import datetime
 from pages.datasets.investigation_dataset_page import (
@@ -26,6 +26,9 @@ class CancerAuditDatasetsPage(BasePage):
         self.save_dataset_button = self.page.locator(
             "#UI_DIV_BUTTON_SAVE1"
         ).get_by_role("button", name="Save Dataset")
+        self.edit_dataset_button = self.page.locator(
+            "#UI_DIV_BUTTON_EDIT1"
+        ).get_by_role("button", name="Edit Dataset")
         # Types of Scan
         self.abdominal_ultrasound_checkbox = self.page.get_by_role(
             "checkbox", name="Abdominal Ultrasound"
@@ -51,6 +54,10 @@ class CancerAuditDatasetsPage(BasePage):
         self.other_checkbox = self.page.get_by_role("checkbox", name="Other")
         self.other_textbox = self.page.get_by_role(
             "textbox", name="Please enter the other"
+        )
+        # Other Staging and Pre-Treatment Information locators
+        self.treatment_received_select = self.page.get_by_label(
+            "Treatment Received", exact=True
         )
         # Tumour Information
         self.date_of_diagnosis_textbox = self.page.get_by_role(
@@ -82,6 +89,10 @@ class CancerAuditDatasetsPage(BasePage):
     def click_save_dataset_button(self) -> None:
         """Clicks on the 'Save Dataset' button."""
         self.click(self.save_dataset_button)
+
+    def click_edit_dataset_button(self) -> None:
+        """Clicks on the 'Edit Dataset' button"""
+        self.click(self.edit_dataset_button)
 
     def check_abdominal_ultrasound_checkbox(self) -> None:
         """Checks the 'Abdominal Ultrasound' checkbox."""
@@ -132,6 +143,10 @@ class CancerAuditDatasetsPage(BasePage):
         self.other_textbox.fill(text)
         self.other_textbox.press("Tab")
 
+    def select_treatment_received_option(self, option: str) -> None:
+        """Select and option from the 'Treatment Received' dropdown"""
+        self.treatment_received_select.select_option(option)
+
     def fill_date_of_diagnosis_textbox(self, date: datetime) -> None:
         """Fills the 'Date of Diagnosis' textbox with the provided date."""
         CalendarPicker(self.page).calendar_picker_ddmmyyyy(
@@ -160,7 +175,7 @@ class CancerAuditDatasetsPage(BasePage):
 NOT_REPORTED_CODE = "202140~~202188"
 
 
-class ASAGradeOptions(Enum):
+class ASAGradeOptions(StrEnum):
     """Enum for ASA Grade options."""
 
     FIT = "17009"
@@ -171,14 +186,14 @@ class ASAGradeOptions(Enum):
     NOT_KNOWN = "17015"
 
 
-class YesNoOptions(Enum):
+class YesNoOptions(StrEnum):
     """Enum for YesNo options."""
 
     YES = "17058"
     NO = "17059"
 
 
-class MetastasesPresentOptions(Enum):
+class MetastasesPresentOptions(StrEnum):
     """Enum for Metastases Present options."""
 
     CERTAIN = "17131~~202199"
@@ -186,7 +201,7 @@ class MetastasesPresentOptions(Enum):
     NOT_REPORTED = NOT_REPORTED_CODE
 
 
-class FinalPreTreatmentTCategoryOptions(Enum):
+class FinalPreTreatmentTCategoryOptions(StrEnum):
     """Enum for Final Pre-Treatment T Category options."""
 
     CTX = "17356"
@@ -198,7 +213,7 @@ class FinalPreTreatmentTCategoryOptions(Enum):
     NOT_REPORTED = NOT_REPORTED_CODE
 
 
-class FinalPreTreatmentNCategoryOptions(Enum):
+class FinalPreTreatmentNCategoryOptions(StrEnum):
     """Enum for Final Pre-Treatment N Category options."""
 
     CNX = "202201"
@@ -208,7 +223,7 @@ class FinalPreTreatmentNCategoryOptions(Enum):
     NOT_REPORTED = NOT_REPORTED_CODE
 
 
-class ReasonNoTreatmentRecievedOptions(Enum):
+class ReasonNoTreatmentRecievedOptions(StrEnum):
     """Enum for Reason No Treatment Received options."""
 
     ADVANCED_DISEASE = "99016"
@@ -219,7 +234,7 @@ class ReasonNoTreatmentRecievedOptions(Enum):
     UNKNOWN = "99018"
 
 
-class PreviouslyExcisedTumorOptions(Enum):
+class PreviouslyExcisedTumorOptions(StrEnum):
     """Enum for Previously Excised Tumor options."""
 
     YES = "17058~~305403"
@@ -228,14 +243,14 @@ class PreviouslyExcisedTumorOptions(Enum):
     NOT_REPORTED = "202140"
 
 
-class TreatmentTypeOptions(Enum):
+class TreatmentTypeOptions(StrEnum):
     """Enum for Treatment Type options."""
 
     SURGICAL = "202143"
     NON_SURGICAL = "202144"
 
 
-class TreatmentGivenOptions(Enum):
+class TreatmentGivenOptions(StrEnum):
     """Enum for Treatment Given options."""
 
     CHEMOTHERAPY = "202160~~202184,202217,202218,202219,202220,202221,202222,202223,202224,202225,202226,202227,202228,202287,305395,305397"
@@ -245,7 +260,7 @@ class TreatmentGivenOptions(Enum):
     SPECIALIST_PALLIATIVE_CARE = "202164~~202184,202217,202218,202219,202220,202221,202222,202223,202224,202225,202226,202227,202228,305395,305397"
 
 
-class CancerTreatmentIntentOptions(Enum):
+class CancerTreatmentIntentOptions(StrEnum):
     """Enum for Cancer Treatment Intent options."""
 
     CURATIVE = "17370"
@@ -254,14 +269,14 @@ class CancerTreatmentIntentOptions(Enum):
     NOT_KNOWN = "17373"
 
 
-class NHSOrPrivateOptions(Enum):
+class NHSOrPrivateOptions(StrEnum):
     """Enum for NHS or Private options."""
 
     NHS = "202153~~202177,202178"
     PRIVATE = "202154~~202179"
 
 
-class TreatmentProviderLookupOptions(Enum):
+class TreatmentProviderLookupOptions(StrEnum):
     """Enum for Treatment Provider lookup options."""
 
     ADVANCE_NURSE_PRACTITIONER_1 = "51905"
@@ -290,7 +305,7 @@ class TreatmentProviderLookupOptions(Enum):
     BUSHBURY_HEALTH_CENTRE = "51801"
 
 
-class ConsultantLookupOptions(Enum):
+class ConsultantLookupOptions(StrEnum):
     """Enum for Consultant lookup options."""
 
     B_FRAME = "201"

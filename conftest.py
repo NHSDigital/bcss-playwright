@@ -35,3 +35,46 @@ def smokescreen_properties() -> dict:
 @pytest.fixture
 def general_properties() -> dict:
     return PropertiesFile().get_general_properties()
+
+
+from typing import Any
+import pytest
+from _pytest.config.argparsing import Parser
+from _pytest.fixtures import FixtureRequest
+
+
+def pytest_addoption(parser: Parser) -> None:
+    """
+    Add custom command-line options to pytest.
+
+    Args:
+        parser (Parser): The pytest parser object used to define CLI options.
+
+    Adds:
+        --subjects-to-run-for (int):
+            The number of subjects to run the test setup for.
+            Default is 10.
+
+    Example:
+        pytest tests/test_setup.py::test_setup_subjects_as_a259 --subjects-to-run-for=5
+    """
+    parser.addoption(
+        "--subjects-to-run-for",
+        action="store",
+        default="10",
+        help="Number of subjects to run the test setup for (default: 10)",
+    )
+
+
+@pytest.fixture
+def subjects_to_run_for(request: FixtureRequest) -> int:
+    """
+    Fixture to retrieve the value of the '--subjects-to-run-for' CLI argument.
+
+    Args:
+        request (FixtureRequest): Provides access to the requesting test context.
+
+    Returns:
+        int: The number of subjects specified via the CLI or default (10).
+    """
+    return int(request.config.getoption("--subjects-to-run-for"))  # type: ignore
