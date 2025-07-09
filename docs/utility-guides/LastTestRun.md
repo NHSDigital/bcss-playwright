@@ -29,7 +29,7 @@ This utility manages a JSON file (`.test_last_runs.json`) that records the last 
 You might want to use this utility in scenarios such as:
 
 - Avoiding repeated execution of slow or stateful tests within the same day.
-- Ensuring setup or teardown routines only run once per day.
+- Ensuring setup or tear down routines only run once per day.
 - Tracking test execution dates for reporting or debugging.
 
 ---
@@ -55,7 +55,7 @@ See the docstrings in the code for details on each function.
 - **save_last_run_data(data: Dict[str, Any]) -> None**
   Saves the provided dictionary to the JSON file.
 
-- **has_test_run_today(test_name: str) -> bool**
+- **has_test_run_today(test_name: str) -> boolean**
   Checks if the given test has already run today. If not, updates the record to mark it as run today.
 
 ---
