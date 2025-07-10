@@ -63,11 +63,12 @@ from utils.screening_subject_page_searcher import (
 from utils.user_tools import UserTools
 
 
-def test_setup_subjects_as_a99(
-    page: Page, subjects_to_run_for: int, request: FixtureRequest
-) -> None:
+@pytest.fixture(scope="function", autouse=True)
+def before_each(page: Page, request: FixtureRequest) -> None:
     """
-    Scenario Outline: Set up 10 subjects to be at status A99
+    Checks that the required organization parameters are set correctly before each test.
+    If not, it sets them to the expected values.
+    Also sets up appointments if the test has not been run today.
     """
     param_12_set_correctly = check_parameter(12, "23162", "10")
     param_28_set_correctly = check_parameter(28, "23162", "07:00")
@@ -84,9 +85,15 @@ def test_setup_subjects_as_a99(
         "subject/episodes/datasets/investigation/endoscopy/polypcategories/test_setup", base_url  # type: ignore
     ):
         setup_appointments(page)
-        page = page.context.new_page()
-        page.goto("/")
 
+
+@pytest.mark.wip
+def test_setup_subjects_as_a99(page: Page, subjects_to_run_for: int) -> None:
+    """
+    Scenario Outline: Set up 10 subjects to be at status A99
+    """
+    page = page.context.new_page()
+    page.goto("/")
     criteria = {
         "latest event status": "S9",
         "latest episode type": "FOBT",
@@ -116,24 +123,8 @@ def test_setup_subjects_as_a259(
     """
     Set up 10 subjects to have new Colonoscopy datasets in episodes started within in the last 4 years
     """
-    param_12_set_correctly = check_parameter(12, "23162", "10")
-    param_28_set_correctly = check_parameter(28, "23162", "07:00")
-    param_29_set_correctly = check_parameter(29, "23162", "20:00")
-    if not param_12_set_correctly:
-        set_org_parameter_value(12, "10", "23162")
-    if not param_28_set_correctly:
-        set_org_parameter_value(28, "07:00", "23162")
-    if not param_29_set_correctly:
-        set_org_parameter_value(29, "20:00", "23162")
-
-    base_url = request.config.getoption("--base-url")
-    if not has_test_run_today(
-        "subject/episodes/datasets/investigation/endoscopy/polypcategories/test_setup", base_url  # type: ignore
-    ):
-        setup_appointments(page)
-        page = page.context.new_page()
-        page.goto("/")
-
+    page = page.context.new_page()
+    page.goto("/")
     criteria = {
         "latest episode status": "open",
         "latest episode latest investigation dataset": "colonoscopy_new",
