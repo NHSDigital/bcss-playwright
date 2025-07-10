@@ -1,10 +1,10 @@
 import os
 import json
 from datetime import date
-from typing import Dict, Any
-import pytest
+from typing import Dict, Any, Optional
 
-LAST_RUN_FILE = "./.test_last_runs.json"
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+LAST_RUN_FILE = os.path.join(PROJECT_ROOT, ".test_last_runs.json")
 
 
 def load_last_run_data() -> Dict[str, Any]:
@@ -37,7 +37,7 @@ def save_last_run_data(data: Dict[str, Any]) -> None:
         json.dump(data, f, indent=2)
 
 
-def has_test_run_today(test_name: str) -> bool:
+def has_test_run_today(test_name: str, base_url: Optional[str] = None) -> bool:
     """
     Checks if the given test has already run today.
     If not, updates the record to mark it as run today.
@@ -50,10 +50,12 @@ def has_test_run_today(test_name: str) -> bool:
     """
     data = load_last_run_data()
     today = date.today().isoformat()
+    env = base_url or "unknown"
 
-    if data.get(test_name) == today:
+    last_run = data.get(test_name, {})
+    if last_run.get("date") == today and last_run.get("env") == env:
         return True
     else:
-        data[test_name] = today
+        data[test_name] = {"date": today, "env": env}
         save_last_run_data(data)
         return False

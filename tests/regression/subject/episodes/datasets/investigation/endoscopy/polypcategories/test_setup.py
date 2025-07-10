@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import pandas as pd
 import pytest
+from _pytest.fixtures import FixtureRequest
 import logging
 from playwright.sync_api import Page
 from classes.subject import Subject
@@ -62,7 +63,9 @@ from utils.screening_subject_page_searcher import (
 from utils.user_tools import UserTools
 
 
-def test_setup_subjects_as_a99(page: Page, subjects_to_run_for: int) -> None:
+def test_setup_subjects_as_a99(
+    page: Page, subjects_to_run_for: int, request: FixtureRequest
+) -> None:
     """
     Scenario Outline: Set up 10 subjects to be at status A99
     """
@@ -76,8 +79,9 @@ def test_setup_subjects_as_a99(page: Page, subjects_to_run_for: int) -> None:
     if not param_29_set_correctly:
         set_org_parameter_value(29, "20:00", "23162")
 
+    base_url = request.config.getoption("--base-url")
     if not has_test_run_today(
-        "subject/episodes/datasets/investigation/endoscopy/polypcategories/test_setup"
+        "subject/episodes/datasets/investigation/endoscopy/polypcategories/test_setup", base_url  # type: ignore
     ):
         setup_appointments(page)
         page = page.context.new_page()
@@ -106,7 +110,9 @@ def test_setup_subjects_as_a99(page: Page, subjects_to_run_for: int) -> None:
     LogoutPage(page).log_out()
 
 
-def test_setup_subjects_as_a259(page: Page, subjects_to_run_for: int) -> None:
+def test_setup_subjects_as_a259(
+    page: Page, subjects_to_run_for: int, request: FixtureRequest
+) -> None:
     """
     Set up 10 subjects to have new Colonoscopy datasets in episodes started within in the last 4 years
     """
@@ -120,8 +126,9 @@ def test_setup_subjects_as_a259(page: Page, subjects_to_run_for: int) -> None:
     if not param_29_set_correctly:
         set_org_parameter_value(29, "20:00", "23162")
 
+    base_url = request.config.getoption("--base-url")
     if not has_test_run_today(
-        "subject/episodes/datasets/investigation/endoscopy/polypcategories/test_setup"
+        "subject/episodes/datasets/investigation/endoscopy/polypcategories/test_setup", base_url  # type: ignore
     ):
         setup_appointments(page)
         page = page.context.new_page()
