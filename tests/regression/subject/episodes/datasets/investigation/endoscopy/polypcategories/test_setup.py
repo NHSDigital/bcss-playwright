@@ -106,7 +106,6 @@ def test_setup_subjects_as_a99(page: Page, subjects_to_run_for: int) -> None:
     LogoutPage(page).log_out()
 
 
-@pytest.mark.wip
 def test_setup_subjects_as_a259(page: Page, subjects_to_run_for: int) -> None:
     """
     Set up 10 subjects to have new Colonoscopy datasets in episodes started within in the last 4 years
@@ -179,10 +178,6 @@ def test_setup_subjects_as_a259(page: Page, subjects_to_run_for: int) -> None:
         )
 
         SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-
-        AdvanceFOBTScreeningEpisodePage(
-            page
-        ).click_suitable_for_endoscopic_test_button()
 
         AdvanceFOBTScreeningEpisodePage(page).click_calendar_button()
         CalendarPicker(page).v1_calender_picker(datetime.today())
