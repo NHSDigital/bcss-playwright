@@ -87,7 +87,6 @@ def before_each(page: Page, request: FixtureRequest) -> None:
         setup_appointments(page)
 
 
-@pytest.mark.wip
 def test_setup_subjects_as_a99(page: Page, subjects_to_run_for: int) -> None:
     """
     Scenario Outline: Set up 10 subjects to be at status A99
