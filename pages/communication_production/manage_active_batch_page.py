@@ -32,7 +32,7 @@ class ManageActiveBatchPage(BasePage):
         """Click the Confirm Printed button"""
         self.click(self.confirm_button)
 
-    def assert_batch_details_visible(self) -> None:
+    def assert_active_batch_details_visible(self) -> None:
         """Asserts that the Manage Active Batch screen has loaded by checking the page title."""
         page_title = self.page.locator("#page-title")
         expect(page_title).to_have_text("Manage Active Batch")

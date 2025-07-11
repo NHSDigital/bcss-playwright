@@ -9,7 +9,6 @@ from utils.user_tools import UserTools
 from pages.communication_production.manage_active_batch_page import (
     ManageActiveBatchPage,
 )
-from pages.communication_production.batch_list_page import ActiveBatchListPage
 from utils.batch_processing import prepare_and_print_batch
 
 
@@ -56,7 +55,7 @@ def test_prepare_retrieve_and_confirm_active_letter_batch(select_user) -> None:
 
     # Step 5: Assert that Manage Active Batch page has loaded
     manage_page = ManageActiveBatchPage(page)
-    manage_page.assert_batch_details_visible()
+    manage_page.assert_active_batch_details_visible()
 
     # Step 6: Prepare, retrieve and confirm the batch using utility method
     prepare_and_print_batch(page, link_text=batch_id)

@@ -232,3 +232,45 @@ class ArchivedBatchListPage(BatchListPage):
         ).first
         assert first_batch_link.count() > 0, "No archived batch links found"
         first_batch_link.click()
+
+    def get_archived_batch_row(
+        self, batch_type: str, event_code: str, description: str
+    ) -> Locator | None:
+        """
+        Returns the first archived batch row matching the specified Type, Event Code, and Description.
+        Assumes columns appear in the following order:
+        1. Batch ID
+        2. Type
+        3. Event Code
+        4. Description
+        5+ ...
+
+        Args:
+            batch_type (str): The target value in the 'Type' column (e.g., 'Original').
+            event_code (str): The target value in the 'Event Code' column (e.g., 'S1').
+            description (str): The target text in the 'Description' column (e.g., 'Pre-invitation (FIT)').
+
+        Returns:
+            Locator: The first <tr> element matching all criteria, or None if not found.
+        """
+        rows = self.page.locator(f"{self.table_selector} tbody tr")
+        row_count = rows.count()
+        if row_count == 0:
+            return None
+
+        for i in range(row_count):
+            row = rows.nth(i)
+
+            try:
+                type_text = row.locator("td").nth(1).inner_text().strip()
+                event_code_text = row.locator("td").nth(4).inner_text().strip()
+                description_text = row.locator("td").nth(5).inner_text().strip()
+
+                if (
+                    batch_type.lower() in type_text.lower()
+                    and event_code.lower() in event_code_text.lower()
+                    and description.lower() in description_text.lower()
+                ):
+                    return row
+            except IndexError:
+                return None
