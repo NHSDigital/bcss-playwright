@@ -12,6 +12,10 @@ from pages.communication_production.manage_active_batch_page import (
 from pages.communication_production.manage_archived_batch_page import (
     ManageArchivedBatchPage,
 )
+from pages.communication_production.letter_library_index_page import (
+    LetterLibraryIndexPage,
+)
+from pages.communication_production import letter_library_index_page
 from utils.batch_processing import prepare_and_print_batch
 
 
@@ -20,15 +24,13 @@ def select_user(page: Page):
     def _login_as(user_role: str):
         # Log in with the specified user
         UserTools.user_login(page, user_role)
-        # Navigate to Active Batch List
+        # Navigate to communications production page
         BasePage(page).go_to_communications_production_page()
-        CommunicationsProductionPage(page).go_to_archived_batch_list_page()
         return page
 
     return _login_as
 
 
-@pytest.mark.wip
 @pytest.mark.letters_tests
 @pytest.mark.regression
 def test_reprint_and_archive_letter_batch(select_user) -> None:
@@ -44,6 +46,7 @@ def test_reprint_and_archive_letter_batch(select_user) -> None:
     """
     # Step 1: Log in as user and navigate to Archived Batch List
     page = select_user("Hub Manager State Registered at BCS01")
+    CommunicationsProductionPage(page).go_to_archived_batch_list_page()
     batch_list_page = ArchivedBatchListPage(page)
 
     # Step 2: Ensure the archived batch list table is visible
@@ -87,14 +90,61 @@ def test_reprint_and_archive_letter_batch(select_user) -> None:
     manage_archived_page.confirm_archived_message_visible()
 
 
-# Scenario: Check that S1 has supplementary batches
-# Given I log in to BCSS "England" as user role "HubManagerStateRegistered"
-# When I view the letter library index
-# And I filter the letter library index list to view the "Supplementary Letters" letters group
-# And I ensure that I can create "S1" supplementary batches
-# And I view the archived batch list
-# And I view the "Original" type archived letter batch for "S1" "Pre"
-# And I create a supplementary batch
-# And I prepare the letter batch
-# And I retrieve and confirm the letters
-# And my batch is now archived
+@pytest.mark.wip
+@pytest.mark.letters_tests
+@pytest.mark.regression
+def test_check_that_s1_has_supplementary_batches(select_user) -> None:
+    """
+    Scenario: I can create a supplementary batch for S1 and archive it
+    Given I log in to BCSS "England" as user role "HubManagerStateRegistered"
+    When I view the letter library index
+    And I filter the letter library index list to view the "Supplementary Letters" letters group
+    And I ensure that I can create "S1" supplementary batches
+    And I view the archived batch list
+    And I view the "Original" type archived letter batch for "S1" "Pre"
+    And I create a supplementary batch
+    And I prepare the letter batch
+    And I retrieve and confirm the letters
+    And my batch is now archived
+    """
+    # Step 1: Log in as user and navigate to Letter Library Index
+    page = select_user("Hub Manager State Registered at BCS01")
+    CommunicationsProductionPage(page).go_to_letter_library_index_page()
+
+    # Step 2: Filter for "Supplementary Letters" group
+    LetterLibraryIndexPage(page).filter_by_letters_group("Supplementary Letters")
+
+    # TODO: Is this below step required? There is no button to create a supplementary batch in the letter library index page.
+    # and there are no supplementary letters in the letter library index page.
+
+    # Step 3: Ensure S1 supplementary batches can be created
+    if not letter_library_index_page.can_create_supplementary_batches("S1"):
+        pytest.skip("No S1 supplementary batches available for creation.")
+
+    # Step 4: Navigate to Archived Batch List
+    archived_batch_list_page = ArchivedBatchListPage(page)
+    archived_batch_list_page.assert_batch_table_visible()
+
+    # Step 5: Find and open archived batch with Type "Original", Event Code "S1", and Description "Pre"
+    row = archived_batch_list_page.get_archived_batch_row(
+        "Original", "S1", "Pre-invitation (FIT)"
+    )
+    if not row:
+        pytest.skip("No archived 'Original' S1 Pre batches found to reprint.")
+
+    batch_id = row.locator("a").first.inner_text()
+    row.locator("a").first.click()
+
+    # Step 6: Create a supplementary batch
+    manage_active_page = ManageActiveBatchPage(page)
+    manage_active_page.click_prepare_button()
+
+    # Step 7: Prepare the letter batch
+    manage_active_page.prepare_and_print()
+
+    # Step 8: Retrieve and confirm letters
+    manage_active_page.retrieve_and_confirm_letters()
+
+    # Step 9: Confirm the batch is now archived
+    manage_archived_page = ManageArchivedBatchPage(page)
+    manage_archived_page.confirm_archived_message_visible()
