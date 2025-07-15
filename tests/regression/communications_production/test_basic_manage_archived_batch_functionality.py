@@ -1,5 +1,5 @@
 import pytest
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 from pages.communication_production.communications_production_page import (
     CommunicationsProductionPage,
@@ -15,7 +15,6 @@ from pages.communication_production.manage_archived_batch_page import (
 from pages.communication_production.letter_library_index_page import (
     LetterLibraryIndexPage,
 )
-from pages.communication_production import letter_library_index_page
 from utils.batch_processing import prepare_and_print_batch
 
 
@@ -90,7 +89,6 @@ def test_reprint_and_archive_letter_batch(select_user) -> None:
     manage_archived_page.confirm_archived_message_visible()
 
 
-@pytest.mark.wip
 @pytest.mark.letters_tests
 @pytest.mark.regression
 def test_check_that_s1_has_supplementary_batches(select_user) -> None:
@@ -98,53 +96,37 @@ def test_check_that_s1_has_supplementary_batches(select_user) -> None:
     Scenario: I can create a supplementary batch for S1 and archive it
     Given I log in to BCSS "England" as user role "HubManagerStateRegistered"
     When I view the letter library index
-    And I filter the letter library index list to view the "Supplementary Letters" letters group
-    And I ensure that I can create "S1" supplementary batches
-    And I view the archived batch list
-    And I view the "Original" type archived letter batch for "S1" "Pre"
-    And I create a supplementary batch
-    And I prepare the letter batch
-    And I retrieve and confirm the letters
-    And my batch is now archived
+    And I filter the letter library index list to view the "Invitation Letters" letters group
+    And I ensure that I can create (define) "S1" supplementary batches
+    And I Go to letter library index and filter by Supplementary Letters
+    And I Open a supplementary letter
     """
     # Step 1: Log in as user and navigate to Letter Library Index
     page = select_user("Hub Manager State Registered at BCS01")
     CommunicationsProductionPage(page).go_to_letter_library_index_page()
 
-    # Step 2: Filter for "Supplementary Letters" group
-    LetterLibraryIndexPage(page).filter_by_letters_group("Supplementary Letters")
-
-    # TODO: Is this below step required? There is no button to create a supplementary batch in the letter library index page.
-    # and there are no supplementary letters in the letter library index page.
+    # Step 2: Filter for "Invitation Letters" group
+    LetterLibraryIndexPage(page).filter_by_letters_group("Invitation Letters")
 
     # Step 3: Ensure S1 supplementary batches can be created
-    if not letter_library_index_page.can_create_supplementary_batches("S1"):
-        pytest.skip("No S1 supplementary batches available for creation.")
-
-    # Step 4: Navigate to Archived Batch List
-    archived_batch_list_page = ArchivedBatchListPage(page)
-    archived_batch_list_page.assert_batch_table_visible()
-
-    # Step 5: Find and open archived batch with Type "Original", Event Code "S1", and Description "Pre"
-    row = archived_batch_list_page.get_archived_batch_row(
-        "Original", "S1", "Pre-invitation (FIT)"
+    LetterLibraryIndexPage(page).filter_by_event_code("S1")
+    LetterLibraryIndexPage(page).click_first_letter_code_link_in_table()
+    LetterLibraryIndexPage(page).click_define_supplementary_letter_button()
+    LetterLibraryIndexPage(page).define_supplementary_letter(
+        description="Pre-invitation (FIT)",
+        destination_id="12057",  # Patient
+        priority_id="12016",  # Medium
+        signatory="signatory",
+        job_title="job title",
+        paragraph_text="body text",
     )
-    if not row:
-        pytest.skip("No archived 'Original' S1 Pre batches found to reprint.")
+    expect(page.locator("#ntshPageTitle")).to_contain_text("Version History")
 
-    batch_id = row.locator("a").first.inner_text()
-    row.locator("a").first.click()
+    # Step 4: Go to letter library index and filter by Supplementary Letters
+    BasePage(page).click_main_menu_link()
+    BasePage(page).go_to_communications_production_page()
+    CommunicationsProductionPage(page).go_to_letter_library_index_page()
+    LetterLibraryIndexPage(page).filter_by_letters_group("Supplementary Letters")
 
-    # Step 6: Create a supplementary batch
-    manage_active_page = ManageActiveBatchPage(page)
-    manage_active_page.click_prepare_button()
-
-    # Step 7: Prepare the letter batch
-    manage_active_page.prepare_and_print()
-
-    # Step 8: Retrieve and confirm letters
-    manage_active_page.retrieve_and_confirm_letters()
-
-    # Step 9: Confirm the batch is now archived
-    manage_archived_page = ManageArchivedBatchPage(page)
-    manage_archived_page.confirm_archived_message_visible()
+    # Step 5: Open a supplementary letter
+    LetterLibraryIndexPage(page).click_first_letter_code_link_in_table()
