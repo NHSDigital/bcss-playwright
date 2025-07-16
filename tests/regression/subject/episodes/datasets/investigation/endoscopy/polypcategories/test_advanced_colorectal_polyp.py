@@ -240,19 +240,6 @@ def test_identify_advanced_colorectal_polyp_from_histology_d(page: Page) -> None
     """
     This test identifies an advanced colorectal polyp from histology results (BCSS-5567 - D).
     """
-    polyp_1_histology = {
-        "date of receipt": datetime.today(),
-        "date of reporting": datetime.today(),
-        "pathology provider": -1,
-        "pathologist": -1,
-        "polyp type": PolypTypeOptions.SERRATED_LESION,
-        "serrated lesion sub type": SerratedLesionSubTypeOptions.MIXED_POLYP,
-        "polyp excision complete": PolypExcisionCompleteOptions.R1,
-        "polyp size": "11",
-        "polyp dysplasia": PolypDysplasiaOptions.NOT_REPORTED,
-        "polyp carcinoma": YesNoUncertainOptions.NO,
-    }
-
     polyp_1_information = make_polyp_1_information(
         **{
             "location": EndoscopyLocationOptions.SPLENIC_FLEXURE,
@@ -733,7 +720,6 @@ def test_identify_advanced_colorectal_polyp_from_histology_o(page: Page) -> None
 
     polyp_1_histology = make_polyp_1_histology(
         **{
-            "polyp type": PolypTypeOptions.ADENOMA,
             "polyp type": PolypTypeOptions.ADENOMA,
             "adenoma sub type": AdenomaSubTypeOptions.VILLOUS_ADENOMA,
             "polyp size": "3",

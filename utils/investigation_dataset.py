@@ -78,6 +78,8 @@ class InvestigationDatasetCompletion:
         self.page = page
         self.estimate_whole_polyp_size_string = "Estimate of whole polyp size"
         self.polyp_access_string = "Polyp Access"
+        self.failure_reasons_string = "Failure Reasons"
+        self.excision_technique_string = "Excision Technique"
 
     def complete_with_result(self, nhs_no: str, result: str) -> None:
         """This method fills out the investigation dataset forms based on the test result and the subject's age.
@@ -109,7 +111,7 @@ class InvestigationDatasetCompletion:
             self.default_investigation_dataset_forms_continuation()
             InvestigationDatasetsPage(self.page).click_show_failure_information()
             DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
-                "Failure Reasons",
+                self.failure_reasons_string,
                 "divFailureSection",
                 FailureReasonsOptions.NO_FAILURE_REASONS,
             )
@@ -205,7 +207,7 @@ class InvestigationDatasetCompletion:
         # Failure Information
         InvestigationDatasetsPage(self.page).click_show_failure_information()
         DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
-            "Failure Reasons",
+            self.failure_reasons_string,
             "divFailureSection",
             FailureReasonsOptions.BLEEDING_INCIDENT,
         )
@@ -262,7 +264,7 @@ class InvestigationDatasetCompletion:
             "Retrieved", "divPolypTherapy2_1Section", YesNoOptions.NO
         )
         DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
-            "Excision Technique",
+            self.excision_technique_string,
             "divPolypTherapy2_1Section",
             PolypInterventionExcisionTechniqueOptions.EN_BLOC,
         )
@@ -307,7 +309,7 @@ class InvestigationDatasetCompletion:
             "Retrieved", "divPolypTherapy1_1Section", YesNoOptions.NO
         )
         DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
-            "Excision Technique",
+            self.excision_technique_string,
             "divPolypTherapy1_1Section",
             PolypInterventionExcisionTechniqueOptions.EN_BLOC,
         )
@@ -440,8 +442,6 @@ class InvestigationDatasetCompletion:
                     DatasetFieldUtil(self.page).populate_select_locator_for_field(
                         "Late outcome", value
                     )
-                case _:
-                    pass
 
         # Completion Proof Information
         if completion_information:
@@ -455,7 +455,7 @@ class InvestigationDatasetCompletion:
         # Failure Information
         InvestigationDatasetsPage(self.page).click_show_failure_information()
         DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
-            "Failure Reasons",
+            self.failure_reasons_string,
             "divFailureSection",
             failure_information["failure reasons"],
         )
@@ -510,8 +510,6 @@ class InvestigationDatasetCompletion:
                             "divLeftInSitu1",
                             value,
                         )
-                    case _:
-                        pass
 
             if polyp_1_intervention:
                 InvestigationDatasetsPage(
@@ -553,7 +551,7 @@ class InvestigationDatasetCompletion:
                             DatasetFieldUtil(
                                 self.page
                             ).populate_select_locator_for_field_inside_div(
-                                "Excision Technique",
+                                self.excision_technique_string,
                                 "divPolypTherapy1_1Section",
                                 value,
                             )
@@ -565,8 +563,6 @@ class InvestigationDatasetCompletion:
                                 "divPolypAppearsFullyResected1_1",
                                 value,
                             )
-                        case _:
-                            pass
 
             if polyp_1_histology:
                 for key, value in polyp_1_histology.items():
@@ -651,8 +647,6 @@ class InvestigationDatasetCompletion:
                                 "divTumourFindings1_1",
                                 value,
                             )
-                        case _:
-                            pass
 
         InvestigationDatasetsPage(self.page).check_dataset_complete_checkbox()
         InvestigationDatasetsPage(self.page).click_save_dataset_button()

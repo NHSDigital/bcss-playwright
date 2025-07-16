@@ -73,6 +73,7 @@ class InvestigationDatasetsPage(BasePage):
         self.edit_dataset_button = self.page.locator(
             "#UI_DIV_BUTTON_EDIT1"
         ).get_by_role("button", name="Edit Dataset")
+        self.visible_ui_results_string = 'select[id^="UI_RESULTS_"]:visible'
 
     def select_site_lookup_option(self, option: str) -> None:
         """
@@ -96,7 +97,7 @@ class InvestigationDatasetsPage(BasePage):
             option (int): The index of the option to select from the site lookup options.
         """
         self.click(self.site_lookup_link)
-        select_locator = self.page.locator('select[id^="UI_RESULTS_"]:visible')
+        select_locator = self.page.locator(self.visible_ui_results_string)
         select_locator.first.wait_for(state="visible")
         # Find all option elements inside the select and click the one at the given index
         option_elements = select_locator.first.locator("option")
@@ -125,7 +126,7 @@ class InvestigationDatasetsPage(BasePage):
             option (int): The index of the option to select from the practitioner options.
         """
         self.click(self.practitioner_link)
-        select_locator = self.page.locator('select[id^="UI_RESULTS_"]:visible')
+        select_locator = self.page.locator(self.visible_ui_results_string)
         select_locator.first.wait_for(state="visible")
         # Find all option elements inside the select and click the one at the given index
         option_elements = select_locator.first.locator("option")
@@ -154,7 +155,7 @@ class InvestigationDatasetsPage(BasePage):
             option (int): The index of the option to select from the testing clinician options.
         """
         self.click(self.testing_clinician_link)
-        select_locator = self.page.locator('select[id^="UI_RESULTS_"]:visible')
+        select_locator = self.page.locator(self.visible_ui_results_string)
         select_locator.first.wait_for(state="visible")
         # Find all option elements inside the select and click the one at the given index
         option_elements = select_locator.first.locator("option")
@@ -183,7 +184,7 @@ class InvestigationDatasetsPage(BasePage):
             option (int): The index of the option to select from the aspirant endoscopist options.
         """
         self.click(self.aspirant_endoscopist_link)
-        select_locator = self.page.locator('select[id^="UI_RESULTS_"]:visible')
+        select_locator = self.page.locator(self.visible_ui_results_string)
         select_locator.first.wait_for(state="visible")
         # Find all option elements inside the select and click the one at the given index
         option_elements = select_locator.first.locator("option")
@@ -337,7 +338,7 @@ class InvestigationDatasetsPage(BasePage):
             option (int): The index of the option to select from the pathology provider options.
         """
         self.click(self.polyp1_pathology_provider)
-        select_locator = self.page.locator('select[id^="UI_RESULTS_"]:visible')
+        select_locator = self.page.locator(self.visible_ui_results_string)
         select_locator.first.wait_for(state="visible")
         # Find all option elements inside the select and click the one at the given index
         option_elements = select_locator.first.locator("option")
@@ -353,7 +354,7 @@ class InvestigationDatasetsPage(BasePage):
             option (int): The index of the option to select from the pathologist options.
         """
         self.click(self.polyp1_pathologist)
-        select_locator = self.page.locator('select[id^="UI_RESULTS_"]:visible')
+        select_locator = self.page.locator(self.visible_ui_results_string)
         select_locator.first.wait_for(state="visible")
         # Find all option elements inside the select and click the one at the given index
         option_elements = select_locator.first.locator("option")
