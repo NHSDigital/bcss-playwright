@@ -312,7 +312,7 @@ Supports dynamic keys like:
 | completion proof   | str   | Value for the "Proof Parameters" field   |
 
 #### Polyp Information (Optional)
-
+<!--vale off-->
 | Field                        | Type  | Description                          |
 |-----------------------------|-------|--------------------------------------|
 | location                    | str   | Polyp location                       |
@@ -320,7 +320,7 @@ Supports dynamic keys like:
 | estimate of whole polyp size| str   | Size in mm                           |
 | polyp access                | str   | Access difficulty                    |
 | left in situ                | str   | `"Yes"` or `"No"`                    |
-
+<!--vale on-->
 #### Polyp Intervention (Optional)
 
 | Field                                   | Type  | Description                     |
