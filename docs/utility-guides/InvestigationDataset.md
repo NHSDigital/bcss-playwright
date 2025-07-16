@@ -24,8 +24,8 @@ The Investigation Dataset Utility provides methods to fill out the investigation
       - [General Information](#general-information)
       - [Drug Information](#drug-information)
       - [Endoscopy Information](#endoscopy-information)
-      - [Failure Infoformation](#failure-infoformation)
-      - [Completion Proof Infoformation](#completion-proof-infoformation)
+      - [Failure Information](#failure-information)
+      - [Completion Proof Information](#completion-proof-information)
       - [Polyp Information (Optional)](#polyp-information-optional)
       - [Polyp Intervention (Optional)](#polyp-intervention-optional)
       - [Polyp Histology (Optional)](#polyp-histology-optional)
@@ -286,8 +286,8 @@ completion_utility.complete_dataset_with_args(
 
 | Field        | Type  | Description                        |
 |--------------|-------|------------------------------------|
-| drug_type1   | str   | Drug name (e.g., Midazolam)        |
-| drug_dose1   | str   | Dose (e.g., "2mg")                 |
+| drug_type1   | str   | Drug name                          |
+| drug_dose1   | str   | Dose                               |
 
 #### Endoscopy Information
 
@@ -299,13 +299,13 @@ Supports dynamic keys like:
 - `"start of intubation time"`: `"09:00"`
 - `"scope id"`: Free text
 
-#### Failure Infoformation
+#### Failure Information
 
 | Field              | Type  | Description                              |
 |-------------------|-------|------------------------------------------|
 | failure reasons    | str   | Reason text for dataset failure          |
 
-#### Completion Proof Infoformation
+#### Completion Proof Information
 
 | Field              | Type  | Description                              |
 |-------------------|-------|------------------------------------------|
