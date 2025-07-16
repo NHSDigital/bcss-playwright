@@ -1,6 +1,8 @@
 from playwright.sync_api import Page
 from enum import StrEnum
+from datetime import datetime
 import logging
+from typing import Optional
 from pages.base_page import BasePage
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
 from pages.screening_subject_search.subject_screening_summary_page import (
@@ -216,7 +218,7 @@ class InvestigationDatasetCompletion:
             "Location", "divPolypNumber1Section", EndoscopyLocationOptions.ILEUM
         )
         DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
-            "Classification", "divPolypNumber1Section", PolypClassificationOptions.LS
+            "Classification", "divPolypNumber1Section", PolypClassificationOptions.IS
         )
         DatasetFieldUtil(self.page).populate_input_locator_for_field_inside_div(
             self.estimate_whole_polyp_size_string, "divPolypNumber1Section", "15"
@@ -232,7 +234,7 @@ class InvestigationDatasetCompletion:
             "Location", "divPolypNumber2Section", EndoscopyLocationOptions.CAECUM
         )
         DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
-            "Classification", "divPolypNumber2Section", PolypClassificationOptions.LS
+            "Classification", "divPolypNumber2Section", PolypClassificationOptions.IS
         )
         DatasetFieldUtil(self.page).populate_input_locator_for_field_inside_div(
             self.estimate_whole_polyp_size_string, "divPolypNumber2Section", "15"
@@ -273,7 +275,7 @@ class InvestigationDatasetCompletion:
             "Location", "divPolypNumber1Section", EndoscopyLocationOptions.ILEUM
         )
         DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
-            "Classification", "divPolypNumber1Section", PolypClassificationOptions.LS
+            "Classification", "divPolypNumber1Section", PolypClassificationOptions.IS
         )
         DatasetFieldUtil(self.page).populate_input_locator_for_field_inside_div(
             self.estimate_whole_polyp_size_string, "divPolypNumber1Section", "30"
@@ -312,6 +314,346 @@ class InvestigationDatasetCompletion:
 
     def save_investigation_dataset(self) -> None:
         """This method saves the investigation dataset form."""
+        InvestigationDatasetsPage(self.page).check_dataset_complete_checkbox()
+        InvestigationDatasetsPage(self.page).click_save_dataset_button()
+
+    def complete_dataset_with_args(
+        self,
+        general_information: dict,
+        drug_information: dict,
+        endoscopy_information: dict,
+        failure_information: dict,
+        completion_information: Optional[dict] = None,
+        polyp_1_information: Optional[dict] = None,
+        polyp_1_intervention: Optional[dict] = None,
+        polyp_1_histology: Optional[dict] = None,
+    ) -> None:
+        """This method completes the investigation dataset with the provided drug information.
+        Args:
+            drug_information (dict): A dictionary containing the drug information to be filled in the form.
+        """
+        # Investigation Dataset
+        InvestigationDatasetsPage(self.page).select_site_lookup_option_index(
+            general_information["site"]
+        )
+        InvestigationDatasetsPage(self.page).select_practitioner_option_index(
+            general_information["practitioner"]
+        )
+        InvestigationDatasetsPage(self.page).select_testing_clinician_option_index(
+            general_information["testing clinician"]
+        )
+
+        if general_information["aspirant endoscopist"] is None:
+            InvestigationDatasetsPage(
+                self.page
+            ).check_aspirant_endoscopist_not_present()
+        else:
+            InvestigationDatasetsPage(
+                self.page
+            ).select_aspirant_endoscopist_option_index(
+                general_information["aspirant endoscopist"]
+            )
+
+        # Drug Information
+        InvestigationDatasetsPage(self.page).click_show_drug_information()
+        if drug_information.get("drug_type1"):
+            InvestigationDatasetsPage(self.page).select_drug_type_option1(
+                drug_information["drug_type1"]
+            )
+            InvestigationDatasetsPage(self.page).fill_drug_type_dose1(
+                drug_information["drug_dose1"]
+            )
+
+        # Endoscopy Information
+        InvestigationDatasetsPage(self.page).click_show_endoscopy_information()
+
+        # Use for loop and match-case for endoscopy_information fields
+        for key, value in endoscopy_information.items():
+            match key:
+                case "endoscope inserted":
+                    if value == "yes":
+                        InvestigationDatasetsPage(
+                            self.page
+                        ).check_endoscope_inserted_yes()
+                    elif value == "no":
+                        InvestigationDatasetsPage(
+                            self.page
+                        ).check_endoscope_inserted_no()
+                case "procedure type":
+                    if value == "therapeutic":
+                        InvestigationDatasetsPage(
+                            self.page
+                        ).select_therapeutic_procedure_type()
+                    elif value == "diagnostic":
+                        InvestigationDatasetsPage(
+                            self.page
+                        ).select_diagnostic_procedure_type()
+                case "bowel preparation quality":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Bowel preparation quality", value
+                    )
+                case "comfort during examination":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Comfort during examination", value
+                    )
+                case "comfort during recovery":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Comfort during recovery", value
+                    )
+                case "endoscopist defined extent":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Endoscopist defined extent", value
+                    )
+                case "scope imager used":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Scope imager used", value
+                    )
+                case "retroverted view":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Retroverted view", value
+                    )
+                case "start of intubation time":
+                    DatasetFieldUtil(self.page).populate_input_locator_for_field(
+                        "Start of intubation time", value
+                    )
+                case "start of extubation time":
+                    DatasetFieldUtil(self.page).populate_input_locator_for_field(
+                        "Start of extubation time", value
+                    )
+                case "end time of procedure":
+                    DatasetFieldUtil(self.page).populate_input_locator_for_field(
+                        "End time of procedure", value
+                    )
+                case "scope id":
+                    DatasetFieldUtil(self.page).populate_input_locator_for_field(
+                        "Scope ID", value
+                    )
+                case "insufflation":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Insufflation", value
+                    )
+                case "outcome at time of procedure":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Outcome at time of procedure", value
+                    )
+                case "late outcome":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Late outcome", value
+                    )
+                case _:
+                    pass
+
+        # Completion Proof Information
+        if completion_information:
+            InvestigationDatasetsPage(
+                self.page
+            ).click_show_completion_proof_information()
+            DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                "Proof Parameters", completion_information["completion proof"]
+            )
+
+        # Failure Information
+        InvestigationDatasetsPage(self.page).click_show_failure_information()
+        DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
+            "Failure Reasons",
+            "divFailureSection",
+            failure_information["failure reasons"],
+        )
+
+        if polyp_1_information:
+            # Polyp Information
+            InvestigationDatasetsPage(self.page).click_add_polyp_button()
+            for key, value in polyp_1_information.items():
+                match key:
+                    case "location":
+                        DatasetFieldUtil(
+                            self.page
+                        ).populate_select_locator_for_field_inside_div(
+                            "Location", "divPolypNumber1Section", value
+                        )
+                    case "classification":
+                        DatasetFieldUtil(
+                            self.page
+                        ).populate_select_locator_for_field_inside_div(
+                            "Classification", "divPolypNumber1Section", value
+                        )
+                    case "estimate of whole polyp size":
+                        DatasetFieldUtil(
+                            self.page
+                        ).populate_input_locator_for_field_inside_div(
+                            self.estimate_whole_polyp_size_string,
+                            "divPolypNumber1Section",
+                            value,
+                        )
+                    case "polyp access":
+                        DatasetFieldUtil(
+                            self.page
+                        ).populate_select_locator_for_field_inside_div(
+                            self.polyp_access_string,
+                            "divPolypNumber1Section",
+                            value,
+                        )
+                    case "secondary piece":
+                        self.page.once("dialog", lambda dialog: dialog.accept())
+                        DatasetFieldUtil(
+                            self.page
+                        ).populate_select_locator_for_field_inside_div(
+                            "Secondary Piece",
+                            "divPolypSecondaryPiece1",
+                            value,
+                        )
+                    case "left in situ":
+                        DatasetFieldUtil(
+                            self.page
+                        ).populate_select_locator_for_field_inside_div(
+                            "Left in Situ",
+                            "divLeftInSitu1",
+                            value,
+                        )
+                    case _:
+                        pass
+
+            if polyp_1_intervention:
+                InvestigationDatasetsPage(
+                    self.page
+                ).click_polyp1_add_intervention_button()
+                for key, value in polyp_1_intervention.items():
+                    match key:
+                        case "modality":
+                            DatasetFieldUtil(
+                                self.page
+                            ).populate_select_locator_for_field_inside_div(
+                                "Modality",
+                                "divPolypTherapy1_1Section",
+                                value,
+                            )
+                        case "device":
+                            DatasetFieldUtil(
+                                self.page
+                            ).populate_select_locator_for_field_inside_div(
+                                "Device",
+                                "divPolypTherapy1_1Section",
+                                value,
+                            )
+                        case "excised":
+                            DatasetFieldUtil(
+                                self.page
+                            ).populate_select_locator_for_field_inside_div(
+                                "Excised", "divPolypResected1_1", value
+                            )
+                        case "retrieved":
+                            DatasetFieldUtil(
+                                self.page
+                            ).populate_select_locator_for_field_inside_div(
+                                "Retrieved",
+                                "divPolypTherapy1_1Section",
+                                value,
+                            )
+                        case "excision technique":
+                            DatasetFieldUtil(
+                                self.page
+                            ).populate_select_locator_for_field_inside_div(
+                                "Excision Technique",
+                                "divPolypTherapy1_1Section",
+                                value,
+                            )
+                        case "polyp appears fully resected endoscopically":
+                            DatasetFieldUtil(
+                                self.page
+                            ).populate_select_locator_for_field_inside_div(
+                                "Polyp appears fully resected endoscopically",
+                                "divPolypAppearsFullyResected1_1",
+                                value,
+                            )
+                        case _:
+                            pass
+
+            if polyp_1_histology:
+                for key, value in polyp_1_histology.items():
+                    match key:
+                        case "date of receipt":
+                            DatasetFieldUtil(
+                                self.page
+                            ).populate_input_locator_for_field_inside_div(
+                                "Date of Receipt",
+                                "divPolypHistology1_1Details",
+                                value.strftime("%d/%m/%Y"),
+                            )
+                        case "date of reporting":
+                            DatasetFieldUtil(
+                                self.page
+                            ).populate_input_locator_for_field_inside_div(
+                                "Date of Reporting",
+                                "divPolypHistology1_1Details",
+                                value.strftime("%d/%m/%Y"),
+                            )
+                        case "pathology provider":
+                            InvestigationDatasetsPage(
+                                self.page
+                            ).select_polyp1_pathology_provider_option_index(value)
+                        case "pathologist":
+                            InvestigationDatasetsPage(
+                                self.page
+                            ).select_polyp1_pathologist_option_index(value)
+                        case "polyp type":
+                            DatasetFieldUtil(
+                                self.page
+                            ).populate_select_locator_for_field_inside_div(
+                                "Polyp Type",
+                                "divPolypHistology1_1Details",
+                                value,
+                            )
+                        case "serrated lesion sub type":
+                            DatasetFieldUtil(
+                                self.page
+                            ).populate_select_locator_for_field_inside_div(
+                                "Polyp Sub Type",
+                                "divSubTypeSerratedLesion1_1",
+                                value,
+                            )
+                        case "adenoma sub type":
+                            DatasetFieldUtil(
+                                self.page
+                            ).populate_select_locator_for_field_inside_div(
+                                "Polyp Sub Type",
+                                "divSubTypeAdenoma1_1",
+                                value,
+                            )
+                        case "polyp excision complete":
+                            DatasetFieldUtil(
+                                self.page
+                            ).populate_select_locator_for_field_inside_div(
+                                "Polyp Excision Complete",
+                                "divExcisionComplete1_1",
+                                value,
+                            )
+                        case "polyp size":
+                            DatasetFieldUtil(
+                                self.page
+                            ).populate_input_locator_for_field_inside_div(
+                                "Polyp Size",
+                                "divPolypHistology1_1Details",
+                                value,
+                            )
+                        case "polyp dysplasia":
+                            DatasetFieldUtil(
+                                self.page
+                            ).populate_select_locator_for_field_inside_div(
+                                "Polyp Dysplasia",
+                                "divTumourFindings1_1",
+                                value,
+                            )
+                        case "polyp carcinoma":
+                            DatasetFieldUtil(
+                                self.page
+                            ).populate_select_locator_for_field_inside_div(
+                                "Polyp Carcinoma",
+                                "divTumourFindings1_1",
+                                value,
+                            )
+                        case _:
+                            pass
+
         InvestigationDatasetsPage(self.page).check_dataset_complete_checkbox()
         InvestigationDatasetsPage(self.page).click_save_dataset_button()
 
