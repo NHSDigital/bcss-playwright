@@ -1,7 +1,7 @@
 import logging
 import pytest
 import pandas as pd
-from _pytest.fixtures import FixtureRequest
+from pytest import FixtureRequest
 from datetime import datetime
 from playwright.sync_api import Page
 from classes.subject import Subject
@@ -103,6 +103,9 @@ completion_information = {
 
 @pytest.fixture(autouse=True)
 def before_test(page: Page, request: FixtureRequest) -> None:
+    """
+    Before each test this will get the relevant subject and navigate to their investigation dataset
+    """
     if request.node.get_closest_marker("skip_before_test"):
         return
     df = obtain_test_data()
@@ -1174,6 +1177,9 @@ def assert_test_results(page: Page, expected_size: str) -> None:
     """
     This function asserts that the polyp algorithm size and category match the expected values.
     """
+    logging.info(
+        f"Asserting test results\nExpected result: Abnormal\nExpected size: {expected_size}\nExpected category: Advanced colorectal polyp"
+    )
     InvestigationDatasetsPage(page).expect_text_to_be_visible("Abnormal")
     InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, expected_size)
     InvestigationDatasetsPage(page).assert_polyp_categrory(
@@ -1184,5 +1190,6 @@ def assert_test_results(page: Page, expected_size: str) -> None:
     InvestigationDatasetsPage(page).click_save_dataset_button()
     InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, None)
     InvestigationDatasetsPage(page).assert_polyp_categrory(1, None)
+    logging.info("Test results asserted successfully.")
 
     LogoutPage(page).log_out()

@@ -341,6 +341,7 @@ class InvestigationDatasetCompletion:
             polyp_1_intervention (Optional[dict]): An optional dictionary containing the polyp 1 intervention to be filled in the form.
             polyp_1_histology (Optional[dict]): An optional dictionary containing the polyp 1 histology to be filled in the form.
         """
+        logging.info("Completing investigation dataset with the provided dictionaries")
         # Investigation Dataset
         InvestigationDatasetsPage(self.page).select_site_lookup_option_index(
             general_information["site"]
@@ -366,6 +367,7 @@ class InvestigationDatasetCompletion:
         # Drug Information
         InvestigationDatasetsPage(self.page).click_show_drug_information()
         if drug_information.get("drug_type1"):
+            logging.info("Filling out drug information")
             InvestigationDatasetsPage(self.page).select_drug_type_option1(
                 drug_information["drug_type1"]
             )
@@ -373,10 +375,12 @@ class InvestigationDatasetCompletion:
                 drug_information["drug_dose1"]
             )
 
+        logging.info("Filling out endoscopy information")
         self.fill_endoscopy_information(endoscopy_information)
 
         # Completion Proof Information
         if completion_information:
+            logging.info("Filling out completion proof information")
             InvestigationDatasetsPage(
                 self.page
             ).click_show_completion_proof_information()
@@ -385,6 +389,7 @@ class InvestigationDatasetCompletion:
             )
 
         # Failure Information
+        logging.info("Filling out failure information")
         InvestigationDatasetsPage(self.page).click_show_failure_information()
         DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
             self.failure_reasons_string,
@@ -393,14 +398,18 @@ class InvestigationDatasetCompletion:
         )
 
         if polyp_1_information:
+            logging.info("Filling out polyp 1 information")
             self.fill_polyp_1_information(polyp_1_information)
 
         if polyp_1_intervention:
+            logging.info("Filling out polyp 1 intervention")
             self.fill_polyp_1_intervention(polyp_1_intervention)
 
         if polyp_1_histology:
+            logging.info("Filling out polyp 1 histology")
             self.fill_polyp_1_histology(polyp_1_histology)
 
+        logging.info("Saving the investigation dataset")
         InvestigationDatasetsPage(self.page).check_dataset_complete_checkbox()
         InvestigationDatasetsPage(self.page).click_save_dataset_button()
 
