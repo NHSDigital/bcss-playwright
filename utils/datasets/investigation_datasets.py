@@ -51,6 +51,33 @@ def get_subject_with_investigation_dataset_ready() -> pd.DataFrame:
     return df
 
 
+def get_subject_with_a99_status() -> pd.DataFrame:
+    """
+    This functions obtains 1 subject who has the latest episode status A99 - Suitable for Endoscopic Test
+    """
+    criteria = {
+        "latest episode has colonoscopy assessment dataset": "yes_complete",
+        "latest episode has diagnostic test": "no",
+        "latest event status": "A99",
+        "latest episode type": "FOBT",
+        "latest episode started": "less than 4 years ago",
+    }
+    user = User()
+    subject = Subject()
+
+    builder = SubjectSelectionQueryBuilder()
+
+    query, bind_vars = builder.build_subject_selection_query(
+        criteria=criteria,
+        user=user,
+        subject=subject,
+        subjects_to_retrieve=1,
+    )
+
+    df = OracleDB().execute_query(query, bind_vars)
+    return df
+
+
 def go_from_investigation_dataset_complete_to_a259_status(page: Page) -> None:
     """
     Takes a subject who has just had thier investigation dataset compelted to having the event status A259 - Attended Diagnostic Test.
@@ -77,17 +104,7 @@ def go_from_investigation_dataset_complete_to_a259_status(page: Page) -> None:
     AdvanceFOBTScreeningEpisodePage(
         page
     ).click_record_other_post_investigation_contact_button()
-    ContactWithPatientPage(page).select_direction_dropdown_option("To patient")
-    ContactWithPatientPage(page).select_caller_id_dropdown_index_option(1)
-    ContactWithPatientPage(page).click_calendar_button()
-    CalendarPicker(page).v1_calender_picker(datetime.today())
-    ContactWithPatientPage(page).enter_start_time("11:00")
-    ContactWithPatientPage(page).enter_end_time("12:00")
-    ContactWithPatientPage(page).enter_discussion_record_text("Test Automation")
-    ContactWithPatientPage(page).select_outcome_dropdown_option(
-        "Post-investigation Appointment Not Required"
-    )
-    ContactWithPatientPage(page).click_save_button()
+    ContactWithPatientPage(page).record_post_investigation_appointment_not_required()
     BasePage(page).click_back_button()
     SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
         "A318 - Post-investigation Appointment NOT Required - Result Letter Created"

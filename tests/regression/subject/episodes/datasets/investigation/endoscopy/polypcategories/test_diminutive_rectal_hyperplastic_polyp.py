@@ -2,8 +2,6 @@ import logging
 import pytest
 from datetime import datetime
 from playwright.sync_api import Page
-from classes.subject import Subject
-from classes.user import User
 from pages.base_page import BasePage
 from pages.datasets.investigation_dataset_page import (
     InvestigationDatasetsPage,
@@ -30,26 +28,16 @@ from pages.logout.log_out_page import LogoutPage
 from pages.screening_subject_search.attend_diagnostic_test_page import (
     AttendDiagnosticTestPage,
 )
-from pages.screening_subject_search.contact_with_patient_page import (
-    ContactWithPatientPage,
-)
-from pages.screening_subject_search.diagnostic_test_outcome_page import (
-    DiagnosticTestOutcomePage,
-    OutcomeOfDiagnosticTest,
-)
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
 from pages.screening_subject_search.advance_fobt_screening_episode_page import (
     AdvanceFOBTScreeningEpisodePage,
 )
-from utils.batch_processing import batch_processing
 from utils.calendar_picker import CalendarPicker
 from utils.investigation_dataset import (
     InvestigationDatasetCompletion,
 )
-from utils.oracle.oracle import OracleDB
-from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
 from utils.screening_subject_page_searcher import (
     search_subject_episode_by_nhs_number,
 )
@@ -57,6 +45,7 @@ from utils.user_tools import UserTools
 from utils.datasets.investigation_datasets import (
     get_subject_with_investigation_dataset_ready,
     go_from_investigation_dataset_complete_to_a259_status,
+    get_subject_with_a99_status,
 )
 
 general_information = {
@@ -281,26 +270,7 @@ def test_identify_diminutive_rectal_hyperplastic_polyp_from_histology_b(
     """
     This test identifies a diminutive rectal hyperplastic polyp from histology results. (BCSS-4659 - B)
     """
-    criteria = {
-        "latest episode has colonoscopy assessment dataset": "yes_complete",
-        "latest episode has diagnostic test": "no",
-        "latest event status": "A99",
-        "latest episode type": "FOBT",
-        "latest episode started": "less than 4 years ago",
-    }
-    user = User()
-    subject = Subject()
-
-    builder = SubjectSelectionQueryBuilder()
-
-    query, bind_vars = builder.build_subject_selection_query(
-        criteria=criteria,
-        user=user,
-        subject=subject,
-        subjects_to_retrieve=1,
-    )
-
-    df = OracleDB().execute_query(query, bind_vars)
+    df = get_subject_with_a99_status()
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"NHS Number: {nhs_no}")
 
