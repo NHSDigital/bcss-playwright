@@ -58,7 +58,7 @@ from utils.screening_subject_page_searcher import (
     verify_subject_event_status_by_nhs_no,
 )
 from utils.user_tools import UserTools
-from utils.datasets.investigation_datasets import go_from_a99_Status_to_a259_status
+from utils.datasets.investigation_datasets import go_from_a99_status_to_a259_status
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -168,7 +168,7 @@ def test_setup_subjects_as_a259(page: Page, subjects_to_run_for: int) -> None:
     for _, row in df.iterrows():
         nhs_no = row["nhs_number"]
         BasePage(page).click_main_menu_link()
-        go_from_a99_Status_to_a259_status(page, nhs_no)
+        go_from_a99_status_to_a259_status(page, nhs_no)
 
     LogoutPage(page).log_out()
 

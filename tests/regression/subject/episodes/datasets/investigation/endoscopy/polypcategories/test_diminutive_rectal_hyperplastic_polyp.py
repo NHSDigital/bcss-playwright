@@ -39,7 +39,7 @@ from utils.datasets.investigation_datasets import (
     get_subject_with_investigation_dataset_ready,
     go_from_investigation_dataset_complete_to_a259_status,
     get_subject_with_a99_status,
-    go_from_a99_Status_to_a259_status,
+    go_from_a99_status_to_a259_status,
 )
 
 general_information = {
@@ -254,7 +254,6 @@ def test_identify_diminutive_rectal_hyperplastic_polyp_from_histology_a(
     LogoutPage(page).log_out()
 
 
-@pytest.mark.wip
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
@@ -270,7 +269,7 @@ def test_identify_diminutive_rectal_hyperplastic_polyp_from_histology_b(
 
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
 
-    go_from_a99_Status_to_a259_status(page, nhs_no)
+    go_from_a99_status_to_a259_status(page, nhs_no)
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
     SubjectDatasetsPage(page).click_investigation_show_datasets()

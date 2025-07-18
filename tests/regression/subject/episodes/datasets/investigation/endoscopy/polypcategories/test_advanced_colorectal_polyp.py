@@ -43,7 +43,7 @@ from utils.datasets.investigation_datasets import (
     get_subject_with_investigation_dataset_ready,
     go_from_investigation_dataset_complete_to_a259_status,
     get_subject_with_a99_status,
-    go_from_a99_Status_to_a259_status,
+    go_from_a99_status_to_a259_status,
 )
 from utils.user_tools import UserTools
 
@@ -916,7 +916,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_r(page: Page) -> None
     logging.info(f"NHS Number: {nhs_no}")
 
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    go_from_a99_Status_to_a259_status(page, nhs_no)
+    go_from_a99_status_to_a259_status(page, nhs_no)
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
     SubjectDatasetsPage(page).click_investigation_show_datasets()

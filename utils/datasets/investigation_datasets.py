@@ -81,7 +81,7 @@ def get_subject_with_a99_status() -> pd.DataFrame:
     return df
 
 
-def go_from_a99_Status_to_a259_status(page: Page, nhs_no: str) -> None:
+def go_from_a99_status_to_a259_status(page: Page, nhs_no: str) -> None:
     """
     Takes a subject who has the latest episode status A99 - Suitable for Endoscopic Test
     and takes them to A259 - Attended Diagnostic Test.
