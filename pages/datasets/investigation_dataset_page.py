@@ -6,6 +6,7 @@ from utils.oracle.oracle_specific_functions import (
     get_investigation_dataset_polyp_algorithm_size,
 )
 from typing import Optional
+import logging
 
 
 class InvestigationDatasetsPage(BasePage):
@@ -361,6 +362,21 @@ class InvestigationDatasetsPage(BasePage):
         option_elements.nth(option).wait_for(state="visible")
         self.click(option_elements.nth(option))
 
+    def select_loopup_option_index(self, option: int) -> None:
+        """
+        This method is designed to select a lookup option by index.
+        It clicks on the lookup link and selects the given option by index.
+
+        Args:
+            option (int): The index of the option to select from the lookup options.
+        """
+        select_locator = self.page.locator(self.visible_ui_results_string)
+        select_locator.first.wait_for(state="visible")
+        # Find all option elements inside the select and click the one at the given index
+        option_elements = select_locator.first.locator("option")
+        option_elements.nth(option).wait_for(state="visible")
+        self.click(option_elements.nth(option))
+
     def click_edit_dataset_button(self) -> None:
         """
         This method is designed to click on the edit dataset button.
@@ -387,6 +403,10 @@ class InvestigationDatasetsPage(BasePage):
         )
 
         # Assert that the actual value matches the expected value
+        logging.info(
+            f"Checking Polyp {polyp_number} algorithm size: actual={actual_value}, expected={expected_value}"
+        )
+
         if actual_value is None or expected_value is None:
             assert (
                 actual_value == expected_value
@@ -415,6 +435,10 @@ class InvestigationDatasetsPage(BasePage):
         )
 
         # Assert that the actual value matches the expected value
+        logging.info(
+            f"Checking Polyp {polyp_number} category: actual={actual_value}, expected={expected_value}"
+        )
+
         if actual_value is None or expected_value is None:
             assert (
                 actual_value == expected_value
@@ -442,6 +466,20 @@ class InvestigationDatasetsPage(BasePage):
                 except ValueError:
                     dataset_id = -1
         return dataset_id
+
+    def click_polyp_add_intervention_button(self, polyp_number: int) -> None:
+        """
+        Clicks the add intervention button for the specified polyp number.
+
+        Args:
+            polyp_number (int): The number of the polyp.
+        """
+
+        self.click(
+            self.page.locator(f"#spanPolypInterventionLink{polyp_number}").get_by_role(
+                "link", name="Add Intervention"
+            )
+        )
 
 
 class SiteLookupOptions(StrEnum):

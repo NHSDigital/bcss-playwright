@@ -151,14 +151,18 @@ def test_identify_advanced_colorectal_polyp_from_histology_a(page: Page) -> None
     )
     del polyp_1_histology["adenoma sub type"]
 
+    polyp_information = [polyp_1_information]
+    polyp_intervention = [polyp_1_intervention]
+    polyp_histology = [polyp_1_histology]
+
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     assert_test_results(page, "9")
@@ -192,15 +196,18 @@ def test_identify_advanced_colorectal_polyp_from_histology_b(page: Page) -> None
     )
     del polyp_1_histology["adenoma sub type"]
 
+    polyp_information = [polyp_1_information]
+    polyp_intervention = [polyp_1_intervention]
+    polyp_histology = [polyp_1_histology]
+
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     assert_test_results(page, "8")
@@ -230,15 +237,18 @@ def test_identify_advanced_colorectal_polyp_from_histology_c(page: Page) -> None
     polyp_1_histology = make_polyp_1_histology()
     del polyp_1_histology["adenoma sub type"]
 
+    polyp_information = [polyp_1_information]
+    polyp_intervention = [polyp_1_intervention]
+    polyp_histology = [polyp_1_histology]
+
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     assert_test_results(page, "10")
@@ -272,15 +282,18 @@ def test_identify_advanced_colorectal_polyp_from_histology_d(page: Page) -> None
     )
     del polyp_1_histology["adenoma sub type"]
 
+    polyp_information = [polyp_1_information]
+    polyp_intervention = [polyp_1_intervention]
+    polyp_histology = [polyp_1_histology]
+
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     assert_test_results(page, "11")
@@ -319,15 +332,18 @@ def test_identify_advanced_colorectal_polyp_from_histology_e(page: Page) -> None
     del polyp_1_histology["polyp carcinoma"]
     del polyp_1_histology["adenoma sub type"]
 
+    polyp_information = [polyp_1_information]
+    polyp_intervention = [polyp_1_intervention]
+    polyp_histology = [polyp_1_histology]
+
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     assert_test_results(page, "11")
@@ -363,15 +379,18 @@ def test_identify_advanced_colorectal_polyp_from_histology_f(page: Page) -> None
     del polyp_1_histology["polyp dysplasia"]
     del polyp_1_histology["adenoma sub type"]
 
+    polyp_information = [polyp_1_information]
+    polyp_intervention = [polyp_1_intervention]
+    polyp_histology = [polyp_1_histology]
+
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     assert_test_results(page, "10")
@@ -405,15 +424,18 @@ def test_identify_advanced_colorectal_polyp_from_histology_g(page: Page) -> None
     )
     del polyp_1_histology["serrated lesion sub type"]
 
+    polyp_information = [polyp_1_information]
+    polyp_intervention = [polyp_1_intervention]
+    polyp_histology = [polyp_1_histology]
+
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     assert_test_results(page, "10")
@@ -449,15 +471,18 @@ def test_identify_advanced_colorectal_polyp_from_histology_h(page: Page) -> None
     )
     del polyp_1_histology["serrated lesion sub type"]
 
+    polyp_information = [polyp_1_information]
+    polyp_intervention = [polyp_1_intervention]
+    polyp_histology = [polyp_1_histology]
+
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     assert_test_results(page, "12")
@@ -496,15 +521,18 @@ def test_identify_advanced_colorectal_polyp_from_histology_i(page: Page) -> None
     )
     del polyp_1_histology["serrated lesion sub type"]
 
+    polyp_information = [polyp_1_information]
+    polyp_intervention = [polyp_1_intervention]
+    polyp_histology = [polyp_1_histology]
+
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     assert_test_results(page, "11")
@@ -537,15 +565,18 @@ def test_identify_advanced_colorectal_polyp_from_histology_j(page: Page) -> None
     )
     del polyp_1_histology["serrated lesion sub type"]
 
+    polyp_information = [polyp_1_information]
+    polyp_intervention = [polyp_1_intervention]
+    polyp_histology = [polyp_1_histology]
+
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     assert_test_results(page, "13")
@@ -580,15 +611,18 @@ def test_identify_advanced_colorectal_polyp_from_histology_k(page: Page) -> None
     )
     del polyp_1_histology["adenoma sub type"]
 
+    polyp_information = [polyp_1_information]
+    polyp_intervention = [polyp_1_intervention]
+    polyp_histology = [polyp_1_histology]
+
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     assert_test_results(page, "7")
@@ -624,15 +658,18 @@ def test_identify_advanced_colorectal_polyp_from_histology_l(page: Page) -> None
     )
     del polyp_1_histology["adenoma sub type"]
 
+    polyp_information = [polyp_1_information]
+    polyp_intervention = [polyp_1_intervention]
+    polyp_histology = [polyp_1_histology]
+
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     assert_test_results(page, "6")
@@ -668,15 +705,18 @@ def test_identify_advanced_colorectal_polyp_from_histology_m(page: Page) -> None
     )
     del polyp_1_histology["serrated lesion sub type"]
 
+    polyp_information = [polyp_1_information]
+    polyp_intervention = [polyp_1_intervention]
+    polyp_histology = [polyp_1_histology]
+
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     assert_test_results(page, "5")
@@ -714,15 +754,18 @@ def test_identify_advanced_colorectal_polyp_from_histology_n(page: Page) -> None
     )
     del polyp_1_histology["serrated lesion sub type"]
 
+    polyp_information = [polyp_1_information]
+    polyp_intervention = [polyp_1_intervention]
+    polyp_histology = [polyp_1_histology]
+
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     assert_test_results(page, "4")
@@ -761,15 +804,18 @@ def test_identify_advanced_colorectal_polyp_from_histology_o(page: Page) -> None
     )
     del polyp_1_histology["serrated lesion sub type"]
 
+    polyp_information = [polyp_1_information]
+    polyp_intervention = [polyp_1_intervention]
+    polyp_histology = [polyp_1_histology]
+
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     assert_test_results(page, "3")
@@ -806,15 +852,18 @@ def test_identify_advanced_colorectal_polyp_from_histology_p(page: Page) -> None
     )
     del polyp_1_histology["serrated lesion sub type"]
 
+    polyp_information = [polyp_1_information]
+    polyp_intervention = [polyp_1_intervention]
+    polyp_histology = [polyp_1_histology]
+
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     assert_test_results(page, "2")
@@ -850,15 +899,18 @@ def test_identify_advanced_colorectal_polyp_from_histology_q(page: Page) -> None
     )
     del polyp_1_histology["serrated lesion sub type"]
 
+    polyp_information = [polyp_1_information]
+    polyp_intervention = [polyp_1_intervention]
+    polyp_histology = [polyp_1_histology]
+
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     assert_test_results(page, "20")
@@ -954,15 +1006,18 @@ def test_identify_advanced_colorectal_polyp_from_histology_r(page: Page) -> None
     )
     del polyp_1_histology["adenoma sub type"]
 
+    polyp_information = [polyp_1_information]
+    polyp_intervention = [polyp_1_intervention]
+    polyp_histology = [polyp_1_histology]
+
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     # Enter the test outcome > A315
@@ -1055,10 +1110,9 @@ def test_identify_advanced_colorectal_polyp_from_histology_r(page: Page) -> None
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     assert_test_results(page, "6")
@@ -1092,15 +1146,18 @@ def test_identify_advanced_colorectal_polyp_from_histology_s(page: Page) -> None
     )
     del polyp_1_histology["adenoma sub type"]
 
+    polyp_information = [polyp_1_information]
+    polyp_intervention = [polyp_1_intervention]
+    polyp_histology = [polyp_1_histology]
+
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
         endoscopy_information=endoscopy_information,
         failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_1_information=polyp_1_information,
-        polyp_1_intervention=polyp_1_intervention,
-        polyp_1_histology=polyp_1_histology,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
     )
 
     assert_test_results(page, "32")

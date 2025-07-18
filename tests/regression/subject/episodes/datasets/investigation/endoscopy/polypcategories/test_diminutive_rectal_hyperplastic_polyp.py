@@ -1,0 +1,593 @@
+import logging
+import pytest
+import pandas as pd
+from pytest import FixtureRequest
+from datetime import datetime
+from playwright.sync_api import Page
+from classes.subject import Subject
+from classes.user import User
+from pages.base_page import BasePage
+from pages.datasets.investigation_dataset_page import (
+    InvestigationDatasetsPage,
+    DrugTypeOptions,
+    BowelPreparationQualityOptions,
+    ComfortOptions,
+    EndoscopyLocationOptions,
+    YesNoOptions,
+    InsufflationOptions,
+    OutcomeAtTimeOfProcedureOptions,
+    LateOutcomeOptions,
+    CompletionProofOptions,
+    FailureReasonsOptions,
+    PolypClassificationOptions,
+    PolypAccessOptions,
+    PolypInterventionModalityOptions,
+    PolypInterventionDeviceOptions,
+    PolypInterventionExcisionTechniqueOptions,
+    PolypTypeOptions,
+    AdenomaSubTypeOptions,
+    SerratedLesionSubTypeOptions,
+    PolypExcisionCompleteOptions,
+    PolypDysplasiaOptions,
+    YesNoUncertainOptions,
+)
+from pages.datasets.subject_datasets_page import SubjectDatasetsPage
+from pages.logout.log_out_page import LogoutPage
+from pages.screening_subject_search.attend_diagnostic_test_page import (
+    AttendDiagnosticTestPage,
+)
+from pages.screening_subject_search.contact_with_patient_page import (
+    ContactWithPatientPage,
+)
+from pages.screening_subject_search.diagnostic_test_outcome_page import (
+    DiagnosticTestOutcomePage,
+    OutcomeOfDiagnosticTest,
+)
+from pages.screening_subject_search.subject_screening_summary_page import (
+    SubjectScreeningSummaryPage,
+)
+from pages.screening_subject_search.advance_fobt_screening_episode_page import (
+    AdvanceFOBTScreeningEpisodePage,
+)
+from utils.batch_processing import batch_processing
+from utils.calendar_picker import CalendarPicker
+from utils.investigation_dataset import (
+    InvestigationDatasetCompletion,
+)
+from utils.oracle.oracle import OracleDB
+from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
+from utils.screening_subject_page_searcher import (
+    search_subject_episode_by_nhs_number,
+)
+from utils.user_tools import UserTools
+
+general_information = {
+    "site": -1,
+    "practitioner": -1,
+    "testing clinician": -1,
+    "aspirant endoscopist": None,
+}
+
+drug_information = {
+    "drug_type1": DrugTypeOptions.MANNITOL,
+    "drug_dose1": "3",
+}
+
+endoscopy_information = {
+    "endoscope inserted": "yes",
+    "procedure type": "therapeutic",
+    "bowel preparation quality": BowelPreparationQualityOptions.GOOD,
+    "comfort during examination": ComfortOptions.NO_DISCOMFORT,
+    "comfort during recovery": ComfortOptions.NO_DISCOMFORT,
+    "endoscopist defined extent": EndoscopyLocationOptions.DESCENDING_COLON,
+    "scope imager used": YesNoOptions.YES,
+    "retroverted view": YesNoOptions.NO,
+    "start of intubation time": "09:00",
+    "start of extubation time": "09:30",
+    "end time of procedure": "10:00",
+    "scope id": "Autotest",
+    "insufflation": InsufflationOptions.AIR,
+    "outcome at time of procedure": OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
+    "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
+}
+
+failure_information = {
+    "failure reasons": FailureReasonsOptions.ADHESION,
+}
+
+
+@pytest.mark.vpn_required
+@pytest.mark.regression
+@pytest.mark.investigation_dataset_tests
+def test_identify_diminutive_rectal_hyperplastic_polyp_from_histology_a(
+    page: Page,
+) -> None:
+    """
+    This test identifies a diminutive rectal hyperplastic polyp from histology results. (BCSS-4659 - A)
+    """
+    criteria = {
+        "latest episode status": "open",
+        "latest episode latest investigation dataset": "colonoscopy_new",
+        "latest episode started": "less than 4 years ago",
+    }
+    user = User()
+    subject = Subject()
+
+    builder = SubjectSelectionQueryBuilder()
+
+    query, bind_vars = builder.build_subject_selection_query(
+        criteria=criteria,
+        user=user,
+        subject=subject,
+        subjects_to_retrieve=1,
+    )
+
+    df = OracleDB().execute_query(query, bind_vars)
+    nhs_no = df.iloc[0]["subject_nhs_number"]
+    logging.info(f"NHS Number: {nhs_no}")
+
+    UserTools.user_login(page, "Screening Centre Manager at BCS001")
+    BasePage(page).click_main_menu_link()
+    BasePage(page).go_to_screening_subject_search_page()
+    search_subject_episode_by_nhs_number(page, nhs_no)
+
+    SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_investigation_show_datasets()
+
+    polyp_1_information = {
+        "location": EndoscopyLocationOptions.RECTUM,
+        "classification": PolypClassificationOptions.IP,
+        "estimate of whole polyp size": "6",
+        "polyp access": PolypAccessOptions.EASY,
+        "left in situ": YesNoOptions.NO,
+    }
+
+    polyp_1_intervention = {
+        "modality": PolypInterventionModalityOptions.POLYPECTOMY,
+        "device": PolypInterventionDeviceOptions.HOT_SNARE,
+        "excised": YesNoOptions.YES,
+        "retrieved": YesNoOptions.YES,
+    }
+
+    polyp_1_histology = {
+        "date of receipt": datetime.today(),
+        "date of reporting": datetime.today(),
+        "pathology provider": -1,
+        "pathologist": -1,
+        "polyp type": PolypTypeOptions.SERRATED_LESION,
+        "serrated lesion sub type": SerratedLesionSubTypeOptions.HYPERPLASTIC_POLYP,
+        "polyp excision complete": PolypExcisionCompleteOptions.R1,
+        "polyp size": "5",
+    }
+
+    polyp_2_information = {
+        "location": EndoscopyLocationOptions.RECTUM,
+        "classification": PolypClassificationOptions.ISP,
+        "estimate of whole polyp size": "1",
+        "polyp access": PolypAccessOptions.EASY,
+        "left in situ": YesNoOptions.NO,
+    }
+
+    polyp_2_intervention = {
+        "modality": PolypInterventionModalityOptions.EMR,
+        "device": PolypInterventionDeviceOptions.HOT_SNARE,
+        "excised": YesNoOptions.YES,
+        "retrieved": YesNoOptions.YES,
+    }
+
+    polyp_2_histology = {
+        "date of receipt": datetime.today(),
+        "date of reporting": datetime.today(),
+        "pathology provider": -1,
+        "pathologist": -1,
+        "polyp type": PolypTypeOptions.SERRATED_LESION,
+        "serrated lesion sub type": SerratedLesionSubTypeOptions.HYPERPLASTIC_POLYP,
+        "polyp excision complete": PolypExcisionCompleteOptions.R1,
+        "polyp size": "1",
+    }
+
+    polyp_3_information = {
+        "location": EndoscopyLocationOptions.RECTUM,
+        "classification": PolypClassificationOptions.IS,
+        "estimate of whole polyp size": "2",
+        "polyp access": PolypAccessOptions.EASY,
+        "left in situ": YesNoOptions.NO,
+    }
+
+    polyp_3_intervention = {
+        "modality": PolypInterventionModalityOptions.ESD,
+        "device": PolypInterventionDeviceOptions.ENDOSCOPIC_KNIFE,
+        "excised": YesNoOptions.YES,
+        "retrieved": YesNoOptions.YES,
+    }
+
+    polyp_3_histology = {
+        "date of receipt": datetime.today(),
+        "date of reporting": datetime.today(),
+        "pathology provider": -1,
+        "pathologist": -1,
+        "polyp type": PolypTypeOptions.SERRATED_LESION,
+        "serrated lesion sub type": SerratedLesionSubTypeOptions.HYPERPLASTIC_POLYP,
+        "polyp excision complete": PolypExcisionCompleteOptions.R1,
+        "polyp size": "3",
+    }
+
+    polyp_4_information = {
+        "location": EndoscopyLocationOptions.RECTUM,
+        "classification": PolypClassificationOptions.IIC,
+        "estimate of whole polyp size": "5",
+        "polyp access": PolypAccessOptions.EASY,
+        "left in situ": YesNoOptions.NO,
+    }
+
+    polyp_4_intervention = {
+        "modality": PolypInterventionModalityOptions.POLYPECTOMY,
+        "device": PolypInterventionDeviceOptions.HOT_SNARE,
+        "excised": YesNoOptions.YES,
+        "retrieved": YesNoOptions.YES,
+        "excision technique": PolypInterventionExcisionTechniqueOptions.PIECE_MEAL,
+    }
+
+    polyp_4_histology = {
+        "date of receipt": datetime.today(),
+        "date of reporting": datetime.today(),
+        "pathology provider": -1,
+        "pathologist": -1,
+        "polyp type": PolypTypeOptions.SERRATED_LESION,
+        "serrated lesion sub type": SerratedLesionSubTypeOptions.HYPERPLASTIC_POLYP,
+        "polyp excision complete": PolypExcisionCompleteOptions.R1,
+        "polyp size": "4",
+    }
+
+    polyp_information = [
+        polyp_1_information,
+        polyp_2_information,
+        polyp_3_information,
+        polyp_4_information,
+    ]
+    polyp_intervention = [
+        polyp_1_intervention,
+        polyp_2_intervention,
+        polyp_3_intervention,
+        polyp_4_intervention,
+    ]
+    polyp_histology = [
+        polyp_1_histology,
+        polyp_2_histology,
+        polyp_3_histology,
+        polyp_4_histology,
+    ]
+
+    InvestigationDatasetCompletion(page).complete_dataset_with_args(
+        general_information=general_information,
+        drug_information=drug_information,
+        endoscopy_information=endoscopy_information,
+        failure_information=failure_information,
+        polyp_information=polyp_information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
+    )
+
+    logging.info
+    polyp_category_string = "Diminutive rectal hyperplastic polyp"
+    InvestigationDatasetsPage(page).expect_text_to_be_visible("Abnormal")
+    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, "5")
+    InvestigationDatasetsPage(page).assert_polyp_categrory(1, polyp_category_string)
+    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(2, "1")
+    InvestigationDatasetsPage(page).assert_polyp_categrory(2, polyp_category_string)
+    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(3, "3")
+    InvestigationDatasetsPage(page).assert_polyp_categrory(3, polyp_category_string)
+    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(4, "5")
+    InvestigationDatasetsPage(page).assert_polyp_categrory(4, polyp_category_string)
+
+    logging.info("Marking investigation dataset not complete")
+    InvestigationDatasetsPage(page).click_edit_dataset_button()
+    InvestigationDatasetsPage(page).check_dataset_incomplete_checkbox()
+    InvestigationDatasetsPage(page).click_save_dataset_button()
+    for polyp_number in range(1, 5):
+        InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(polyp_number, None)
+        InvestigationDatasetsPage(page).assert_polyp_categrory(polyp_number, None)
+
+    LogoutPage(page).log_out()
+
+
+@pytest.mark.wip
+@pytest.mark.vpn_required
+@pytest.mark.regression
+@pytest.mark.investigation_dataset_tests
+def test_identify_diminutive_rectal_hyperplastic_polyp_from_histology_b(
+    page: Page,
+) -> None:
+    """
+    This test identifies a diminutive rectal hyperplastic polyp from histology results. (BCSS-4659 - B)
+    """
+    criteria = {
+        "latest episode has colonoscopy assessment dataset": "yes_complete",
+        "latest episode has diagnostic test": "no",
+        "latest event status": "A99",
+        "latest episode type": "FOBT",
+        "latest episode started": "less than 4 years ago",
+    }
+    user = User()
+    subject = Subject()
+
+    builder = SubjectSelectionQueryBuilder()
+
+    query, bind_vars = builder.build_subject_selection_query(
+        criteria=criteria,
+        user=user,
+        subject=subject,
+        subjects_to_retrieve=1,
+    )
+
+    df = OracleDB().execute_query(query, bind_vars)
+    nhs_no = df.iloc[0]["subject_nhs_number"]
+    logging.info(f"NHS Number: {nhs_no}")
+
+    UserTools.user_login(page, "Screening Centre Manager at BCS001")
+
+    BasePage(page).go_to_screening_subject_search_page()
+    search_subject_episode_by_nhs_number(page, nhs_no)
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+
+    AdvanceFOBTScreeningEpisodePage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+
+    AdvanceFOBTScreeningEpisodePage(page).select_test_type_dropdown_option(
+        "Colonoscopy"
+    )
+
+    AdvanceFOBTScreeningEpisodePage(page).click_invite_for_diagnostic_test_button()
+    AdvanceFOBTScreeningEpisodePage(page).verify_latest_event_status_value(
+        "A59 - Invited for Diagnostic Test"
+    )
+
+    AdvanceFOBTScreeningEpisodePage(page).click_attend_diagnostic_test_button()
+
+    AttendDiagnosticTestPage(page).select_actual_type_of_test_dropdown_option(
+        "Colonoscopy"
+    )
+    AttendDiagnosticTestPage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+    AttendDiagnosticTestPage(page).click_save_button()
+    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+        "A259 - Attended Diagnostic Test"
+    )
+
+    SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_investigation_show_datasets()
+
+    polyp__information = [
+        {
+            "location": EndoscopyLocationOptions.RECTUM,
+            "classification": PolypClassificationOptions.LST_NG,
+            "estimate of whole polyp size": "4",
+            "polyp access": PolypAccessOptions.EASY,
+            "left in situ": YesNoOptions.NO,
+        }
+    ]
+    polyp_intervention = [
+        {
+            "modality": PolypInterventionModalityOptions.EMR,
+            "device": PolypInterventionDeviceOptions.COLD_SNARE,
+            "excised": YesNoOptions.YES,
+            "retrieved": YesNoOptions.YES,
+            "excision technique": PolypInterventionExcisionTechniqueOptions.EN_BLOC,
+        }
+    ]
+    polyp_histology = [
+        {
+            "date of receipt": datetime.today(),
+            "date of reporting": datetime.today(),
+            "pathology provider": -1,
+            "pathologist": -1,
+            "polyp type": PolypTypeOptions.SERRATED_LESION,
+            "serrated lesion sub type": SerratedLesionSubTypeOptions.HYPERPLASTIC_POLYP,
+            "polyp excision complete": PolypExcisionCompleteOptions.R1,
+            "polyp size": "2",
+        }
+    ]
+
+    InvestigationDatasetCompletion(page).complete_dataset_with_args(
+        general_information=general_information,
+        drug_information=drug_information,
+        endoscopy_information=endoscopy_information,
+        failure_information=failure_information,
+        polyp_information=polyp__information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
+    )
+    # Enter the test outcome > A315
+    BasePage(page).click_back_button()
+    BasePage(page).click_back_button()
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_enter_diagnostic_test_outcome_button()
+    DiagnosticTestOutcomePage(page).select_test_outcome_option(
+        OutcomeOfDiagnosticTest.FAILED_TEST_REFER_ANOTHER
+    )
+    DiagnosticTestOutcomePage(page).click_save_button()
+    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+        "A315 - Diagnostic Test Outcome Entered"
+    )
+
+    # Make post investigation contact > A361
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_other_post_investigation_button()
+    AdvanceFOBTScreeningEpisodePage(page).verify_latest_event_status_value(
+        "A361 - Other Post-investigation Contact Required"
+    )
+
+    AdvanceFOBTScreeningEpisodePage(
+        page
+    ).click_record_other_post_investigation_contact_button()
+    ContactWithPatientPage(page).select_direction_dropdown_option("To patient")
+    ContactWithPatientPage(page).select_caller_id_dropdown_index_option(1)
+    ContactWithPatientPage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+    ContactWithPatientPage(page).enter_start_time("11:00")
+    ContactWithPatientPage(page).enter_end_time("12:00")
+    ContactWithPatientPage(page).enter_discussion_record_text("Test Automation")
+    ContactWithPatientPage(page).select_outcome_dropdown_option(
+        "Post-investigation Appointment Not Required"
+    )
+    ContactWithPatientPage(page).click_save_button()
+    BasePage(page).click_back_button()
+    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+        "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
+    )
+
+    # Process the A318 letters > A380
+    batch_processing(
+        page,
+        "A318",
+        "Result Letters - No Post-investigation Appointment",
+        "A380 - Failed Diagnostic Test - Refer Another",
+    )
+
+    # Another contact to bring the subject back to A99
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_record_contact_with_patient_button()
+    ContactWithPatientPage(page).select_direction_dropdown_option("To patient")
+    ContactWithPatientPage(page).select_caller_id_dropdown_index_option(1)
+    ContactWithPatientPage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+    ContactWithPatientPage(page).enter_start_time("11:00")
+    ContactWithPatientPage(page).enter_end_time("12:00")
+    ContactWithPatientPage(page).enter_discussion_record_text("Test Automation")
+    ContactWithPatientPage(page).select_outcome_dropdown_option(
+        "Suitable for Endoscopic Test"
+    )
+    ContactWithPatientPage(page).click_save_button()
+    AdvanceFOBTScreeningEpisodePage(page).verify_latest_event_status_value(
+        "A99 - Suitable for Endoscopic Test"
+    )
+
+    # Invite for 2nd diagnostic test > A59 - check options
+    AdvanceFOBTScreeningEpisodePage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+    AdvanceFOBTScreeningEpisodePage(page).select_test_type_dropdown_option_2(
+        "Colonoscopy"
+    )
+    AdvanceFOBTScreeningEpisodePage(page).click_invite_for_diagnostic_test_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_attend_diagnostic_test_button()
+    AttendDiagnosticTestPage(page).select_actual_type_of_test_dropdown_option(
+        "Colonoscopy"
+    )
+    AttendDiagnosticTestPage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+    AttendDiagnosticTestPage(page).click_save_button()
+    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+        "A259 - Attended Diagnostic Test"
+    )
+    SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_investigation_show_datasets()
+
+    # Enter the test outcome > A315
+    BasePage(page).click_back_button()
+    BasePage(page).click_back_button()
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_enter_diagnostic_test_outcome_button()
+    DiagnosticTestOutcomePage(page).select_test_outcome_option(
+        OutcomeOfDiagnosticTest.FAILED_TEST_REFER_ANOTHER
+    )
+    DiagnosticTestOutcomePage(page).click_save_button()
+    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+        "A315 - Diagnostic Test Outcome Entered"
+    )
+
+    # Make post investigation contact > A361
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_other_post_investigation_button()
+    AdvanceFOBTScreeningEpisodePage(page).verify_latest_event_status_value(
+        "A361 - Other Post-investigation Contact Required"
+    )
+
+    AdvanceFOBTScreeningEpisodePage(
+        page
+    ).click_record_other_post_investigation_contact_button()
+    ContactWithPatientPage(page).select_direction_dropdown_option("To patient")
+    ContactWithPatientPage(page).select_caller_id_dropdown_index_option(1)
+    ContactWithPatientPage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+    ContactWithPatientPage(page).enter_start_time("11:00")
+    ContactWithPatientPage(page).enter_end_time("12:00")
+    ContactWithPatientPage(page).enter_discussion_record_text("Test Automation")
+    ContactWithPatientPage(page).select_outcome_dropdown_option(
+        "Post-investigation Appointment Not Required"
+    )
+    ContactWithPatientPage(page).click_save_button()
+    BasePage(page).click_back_button()
+    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+        "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
+    )
+
+    # Process the A318 letters > A380
+    batch_processing(
+        page,
+        "A318",
+        "Result Letters - No Post-investigation Appointment",
+        "A380 - Failed Diagnostic Test - Refer Another",
+    )
+
+    # Another contact to bring the subject back to A99
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_record_contact_with_patient_button()
+    ContactWithPatientPage(page).select_direction_dropdown_option("To patient")
+    ContactWithPatientPage(page).select_caller_id_dropdown_index_option(1)
+    ContactWithPatientPage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+    ContactWithPatientPage(page).enter_start_time("11:00")
+    ContactWithPatientPage(page).enter_end_time("12:00")
+    ContactWithPatientPage(page).enter_discussion_record_text("Test Automation")
+    ContactWithPatientPage(page).select_outcome_dropdown_option(
+        "Suitable for Endoscopic Test"
+    )
+    ContactWithPatientPage(page).click_save_button()
+    AdvanceFOBTScreeningEpisodePage(page).verify_latest_event_status_value(
+        "A99 - Suitable for Endoscopic Test"
+    )
+
+    # Invite for 2nd diagnostic test > A59 - check options
+    AdvanceFOBTScreeningEpisodePage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+    AdvanceFOBTScreeningEpisodePage(page).select_test_type_dropdown_option_2(
+        "Colonoscopy"
+    )
+    AdvanceFOBTScreeningEpisodePage(page).click_invite_for_diagnostic_test_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_attend_diagnostic_test_button()
+    AttendDiagnosticTestPage(page).select_actual_type_of_test_dropdown_option(
+        "Colonoscopy"
+    )
+    AttendDiagnosticTestPage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+    AttendDiagnosticTestPage(page).click_save_button()
+    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+        "A259 - Attended Diagnostic Test"
+    )
+    SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_investigation_show_datasets()
+
+    # Complete the investigation dataset
+    InvestigationDatasetCompletion(page).complete_dataset_with_args(
+        general_information=general_information,
+        drug_information=drug_information,
+        endoscopy_information=endoscopy_information,
+        failure_information=failure_information,
+        polyp_information=polyp__information,
+        polyp_intervention=polyp_intervention,
+        polyp_histology=polyp_histology,
+    )
+
+    InvestigationDatasetsPage(page).expect_text_to_be_visible("Abnormal")
+    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, "5")
+    InvestigationDatasetsPage(page).assert_polyp_categrory(
+        1, "Diminutive rectal hyperplastic polyp"
+    )
+
+    logging.info("Marking investigation dataset not complete")
+    InvestigationDatasetsPage(page).click_edit_dataset_button()
+    InvestigationDatasetsPage(page).check_dataset_incomplete_checkbox()
+    InvestigationDatasetsPage(page).click_save_dataset_button()
+    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, None)
+    InvestigationDatasetsPage(page).assert_polyp_categrory(1, None)
+    LogoutPage(page).log_out()
