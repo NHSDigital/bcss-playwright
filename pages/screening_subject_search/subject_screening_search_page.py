@@ -1,3 +1,4 @@
+import logging
 from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 from enum import Enum
@@ -153,6 +154,71 @@ class SubjectScreeningPage(BasePage):
     def verify_date_of_birth_filter_input(self, expected_text: str) -> None:
         """Verifies that the Date of Birth filter input field has the expected value."""
         expect(self.date_of_birth_filter).to_have_value(expected_text)
+
+    def search_by_nhs_number(self, nhs_number: str) -> None:
+        """
+        Searches for a subject using NHS number.
+        Selects 'Whole Database' to bypass modal dialogs triggered by limited search scopes.
+        """
+        # Step 1: Clear any existing filters
+        self.click_clear_filters_button()
+
+        # Step 2: Enter NHS number
+        self.nhs_number_filter.fill(nhs_number)
+        self.nhs_number_filter.press("Tab")
+
+        # Step 3: Select 'Whole Database' to avoid confirmation modal
+        self.select_search_area_option(
+            SearchAreaSearchOptions.SEARCH_AREA_WHOLE_DATABASE.value
+        )
+
+        # Step 4: Run search
+        self.click_search_button()
+
+    def click_send_kit_button(self) -> None:
+        """
+        Clicks the 'Send a kit' button for self-referral.
+        Verifies the transition to the 'Send a kit' page and logs errors if that check fails.
+        """
+        send_kit_button = self.page.locator("#self_ref_button")
+        expect(send_kit_button).to_be_visible()
+        send_kit_button.click()
+
+        try:
+            expect(self.page.locator("h1")).to_contain_text("Send a kit")
+            logging.info("[PAGE TRANSITION] Successfully landed on Send a kit page")
+        except Exception as e:
+            logging.error(
+                f"[PAGE TRANSITION FAILED] Did not reach Send a kit page: {e}"
+            )
+            raise
+    
+    def complete_send_kit_form(self, request_from: str = "Subject", previous_kit_status: str = "Lost", note_text: str = "Test") -> None:
+        """
+        Completes the 'Send a kit' form by:
+        - Selecting who requested the kit
+        - Selecting previous kit status
+        - Entering reason text
+        - Clicking the 'Send a kit' button
+
+        Args:
+            request_from (str): Option to select for who requested the kit.
+            previous_kit_status (str): Reason for replacing or requesting the kit.
+            note_text (str): Free-text note to include with the request.
+        """
+        # Fill dropdowns
+        self.page.locator("#kitRequestFrom").select_option(request_from)
+        self.page.locator("#previousKit").select_option(previous_kit_status)
+
+        # Fill note text
+        self.page.locator("textarea[data-testid='reasonNote']").fill(note_text)
+
+        # Wait for button to become enabled before clicking
+        send_button = self.page.locator("button[data-testid='sendKitButton']")
+        expect(send_button).to_be_enabled()
+        send_button.click()
+
+        logging.info("[KIT REQUEST] 'Send a kit' form submitted successfully")
 
 
 class ScreeningStatusSearchOptions(Enum):

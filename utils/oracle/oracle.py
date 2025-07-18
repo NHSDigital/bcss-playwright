@@ -1,3 +1,4 @@
+from tkinter import N
 import oracledb
 import os
 from dotenv import load_dotenv
@@ -160,6 +161,8 @@ class OracleDB:
         """
         conn = self.connect_to_db()
         engine = create_engine("oracle+oracledb://", creator=lambda: conn)
+        df = pd.DataFrame()
+
         try:
             df = (
                 pd.read_sql(query, engine)
@@ -176,7 +179,7 @@ class OracleDB:
         return df
 
     def execute_stored_procedure(
-        self, procedure: str
+        self, procedure: str, params: list = [None]
     ) -> None:  # To use when "exec xxxx" (stored procedures)
         """
         This is to be used whenever we need to execute a stored procedure.
@@ -189,7 +192,10 @@ class OracleDB:
         try:
             logging.info(f"Attempting to execute stored procedure: {procedure}")
             cursor = conn.cursor()
-            cursor.callproc(procedure)
+            if params is not None:
+                cursor.callproc(procedure, params)
+            else:
+                cursor.callproc(procedure)
             conn.commit()
             logging.info("stored procedure execution successful!")
         except Exception as executionError:
@@ -225,3 +231,142 @@ class OracleDB:
         finally:
             if conn is not None:
                 self.disconnect_from_db(conn)
+
+
+class OracleSubjectTools(OracleDB):
+    def __init__(self):
+        super().__init__()
+
+    def create_subjects_via_sspi(
+        self,
+        count: int,
+        screening_centre: str,
+        base_age: int,
+        start_offset: int = -2,
+        end_offset: int = 4,
+        nhs_start: int = 9200000000,
+    ) -> None:
+        conn = self.connect_to_db()
+        try:
+            cursor = conn.cursor()
+            cursor.callproc(
+                "PKG_SSPI.p_process_pi_subject",
+                [
+                    count,
+                    screening_centre,
+                    base_age,
+                    start_offset,
+                    end_offset,
+                    nhs_start,
+                ],
+            )
+            conn.commit()
+        except Exception as e:
+            logging.error(f"Failed to generate subjects: {e}")
+        finally:
+            self.disconnect_from_db(conn)
+
+    def create_self_referral_ready_subject(
+        self, screening_centre: str = "BCS002", base_age: int = 75
+    ) -> str:
+        """
+        Creates a subject in the database with no screening history who is eligible to self refer.
+        Uses PKG_SSPI.p_process_pi_subject to insert the subject,
+        then retrieves the NHS number based on age and applies bcss_timed_events.
+
+        Args:
+            screening_centre (str): The screening centre code to associate the subject with.
+            base_age (int): The minimum age threshold for subject date of birth.
+
+        Returns:
+            str: The NHS number of the created subject.
+        """
+        # Step 1: Generate subject via stored procedure
+        self.create_subjects_via_sspi(
+            count=1,
+            screening_centre=screening_centre,
+            base_age=base_age,
+            start_offset=-2,
+            end_offset=4,
+            nhs_start=9200000000,
+        )
+
+        # Step 1a: Retrieve NHS number by joining SCREENING_SUBJECT_T and SD_CONTACT_T
+        # - Ensures subject exists in both tables
+        # - Filters by minimum age using DATE_OF_BIRTH
+        # - Sorted by NHS number descending to get most recent insert
+
+        query = """
+            SELECT s.SUBJECT_NHS_NUMBER
+            FROM SCREENING_SUBJECT_T s
+            JOIN SD_CONTACT_T c ON s.SUBJECT_NHS_NUMBER = c.NHS_NUMBER
+            WHERE c.DATE_OF_BIRTH <= ADD_MONTHS(TRUNC(SYSDATE), -12 * :min_age)
+            ORDER BY s.SUBJECT_NHS_NUMBER DESC
+            FETCH FIRST 1 ROWS ONLY
+        """
+        df = self.execute_query(query, {"min_age": base_age})
+
+        if df.empty:
+            raise RuntimeError(f"No subjects found aged {base_age}+ in both tables.")
+
+        nhs_number = df.iloc[0]["subject_nhs_number"]
+        logging.info(f"[SUBJECT CREATED WITH AGE {base_age}+] NHS number: {nhs_number}")
+
+        # Step 2: Progress timeline
+        nhs_df = pd.DataFrame({"subject_nhs_number": [nhs_number]})
+        self.exec_bcss_timed_events(nhs_df)
+
+        logging.info(f"[SUBJECT READY FOR SELF REFERRAL] NHS number: {nhs_number}")
+        return nhs_number
+
+    def open_subject_by_nhs(self, nhs_number: str) -> "OracleSubjectTools":
+        """
+        Placeholder for accessing a subject by NHS number.
+        While no front-end page exists for subject viewing, this method preserves test readability
+        and signals that the subject record is now active within the test context.
+
+        Args:
+            nhs_number (str): The NHS number of the subject you want to access.
+
+        Returns:
+            OracleSubjectTools: Returns self for method chaining.
+        """
+        logging.info(f"[SUBJECT ACCESS] NHS number: {nhs_number} loaded into test flow")
+        return self
+    
+    # def create_self_referral_ready_subject(
+    #     screening_centre: str = "BCS002", base_age: int = 75
+    # ) -> str:
+    #     """
+    #     Creates a subject with no screening history who is eligible to self refer.
+
+    #     Args:
+    #         screening_centre (str): SC code for the subject
+    #         base_age (int): The age to base the DOB on
+
+    #     Returns:
+    #         str: NHS number of the created subject
+    #     """
+    #     oracle = OracleDB()
+
+    #     # Step 1: Create a single subject
+    #     nhs_numbers = OracleSubjectTools().create_subjects_via_sspi(
+    #         count=1,
+    #         screening_centre=screening_centre,
+    #         base_age=base_age,
+    #         start_offset=-2,
+    #         end_offset=4,
+    #         nhs_start=9200000000,
+    #     )
+
+    #     if not nhs_numbers:
+    #         raise RuntimeError("Subject creation failed—no NHS numbers returned")
+
+    #     nhs_number = nhs_numbers[0]
+
+    #     # Step 2: Execute bcss_timed_events to progress the subject
+    #     nhs_df = pd.DataFrame({"subject_nhs_number": [nhs_number]})
+    #     oracle.exec_bcss_timed_events(nhs_df)
+
+    #     logging.info(f"[SUBJECT READY] NHS number: {nhs_number}")
+    #     return nhs_number

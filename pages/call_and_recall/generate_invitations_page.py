@@ -2,6 +2,10 @@ from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 import pytest
 import logging
+from utils.oracle.oracle import OracleDB
+from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
+from classes.user import User
+from classes.subject import Subject
 
 
 class GenerateInvitationsPage(BasePage):
@@ -17,7 +21,7 @@ class GenerateInvitationsPage(BasePage):
         self.display_rs = self.page.locator("#displayRS")
         self.refresh_button = self.page.get_by_role("button", name="Refresh")
         self.planned_invitations_total = self.page.locator("#col8_total")
-        self.self_referrals_total = self.page.locator("#col9_total")
+        self.self_referrals_total = self.page.locator("#col5_total")
 
     def click_generate_invitations_button(self) -> None:
         """This function is used to click the Generate Invitations button."""
@@ -103,3 +107,67 @@ class GenerateInvitationsPage(BasePage):
         else:
             logging.warning("No S1 Digital Leaflet batch will be generated")
             return False
+
+    def check_self_referral_subjects_ready(
+        self, search_scope: str, volume: str
+    ) -> None:
+        """
+        Asserts whether self-referral subjects are ready to invite.
+
+        Args:
+            search_scope (str): Either "currently" or "now" to determine when to assert
+            volume (str): Either "some" or "no" — expected number of self-referrals
+
+        Raises:
+            AssertionError if the count doesn't match expectation and search_scope is "now"
+        """
+        assert search_scope in (
+            "currently",
+            "now",
+        ), f"Invalid search_scope: '{search_scope}'"
+        assert volume in ("some", "no"), f"Invalid volume: '{volume}'"
+
+        # Confirm we're on the Generate Invitations page
+        self.verify_generate_invitations_title()
+
+        # Extract and clean the count
+        self_referrals_text = self.self_referrals_total.text_content()
+        if self_referrals_text is None:
+            pytest.fail("Failed to read self-referrals total")
+        self_referrals_count = int(self_referrals_text.strip())
+
+        # Determine if condition is met
+        condition_met = (
+            self_referrals_count > 0 if volume == "some" else self_referrals_count == 0
+        )
+
+        logging.debug(f"[DEBUG] Self-referral subject count = {self_referrals_count}")
+
+        if search_scope == "now":
+            assert (
+                condition_met
+            ), f"Expected {volume.upper()} self-referral subjects, but got {self_referrals_count}"
+        logging.info(
+            f"[SELF-REFERRAL CHECK] scope='{search_scope}' | expected='{volume}' | actual={self_referrals_count}"
+        )
+
+    def get_self_referral_eligible_subject(self, user: User, subject: Subject) -> str:
+        criteria = {
+            "screening status": "Inactive",
+            "subject age": ">= 75",
+            "has GP practice": "Yes - active",
+            "subject hub code": "BCS02",
+        }
+
+        builder = SubjectSelectionQueryBuilder()
+        query, bind_vars = builder.build_subject_selection_query(
+            criteria, user, subject
+        )
+
+        oracle = OracleDB()
+        result = oracle.execute_query(query, bind_vars)
+
+        if result.empty:
+            raise RuntimeError("No eligible subject found")
+
+        return result.iloc[0]["subject_nhs_number"]

@@ -3,6 +3,7 @@ from pages.base_page import BasePage
 from datetime import datetime
 from utils.calendar_picker import CalendarPicker
 from utils.table_util import TableUtils
+import logging
 
 
 class BatchListPage(BasePage):
@@ -218,6 +219,16 @@ class ActiveBatchListPage(BatchListPage):
                 return row
         return None
 
+    def assert_s83f_batch_present(self) -> None:
+        self.enter_type_filter("Original")
+        self.enter_event_code_filter("S83")
+        self.enter_description_filter("Invitation & Test Kit (Self-referral) (FIT)")
+        expect(
+            self.table_data.filter(
+                has_text="Invitation & Test Kit (Self-referral) (FIT)"
+            )
+        ).to_be_visible()
+
 
 class ArchivedBatchListPage(BatchListPage):
     """Archived Batch List Page-specific setup."""
@@ -274,3 +285,57 @@ class ArchivedBatchListPage(BatchListPage):
                     return row
             except IndexError:
                 return None
+
+
+class LetterBatchDetailsPage(BasePage):
+    """Page object for the Letter Batch Details view."""
+
+    def __init__(self, page: Page):
+        super().__init__(page)
+        self.page = page
+        self.letter_table = self.page.locator("table#letterBatchDetails")
+
+    def assert_letter_component_present(self, letter_type: str, format: str) -> None:
+        """
+        Asserts that a letter component with the given type and format is listed.
+
+        Args:
+            letter_type (str): The letter type (e.g. "Invitation & Test Kit (Self-referral) (FIT)")
+            format (str): The file format (e.g. "PDF-A4-V03")
+        """
+        row_locator = self.letter_table.locator("tbody tr")
+        match_found = False
+
+        for i in range(row_locator.count()):
+            row = row_locator.nth(i)
+            type_cell = row.locator("td").nth(1)
+            format_cell = row.locator("td").nth(2)
+
+            if (
+                letter_type.lower() in type_cell.inner_text().lower()
+                and format.lower() in format_cell.inner_text().lower()
+            ):
+                match_found = True
+                break
+
+        assert (
+            match_found
+        ), f"Letter type '{letter_type}' with format '{format}' not found"
+
+    def get_first_subject_nhs_number(self) -> str:
+        """
+        Retrieves the NHS number of the first subject listed in the letter batch details table.
+
+        Returns:
+            str: The NHS number of the subject.
+        """
+        table_utils = TableUtils(self.page, "table#letterBatchDetails")
+        row_data = table_utils.get_row_data_with_headers(0)  # First row (0-based index)
+        
+        nhs_number = row_data.get("NHS Number")
+        if not nhs_number:
+            raise RuntimeError("NHS Number not found in the first row of the letter batch table")
+
+        logging.info(f"Retrieved NHS number from batch: {nhs_number}")
+        return nhs_number
+
