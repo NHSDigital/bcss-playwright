@@ -59,6 +59,10 @@ from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBu
 from utils.screening_subject_page_searcher import (
     search_subject_episode_by_nhs_number,
 )
+from utils.datasets.investigation_datasets import (
+    get_subject_with_investigation_dataset_ready,
+    go_from_investigation_dataset_complete_to_a259_status,
+)
 from utils.user_tools import UserTools
 
 # Defining dictionaries used in tests
@@ -108,7 +112,7 @@ def before_test(page: Page, request: FixtureRequest) -> None:
     """
     if request.node.get_closest_marker("skip_before_test"):
         return
-    df = obtain_test_data()
+    df = get_subject_with_investigation_dataset_ready()
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"NHS Number: {nhs_no}")
 
@@ -1020,88 +1024,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_r(page: Page) -> None
         polyp_histology=polyp_histology,
     )
 
-    # Enter the test outcome > A315
-    BasePage(page).click_back_button()
-    BasePage(page).click_back_button()
-    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-    AdvanceFOBTScreeningEpisodePage(page).click_enter_diagnostic_test_outcome_button()
-    DiagnosticTestOutcomePage(page).select_test_outcome_option(
-        OutcomeOfDiagnosticTest.FAILED_TEST_REFER_ANOTHER
-    )
-    DiagnosticTestOutcomePage(page).click_save_button()
-    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
-        "A315 - Diagnostic Test Outcome Entered"
-    )
-
-    # Make post investigation contact > A361
-    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-    AdvanceFOBTScreeningEpisodePage(page).click_other_post_investigation_button()
-    AdvanceFOBTScreeningEpisodePage(page).verify_latest_event_status_value(
-        "A361 - Other Post-investigation Contact Required"
-    )
-
-    AdvanceFOBTScreeningEpisodePage(
-        page
-    ).click_record_other_post_investigation_contact_button()
-    ContactWithPatientPage(page).select_direction_dropdown_option("To patient")
-    ContactWithPatientPage(page).select_caller_id_dropdown_index_option(1)
-    ContactWithPatientPage(page).click_calendar_button()
-    CalendarPicker(page).v1_calender_picker(datetime.today())
-    ContactWithPatientPage(page).enter_start_time("11:00")
-    ContactWithPatientPage(page).enter_end_time("12:00")
-    ContactWithPatientPage(page).enter_discussion_record_text("Test Automation")
-    ContactWithPatientPage(page).select_outcome_dropdown_option(
-        "Post-investigation Appointment Not Required"
-    )
-    ContactWithPatientPage(page).click_save_button()
-    BasePage(page).click_back_button()
-    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
-        "A318 - Post-investigation Appointment NOT Required - Result Letter Created"
-    )
-
-    # Process the A318 letters > A380
-    batch_processing(
-        page,
-        "A318",
-        "Result Letters - No Post-investigation Appointment",
-        "A380 - Failed Diagnostic Test - Refer Another",
-    )
-
-    # Another contact to bring the subject back to A99
-    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-    AdvanceFOBTScreeningEpisodePage(page).click_record_contact_with_patient_button()
-    ContactWithPatientPage(page).select_direction_dropdown_option("To patient")
-    ContactWithPatientPage(page).select_caller_id_dropdown_index_option(1)
-    ContactWithPatientPage(page).click_calendar_button()
-    CalendarPicker(page).v1_calender_picker(datetime.today())
-    ContactWithPatientPage(page).enter_start_time("11:00")
-    ContactWithPatientPage(page).enter_end_time("12:00")
-    ContactWithPatientPage(page).enter_discussion_record_text("Test Automation")
-    ContactWithPatientPage(page).select_outcome_dropdown_option(
-        "Suitable for Endoscopic Test"
-    )
-    ContactWithPatientPage(page).click_save_button()
-    AdvanceFOBTScreeningEpisodePage(page).verify_latest_event_status_value(
-        "A99 - Suitable for Endoscopic Test"
-    )
-
-    # Invite for 2nd diagnostic test > A59 - check options
-    AdvanceFOBTScreeningEpisodePage(page).click_calendar_button()
-    CalendarPicker(page).v1_calender_picker(datetime.today())
-    AdvanceFOBTScreeningEpisodePage(page).select_test_type_dropdown_option_2(
-        "Colonoscopy"
-    )
-    AdvanceFOBTScreeningEpisodePage(page).click_invite_for_diagnostic_test_button()
-    AdvanceFOBTScreeningEpisodePage(page).click_attend_diagnostic_test_button()
-    AttendDiagnosticTestPage(page).select_actual_type_of_test_dropdown_option(
-        "Colonoscopy"
-    )
-    AttendDiagnosticTestPage(page).click_calendar_button()
-    CalendarPicker(page).v1_calender_picker(datetime.today())
-    AttendDiagnosticTestPage(page).click_save_button()
-    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
-        "A259 - Attended Diagnostic Test"
-    )
+    go_from_investigation_dataset_complete_to_a259_status(page)
     SubjectScreeningSummaryPage(page).click_datasets_link()
     SubjectDatasetsPage(page).click_investigation_show_datasets()
 
@@ -1161,32 +1084,6 @@ def test_identify_advanced_colorectal_polyp_from_histology_s(page: Page) -> None
     )
 
     assert_test_results(page, "32")
-
-
-def obtain_test_data() -> pd.DataFrame:
-    """
-    This function builds a query to retrieve subjects based on specific criteria
-    and returns a DataFrame containing the results.
-    """
-    criteria = {
-        "latest episode status": "open",
-        "latest episode latest investigation dataset": "colonoscopy_new",
-        "latest episode started": "less than 4 years ago",
-    }
-    user = User()
-    subject = Subject()
-
-    builder = SubjectSelectionQueryBuilder()
-
-    query, bind_vars = builder.build_subject_selection_query(
-        criteria=criteria,
-        user=user,
-        subject=subject,
-        subjects_to_retrieve=1,
-    )
-
-    df = OracleDB().execute_query(query, bind_vars)
-    return df
 
 
 def make_polyp_1_information(**overrides):

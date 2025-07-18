@@ -16,6 +16,8 @@ class InvestigationDatasetsPage(BasePage):
         super().__init__(page)
         self.page = page
 
+        self.add_intervention_string = "Add Intervention"
+
         # Investigation datasets page locators
         self.site_lookup_link = self.page.locator("#UI_SITE_SELECT_LINK")
         self.practitioner_link = self.page.locator("#UI_SSP_PIO_SELECT_LINK")
@@ -48,11 +50,11 @@ class InvestigationDatasetsPage(BasePage):
         self.show_failure_information_details = self.page.locator("#anchorFailure")
         self.add_polyp_button = self.page.get_by_role("button", name="Add Polyp")
         self.polyp1_add_intervention_button = self.page.get_by_role(
-            "link", name="Add Intervention"
+            "link", name=self.add_intervention_string
         )
         self.polyp2_add_intervention_button = self.page.locator(
             "#spanPolypInterventionLink2"
-        ).get_by_role("link", name="Add Intervention")
+        ).get_by_role("link", name=self.add_intervention_string)
         self.dataset_complete_checkbox = self.page.locator("#radDatasetCompleteYes")
         self.dataset_incomplete_checkbox = self.page.locator("#radDatasetCompleteNo")
         self.save_dataset_button = self.page.locator(
@@ -477,7 +479,7 @@ class InvestigationDatasetsPage(BasePage):
 
         self.click(
             self.page.locator(f"#spanPolypInterventionLink{polyp_number}").get_by_role(
-                "link", name="Add Intervention"
+                "link", name=self.add_intervention_string
             )
         )
 
