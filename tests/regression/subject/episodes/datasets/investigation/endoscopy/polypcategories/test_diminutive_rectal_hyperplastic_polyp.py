@@ -86,7 +86,7 @@ def test_identify_diminutive_rectal_hyperplastic_polyp_from_histology_a(
     """
     This test identifies a diminutive rectal hyperplastic polyp from histology results. (BCSS-4659 - A)
     """
-    df = get_subject_with_investigation_dataset_ready
+    df = get_subject_with_investigation_dataset_ready()
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"NHS Number: {nhs_no}")
 
