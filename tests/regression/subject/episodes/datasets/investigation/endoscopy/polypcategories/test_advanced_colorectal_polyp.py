@@ -122,6 +122,7 @@ def before_test(page: Page, request: FixtureRequest) -> None:
 
 
 @pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
 def test_identify_advanced_colorectal_polyp_from_histology_a(page: Page) -> None:
     """
@@ -164,6 +165,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_a(page: Page) -> None
 
 
 @pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
 def test_identify_advanced_colorectal_polyp_from_histology_b(page: Page) -> None:
     """
@@ -205,6 +207,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_b(page: Page) -> None
 
 
 @pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
 def test_identify_advanced_colorectal_polyp_from_histology_c(page: Page) -> None:
     """
@@ -242,6 +245,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_c(page: Page) -> None
 
 
 @pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
 def test_identify_advanced_colorectal_polyp_from_histology_d(page: Page) -> None:
     """
@@ -283,6 +287,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_d(page: Page) -> None
 
 
 @pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
 def test_identify_advanced_colorectal_polyp_from_histology_e(page: Page) -> None:
     """
@@ -329,6 +334,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_e(page: Page) -> None
 
 
 @pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
 def test_identify_advanced_colorectal_polyp_from_histology_f(page: Page) -> None:
     """
@@ -372,6 +378,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_f(page: Page) -> None
 
 
 @pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
 def test_identify_advanced_colorectal_polyp_from_histology_g(page: Page) -> None:
     """
@@ -413,6 +420,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_g(page: Page) -> None
 
 
 @pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
 def test_identify_advanced_colorectal_polyp_from_histology_h(page: Page) -> None:
     """
@@ -456,6 +464,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_h(page: Page) -> None
 
 
 @pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
 def test_identify_advanced_colorectal_polyp_from_histology_i(page: Page) -> None:
     """
@@ -502,6 +511,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_i(page: Page) -> None
 
 
 @pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
 def test_identify_advanced_colorectal_polyp_from_histology_j(page: Page) -> None:
     """
@@ -542,6 +552,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_j(page: Page) -> None
 
 
 @pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
 def test_identify_advanced_colorectal_polyp_from_histology_k(page: Page) -> None:
     """
@@ -584,6 +595,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_k(page: Page) -> None
 
 
 @pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
 def test_identify_advanced_colorectal_polyp_from_histology_l(page: Page) -> None:
     """
@@ -627,6 +639,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_l(page: Page) -> None
 
 
 @pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
 def test_identify_advanced_colorectal_polyp_from_histology_m(page: Page) -> None:
     """
@@ -670,6 +683,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_m(page: Page) -> None
 
 
 @pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
 def test_identify_advanced_colorectal_polyp_from_histology_n(page: Page) -> None:
     """
@@ -715,6 +729,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_n(page: Page) -> None
 
 
 @pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
 def test_identify_advanced_colorectal_polyp_from_histology_o(page: Page) -> None:
     """
@@ -761,6 +776,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_o(page: Page) -> None
 
 
 @pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
 def test_identify_advanced_colorectal_polyp_from_histology_p(page: Page) -> None:
     """
@@ -805,6 +821,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_p(page: Page) -> None
 
 
 @pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
 def test_identify_advanced_colorectal_polyp_from_histology_q(page: Page) -> None:
     """
@@ -848,6 +865,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_q(page: Page) -> None
 
 
 @pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.skip_before_test
 @pytest.mark.investigation_dataset_tests
 def test_identify_advanced_colorectal_polyp_from_histology_r(page: Page) -> None:
@@ -1047,6 +1065,7 @@ def test_identify_advanced_colorectal_polyp_from_histology_r(page: Page) -> None
 
 
 @pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
 def test_identify_advanced_colorectal_polyp_from_histology_s(page: Page) -> None:
     """
