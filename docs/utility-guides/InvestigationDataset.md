@@ -388,7 +388,7 @@ completion_utility.complete_dataset_with_args(
 | drug_dose1   | str   | "3"                         | Dose                               |
 
 #### Endoscopy Information
-
+<!--vale off-->
 | Field                        | Type    | Example Value                                         | Description                          |
 |------------------------------|---------|-------------------------------------------------------|--------------------------------------|
 | endoscope inserted           | str     | "yes"                                                | "yes" or "no"                        |
@@ -406,21 +406,21 @@ completion_utility.complete_dataset_with_args(
 | insufflation                 | enum    | InsufflationOptions.AIR                               | Option from dropdown                 |
 | outcome at time of procedure | enum    | OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT      | Option from dropdown                 |
 | late outcome                 | enum    | LateOutcomeOptions.NO_COMPLICATIONS                   | Option from dropdown                 |
-
+<!--vale on-->
 #### Failure Information
-
+<!--vale off-->
 | Field              | Type  | Example Value                       | Description                              |
 |--------------------|-------|-------------------------------------|------------------------------------------|
 | failure reasons    | enum  | FailureReasonsOptions.ADHESION       | Reason text for dataset failure          |
-
+<!--vale on-->
 #### Completion Proof Information
-
+<!--vale off-->
 | Field              | Type  | Example Value                       | Description                              |
 |--------------------|-------|-------------------------------------|------------------------------------------|
 | completion proof   | enum  | CompletionProofOptions.VIDEO_APPENDIX| Value for the "Proof Parameters" field   |
-
+<!--vale on-->
 #### Polyp Information (Optional)
-
+<!--vale off-->
 | Field                        | Type  | Example Value                                 | Description                          |
 |------------------------------|-------|-----------------------------------------------|--------------------------------------|
 | location                     | enum  | EndoscopyLocationOptions.RECTUM               | Polyp location                       |
@@ -428,9 +428,9 @@ completion_utility.complete_dataset_with_args(
 | estimate of whole polyp size | str   | "6"                                           | Size in mm                           |
 | polyp access                 | enum  | PolypAccessOptions.EASY                       | Access difficulty                    |
 | left in situ                 | enum  | YesNoOptions.NO                               | "Yes" or "No"                        |
-
+<!--vale on-->
 #### Polyp Intervention (Optional)
-
+<!--vale off-->
 | Field                                   | Type  | Example Value                                         | Description                     |
 |------------------------------------------|-------|-------------------------------------------------------|---------------------------------|
 | modality                                | enum  | PolypInterventionModalityOptions.POLYPECTOMY          | E.g., "Polypectomy"             |
@@ -439,9 +439,9 @@ completion_utility.complete_dataset_with_args(
 | retrieved                               | enum  | YesNoOptions.YES                                      | "Yes" or "No"                   |
 | excision technique                      | enum  | PolypInterventionExcisionTechniqueOptions.PIECE_MEAL  | Optional technique detail       |
 | polyp appears fully resected endoscopically | enum | YesNoOptions.YES                                  | Option from dropdown            |
-
+<!--vale on-->
 #### Polyp Histology (Optional)
-
+<!--vale off-->
 | Field                     | Type        | Example Value                                         | Description                         |
 |---------------------------|-------------|-------------------------------------------------------|-------------------------------------|
 | date of receipt           | `datetime`  | datetime.today()                                      | Date of receipt                     |
@@ -455,7 +455,7 @@ completion_utility.complete_dataset_with_args(
 | polyp size                | str         | "5"                                                   | Size in mm                          |
 | polyp dysplasia           | enum        | PolypDysplasiaOptions.NOT_REPORTED                    | Dysplasia report                    |
 | polyp carcinoma           | enum        | YesNoUncertainOptions.NO                              | "Yes", "No", or "Uncertain"         |
-
+<!--vale on-->
 ---
 
 For more details on each function's implementation, refer to the source code in `utils/investigation_dataset.py`.
