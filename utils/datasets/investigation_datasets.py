@@ -24,6 +24,9 @@ from utils.batch_processing import batch_processing
 from utils.calendar_picker import CalendarPicker
 from utils.oracle.oracle import OracleDB
 from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
+from utils.screening_subject_page_searcher import (
+    search_subject_episode_by_nhs_number,
+)
 
 
 def get_subject_with_investigation_dataset_ready() -> pd.DataFrame:
@@ -76,6 +79,43 @@ def get_subject_with_a99_status() -> pd.DataFrame:
 
     df = OracleDB().execute_query(query, bind_vars)
     return df
+
+
+def go_from_a99_Status_to_a259_status(page: Page, nhs_no: str) -> None:
+    """
+    Takes a subject who has the latest episode status A99 - Suitable for Endoscopic Test
+    and takes them to A259 - Attended Diagnostic Test.
+
+    Args:
+        nhs_no (str): The NHS number of the subject.
+    """
+    BasePage(page).go_to_screening_subject_search_page()
+    search_subject_episode_by_nhs_number(page, nhs_no)
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+
+    AdvanceFOBTScreeningEpisodePage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+
+    AdvanceFOBTScreeningEpisodePage(page).select_test_type_dropdown_option(
+        "Colonoscopy"
+    )
+
+    AdvanceFOBTScreeningEpisodePage(page).click_invite_for_diagnostic_test_button()
+    AdvanceFOBTScreeningEpisodePage(page).verify_latest_event_status_value(
+        "A59 - Invited for Diagnostic Test"
+    )
+
+    AdvanceFOBTScreeningEpisodePage(page).click_attend_diagnostic_test_button()
+
+    AttendDiagnosticTestPage(page).select_actual_type_of_test_dropdown_option(
+        "Colonoscopy"
+    )
+    AttendDiagnosticTestPage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+    AttendDiagnosticTestPage(page).click_save_button()
+    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
+        "A259 - Attended Diagnostic Test"
+    )
 
 
 def go_from_investigation_dataset_complete_to_a259_status(page: Page) -> None:

@@ -25,16 +25,9 @@ from pages.datasets.investigation_dataset_page import (
 )
 from pages.datasets.subject_datasets_page import SubjectDatasetsPage
 from pages.logout.log_out_page import LogoutPage
-from pages.screening_subject_search.attend_diagnostic_test_page import (
-    AttendDiagnosticTestPage,
-)
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
-from pages.screening_subject_search.advance_fobt_screening_episode_page import (
-    AdvanceFOBTScreeningEpisodePage,
-)
-from utils.calendar_picker import CalendarPicker
 from utils.investigation_dataset import (
     InvestigationDatasetCompletion,
 )
@@ -46,6 +39,7 @@ from utils.datasets.investigation_datasets import (
     get_subject_with_investigation_dataset_ready,
     go_from_investigation_dataset_complete_to_a259_status,
     get_subject_with_a99_status,
+    go_from_a99_Status_to_a259_status,
 )
 
 general_information = {
@@ -276,33 +270,7 @@ def test_identify_diminutive_rectal_hyperplastic_polyp_from_histology_b(
 
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
 
-    BasePage(page).go_to_screening_subject_search_page()
-    search_subject_episode_by_nhs_number(page, nhs_no)
-    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-
-    AdvanceFOBTScreeningEpisodePage(page).click_calendar_button()
-    CalendarPicker(page).v1_calender_picker(datetime.today())
-
-    AdvanceFOBTScreeningEpisodePage(page).select_test_type_dropdown_option(
-        "Colonoscopy"
-    )
-
-    AdvanceFOBTScreeningEpisodePage(page).click_invite_for_diagnostic_test_button()
-    AdvanceFOBTScreeningEpisodePage(page).verify_latest_event_status_value(
-        "A59 - Invited for Diagnostic Test"
-    )
-
-    AdvanceFOBTScreeningEpisodePage(page).click_attend_diagnostic_test_button()
-
-    AttendDiagnosticTestPage(page).select_actual_type_of_test_dropdown_option(
-        "Colonoscopy"
-    )
-    AttendDiagnosticTestPage(page).click_calendar_button()
-    CalendarPicker(page).v1_calender_picker(datetime.today())
-    AttendDiagnosticTestPage(page).click_save_button()
-    SubjectScreeningSummaryPage(page).verify_latest_event_status_value(
-        "A259 - Attended Diagnostic Test"
-    )
+    go_from_a99_Status_to_a259_status(page, nhs_no)
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
     SubjectDatasetsPage(page).click_investigation_show_datasets()
