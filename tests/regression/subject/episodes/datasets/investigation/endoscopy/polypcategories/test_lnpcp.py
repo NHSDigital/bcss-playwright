@@ -5,14 +5,8 @@ from playwright.sync_api import Page
 from pages.base_page import BasePage
 from pages.datasets.investigation_dataset_page import (
     InvestigationDatasetsPage,
-    DrugTypeOptions,
-    BowelPreparationQualityOptions,
-    ComfortOptions,
     EndoscopyLocationOptions,
     YesNoOptions,
-    InsufflationOptions,
-    OutcomeAtTimeOfProcedureOptions,
-    LateOutcomeOptions,
     FailureReasonsOptions,
     PolypClassificationOptions,
     PolypAccessOptions,
@@ -28,7 +22,6 @@ from pages.datasets.investigation_dataset_page import (
     CompletionProofOptions,
 )
 from pages.datasets.subject_datasets_page import SubjectDatasetsPage
-from pages.logout.log_out_page import LogoutPage
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
@@ -44,39 +37,19 @@ from utils.datasets.investigation_datasets import (
     go_from_investigation_dataset_complete_to_a259_status,
     get_subject_with_a99_status,
     go_from_a99_status_to_a259_status,
+    get_default_general_information,
+    get_default_drug_information,
+    get_default_endoscopy_information,
+    complete_and_assert_investigation,
 )
 
 lnpcp_string = "LNPCP"
 
-general_information = {
-    "site": -1,
-    "practitioner": -1,
-    "testing clinician": -1,
-    "aspirant endoscopist": None,
-}
+general_information = get_default_general_information()
 
-drug_information = {
-    "drug_type1": DrugTypeOptions.MANNITOL,
-    "drug_dose1": "3",
-}
+drug_information = get_default_drug_information()
 
-endoscopy_information = {
-    "endoscope inserted": "yes",
-    "procedure type": "therapeutic",
-    "bowel preparation quality": BowelPreparationQualityOptions.GOOD,
-    "comfort during examination": ComfortOptions.NO_DISCOMFORT,
-    "comfort during recovery": ComfortOptions.NO_DISCOMFORT,
-    "endoscopist defined extent": EndoscopyLocationOptions.DESCENDING_COLON,
-    "scope imager used": YesNoOptions.YES,
-    "retroverted view": YesNoOptions.NO,
-    "start of intubation time": "09:00",
-    "start of extubation time": "09:30",
-    "end time of procedure": "10:00",
-    "scope id": "Autotest",
-    "insufflation": InsufflationOptions.AIR,
-    "outcome at time of procedure": OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
-    "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
-}
+endoscopy_information = get_default_endoscopy_information()
 
 failure_information = {
     "failure reasons": FailureReasonsOptions.ADHESION,
@@ -87,6 +60,7 @@ completion_information = {
 }
 
 
+@pytest.mark.wip
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
@@ -137,25 +111,18 @@ def test_identify_lnpcp_from_histology_a(
         "polyp carcinoma": YesNoUncertainOptions.NO,
     }
 
-    polyp_information = [polyp_1_information]
-    polyp_intervention = [polyp_1_intervention]
-    polyp_histology = [polyp_1_histology]
-
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        general_information=general_information,
-        drug_information=drug_information,
-        endoscopy_information=endoscopy_information,
-        failure_information=failure_information,
-        polyp_information=polyp_information,
-        polyp_intervention=polyp_intervention,
-        polyp_histology=polyp_histology,
+    complete_and_assert_investigation(
+        page,
+        general_information,
+        drug_information,
+        endoscopy_information,
+        failure_information,
+        polyp_1_information,
+        polyp_1_intervention,
+        polyp_1_histology,
+        expected_category=lnpcp_string,
+        expected_size="20",
     )
-
-    InvestigationDatasetsPage(page).expect_text_to_be_visible(lnpcp_string)
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, "20")
-    InvestigationDatasetsPage(page).assert_polyp_categrory(1, lnpcp_string)
-
-    mark_dataset_not_complete_and_assert(page)
 
 
 @pytest.mark.vpn_required
@@ -208,25 +175,18 @@ def test_identify_lnpcp_from_histology_b(
         "polyp carcinoma": YesNoUncertainOptions.NO,
     }
 
-    polyp_information = [polyp_1_information]
-    polyp_intervention = [polyp_1_intervention]
-    polyp_histology = [polyp_1_histology]
-
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        general_information=general_information,
-        drug_information=drug_information,
-        endoscopy_information=endoscopy_information,
-        failure_information=failure_information,
-        polyp_information=polyp_information,
-        polyp_intervention=polyp_intervention,
-        polyp_histology=polyp_histology,
+    complete_and_assert_investigation(
+        page,
+        general_information,
+        drug_information,
+        endoscopy_information,
+        failure_information,
+        polyp_1_information,
+        polyp_1_intervention,
+        polyp_1_histology,
+        expected_category=lnpcp_string,
+        expected_size="21",
     )
-
-    InvestigationDatasetsPage(page).expect_text_to_be_visible(lnpcp_string)
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, "21")
-    InvestigationDatasetsPage(page).assert_polyp_categrory(1, lnpcp_string)
-
-    mark_dataset_not_complete_and_assert(page)
 
 
 @pytest.mark.vpn_required
@@ -279,25 +239,18 @@ def test_identify_lnpcp_from_histology_c(
         "polyp carcinoma": YesNoUncertainOptions.UNCERTAIN,
     }
 
-    polyp_information = [polyp_1_information]
-    polyp_intervention = [polyp_1_intervention]
-    polyp_histology = [polyp_1_histology]
-
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        general_information=general_information,
-        drug_information=drug_information,
-        endoscopy_information=endoscopy_information,
-        failure_information=failure_information,
-        polyp_information=polyp_information,
-        polyp_intervention=polyp_intervention,
-        polyp_histology=polyp_histology,
+    complete_and_assert_investigation(
+        page,
+        general_information,
+        drug_information,
+        endoscopy_information,
+        failure_information,
+        polyp_1_information,
+        polyp_1_intervention,
+        polyp_1_histology,
+        expected_category=lnpcp_string,
+        expected_size="22",
     )
-
-    InvestigationDatasetsPage(page).expect_text_to_be_visible(lnpcp_string)
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, "22")
-    InvestigationDatasetsPage(page).assert_polyp_categrory(1, lnpcp_string)
-
-    mark_dataset_not_complete_and_assert(page)
 
 
 @pytest.mark.vpn_required
@@ -351,25 +304,18 @@ def test_identify_lnpcp_from_histology_d(
         "polyp carcinoma": YesNoUncertainOptions.UNCERTAIN,
     }
 
-    polyp_information = [polyp_1_information]
-    polyp_intervention = [polyp_1_intervention]
-    polyp_histology = [polyp_1_histology]
-
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        general_information=general_information,
-        drug_information=drug_information,
-        endoscopy_information=endoscopy_information,
-        failure_information=failure_information,
-        polyp_information=polyp_information,
-        polyp_intervention=polyp_intervention,
-        polyp_histology=polyp_histology,
+    complete_and_assert_investigation(
+        page,
+        general_information,
+        drug_information,
+        endoscopy_information,
+        failure_information,
+        polyp_1_information,
+        polyp_1_intervention,
+        polyp_1_histology,
+        expected_category=lnpcp_string,
+        expected_size="20",
     )
-
-    InvestigationDatasetsPage(page).expect_text_to_be_visible(lnpcp_string)
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, "20")
-    InvestigationDatasetsPage(page).assert_polyp_categrory(1, lnpcp_string)
-
-    mark_dataset_not_complete_and_assert(page)
 
 
 @pytest.mark.vpn_required
@@ -425,26 +371,19 @@ def test_identify_lnpcp_from_histology_e(
         "polyp size": "20",
     }
 
-    polyp_information = [polyp_1_information]
-    polyp_intervention = [polyp_1_intervention]
-    polyp_histology = [polyp_1_histology]
-
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        general_information=general_information,
-        drug_information=drug_information,
-        endoscopy_information=endoscopy_information,
-        failure_information=failure_information,
-        polyp_information=polyp_information,
+    complete_and_assert_investigation(
+        page,
+        general_information,
+        drug_information,
+        endoscopy_information,
+        failure_information,
+        polyp_1_information,
+        polyp_1_intervention,
+        polyp_1_histology,
+        expected_category=lnpcp_string,
+        expected_size="20",
         completion_information=completion_information,
-        polyp_intervention=polyp_intervention,
-        polyp_histology=polyp_histology,
     )
-
-    InvestigationDatasetsPage(page).expect_text_to_be_visible(lnpcp_string)
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, "20")
-    InvestigationDatasetsPage(page).assert_polyp_categrory(1, lnpcp_string)
-
-    mark_dataset_not_complete_and_assert(page)
 
 
 @pytest.mark.vpn_required
@@ -502,26 +441,19 @@ def test_identify_lnpcp_from_histology_f(
         "polyp carcinoma": YesNoUncertainOptions.NO,
     }
 
-    polyp_information = [polyp_1_information]
-    polyp_intervention = [polyp_1_intervention]
-    polyp_histology = [polyp_1_histology]
-
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        general_information=general_information,
-        drug_information=drug_information,
-        endoscopy_information=endoscopy_information,
-        failure_information=failure_information,
-        polyp_information=polyp_information,
+    complete_and_assert_investigation(
+        page,
+        general_information,
+        drug_information,
+        endoscopy_information,
+        failure_information,
+        polyp_1_information,
+        polyp_1_intervention,
+        polyp_1_histology,
+        expected_category=lnpcp_string,
+        expected_size="21",
         completion_information=completion_information,
-        polyp_intervention=polyp_intervention,
-        polyp_histology=polyp_histology,
     )
-
-    InvestigationDatasetsPage(page).expect_text_to_be_visible(lnpcp_string)
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, "21")
-    InvestigationDatasetsPage(page).assert_polyp_categrory(1, lnpcp_string)
-
-    mark_dataset_not_complete_and_assert(page)
 
 
 @pytest.mark.vpn_required
@@ -577,26 +509,19 @@ def test_identify_lnpcp_from_histology_g(
         "polyp carcinoma": YesNoUncertainOptions.NO,
     }
 
-    polyp_information = [polyp_1_information]
-    polyp_intervention = [polyp_1_intervention]
-    polyp_histology = [polyp_1_histology]
-
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        general_information=general_information,
-        drug_information=drug_information,
-        endoscopy_information=endoscopy_information,
-        failure_information=failure_information,
-        polyp_information=polyp_information,
+    complete_and_assert_investigation(
+        page,
+        general_information,
+        drug_information,
+        endoscopy_information,
+        failure_information,
+        polyp_1_information,
+        polyp_1_intervention,
+        polyp_1_histology,
+        expected_category=lnpcp_string,
+        expected_size="20",
         completion_information=completion_information,
-        polyp_intervention=polyp_intervention,
-        polyp_histology=polyp_histology,
     )
-
-    InvestigationDatasetsPage(page).expect_text_to_be_visible(lnpcp_string)
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, "20")
-    InvestigationDatasetsPage(page).assert_polyp_categrory(1, lnpcp_string)
-
-    mark_dataset_not_complete_and_assert(page)
 
 
 @pytest.mark.vpn_required
@@ -653,26 +578,19 @@ def test_identify_lnpcp_from_histology_h(
         "polyp carcinoma": YesNoUncertainOptions.NO,
     }
 
-    polyp_information = [polyp_1_information]
-    polyp_intervention = [polyp_1_intervention]
-    polyp_histology = [polyp_1_histology]
-
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        general_information=general_information,
-        drug_information=drug_information,
-        endoscopy_information=endoscopy_information,
-        failure_information=failure_information,
-        polyp_information=polyp_information,
+    complete_and_assert_investigation(
+        page,
+        general_information,
+        drug_information,
+        endoscopy_information,
+        failure_information,
+        polyp_1_information,
+        polyp_1_intervention,
+        polyp_1_histology,
+        expected_category=lnpcp_string,
+        expected_size="22",
         completion_information=completion_information,
-        polyp_intervention=polyp_intervention,
-        polyp_histology=polyp_histology,
     )
-
-    InvestigationDatasetsPage(page).expect_text_to_be_visible(lnpcp_string)
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, "22")
-    InvestigationDatasetsPage(page).assert_polyp_categrory(1, lnpcp_string)
-
-    mark_dataset_not_complete_and_assert(page)
 
 
 @pytest.mark.vpn_required
@@ -729,26 +647,19 @@ def test_identify_lnpcp_from_histology_i(
         "polyp carcinoma": YesNoUncertainOptions.NO,
     }
 
-    polyp_information = [polyp_1_information]
-    polyp_intervention = [polyp_1_intervention]
-    polyp_histology = [polyp_1_histology]
-
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        general_information=general_information,
-        drug_information=drug_information,
-        endoscopy_information=endoscopy_information,
-        failure_information=failure_information,
-        polyp_information=polyp_information,
+    complete_and_assert_investigation(
+        page,
+        general_information,
+        drug_information,
+        endoscopy_information,
+        failure_information,
+        polyp_1_information,
+        polyp_1_intervention,
+        polyp_1_histology,
+        expected_category=lnpcp_string,
+        expected_size="21",
         completion_information=completion_information,
-        polyp_intervention=polyp_intervention,
-        polyp_histology=polyp_histology,
     )
-
-    InvestigationDatasetsPage(page).expect_text_to_be_visible(lnpcp_string)
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, "21")
-    InvestigationDatasetsPage(page).assert_polyp_categrory(1, lnpcp_string)
-
-    mark_dataset_not_complete_and_assert(page)
 
 
 @pytest.mark.vpn_required
@@ -806,26 +717,19 @@ def test_identify_lnpcp_from_histology_r(
         "polyp carcinoma": YesNoUncertainOptions.NO,
     }
 
-    polyp_information = [polyp_1_information]
-    polyp_intervention = [polyp_1_intervention]
-    polyp_histology = [polyp_1_histology]
-
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        general_information=general_information,
-        drug_information=drug_information,
-        endoscopy_information=endoscopy_information,
-        failure_information=failure_information,
-        polyp_information=polyp_information,
+    complete_and_assert_investigation(
+        page,
+        general_information,
+        drug_information,
+        endoscopy_information,
+        failure_information,
+        polyp_1_information,
+        polyp_1_intervention,
+        polyp_1_histology,
+        expected_category=lnpcp_string,
+        expected_size="20",
         completion_information=completion_information,
-        polyp_intervention=polyp_intervention,
-        polyp_histology=polyp_histology,
     )
-
-    InvestigationDatasetsPage(page).expect_text_to_be_visible(lnpcp_string)
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, "20")
-    InvestigationDatasetsPage(page).assert_polyp_categrory(1, lnpcp_string)
-
-    mark_dataset_not_complete_and_assert(page)
 
 
 @pytest.mark.vpn_required
@@ -904,35 +808,16 @@ def test_identify_lnpcp_from_histology_s(
     polyp_1_information["estimate of whole polyp size"] = "20"
     polyp_1_histology["polyp size"] = "20"
 
-    polyp_information = [polyp_1_information]
-    polyp_histology = [polyp_1_histology]
-
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        general_information=general_information,
-        drug_information=drug_information,
-        endoscopy_information=endoscopy_information,
-        failure_information=failure_information,
+    complete_and_assert_investigation(
+        page,
+        general_information,
+        drug_information,
+        endoscopy_information,
+        failure_information,
+        polyp_1_information,
+        polyp_1_intervention,
+        polyp_1_histology,
+        expected_category=lnpcp_string,
+        expected_size="20",
         completion_information=completion_information,
-        polyp_information=polyp_information,
-        polyp_intervention=polyp_intervention,
-        polyp_histology=polyp_histology,
     )
-
-    InvestigationDatasetsPage(page).expect_text_to_be_visible(lnpcp_string)
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, "20")
-    InvestigationDatasetsPage(page).assert_polyp_categrory(1, lnpcp_string)
-
-    mark_dataset_not_complete_and_assert(page)
-
-
-def mark_dataset_not_complete_and_assert(page: Page) -> None:
-    """
-    Marks the investigation dataset as not complete and asserts that the polyp size and category are None.
-    """
-    logging.info("Marking investigation dataset not complete")
-    InvestigationDatasetsPage(page).click_edit_dataset_button()
-    InvestigationDatasetsPage(page).check_dataset_incomplete_checkbox()
-    InvestigationDatasetsPage(page).click_save_dataset_button()
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, None)
-    InvestigationDatasetsPage(page).assert_polyp_categrory(1, None)
-    LogoutPage(page).log_out()
