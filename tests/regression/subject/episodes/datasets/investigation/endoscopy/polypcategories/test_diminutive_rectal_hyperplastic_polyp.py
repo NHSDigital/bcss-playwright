@@ -207,22 +207,22 @@ def test_identify_diminutive_rectal_hyperplastic_polyp_from_histology_a(
 
     polyp_category_string = "Diminutive rectal hyperplastic polyp"
     InvestigationDatasetsPage(page).expect_text_to_be_visible("Abnormal")
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, "5")
-    InvestigationDatasetsPage(page).assert_polyp_categrory(1, polyp_category_string)
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(2, "1")
-    InvestigationDatasetsPage(page).assert_polyp_categrory(2, polyp_category_string)
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(3, "3")
-    InvestigationDatasetsPage(page).assert_polyp_categrory(3, polyp_category_string)
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(4, "5")
-    InvestigationDatasetsPage(page).assert_polyp_categrory(4, polyp_category_string)
+    InvestigationDatasetsPage(page).assert_polyp_algorithm_size(1, "5")
+    InvestigationDatasetsPage(page).assert_polyp_category(1, polyp_category_string)
+    InvestigationDatasetsPage(page).assert_polyp_algorithm_size(2, "1")
+    InvestigationDatasetsPage(page).assert_polyp_category(2, polyp_category_string)
+    InvestigationDatasetsPage(page).assert_polyp_algorithm_size(3, "3")
+    InvestigationDatasetsPage(page).assert_polyp_category(3, polyp_category_string)
+    InvestigationDatasetsPage(page).assert_polyp_algorithm_size(4, "5")
+    InvestigationDatasetsPage(page).assert_polyp_category(4, polyp_category_string)
 
     logging.info("Marking investigation dataset not complete")
     InvestigationDatasetsPage(page).click_edit_dataset_button()
     InvestigationDatasetsPage(page).check_dataset_incomplete_checkbox()
     InvestigationDatasetsPage(page).click_save_dataset_button()
     for polyp_number in range(1, 5):
-        InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(polyp_number, None)
-        InvestigationDatasetsPage(page).assert_polyp_categrory(polyp_number, None)
+        InvestigationDatasetsPage(page).assert_polyp_algorithm_size(polyp_number, None)
+        InvestigationDatasetsPage(page).assert_polyp_category(polyp_number, None)
 
     LogoutPage(page).log_out()
 
@@ -304,8 +304,8 @@ def test_identify_diminutive_rectal_hyperplastic_polyp_from_histology_b(
     )
 
     InvestigationDatasetsPage(page).expect_text_to_be_visible("Abnormal")
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, "2")
-    InvestigationDatasetsPage(page).assert_polyp_categrory(
+    InvestigationDatasetsPage(page).assert_polyp_algorithm_size(1, "2")
+    InvestigationDatasetsPage(page).assert_polyp_category(
         1, "Diminutive rectal hyperplastic polyp"
     )
 
@@ -313,6 +313,6 @@ def test_identify_diminutive_rectal_hyperplastic_polyp_from_histology_b(
     InvestigationDatasetsPage(page).click_edit_dataset_button()
     InvestigationDatasetsPage(page).check_dataset_incomplete_checkbox()
     InvestigationDatasetsPage(page).click_save_dataset_button()
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, None)
-    InvestigationDatasetsPage(page).assert_polyp_categrory(1, None)
+    InvestigationDatasetsPage(page).assert_polyp_algorithm_size(1, None)
+    InvestigationDatasetsPage(page).assert_polyp_category(1, None)
     LogoutPage(page).log_out()

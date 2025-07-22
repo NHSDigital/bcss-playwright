@@ -282,8 +282,8 @@ def complete_and_assert_investigation(
         completion_information=completion_information,
     )
 
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, expected_size)
-    InvestigationDatasetsPage(page).assert_polyp_categrory(1, expected_category)
+    InvestigationDatasetsPage(page).assert_polyp_algorithm_size(1, expected_size)
+    InvestigationDatasetsPage(page).assert_polyp_category(1, expected_category)
 
     mark_dataset_not_complete_and_assert(page)
 
@@ -296,6 +296,6 @@ def mark_dataset_not_complete_and_assert(page: Page) -> None:
     InvestigationDatasetsPage(page).click_edit_dataset_button()
     InvestigationDatasetsPage(page).check_dataset_incomplete_checkbox()
     InvestigationDatasetsPage(page).click_save_dataset_button()
-    InvestigationDatasetsPage(page).assert_polyp_alogrithm_size(1, None)
-    InvestigationDatasetsPage(page).assert_polyp_categrory(1, None)
+    InvestigationDatasetsPage(page).assert_polyp_algorithm_size(1, None)
+    InvestigationDatasetsPage(page).assert_polyp_category(1, None)
     LogoutPage(page).log_out()

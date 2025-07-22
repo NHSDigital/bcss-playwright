@@ -60,7 +60,6 @@ completion_information = {
 }
 
 
-@pytest.mark.wip
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
