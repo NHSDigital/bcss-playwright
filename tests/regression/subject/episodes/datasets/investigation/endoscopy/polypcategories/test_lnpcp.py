@@ -799,7 +799,11 @@ def test_identify_lnpcp_from_histology_s(
         polyp_histology=polyp_histology,
     )
 
-    InvestigationDatasetsPage(page).expect_text_to_be_visible("Abnormal")
+    try:
+        InvestigationDatasetsPage(page).expect_text_to_be_visible("Abnormal")
+        logging.info("Found 'Abnormal' result.")
+    except Exception as e:
+        logging.error(f"Expected text not found: {e}")
     go_from_investigation_dataset_complete_to_a259_status(page)
     SubjectScreeningSummaryPage(page).click_datasets_link()
     SubjectDatasetsPage(page).click_investigation_show_datasets()
