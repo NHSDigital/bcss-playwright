@@ -11,29 +11,28 @@ from pages.communication_production.manage_active_batch_page import (
 )
 
 
-@pytest.fixture
-def select_user(page: Page):
-    def _login_as(user_role: str):
-        # Log in with the specified user
-        UserTools.user_login(page, user_role)
-        # Navigate to Active Batch List
-        BasePage(page).go_to_communications_production_page()
-        CommunicationsProductionPage(page).go_to_active_batch_list_page()
-        return page
+@pytest.fixture(scope="function", autouse=True)
+def before_each(page: Page):
+    """
+    Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the active batch list page
+    """
+    # Log in to BCSS
+    UserTools.user_login(page, "Hub Manager at BCS01")
 
-    return _login_as
+    # Go to active batch list page
+    BasePage(page).go_to_communications_production_page()
+    CommunicationsProductionPage(page).go_to_active_batch_list_page()
 
 
 @pytest.mark.letters_tests
 @pytest.mark.regression
-def test_headings_on_active_batch_list_screen(select_user) -> None:
+def test_headings_on_active_batch_list_screen(page: Page) -> None:
     """
     Scenario: Check headings on Active Batch List Screen
     Given I log in to BCSS "England" as user role "HubManager"
     When I view the active batch list
     Then the table contains a sortable and filterable column for "<Column Name>"
     """
-    page = select_user("Hub Manager at BCS01")
     batch_list_page = ActiveBatchListPage(page)
 
     expected_columns = [
@@ -49,21 +48,21 @@ def test_headings_on_active_batch_list_screen(select_user) -> None:
         "Deadline",
         "Count",
     ]
-
+    # The table contains a sortable and filterable column for each expected header
     for column in expected_columns:
-        # Step 1: Ensure the column is present
+        # Ensure the column is present
         batch_list_page.assert_column_present(column)
 
-        # Step 2: Assert sortable UI attribute is present
+        # Assert sortable UI attribute is present
         batch_list_page.assert_column_sortable(column)
 
-        # Step 3: Assert filterable control is rendered
+        # Assert filterable control is rendered
         batch_list_page.assert_column_filterable(column)
 
 
 @pytest.mark.letters_tests
 @pytest.mark.regression
-def test_navigation_to_manage_active_batch_screen(select_user) -> None:
+def test_navigation_to_manage_active_batch_screen(page: Page) -> None:
     """
     Scenario: Check navigation from Active Batch List Screen to Manage Active Batch Screen
     Given I log in to BCSS "England" as user role "HubManager"
@@ -71,15 +70,14 @@ def test_navigation_to_manage_active_batch_screen(select_user) -> None:
     And I select an active batch
     Then I view the details of an active batch
     """
-    page = select_user("Hub Manager at BCS01")
     batch_list_page = ActiveBatchListPage(page)
 
-    # Step 1: Ensure the batch list table is visible
+    # Ensure the batch list table is visible
     batch_list_page.assert_batch_table_visible()
 
-    # Step 2: Click into the first available batch link (usually ID column)
+    # Click into the first available batch link
     batch_list_page.select_first_active_batch()
 
-    # Step 3: Assert navigation to the Manage Active Batch page
+    # Assert navigation to the Manage Active Batch page
     manage_batch_page = ManageActiveBatchPage(page)
     manage_batch_page.assert_active_batch_details_visible()
