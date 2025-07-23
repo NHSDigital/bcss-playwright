@@ -16,6 +16,8 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         )
         self.calendar_button = self.page.get_by_role("button", name="Calendar")
         self.test_type_dropdown = self.page.locator("#UI_EXT_TEST_TYPE_2233")
+        self.advance_checkbox = self.page.get_by_label("There are some events available which should only be used in exceptional circumstances. If you wish to see them, check this box")
+
         self.invite_for_diagnostic_test_button = self.page.get_by_role(
             "button", name="Invite for Diagnostic Test >>"
         )
@@ -37,6 +39,10 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         self.record_diagnosis_date_button = self.page.get_by_role(
             "button", name="Record Diagnosis Date"
         )
+
+    def select_advance_check(self) -> None:
+        """Selects the 'Advance FOBT' checkbox."""
+        self.advance_checkbox.check()
 
     def click_suitable_for_endoscopic_test_button(self) -> None:
         """Click the 'Suitable for Endoscopic Test' button."""
@@ -83,6 +89,8 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
             logging.info(f"Subject has the status: {latest_event_status}")
         except Exception:
             pytest.fail(f"Subject does not have the status: {latest_event_status}")
+
+
 
     def click_record_other_post_investigation_contact_button(self) -> None:
         """Click the 'Record other post-investigation contact' button."""
