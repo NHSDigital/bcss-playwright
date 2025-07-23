@@ -14,6 +14,14 @@ class RecordDiagnosisDatePage(BasePage):
         self.diagnosis_date_field = self.page.locator("#diagnosisDate")
         self.save_button = self.page.get_by_role("button", name="Save")
 
+    def get_alert_message(self) -> str:
+
+        self.alert_message = self.page.get_by_role("alert")
+        if self.alert_message.is_visible():
+            return self.alert_message.inner_text()
+        else:
+            return ""
+
     def enter_date_in_diagnosis_date_field(self, date: datetime) -> None:
         """
         Enters a date in the diagnosis date field.
@@ -22,7 +30,7 @@ class RecordDiagnosisDatePage(BasePage):
         """
         self.click(self.diagnosis_date_field)
         CalendarPicker(self.page).v2_calendar_picker(date)
-        self.diagnosis_date_field.press("Enter")
+        self.diagnosis_date_field.press("Tab")
 
     def click_save_button(self) -> None:
         """Clicks the save button."""
