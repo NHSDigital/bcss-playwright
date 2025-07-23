@@ -28,6 +28,7 @@ from classes.user import User
 from classes.selection_builder_exception import SelectionBuilderException
 from classes.appointments_slot_type import AppointmentSlotType
 from classes.appointment_status_type import AppointmentStatusType
+from classes.diagnosis_date_reason_type import DiagnosisDateReasonType
 from classes.which_diagnostic_test import WhichDiagnosticTest
 from classes.diagnostic_test_type import DiagnosticTestType
 from classes.diagnostic_test_is_void import DiagnosticTestIsVoid
@@ -739,30 +740,18 @@ class SubjectSelectionQueryBuilder:
         Translates a human-readable episode type string into an internal numeric ID.
         """
         try:
-            value = self.criteria_value.lower()
-            comparator = self.criteria_comparator
-
-            # Simulate EpisodeType enum mapping
-            episode_type_map = {
-                "referral": 1,
-                "invitation": 2,
-                "test_kit_sent": 3,
-                "reminder": 4,
-                "episode_end": 5,
-                # Add more mappings as needed
-            }
-
-            if value not in episode_type_map:
-                raise ValueError(f"Unknown episode type: {value}")
-
-            episode_type_id = episode_type_map[value]
-
-            # Simulate the required join (docs only—no real SQL execution here)
-            # In real builder this would ensure join to 'latest_episode' alias (ep)
-            self.sql_where.append(
-                f"AND ep.episode_type_id {comparator} {episode_type_id}"
+            episode_type = EpisodeType.by_description_case_insensitive(
+                self.criteria_value
             )
+            if episode_type is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
 
+            self._add_join_to_latest_episode()
+            self.sql_where.append(
+                f" AND ep.episode_type_id {self.criteria_comparator}{episode_type.valid_value_id}"
+            )
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
@@ -816,6 +805,9 @@ class SubjectSelectionQueryBuilder:
                 "pending": 102,
                 "cancelled": 103,
                 "invalid": 104,
+                "open": 11352,
+                "closed": 11353,
+                "paused": 11354,
                 # Add actual mappings as needed
             }
 
@@ -1206,34 +1198,19 @@ class SubjectSelectionQueryBuilder:
 
     def _add_criteria_diagnosis_date_reason(self) -> None:
         """
-        Adds a filter on ep.diagnosis_date_reason_id.
-        Supports symbolic matches (via ID) and special values: NULL, NOT_NULL.
+        Adds a SQL WHERE clause for the latest episode's diagnosis_date_reason_id based on self.criteria_value.
+        Assumes self.sql_where, self.criteria_comparator, and self.criteria_value are set.
         """
         try:
-            value = self.criteria_value.strip().lower()
-            comparator = self.criteria_comparator
-
-            # Simulated DiagnosisDateReasonType
-            reason_map = {
-                "patient informed": 900,
-                "clinician notified": 901,
-                "screening outcome": 902,
-                "null": "NULL",
-                "not_null": "NOT NULL",
-                # Extend as needed
-            }
-
-            if value not in reason_map:
-                raise ValueError(f"Unknown diagnosis date reason: {value}")
-
-            resolved = reason_map[value]
-            if resolved in ("NULL", "NOT NULL"):
-                self.sql_where.append(f"AND ep.diagnosis_date_reason_id IS {resolved}")
+            diagnosis_date_reason = DiagnosisDateReasonType.by_description_case_insensitive(self.criteria_value)
+            if diagnosis_date_reason is None:
+                raise ValueError(f"Unknown diagnosis date reason: {self.criteria_value}")
+            self._add_join_to_latest_episode()
+            self.sql_where.append(" AND ep.diagnosis_date_reason_id ")
+            if diagnosis_date_reason in (DiagnosisDateReasonType.NULL, DiagnosisDateReasonType.NOT_NULL):
+                self.sql_where.append(f" IS {diagnosis_date_reason.get_description()}")
             else:
-                self.sql_where.append(
-                    f"AND ep.diagnosis_date_reason_id {comparator} {resolved}"
-                )
-
+                self.sql_where.append(f"{self.criteria_comparator}{diagnosis_date_reason.get_valid_value_id()}")
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
