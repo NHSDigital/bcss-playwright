@@ -93,6 +93,7 @@ class SubjectSelectionCriteriaKey(Enum):
     DEMOGRAPHICS_TEMPORARY_ADDRESS = ("subject has temporary address", False, False)
     DIAGNOSTIC_TEST_CONFIRMED_DATE = ("diagnostic test confirmed date", False, False)
     DIAGNOSTIC_TEST_CONFIRMED_TYPE = ("diagnostic test confirmed type", True, True)
+    DIAGNOSTIC_TEST_FAILED = ("diagnostic test failed", False, True)
     DIAGNOSTIC_TEST_HAS_OUTCOME = ("diagnostic test has outcome", False, True)
     DIAGNOSTIC_TEST_HAS_RESULT = ("diagnostic test has result", False, True)
     DIAGNOSTIC_TEST_INTENDED_EXTENT = ("diagnostic test intended extent", True, False)
