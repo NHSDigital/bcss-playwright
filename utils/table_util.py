@@ -332,4 +332,20 @@ class TableUtils:
             return footer_cell_tfoot.first.inner_text().strip()
         else:
             raise ValueError(f"No footer cell found under column '{header_name}'")
+        
+    def get_row_where(self, criteria: dict[str, str]) -> Locator | None:
+        """
+        Finds and returns the first table row matching the given header-value criteria.
 
+        Args:
+            criteria (dict[str, str]): A dictionary where keys are column headers and values are expected contents.
+
+        Returns:
+            Locator of the matching row or None if not found.
+        """
+        row_count = self.get_row_count()
+        for i in range(row_count):
+            row_data = self.get_row_data_with_headers(i)
+            if all(row_data.get(key, "").strip() == value for key, value in criteria.items()):
+                return self.pick_row(i)
+        return None

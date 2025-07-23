@@ -93,7 +93,7 @@ class LetterLibraryIndexPage(BasePage):
         priority_id: str = "12016",
         signatory: str = "signatory",
         job_title: str = "job title",
-        paragraph_text: str = "body text"
+        paragraph_text: str = "body text",
     ) -> None:
         """
         Fills out the form to define a supplementary letter and confirms save via modal.
@@ -118,3 +118,50 @@ class LetterLibraryIndexPage(BasePage):
         self.page.get_by_role("button", name="Save").click()
 
 
+class LetterDefinitionDetailPage(BasePage):
+    """Page object for the Letter Definition detail view"""
+
+    def __init__(self, page: Page):
+        super().__init__(page)
+        self.page = page
+
+        # Locators for each letter definition setting
+        self.definition_table = self.page.locator("table#displayRS")
+        self.current_version_label = self.page.get_by_text(
+            "Current Version", exact=True
+        )
+
+    def assert_definition_setting(self, field_name: str, expected_value: str) -> None:
+        """
+        Asserts that a specific letter setting matches the expected value.
+
+        Args:
+            field_name (str): The label text (e.g., "Description")
+            expected_value (str): The expected value shown beside the label
+        """
+        label_cell = self.page.locator(f"td.screenTableLabelCell", has_text=field_name)
+        assert (
+            label_cell.count() > 0
+        ), f"[ASSERTION FAILED] Field label '{field_name}' not found"
+
+        # The label is always followed by its corresponding input/value cell
+        value_cell = label_cell.nth(0).locator("xpath=following-sibling::td[1]")
+        actual_value = value_cell.inner_text().strip()
+
+        assert (
+            actual_value == expected_value
+        ), f"[ASSERTION FAILED] For field '{field_name}', expected '{expected_value}', got '{actual_value}'"
+
+    def has_current_version(self) -> bool:
+        """
+        Checks whether a version row exists with 'Current' as the type.
+
+        Returns:
+            bool: True if a current version row is present, False otherwise
+        """
+        version_table = self.page.locator("table#displayRS")
+        current_row = version_table.locator("tr").filter(
+            has=self.page.locator("td", has_text="Current")
+        ).first
+
+        return current_row.count() > 0
