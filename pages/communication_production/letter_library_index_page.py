@@ -2,6 +2,8 @@ from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 from utils.table_util import TableUtils
 
+DISPLAY_RS_SELECTOR = "#displayRS"
+
 
 class LetterLibraryIndexPage(BasePage):
     """Letter Library Index Page locators, and methods for interacting with the page"""
@@ -9,10 +11,10 @@ class LetterLibraryIndexPage(BasePage):
     def __init__(self, page: Page):
         super().__init__(page)
         self.page = page
-        self.table_utils = TableUtils(page, "#displayRS")
+        self.table_utils = TableUtils(page, DISPLAY_RS_SELECTOR)
         # Letter Library Index - page locators, methods
 
-        self.letter_library_index_table = page.locator("#displayRS")
+        self.letter_library_index_table = page.locator(DISPLAY_RS_SELECTOR)
         self.define_supplementary_letter_button = page.locator(
             "input.HeaderButtons[value='Define Supplementary Letter']"
         )
@@ -139,7 +141,7 @@ class LetterDefinitionDetailPage(BasePage):
             field_name (str): The label text (e.g., "Description")
             expected_value (str): The expected value shown beside the label
         """
-        label_cell = self.page.locator(f"td.screenTableLabelCell", has_text=field_name)
+        label_cell = self.page.locator("td.screenTableLabelCell", has_text=field_name)
         assert (
             label_cell.count() > 0
         ), f"[ASSERTION FAILED] Field label '{field_name}' not found"
@@ -160,8 +162,10 @@ class LetterDefinitionDetailPage(BasePage):
             bool: True if a current version row is present, False otherwise
         """
         version_table = self.page.locator("table#displayRS")
-        current_row = version_table.locator("tr").filter(
-            has=self.page.locator("td", has_text="Current")
-        ).first
+        current_row = (
+            version_table.locator("tr")
+            .filter(has=self.page.locator("td", has_text="Current"))
+            .first
+        )
 
         return current_row.count() > 0

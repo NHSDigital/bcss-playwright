@@ -5,11 +5,13 @@ from utils.calendar_picker import CalendarPicker
 from utils.table_util import TableUtils
 import logging
 
+BATCH_LIST_SELECTOR = "table#batchList"
+
 
 class BatchListPage(BasePage):
     """Shared base class for both Active and Archived Batch List Pages."""
 
-    def __init__(self, page: Page, table_selector: str = "table#batchList"):
+    def __init__(self, page: Page, table_selector: str = BATCH_LIST_SELECTOR):
         super().__init__(page)
         self.page = page
         self.table_selector = table_selector
@@ -175,7 +177,7 @@ class ActiveBatchListPage(BatchListPage):
     """Active Batch List Page-specific methods."""
 
     def __init__(self, page: Page):
-        super().__init__(page, table_selector="table#batchList")
+        super().__init__(page, table_selector=BATCH_LIST_SELECTOR)
 
     def select_first_active_batch(self) -> None:
         """Clicks the first batch ID link in the active batch list."""
@@ -199,7 +201,7 @@ class ActiveBatchListPage(BatchListPage):
         Returns:
             Locator of the matching <tr> element, or None if not found.
         """
-        table = TableUtils(self.page, "table#batchList")
+        table = TableUtils(self.page, BATCH_LIST_SELECTOR)
         row_count = table.get_row_count()
 
         for i in range(row_count):
@@ -210,7 +212,6 @@ class ActiveBatchListPage(BatchListPage):
             ):
                 return table.pick_row(i)
         return None
-
 
     def assert_s83f_batch_present(self) -> None:
         self.enter_type_filter("Original")
@@ -227,7 +228,7 @@ class ArchivedBatchListPage(BatchListPage):
     """Archived Batch List Page-specific setup."""
 
     def __init__(self, page: Page):
-        super().__init__(page, table_selector="table#batchList")
+        super().__init__(page, table_selector=BATCH_LIST_SELECTOR)
 
     def select_first_archived_batch(self) -> None:
         """Clicks the first batch ID link in the archived batch list."""

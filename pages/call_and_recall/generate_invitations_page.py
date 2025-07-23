@@ -8,6 +8,8 @@ from classes.user import User
 from classes.subject import Subject
 from utils.table_util import TableUtils
 
+DISPLAY_RS_SELECTOR = "#displayRS"
+
 
 class GenerateInvitationsPage(BasePage):
     """Generate Invitations page locators, and methods to interact with the page"""
@@ -19,7 +21,7 @@ class GenerateInvitationsPage(BasePage):
         self.generate_invitations_button = self.page.get_by_role(
             "button", name="Generate Invitations"
         )
-        self.display_rs = self.page.locator("#displayRS")
+        self.display_rs = self.page.locator(DISPLAY_RS_SELECTOR)
         self.refresh_button = self.page.get_by_role("button", name="Refresh")
         self.planned_invitations_total = self.page.locator("#col8_total")
         self.self_referrals_total = self.page.locator("#col5_total")
@@ -50,7 +52,7 @@ class GenerateInvitationsPage(BasePage):
         Every 5 seconds it refreshes the table and checks to see if the invitations have been generated.
         It also checks that enough invitations were generated and checks to see if self referrals are present
         """
-        self.page.wait_for_selector("#displayRS", timeout=5000)
+        self.page.wait_for_selector(DISPLAY_RS_SELECTOR, timeout=5000)
 
         if self.planned_invitations_total == "0":
             pytest.fail("There are no planned invitations to generate")
@@ -152,7 +154,7 @@ class GenerateInvitationsPage(BasePage):
             pytest.fail(f"[ERROR] Invitations not generated successfully: {str(e)}")
 
         # Dynamically check 'Self Referrals Generated'
-        table_utils = TableUtils(self.page, "#displayRS")
+        table_utils = TableUtils(self.page, DISPLAY_RS_SELECTOR)
 
         try:
             value_text = table_utils.get_footer_value_by_header(
@@ -197,7 +199,9 @@ class GenerateInvitationsPage(BasePage):
         self_referrals_text = self.self_referrals_total.text_content()
         if self_referrals_text is None:
             pytest.fail("Failed to read self-referrals total")
-        self_referrals_count = int(self_referrals_text.strip())
+
+        self_referrals_text = self_referrals_text.strip()
+        self_referrals_count = int(self_referrals_text)
 
         # Determine if condition is met
         condition_met = (

@@ -29,7 +29,7 @@ def before_each(page: Page):
     # Go to communications production page
     BasePage(page).go_to_communications_production_page()
 
-
+@pytest.mark.wip
 @pytest.mark.letters_tests
 @pytest.mark.regression
 def test_reprint_and_archive_letter_batch(page: Page) -> None:
@@ -53,11 +53,6 @@ def test_reprint_and_archive_letter_batch(page: Page) -> None:
     page.wait_for_function(
         "document.querySelectorAll('table#batchList tbody tr').length > 1", timeout=8000
     )
-    rows = page.locator("table#batchList tbody tr")
-    row_count = rows.count()
-
-    for i in range(row_count):
-        row = rows.nth(i)
 
     # Find and open archived batch with Type "Original", Event Code "S1", and Description "Pre"
     # You might want to use filters like:
