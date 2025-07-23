@@ -37,12 +37,6 @@ class ManageActiveBatchPage(BasePage):
         page_title = self.page.locator("#page-title")
         expect(page_title).to_have_text("Manage Active Batch")
 
-    def prepare_and_print(self) -> None:
-        """Clicks the Prepare and Print button."""
-        button = self.page.get_by_role("button", name="Prepare and Print")
-        expect(button).to_be_enabled()
-        button.click()
-
     def retrieve_and_confirm_letters(self) -> None:
         """Clicks the Retrieve and Confirm Letters button."""
         button = self.page.get_by_role("button", name="Retrieve and Confirm Letters")

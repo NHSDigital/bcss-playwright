@@ -303,3 +303,33 @@ class TableUtils:
                 for cell in surname_criteria.element_handles()
             )
         assert found, f"No surname matching '{surname_pattern}' found in table."
+
+    def get_footer_value_by_header(self, header_name: str) -> str:
+        """
+        Retrieves the value from the footer row for the given column header name.
+
+        Args:
+            header_name (str): The visible text of the column header.
+
+        Returns:
+            str: Text content of the corresponding footer cell.
+
+        Raises:
+            ValueError: If the column header is not found or cell is missing.
+        """
+        # First get the column index dynamically
+        column_index = self.get_column_index(header_name)
+        if column_index == -1:
+            raise ValueError(f"Column '{header_name}' not found")
+
+        # Try to locate footer cell in tbody (last row), or fallback to tfoot
+        footer_cell_tbody = self.page.locator(f"{self.table_id} tbody tr:last-child td:nth-child({column_index})")
+        footer_cell_tfoot = self.page.locator(f"{self.table_id} tfoot tr td:nth-child({column_index})")
+
+        if footer_cell_tbody.count() and footer_cell_tbody.first.is_visible():
+            return footer_cell_tbody.first.inner_text().strip()
+        elif footer_cell_tfoot.count() and footer_cell_tfoot.first.is_visible():
+            return footer_cell_tfoot.first.inner_text().strip()
+        else:
+            raise ValueError(f"No footer cell found under column '{header_name}'")
+

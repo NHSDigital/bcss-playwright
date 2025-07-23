@@ -192,8 +192,13 @@ class SubjectScreeningPage(BasePage):
                 f"[PAGE TRANSITION FAILED] Did not reach Send a kit page: {e}"
             )
             raise
-    
-    def complete_send_kit_form(self, request_from: str = "Subject", previous_kit_status: str = "Lost", note_text: str = "Test") -> None:
+
+    def complete_send_kit_form(
+        self,
+        request_from: str = "Subject",
+        previous_kit_status: str = "Lost",
+        note_text: str = "Test",
+    ) -> None:
         """
         Completes the 'Send a kit' form by:
         - Selecting who requested the kit
@@ -217,6 +222,17 @@ class SubjectScreeningPage(BasePage):
         send_button = self.page.locator("button[data-testid='sendKitButton']")
         expect(send_button).to_be_enabled()
         send_button.click()
+
+        # Handle confirmation modal if it appears
+        success_button = self.page.locator("button[data-testid='successButton']")
+        if success_button.is_visible():
+            expect(success_button).to_be_enabled()
+            success_button.click()
+            logging.info("[MODAL CLOSED] Success modal dismissed")
+        else:
+            logging.warning(
+                "[MODAL NOT FOUND] Success button not visible after kit request"
+            )
 
         logging.info("[KIT REQUEST] 'Send a kit' form submitted successfully")
 

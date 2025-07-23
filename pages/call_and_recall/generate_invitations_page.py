@@ -6,6 +6,7 @@ from utils.oracle.oracle import OracleDB
 from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
 from classes.user import User
 from classes.subject import Subject
+from utils.table_util import TableUtils
 
 
 class GenerateInvitationsPage(BasePage):
@@ -106,6 +107,68 @@ class GenerateInvitationsPage(BasePage):
             return True
         else:
             logging.warning("No S1 Digital Leaflet batch will be generated")
+            return False
+
+    def wait_for_self_referral_invitation_generation_complete(
+        self, expected_minimum: int = 1
+    ) -> bool:
+        """
+        Waits until the invitations have been generated and checks that 'Self Referrals Generated' meets the expected threshold.
+
+        Args:
+            expected_minimum (int): Minimum number of self-referrals expected to be generated (default is 1)
+
+        Returns:
+            bool: True if threshold is met, False otherwise.
+        """
+        # Reuse the existing table completion logic — consider extracting this into a shared method later
+        timeout = 120000
+        wait_interval = 5000
+        elapsed = 0
+        logging.info(
+            "[WAIT] Waiting for self-referral invitation generation to complete"
+        )
+
+        while elapsed < timeout:
+            table_text = self.display_rs.text_content()
+            if table_text is None:
+                pytest.fail("Failed to retrieve table text content")
+
+            if "Failed" in table_text:
+                pytest.fail("Invitation has failed to generate")
+            elif "Queued" in table_text or "In Progress" in table_text:
+                self.click_refresh_button()
+                self.page.wait_for_timeout(wait_interval)
+                elapsed += wait_interval
+            else:
+                break
+
+        try:
+            expect(self.display_rs).to_contain_text("Completed")
+            logging.info(
+                f"[STATUS] Generation finished after {elapsed / 1000:.1f} seconds"
+            )
+        except Exception as e:
+            pytest.fail(f"[ERROR] Invitations not generated successfully: {str(e)}")
+
+        # Dynamically check 'Self Referrals Generated'
+        table_utils = TableUtils(self.page, "#displayRS")
+
+        try:
+            value_text = table_utils.get_footer_value_by_header(
+                "Self Referrals Generated"
+            )
+            value = int(value_text.strip())
+            logging.info(f"[RESULT] 'Self Referrals Generated' = {value}")
+        except Exception as e:
+            pytest.fail(f"[ERROR] Unable to read 'Self Referrals Generated': {str(e)}")
+
+        if value >= expected_minimum:
+            return True
+        else:
+            logging.warning(
+                f"[ASSERTION] Expected at least {expected_minimum}, but got {value}"
+            )
             return False
 
     def check_self_referral_subjects_ready(

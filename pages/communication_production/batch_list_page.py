@@ -91,9 +91,16 @@ class BatchListPage(BasePage):
         self.id_filter.fill(search_text)
         self.id_filter.press("Enter")
 
-    def enter_type_filter(self, search_text: str) -> None:
-        self.type_filter.fill(search_text)
-        self.type_filter.press("Enter")
+    def enter_type_filter(self, option_text: str) -> None:
+        """
+        Selects the given option from the 'Type' filter dropdown.
+
+        Args:
+            option_text (str): The visible label of the option to select (e.g. "Original", "All")
+        """
+        self.type_filter.select_option(label=option_text)
+        logging.info(f"[FILTER] Type filter set to '{option_text}'")
+
 
     def enter_original_filter(self, search_text: str) -> None:
         self.original_filter.fill(search_text)
@@ -183,19 +190,6 @@ class ActiveBatchListPage(BatchListPage):
             f"{self.table_selector} tbody tr td", has_text=batch_type
         )
         return locator.count() > 0
-
-    def prepare_batch(self, batch_type: str) -> None:
-        """Finds and clicks the Prepare button for the specified batch type."""
-        row = (
-            self.page.locator(f"{self.table_selector} tbody tr")
-            .filter(has=self.page.locator("td", has_text=batch_type))
-            .first
-        )
-
-        prepare_button = row.locator("a", has_text="Prepare").first
-        expect(prepare_button).to_be_visible()
-        prepare_button.click()
-        expect(row).not_to_be_visible(timeout=5000)
 
     def get_open_original_batch_row(self) -> Locator | None:
         """
@@ -298,29 +292,26 @@ class LetterBatchDetailsPage(BasePage):
     def assert_letter_component_present(self, letter_type: str, format: str) -> None:
         """
         Asserts that a letter component with the given type and format is listed.
+        This version works with div-based structures, not tables.
 
         Args:
-            letter_type (str): The letter type (e.g. "Invitation & Test Kit (Self-referral) (FIT)")
-            format (str): The file format (e.g. "PDF-A4-V03")
+            letter_type (str): Visible component description
+            format (str): File format label (e.g., "PDF-A4-V03", "FIT-KIT-CSV")
         """
-        row_locator = self.letter_table.locator("tbody tr")
+        descriptions = self.page.locator("div.letterDescription")
+        formats = self.page.locator("div.letterFormat")
         match_found = False
 
-        for i in range(row_locator.count()):
-            row = row_locator.nth(i)
-            type_cell = row.locator("td").nth(1)
-            format_cell = row.locator("td").nth(2)
-
+        for i in range(min(descriptions.count(), formats.count())):
             if (
-                letter_type.lower() in type_cell.inner_text().lower()
-                and format.lower() in format_cell.inner_text().lower()
+                letter_type.lower() in descriptions.nth(i).inner_text().lower()
+                and format.lower() in formats.nth(i).inner_text().lower()
             ):
                 match_found = True
                 break
 
-        assert (
-            match_found
-        ), f"Letter type '{letter_type}' with format '{format}' not found"
+        assert match_found, f"Letter type '{letter_type}' with format '{format}' not found"
+
 
     def get_first_subject_nhs_number(self) -> str:
         """

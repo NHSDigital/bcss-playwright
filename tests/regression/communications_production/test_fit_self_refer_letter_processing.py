@@ -22,9 +22,9 @@ from pages.communication_production.batch_list_page import (
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
-from pages.communication_production.manage_active_batch_page import (
-    ManageActiveBatchPage,
-)
+from utils.table_util import TableUtils
+from utils.oracle.oracle_specific_functions import get_nhs_no_from_batch_id
+from utils import batch_processing
 
 
 # Feature: FIT Self Refer - letter processing
@@ -150,20 +150,28 @@ def test_self_refer_subject_in_my_hub_for_fit(select_user) -> None:
         "[STORED PROCEDURE] Executed: pkg_fobt_call.p_find_next_subjects_to_invite (20, 100, NULL, NULL)"
     )
 
-    # # Step 7: Confirm self-referral subjects exist
-    # This checks the "Self Referrals" column for BCS002 (row index 3)
-    self_referral_cell = page.locator("#col5_3")
-    self_referral_count_text = self_referral_cell.text_content()
-    if self_referral_count_text is None:
-        pytest.fail("Failed to read self-referral count for BCS002")
+    base_page.click_main_menu_link()
+    base_page.go_to_call_and_recall_page()
+    CallAndRecallPage(page).go_to_generate_invitations_page()
 
-    self_referral_count = int(self_referral_count_text.strip())
-    assert (
-        self_referral_count > 0
-    ), f"Expected self-referral count > 0 for BCS002, but got {self_referral_count}"
-    logging.info(
-        f"[ASSERTION PASSED] Self-referral count for BCS002 is now {self_referral_count}"
-    )
+    # Use TableUtils to get the correct value dynamically
+    table_utils = TableUtils(page, "#displayRS")
+
+    try:
+        self_referral_count_text = table_utils.get_footer_value_by_header(
+            "Self Referrals"
+        )
+        self_referral_count = int(self_referral_count_text.strip())
+        assert (
+            self_referral_count > 0
+        ), f"Expected self-referral count > 0 for BCS002, but got {self_referral_count}"
+        logging.info(
+            f"[ASSERTION PASSED] Self-referral count for BCS002 is now {self_referral_count}"
+        )
+    except Exception as e:
+        pytest.fail(
+            f"[ERROR] Unable to retrieve or assert Self Referrals count: {str(e)}"
+        )
 
 
 @pytest.mark.wip
@@ -199,9 +207,7 @@ def test_invite_self_referral_creates_s83f_batch(select_user) -> None:
     # Step 3: Generate invitations
     generate_invitations_page.click_generate_invitations_button()
     logging.info("[ACTION] Clicked Generate Invitations button")
-    generate_invitations_page.wait_for_invitation_generation_complete(
-        number_of_invitations=1
-    )
+    generate_invitations_page.wait_for_self_referral_invitation_generation_complete()
     logging.info("[WAIT] Invitation generation completed")
 
     # Step 4: Navigate to Active Batch List
@@ -215,12 +221,7 @@ def test_invite_self_referral_creates_s83f_batch(select_user) -> None:
     # Step 5: Filter by "Original" type and "Open" status
     active_batch_page.enter_type_filter("Original")
     active_batch_page.enter_event_code_filter("S83")
-    active_batch_page.enter_description_filter(
-        "Invitation & Test Kit (Self-referral) (FIT)"
-    )
-    logging.info(
-        "[FILTER] Applied filters: Type='Original', Event Code='S83', Description='Invitation & Test Kit (Self-referral) (FIT)'"
-    )
+    logging.info("[FILTER] Applied filters: Type='Original', Event Code='S83'")
 
     # Step 6: Assert S83f batch is present
     active_batch_page.assert_s83f_batch_present()
@@ -252,6 +253,7 @@ def test_s83f_letter_batch_has_three_components(select_user) -> None:
 
     # Step 2: Navigate to Active Batch List and filter
     base_page.click_main_menu_link()
+    base_page.go_to_communications_production_page()
     CommunicationsProductionPage(page).go_to_active_batch_list_page()
     logging.info("[NAVIGATION] Navigated to Active Batch List page")
     active_batch_page.enter_type_filter("Original")
@@ -319,6 +321,7 @@ def test_before_confirming_s83f_batch_subject_status_is_s83(select_user) -> None
 
     # Step 2: Navigate to Active Batch List and filter
     base_page.click_main_menu_link()
+    base_page.go_to_communications_production_page()
     CommunicationsProductionPage(page).go_to_active_batch_list_page()
     logging.info("[NAVIGATION] Navigated to Active Batch List page")
     active_batch_page.enter_type_filter("Original")
@@ -329,18 +332,14 @@ def test_before_confirming_s83f_batch_subject_status_is_s83(select_user) -> None
     logging.info(
         "[FILTER] Applied filters: Type='Original', Event Code='S83', Description='Invitation & Test Kit (Self-referral) (FIT)'"
     )
+    # Step 3: Identify the S83f batch ID
+    batch_id_link = page.locator("a[href*='/letters/activebatch/']").first
+    batch_id = batch_id_link.inner_text().strip()
+    logging.info(f"[BATCH IDENTIFIED] Batch ID: {batch_id}")
 
-    # Step 3: Open the matching batch
-    active_batch_page.open_letter_batch(
-        batch_type="Original",
-        status="Open",
-        description="Invitation & Test Kit (Self-referral) (FIT)",
-    )
-    logging.info("[ACTION] Opened S83f batch")
-
-    # Step 4: Identify a subject in the batch
-    letter_batch_page = LetterBatchDetailsPage(page)
-    nhs_number = letter_batch_page.get_first_subject_nhs_number()
+    # Step 4: Query DB for subjects in the batch
+    nhs_df = get_nhs_no_from_batch_id(batch_id)
+    nhs_number = nhs_df.iloc[0]["subject_nhs_number"]
     logging.info(f"[SUBJECT IDENTIFIED] NHS number: {nhs_number}")
 
     # Step 5: View the subject
@@ -387,6 +386,7 @@ def test_confirm_s83f_batch_subject_has_s84_event_and_letters(select_user) -> No
 
     # Step 2: Navigate to Active Batch List and filter
     base_page.click_main_menu_link()
+    base_page.go_to_communications_production_page()
     CommunicationsProductionPage(page).go_to_active_batch_list_page()
     logging.info("[NAVIGATION] Navigated to Active Batch List page")
     active_batch_page.enter_type_filter("Original")
@@ -398,36 +398,33 @@ def test_confirm_s83f_batch_subject_has_s84_event_and_letters(select_user) -> No
         "[FILTER] Applied filters: Type='Original', Event Code='S83', Description='Invitation & Test Kit (Self-referral) (FIT)'"
     )
 
+    # Step 4: Identify a subject in the batch using DB query
+    batch_id_link = page.locator("a[href*='/letters/activebatch/']").first
+    batch_id = batch_id_link.inner_text().strip()
+    logging.info(f"[BATCH IDENTIFIED] Batch ID: {batch_id}")
+
+    nhs_df = get_nhs_no_from_batch_id(batch_id)
+    nhs_number = nhs_df.iloc[0]["subject_nhs_number"]
+    logging.info(f"[SUBJECT IDENTIFIED] NHS number: {nhs_number}")
+
     # Step 3: Open the matching batch
     active_batch_page.open_letter_batch(
         batch_type="Original",
-        status="Open",
         description="Invitation & Test Kit (Self-referral) (FIT)",
     )
     logging.info("[ACTION] Opened S83f batch")
 
-    # Step 4: Identify a subject
-    letter_batch_page = LetterBatchDetailsPage(page)
-    nhs_number = letter_batch_page.get_first_subject_nhs_number()
-    logging.info(f"[SUBJECT IDENTIFIED] NHS number: {nhs_number}")
-
     # Step 5: Prepare the batch
-    active_batch_page.prepare_batch("Invitation & Test Kit (Self-referral) (FIT)")
-    logging.info("[ACTION] Prepared the batch")
+    batch_processing.prepare_and_print_batch(page, link_text=batch_id)
 
-    # Step 6: Retrieve and confirm letters
-    manage_batch_page = ManageActiveBatchPage(page)
-    manage_batch_page.retrieve_and_confirm_letters()
-    logging.info("[ACTION] Retrieved and confirmed letters")
-
-    # Step 7: View the subject
+    # Step 6: View the subject
     subject_screening_page = SubjectScreeningPage(page)
     base_page.click_main_menu_link()
     base_page.go_to_screening_subject_search_page()
     subject_screening_page.search_by_nhs_number(nhs_number)
     logging.info("[SUBJECT VIEW] Subject loaded in UI")
 
-    # Step 8: Assert latest event status is S84
+    # Step 7: Assert latest event status is S84
     summary_page = SubjectScreeningSummaryPage(page)
     summary_page.verify_latest_event_status_value(
         "S84 - Invitation and Test Kit Sent (Self-referral)"
@@ -436,7 +433,9 @@ def test_confirm_s83f_batch_subject_has_s84_event_and_letters(select_user) -> No
         "[ASSERTION PASSED] Subject is at status: S84 - Invitation and Test Kit Sent (Self-referral)"
     )
 
-    # Step 9: Assert 2 "View Letter" links for S84
+    # Step 8: Assert 2 "View Letter" links for S84
+    summary_page.click_list_episodes()
+    summary_page.click_view_events_link()
     summary_page.assert_view_letter_links_for_event(
         "S84 - Invitation and Test Kit Sent (Self-referral)", expected_count=2
     )

@@ -60,6 +60,9 @@ class SubjectScreeningSummaryPage(BasePage):
         self.temporary_address_popup = self.page.locator("#idTempAddress")
         self.close_button = self.page.get_by_role("img", name="close")
 
+        # List of Subject Episodes - page filters
+        self.view_events_link = self.page.get_by_role("link", name="events")
+
     def wait_for_page_title(self) -> None:
         """Waits for the page to be the Subject Screening Summary"""
         self.subject_screening_summary.wait_for()
@@ -227,36 +230,35 @@ class SubjectScreeningSummaryPage(BasePage):
         """Click on the close button in the temporary address popup."""
         self.click(self.close_button)
 
+    def click_view_events_link(self) -> None:
+        """Click on the 'View Events' link."""
+        self.click(self.view_events_link)
+
     def assert_view_letter_links_for_event(
         self, event_name: str, expected_count: int
     ) -> None:
-        """
-        Asserts that the specified event row contains the expected number of 'View Letter' links.
-
-        Args:
-            event_name (str): The name of the event to locate (e.g. "S84 - Invitation and Test Kit Sent (Self-referral)")
-            expected_count (int): The expected number of 'View Letter' links in that row
-        """
-        # Locate the event row by its name
+        # Locate the row where the 3rd <td> contains the target event status
         event_row = (
-            self.page.locator("table#subjectEvents tbody tr")
-            .filter(has=self.page.locator("td", has_text=event_name))
+            self.page.locator("table#displayRS tbody tr")
+            .filter(has=self.page.locator("td:nth-child(3)", has_text=event_name))
             .first
         )
 
-        if event_row.count() == 0:
-            raise RuntimeError(f"Event row for '{event_name}' not found")
+        event_row.wait_for(timeout=10000)
 
-        # Count the 'View Letter' links in that row
-        view_links = event_row.locator("a", has_text="View Letter")
-        actual_count = view_links.count()
+        if event_row.count() == 0:
+            raise RuntimeError(f"[ERROR] Event row for '{event_name}' not found")
+
+        # Count the number of 'View Letter' links inside the 5th column (Item)
+        letter_links = event_row.locator("td:nth-child(5) a", has_text="View Letter")
+        actual_count = letter_links.count()
 
         logging.info(
-            f"Found {actual_count} 'View Letter' links for event '{event_name}'"
+            f"[DEBUG] Found {actual_count} 'View Letter' links for event: {event_name}"
         )
         assert (
             actual_count == expected_count
-        ), f"Expected {expected_count} 'View Letter' links for event '{event_name}', but found {actual_count}"
+        ), f"[ASSERTION FAILED] Expected {expected_count} 'View Letter' links for '{event_name}', but found {actual_count}"
 
 
 class ChangeScreeningStatusOptions(Enum):
