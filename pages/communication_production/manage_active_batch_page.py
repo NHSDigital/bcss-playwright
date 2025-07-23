@@ -35,6 +35,7 @@ class ManageActiveBatchPage(BasePage):
     def assert_active_batch_details_visible(self) -> None:
         """Asserts that the Manage Active Batch screen has loaded by checking the page title."""
         page_title = self.page.locator("#page-title")
+        page_title.wait_for(timeout=10000)
         expect(page_title).to_have_text("Manage Active Batch")
 
     def retrieve_and_confirm_letters(self) -> None:

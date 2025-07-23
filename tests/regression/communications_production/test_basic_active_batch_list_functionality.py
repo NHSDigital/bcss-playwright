@@ -82,4 +82,4 @@ def test_navigation_to_manage_active_batch_screen(select_user) -> None:
 
     # Step 3: Assert navigation to the Manage Active Batch page
     manage_batch_page = ManageActiveBatchPage(page)
-    manage_batch_page.assert_batch_details_visible()
+    manage_batch_page.assert_active_batch_details_visible()

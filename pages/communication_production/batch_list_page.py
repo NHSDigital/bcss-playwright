@@ -101,7 +101,6 @@ class BatchListPage(BasePage):
         self.type_filter.select_option(label=option_text)
         logging.info(f"[FILTER] Type filter set to '{option_text}'")
 
-
     def enter_original_filter(self, search_text: str) -> None:
         self.original_filter.fill(search_text)
         self.original_filter.press("Enter")
@@ -200,18 +199,18 @@ class ActiveBatchListPage(BatchListPage):
         Returns:
             Locator of the matching <tr> element, or None if not found.
         """
-        rows = self.page.locator(f"{self.table_selector} tbody tr")
-        for i in range(rows.count()):
-            row = rows.nth(i)
-            type_cell = row.locator("td").nth(1)  # Assuming Type is 2nd column
-            status_cell = row.locator("td").nth(8)  # Assuming Status is 9th column
+        table = TableUtils(self.page, "table#batchList")
+        row_count = table.get_row_count()
 
+        for i in range(row_count):
+            row_data = table.get_row_data_with_headers(i)
             if (
-                "Original" in type_cell.inner_text()
-                and "Open" in status_cell.inner_text()
+                row_data.get("Type", "").strip() == "Original"
+                and row_data.get("Status", "").strip() == "Open"
             ):
-                return row
+                return table.pick_row(i)
         return None
+
 
     def assert_s83f_batch_present(self) -> None:
         self.enter_type_filter("Original")
@@ -232,9 +231,8 @@ class ArchivedBatchListPage(BatchListPage):
 
     def select_first_archived_batch(self) -> None:
         """Clicks the first batch ID link in the archived batch list."""
-        first_batch_link = self.page.locator(
-            f"{self.table_selector} tbody tr td.id a"
-        ).first
+        first_batch_link = self.page.locator("table#batchList tbody tr td.id a").first
+        first_batch_link.wait_for(timeout=10000)
         assert first_batch_link.count() > 0, "No archived batch links found"
         first_batch_link.click()
 
@@ -310,8 +308,9 @@ class LetterBatchDetailsPage(BasePage):
                 match_found = True
                 break
 
-        assert match_found, f"Letter type '{letter_type}' with format '{format}' not found"
-
+        assert (
+            match_found
+        ), f"Letter type '{letter_type}' with format '{format}' not found"
 
     def get_first_subject_nhs_number(self) -> str:
         """
@@ -322,11 +321,12 @@ class LetterBatchDetailsPage(BasePage):
         """
         table_utils = TableUtils(self.page, "table#letterBatchDetails")
         row_data = table_utils.get_row_data_with_headers(0)  # First row (0-based index)
-        
+
         nhs_number = row_data.get("NHS Number")
         if not nhs_number:
-            raise RuntimeError("NHS Number not found in the first row of the letter batch table")
+            raise RuntimeError(
+                "NHS Number not found in the first row of the letter batch table"
+            )
 
         logging.info(f"Retrieved NHS number from batch: {nhs_number}")
         return nhs_number
-

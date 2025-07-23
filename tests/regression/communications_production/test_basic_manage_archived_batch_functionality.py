@@ -29,7 +29,7 @@ def select_user(page: Page):
 
     return _login_as
 
-
+@pytest.mark.wip
 @pytest.mark.letters_tests
 @pytest.mark.regression
 def test_reprint_and_archive_letter_batch(select_user) -> None:
@@ -89,6 +89,7 @@ def test_reprint_and_archive_letter_batch(select_user) -> None:
     manage_archived_page.confirm_archived_message_visible()
 
 
+@pytest.mark.wip
 @pytest.mark.letters_tests
 @pytest.mark.regression
 def test_check_that_s1_has_supplementary_batches(select_user) -> None:
