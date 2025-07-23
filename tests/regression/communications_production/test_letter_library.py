@@ -28,21 +28,21 @@ from pages.communication_production.letter_library_index_page import (
 # -------------------------------------------------------------------------------------------------
 
 
-@pytest.fixture
-def select_user(page: Page):
-    def _login_as(user_role: str):
-        # Log in with the specified user
-        UserTools.user_login(page, user_role)
-        # Navigate to call and recall page
-        BasePage(page).go_to_call_and_recall_page()
-        return page
+@pytest.fixture(scope="function", autouse=True)
+def before_each(page: Page):
+    """
+    Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the call and recall page
+    """
+    # Log in to BCSS
+    UserTools.user_login(page, "Hub Manager at BCS01")
 
-    return _login_as
+    # Go to call and recall page
+    BasePage(page).go_to_call_and_recall_page()
 
-@pytest.mark.wip
+
 @pytest.mark.regression
 @pytest.mark.letters_tests
-def test_all_s83f_letter_parts_are_listed_in_letter_library(select_user) -> None:
+def test_all_s83f_letter_parts_are_listed_in_letter_library(page: Page) -> None:
     """
     Scenario: All three parts of the S83f letter exist
     Given I log in to BCSS "England" as user role "HubManager"
@@ -55,26 +55,21 @@ def test_all_s83f_letter_parts_are_listed_in_letter_library(select_user) -> None
     logging.info(
         "[TEST START] Verify all parts of the S83f letter exist in Letter Library"
     )
-    user_role = "Hub Manager at BCS01"
 
-    # Step 1: Log in and land on Call and Recall page
-    page = select_user(user_role)
-    logging.info(f"[LOGIN] Logged in as {user_role}")
-
-    # Step 2: Navigate to Letter Library Index
+    # Navigate to Letter Library Index
     base_page = BasePage(page)
     base_page.click_main_menu_link()
     base_page.go_to_communications_production_page()
     CommunicationsProductionPage(page).go_to_letter_library_index_page()
     logging.info("[NAVIGATION] Navigated to Letter Library Index page")
 
-    # Step 3: Apply filter
+    # Apply filter
     letter_index_page = LetterLibraryIndexPage(page)
     letter_index_page.filter_by_letters_group("Invitation Letters")
     letter_index_page.verify_letter_library_index_title()
     logging.info("[FILTER] Applied 'Invitation Letters' group filter")
 
-    # Step 4: Assert that all required letter codes are visible
+    # Assert that all required letter codes are visible
     expected_codes = ["S83f", "S83f-CSV", "S83f-ATT"]
     for code in expected_codes:
         matching_row = letter_index_page.table_utils.get_row_where({"Code": code})
@@ -84,10 +79,9 @@ def test_all_s83f_letter_parts_are_listed_in_letter_library(select_user) -> None
         logging.info(f"[ASSERTION PASSED] Letter code '{code}' listed in library")
 
 
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.letters_tests
-def test_s83f_letter_definition_has_correct_settings(select_user) -> None:
+def test_s83f_letter_definition_has_correct_settings(page: Page) -> None:
     """
     Scenario: A current S83f FIT self-referral invitation and test kit letter exists and has the correct settings
     Given I log in to BCSS "England" as user role "HubManager"
@@ -103,18 +97,15 @@ def test_s83f_letter_definition_has_correct_settings(select_user) -> None:
     And there "is" a current version of the selected letter definition
     """
     logging.info("[TEST START] Verify S83f letter definition has correct settings")
-    user_role = "Hub Manager at BCS01"
 
-    # Step 1: Log in and navigate to Letter Library
-    page = select_user(user_role)
-    logging.info(f"[LOGIN] Logged in as {user_role}")
+    # Navigate to Letter Library
     base_page = BasePage(page)
     base_page.click_main_menu_link()
     base_page.go_to_communications_production_page()
     CommunicationsProductionPage(page).go_to_letter_library_index_page()
     logging.info("[NAVIGATION] Navigated to Letter Library Index page")
 
-    # Step 2: Filter and open S83f letter definition
+    # Filter and open S83f letter definition
     letter_index_page = LetterLibraryIndexPage(page)
     letter_index_page.filter_by_letters_group("Invitation Letters")
     letter_index_page.verify_letter_library_index_title()
@@ -124,7 +115,7 @@ def test_s83f_letter_definition_has_correct_settings(select_user) -> None:
     letter_row.locator("a").click()
     logging.info("[ACTION] Opened S83f letter definition")
 
-    # Step 3: Assert letter settings
+    # Assert letter settings
     letter_detail_page = LetterDefinitionDetailPage(page)
     letter_detail_page.assert_definition_setting(
         "Description", "Invitation & Test Kit (Self-referral) (FIT)"
@@ -137,17 +128,16 @@ def test_s83f_letter_definition_has_correct_settings(select_user) -> None:
     letter_detail_page.assert_definition_setting("Event Status", "S83")
     logging.info("[ASSERTION PASSED] All letter settings match expected values")
 
-    # Step 4: Confirm current version exists
+    # Confirm current version exists
     assert (
         letter_detail_page.has_current_version()
     ), "[ASSERTION FAILED] No current version for S83f"
     logging.info("[ASSERTION PASSED] S83f has a current version")
 
 
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.letters_tests
-def test_s83f_att_letter_definition_has_correct_settings(select_user) -> None:
+def test_s83f_att_letter_definition_has_correct_settings(page: Page) -> None:
     """
     Scenario: A current S83f-ATT FIT self-referral pre-invitation letter exists and has the correct settings
     Given I log in to BCSS "England" as user role "HubManager"
@@ -164,18 +154,15 @@ def test_s83f_att_letter_definition_has_correct_settings(select_user) -> None:
     And there "is" a current version of the selected letter definition
     """
     logging.info("[TEST START] Verify S83f-ATT letter definition has correct settings")
-    user_role = "Hub Manager at BCS01"
 
-    # Step 1: Log in and navigate to Letter Library Index
-    page = select_user(user_role)
-    logging.info(f"[LOGIN] Logged in as {user_role}")
+    # Navigate to Letter Library Index
     base_page = BasePage(page)
     base_page.click_main_menu_link()
     base_page.go_to_communications_production_page()
     CommunicationsProductionPage(page).go_to_letter_library_index_page()
     logging.info("[NAVIGATION] Navigated to Letter Library Index page")
 
-    # Step 2: Filter and open S83f-ATT letter definition
+    # Filter and open S83f-ATT letter definition
     letter_index_page = LetterLibraryIndexPage(page)
     letter_index_page.filter_by_letters_group("Invitation Letters")
     letter_index_page.verify_letter_library_index_title()
@@ -185,10 +172,7 @@ def test_s83f_att_letter_definition_has_correct_settings(select_user) -> None:
     letter_row.locator("a").click()
     logging.info("[ACTION] Opened S83f-ATT letter definition")
 
-    # Step 3: Pause to admire the view
-    page.wait_for_timeout(1000)
-
-    # Step 4: Assert all settings
+    # Assert all settings
     letter_detail_page = LetterDefinitionDetailPage(page)
     letter_detail_page.assert_definition_setting(
         "Description", "Pre-invitation (Self-referral) (FIT)"
@@ -201,17 +185,16 @@ def test_s83f_att_letter_definition_has_correct_settings(select_user) -> None:
     letter_detail_page.assert_definition_setting("Event Status", "S83")
     logging.info("[ASSERTION PASSED] All S83f-ATT letter settings match expectations")
 
-    # Step 5: Confirm current version exists
+    # Confirm current version exists
     assert (
         letter_detail_page.has_current_version()
     ), "[ASSERTION FAILED] No current version for S83f-ATT"
     logging.info("[ASSERTION PASSED] S83f-ATT has a current version")
 
 
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.letters_tests
-def test_s83f_define_local_letter_reuses_existing_settings(select_user) -> None:
+def test_s83f_define_local_letter_reuses_existing_settings(page: Page) -> None:
     """
     Scenario: As a hub manager, I can safely access and submit the local letter definition flow for S83f
     Given I log in to BCSS "England" as user role "HubManager"
@@ -224,11 +207,7 @@ def test_s83f_define_local_letter_reuses_existing_settings(select_user) -> None:
     """
     logging.info("[TEST START] Define local version of S83f without altering data")
 
-    user_role = "Hub Manager at BCS01"
-    page = select_user(user_role)
-    logging.info(f"[LOGIN] Logged in as {user_role}")
-
-    # Step 1: Navigate to Letter Library Index
+    # Navigate to Letter Library Index
     base_page = BasePage(page)
     base_page.click_main_menu_link()
     base_page.go_to_communications_production_page()
@@ -243,7 +222,7 @@ def test_s83f_define_local_letter_reuses_existing_settings(select_user) -> None:
 
     page.wait_for_timeout(1000)
 
-    # Step 2: Define Local Version using known-good settings
+    # Define Local Version using known-good settings
     letter_index_page.click_define_supplementary_letter_button()
     letter_index_page.define_supplementary_letter(
         description="Invitation & Test Kit (Self-referral) (FIT)",
@@ -256,10 +235,9 @@ def test_s83f_define_local_letter_reuses_existing_settings(select_user) -> None:
     logging.info("[ACTION] Local definition form submitted with existing settings")
 
 
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.letters_tests
-def test_s83f_att_define_local_letter_reuses_existing_settings(select_user) -> None:
+def test_s83f_att_define_local_letter_reuses_existing_settings(page: Page) -> None:
     """
     Scenario: As a hub manager, I can safely access and submit the local letter definition flow for S83f-ATT
     Given I log in to BCSS "England" as user role "HubManager"
@@ -272,11 +250,7 @@ def test_s83f_att_define_local_letter_reuses_existing_settings(select_user) -> N
     """
     logging.info("[TEST START] Define local version of S83f-ATT without altering data")
 
-    user_role = "Hub Manager at BCS01"
-    page = select_user(user_role)
-    logging.info(f"[LOGIN] Logged in as {user_role}")
-
-    # Step 1: Navigate to Letter Library Index
+    # Navigate to Letter Library Index
     base_page = BasePage(page)
     base_page.click_main_menu_link()
     base_page.go_to_communications_production_page()
@@ -291,7 +265,7 @@ def test_s83f_att_define_local_letter_reuses_existing_settings(select_user) -> N
 
     page.wait_for_timeout(1000)
 
-    # Step 2: Define Local Version using known-good settings
+    # Define Local Version using known-good settings
     letter_index_page.click_define_supplementary_letter_button()
     letter_index_page.define_supplementary_letter(
         description="Pre-invitation (Self-referral) (FIT)",
@@ -304,20 +278,9 @@ def test_s83f_att_define_local_letter_reuses_existing_settings(select_user) -> N
     logging.info("[ACTION] Local definition form submitted with existing settings")
 
 
-# # Manual Scenario: I set up a local version for S83f-ATT pre-invitation letter
-# # Given I log in to BCSS England as user role Hub Manager
-# # When I view the letter library index
-# # And I view the S83f-ATT pre-invitation letter definition
-# # Then I define a local version
-
-# #-------------------------------------------------------------------------------------------------
-# # A183 : 1st Positive Appointment Requested letter
-
-
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.letters_tests
-def test_a183_letter_definition_has_correct_settings(select_user) -> None:
+def test_a183_letter_definition_has_correct_settings(page: Page) -> None:
     """
     Scenario: A current A183 letter exists and has the correct settings
     Given I log in to BCSS "England" as user role "HubManager"
@@ -334,18 +297,15 @@ def test_a183_letter_definition_has_correct_settings(select_user) -> None:
     And there "is" a current version of the selected letter definition
     """
     logging.info("[TEST START] Verify A183 letter definition has correct settings")
-    user_role = "Hub Manager at BCS01"
 
-    # Step 1: Login and navigate
-    page = select_user(user_role)
-    logging.info(f"[LOGIN] Logged in as {user_role}")
+    # Navigate to Letter Library Index
     base_page = BasePage(page)
     base_page.click_main_menu_link()
     base_page.go_to_communications_production_page()
     CommunicationsProductionPage(page).go_to_letter_library_index_page()
     logging.info("[NAVIGATION] Reached Letter Library Index")
 
-    # Step 2: Filter and open A183 letter
+    # Filter and open A183 letter
     letter_index_page = LetterLibraryIndexPage(page)
     letter_index_page.filter_by_letters_group("Practitioner Clinic Letters")
     letter_index_page.verify_letter_library_index_title()
@@ -355,7 +315,7 @@ def test_a183_letter_definition_has_correct_settings(select_user) -> None:
     letter_row.locator("a").click()
     logging.info("[ACTION] Opened A183 letter definition")
 
-    # Step 3: Pause and assert settings
+    # Pause and assert settings
     page.wait_for_timeout(1000)
     letter_detail_page = LetterDefinitionDetailPage(page)
     letter_detail_page.assert_definition_setting(
@@ -371,7 +331,7 @@ def test_a183_letter_definition_has_correct_settings(select_user) -> None:
     letter_detail_page.assert_definition_setting("Event Status", "A183")
     logging.info("[ASSERTION PASSED] All A183 letter settings verified")
 
-    # Step 4: Confirm current version exists
+    # Confirm current version exists
     assert (
         letter_detail_page.has_current_version()
     ), "[ASSERTION FAILED] No current version for A183"
