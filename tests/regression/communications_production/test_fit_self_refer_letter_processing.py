@@ -42,21 +42,21 @@ from utils import batch_processing
 # # been changed to use hub BCS02 instead.
 
 
-@pytest.fixture
-def select_user(page: Page):
-    def _login_as(user_role: str):
-        # Log in with the specified user
-        UserTools.user_login(page, user_role)
-        # Navigate to call and recall page
-        BasePage(page).go_to_call_and_recall_page()
-        return page
+@pytest.fixture(scope="function", autouse=True)
+def before_each(page: Page):
+    """
+    Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the call and recall page
+    """
+    # Log in to BCSS
+    UserTools.user_login(page, "Hub Manager at BCS02")
 
-    return _login_as
+    # Go to call and recall page
+    BasePage(page).go_to_call_and_recall_page()
 
 
 @pytest.mark.regression
 @pytest.mark.letters_tests
-def test_self_refer_subject_in_my_hub_for_fit(select_user) -> None:
+def test_self_refer_subject_in_my_hub_for_fit(page: Page) -> None:
     """
     Scenario: Self-refer a subject in my hub for FIT
     Given I log in to BCSS "England" as user role "Hub Manager at BCS02"
@@ -71,21 +71,19 @@ def test_self_refer_subject_in_my_hub_for_fit(select_user) -> None:
     logging.info("[TEST START] Self-refer subject in my hub for FIT")
     user_role = "Hub Manager at BCS02"
 
-    # Step 1: Log in and navigate to Generate Invitations page
-    page = select_user(user_role)
-    logging.info(f"[LOGIN] Logged in as {user_role}")
+    # Navigate to Generate Invitations page
     CallAndRecallPage(page).go_to_generate_invitations_page()
     logging.info("[NAVIGATION] Navigated to Generate Invitations page")
 
-    # Step 1a - Retrieve hub info from users.json
+    # Retrieve hub info from users.json
     user_details = UserTools.retrieve_user(user_role)
 
-    # Step 2: Confirm no subjects ready to invite
+    # Confirm no subjects ready to invite
     generate_invitations_page = GenerateInvitationsPage(page)
     generate_invitations_page.check_self_referral_subjects_ready("currently", "no")
     logging.info("[ASSERTION] Confirmed no self-referral subjects are ready")
 
-    # Step 3: Try to retrieve eligible subject from DB, fallback to create if none found
+    # Try to retrieve eligible subject from DB, fallback to create if none found
     # Convert user details dictionary into User object for easier handling
     user = UserTools.get_user_object(user_details)
     # Create empty Subject object to store subject details
@@ -116,13 +114,13 @@ def test_self_refer_subject_in_my_hub_for_fit(select_user) -> None:
         # Open the newly created subject record
         oracle_subject.open_subject_by_nhs(nhs_number)
 
-    # Step 3b: Run stored procedure to include subject in invitation shortlist
+    # Run stored procedure to include subject in invitation shortlist
     OracleDB().execute_stored_procedure("pkg_fobt_call.p_find_next_subjects_to_invite")
     logging.info(
         "[STORED PROCEDURE] Executed: pkg_fobt_call.p_find_next_subjects_to_invite"
     )
 
-    # Step 4: View subject
+    # View subject
     base_page = BasePage(page)
     subject_screening_page = SubjectScreeningPage(page)
     base_page.click_main_menu_link()
@@ -130,14 +128,14 @@ def test_self_refer_subject_in_my_hub_for_fit(select_user) -> None:
     subject_screening_page.search_by_nhs_number(nhs_number)
     logging.info("[SUBJECT VIEW] Subject loaded in UI")
 
-    # Step 5: Send new kit
+    # Send new kit
     subject_screening_page.click_send_kit_button()
     subject_screening_page.complete_send_kit_form(
         request_from="Subject", previous_kit_status="Lost", note_text="Test"
     )
     logging.info("[KIT SENT] New kit dispatched")
 
-    # Step 6: Rebuild invitation shortlist to include self-referral subject
+    # Rebuild invitation shortlist to include self-referral subject
     # Arguments:
     # - pi_number_of_weeks: how far ahead to look for subjects (e.g. 20)
     # - pi_max_number_of_subjects: how many subjects to shortlist (e.g. 100)
@@ -175,7 +173,7 @@ def test_self_refer_subject_in_my_hub_for_fit(select_user) -> None:
 
 @pytest.mark.regression
 @pytest.mark.letters_tests
-def test_invite_self_referral_creates_s83f_batch(select_user) -> None:
+def test_invite_self_referral_creates_s83f_batch(page: Page) -> None:
     """
     Scenario: Invite a self-refer subject for FIT creates or updates an S83f letter batch
     Given I log in to BCSS "England" as user role "HubManagerAtBCS02"
@@ -189,26 +187,23 @@ def test_invite_self_referral_creates_s83f_batch(select_user) -> None:
     logging.info(
         "[TEST START] Invite self-referral creates or updates an S83f letter batch"
     )
-    user_role = "Hub Manager at BCS02"
 
-    # Step 1: Log in and navigate to Generate Invitations page
-    page = select_user(user_role)
-    logging.info(f"[LOGIN] Logged in as {user_role}")
+    # Navigate to Generate Invitations page
     CallAndRecallPage(page).go_to_generate_invitations_page()
     logging.info("[NAVIGATION] Navigated to Generate Invitations page")
 
-    # Step 2: Confirm self-referral subjects are ready
+    # Confirm self-referral subjects are ready
     generate_invitations_page = GenerateInvitationsPage(page)
     generate_invitations_page.check_self_referral_subjects_ready("currently", "some")
     logging.info("[ASSERTION] Confirmed self-referral subjects are ready")
 
-    # Step 3: Generate invitations
+    # Generate invitations
     generate_invitations_page.click_generate_invitations_button()
     logging.info("[ACTION] Clicked Generate Invitations button")
     generate_invitations_page.wait_for_self_referral_invitation_generation_complete()
     logging.info("[WAIT] Invitation generation completed")
 
-    # Step 4: Navigate to Active Batch List
+    # Navigate to Active Batch List
     base_page = BasePage(page)
     active_batch_page = ActiveBatchListPage(page)
     base_page.click_main_menu_link()
@@ -216,12 +211,12 @@ def test_invite_self_referral_creates_s83f_batch(select_user) -> None:
     CommunicationsProductionPage(page).go_to_active_batch_list_page()
     logging.info("[NAVIGATION] Navigated to Active Batch List page")
 
-    # Step 5: Filter by "Original" type and "Open" status
+    # Filter by "Original" type and "Open" status
     active_batch_page.enter_type_filter("Original")
     active_batch_page.enter_event_code_filter("S83")
     logging.info("[FILTER] Applied filters: Type='Original', Event Code='S83'")
 
-    # Step 6: Assert S83f batch is present
+    # Assert S83f batch is present
     active_batch_page.assert_s83f_batch_present()
     logging.info("[ASSERTION PASSED] S83f batch is present in Active Batch List")
 
@@ -229,7 +224,7 @@ def test_invite_self_referral_creates_s83f_batch(select_user) -> None:
 # # Note that this "When I view ..." includes 3 steps from above (view active batch list, and filter by type and status), and clicks the batch ID link
 @pytest.mark.regression
 @pytest.mark.letters_tests
-def test_s83f_letter_batch_has_three_components(select_user) -> None:
+def test_s83f_letter_batch_has_three_components(page: Page) -> None:
     """
     Scenario: There are 3 components in the S83f letter batch
     Given I log in to BCSS "England" as user role "HubManagerAtBCS02"
@@ -240,18 +235,15 @@ def test_s83f_letter_batch_has_three_components(select_user) -> None:
     And letter type "Invitation & Test Kit (Self-referral) (FIT)" with file format "FIT-KIT-CSV" is listed
     """
     logging.info("[TEST START] S83f letter batch has three components")
-    user_role = "Hub Manager at BCS02"
 
-    # Step 1: Log in
-    page = select_user(user_role)
-    logging.info(f"[LOGIN] Logged in as {user_role}")
+    # Navigate to Active Batch List and filter
     base_page = BasePage(page)
     active_batch_page = ActiveBatchListPage(page)
-
-    # Step 2: Navigate to Active Batch List and filter
     base_page.click_main_menu_link()
     base_page.go_to_communications_production_page()
     CommunicationsProductionPage(page).go_to_active_batch_list_page()
+
+    # Filter by "Original" type, "S83" event code, and description
     logging.info("[NAVIGATION] Navigated to Active Batch List page")
     active_batch_page.enter_type_filter("Original")
     active_batch_page.enter_event_code_filter("S83")
@@ -262,7 +254,7 @@ def test_s83f_letter_batch_has_three_components(select_user) -> None:
         "[FILTER] Applied filters: Type='Original', Event Code='S83', Description='Invitation & Test Kit (Self-referral) (FIT)'"
     )
 
-    # Step 3: Open the matching batch
+    # Open the matching batch
     active_batch_page.open_letter_batch(
         batch_type="Original",
         status="Open",
@@ -270,7 +262,7 @@ def test_s83f_letter_batch_has_three_components(select_user) -> None:
     )
     logging.info("[ACTION] Opened S83f batch")
 
-    # Step 4: Assert letter components
+    # Assert letter components
     letter_batch_page = LetterBatchDetailsPage(page)
     letter_batch_page.assert_letter_component_present(
         "Invitation & Test Kit (Self-referral) (FIT)", "PDF-A4-V03"
@@ -296,7 +288,7 @@ def test_s83f_letter_batch_has_three_components(select_user) -> None:
 
 @pytest.mark.regression
 @pytest.mark.letters_tests
-def test_before_confirming_s83f_batch_subject_status_is_s83(select_user) -> None:
+def test_before_confirming_s83f_batch_subject_status_is_s83(page: Page) -> None:
     """
     Scenario: Before confirming the S83f letter batch the self-referred subject's latest event status is S83
     Given I log in to BCSS "England" as user role "HubManagerAtBCS02"
@@ -307,19 +299,16 @@ def test_before_confirming_s83f_batch_subject_status_is_s83(select_user) -> None
     Then the subject is at latest event status "S83 - Selected for Screening (Self-referral)"
     """
     logging.info("[TEST START] Before confirming S83f batch, subject status is S83")
-    user_role = "Hub Manager at BCS02"
 
-    # Step 1: Log in
-    page = select_user(user_role)
-    logging.info(f"[LOGIN] Logged in as {user_role}")
+    # Navigate to Active Batch List and filter
     base_page = BasePage(page)
     active_batch_page = ActiveBatchListPage(page)
-
-    # Step 2: Navigate to Active Batch List and filter
     base_page.click_main_menu_link()
     base_page.go_to_communications_production_page()
     CommunicationsProductionPage(page).go_to_active_batch_list_page()
     logging.info("[NAVIGATION] Navigated to Active Batch List page")
+
+    # Filter by "Original" type, "S83" event code, and description
     active_batch_page.enter_type_filter("Original")
     active_batch_page.enter_event_code_filter("S83")
     active_batch_page.enter_description_filter(
@@ -328,24 +317,24 @@ def test_before_confirming_s83f_batch_subject_status_is_s83(select_user) -> None
     logging.info(
         "[FILTER] Applied filters: Type='Original', Event Code='S83', Description='Invitation & Test Kit (Self-referral) (FIT)'"
     )
-    # Step 3: Identify the S83f batch ID
+    # Identify the S83f batch ID
     batch_id_link = page.locator("a[href*='/letters/activebatch/']").first
     batch_id = batch_id_link.inner_text().strip()
     logging.info(f"[BATCH IDENTIFIED] Batch ID: {batch_id}")
 
-    # Step 4: Query DB for subjects in the batch
+    # Query DB for subjects in the batch
     nhs_df = get_nhs_no_from_batch_id(batch_id)
     nhs_number = nhs_df.iloc[0]["subject_nhs_number"]
     logging.info(f"[SUBJECT IDENTIFIED] NHS number: {nhs_number}")
 
-    # Step 5: View the subject
+    # View the subject
     subject_screening_page = SubjectScreeningPage(page)
     base_page.click_main_menu_link()
     base_page.go_to_screening_subject_search_page()
     subject_screening_page.search_by_nhs_number(nhs_number)
     logging.info("[SUBJECT VIEW] Subject loaded in UI")
 
-    # Step 6: Assert latest event status is S83
+    # Assert latest event status is S83
     summary_page = SubjectScreeningSummaryPage(page)
     summary_page.verify_latest_event_status_value(
         "S83 - Selected for Screening (Self-referral)"
@@ -357,7 +346,7 @@ def test_before_confirming_s83f_batch_subject_status_is_s83(select_user) -> None
 
 @pytest.mark.regression
 @pytest.mark.letters_tests
-def test_confirm_s83f_batch_subject_has_s84_event_and_letters(select_user) -> None:
+def test_confirm_s83f_batch_subject_has_s84_event_and_letters(page: Page) -> None:
     """
     Scenario: When the S83f batch has been confirmed the self-referred subject has a self-referral invitation and test kit sent
     Given I log in to BCSS "England" as user role "HubManagerAtBCS02"
@@ -371,19 +360,16 @@ def test_confirm_s83f_batch_subject_has_s84_event_and_letters(select_user) -> No
     And the latest "S84 - Invitation and Test Kit Sent (Self-referral)" event shows "2" "View Letter" links
     """
     logging.info("[TEST START] Confirm S83f batch: subject has S84 event and letters")
-    user_role = "Hub Manager at BCS02"
 
-    # Step 1: Log in
-    page = select_user(user_role)
-    logging.info(f"[LOGIN] Logged in as {user_role}")
+    # Navigate to Active Batch List and filter
     base_page = BasePage(page)
     active_batch_page = ActiveBatchListPage(page)
-
-    # Step 2: Navigate to Active Batch List and filter
     base_page.click_main_menu_link()
     base_page.go_to_communications_production_page()
     CommunicationsProductionPage(page).go_to_active_batch_list_page()
     logging.info("[NAVIGATION] Navigated to Active Batch List page")
+
+    # Filter by "Original" type, "S83" event code, and description
     active_batch_page.enter_type_filter("Original")
     active_batch_page.enter_event_code_filter("S83")
     active_batch_page.enter_description_filter(
@@ -393,7 +379,7 @@ def test_confirm_s83f_batch_subject_has_s84_event_and_letters(select_user) -> No
         "[FILTER] Applied filters: Type='Original', Event Code='S83', Description='Invitation & Test Kit (Self-referral) (FIT)'"
     )
 
-    # Step 4: Identify a subject in the batch using DB query
+    # Identify a subject in the batch using DB query
     batch_id_link = page.locator("a[href*='/letters/activebatch/']").first
     batch_id = batch_id_link.inner_text().strip()
     logging.info(f"[BATCH IDENTIFIED] Batch ID: {batch_id}")
@@ -402,24 +388,24 @@ def test_confirm_s83f_batch_subject_has_s84_event_and_letters(select_user) -> No
     nhs_number = nhs_df.iloc[0]["subject_nhs_number"]
     logging.info(f"[SUBJECT IDENTIFIED] NHS number: {nhs_number}")
 
-    # Step 3: Open the matching batch
+    # Open the matching batch
     active_batch_page.open_letter_batch(
         batch_type="Original",
         description="Invitation & Test Kit (Self-referral) (FIT)",
     )
     logging.info("[ACTION] Opened S83f batch")
 
-    # Step 5: Prepare the batch
+    # Prepare the batch
     batch_processing.prepare_and_print_batch(page, link_text=batch_id)
 
-    # Step 6: View the subject
+    # View the subject
     subject_screening_page = SubjectScreeningPage(page)
     base_page.click_main_menu_link()
     base_page.go_to_screening_subject_search_page()
     subject_screening_page.search_by_nhs_number(nhs_number)
     logging.info("[SUBJECT VIEW] Subject loaded in UI")
 
-    # Step 7: Assert latest event status is S84
+    # Assert latest event status is S84
     summary_page = SubjectScreeningSummaryPage(page)
     summary_page.verify_latest_event_status_value(
         "S84 - Invitation and Test Kit Sent (Self-referral)"
@@ -428,7 +414,7 @@ def test_confirm_s83f_batch_subject_has_s84_event_and_letters(select_user) -> No
         "[ASSERTION PASSED] Subject is at status: S84 - Invitation and Test Kit Sent (Self-referral)"
     )
 
-    # Step 8: Assert 2 "View Letter" links for S84
+    # Assert 2 "View Letter" links for S84
     summary_page.click_list_episodes()
     summary_page.click_view_events_link()
     summary_page.assert_view_letter_links_for_event(
