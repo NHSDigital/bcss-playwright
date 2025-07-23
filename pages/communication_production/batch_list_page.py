@@ -147,6 +147,12 @@ class BatchListPage(BasePage):
     ) -> None:
         """
         Finds and opens the batch row based on non-empty filters.
+
+        Args:
+            batch_type (str): Optional filter for batch type (e.g., "Original").
+            status (str): Optional filter for batch status (e.g., "Open").
+            level (str): Optional filter for batch level (e.g., "S1").
+            description (str): Optional filter for batch description (e.g., "Pre-invitation (FIT)").
         """
         row_locator = self.page.locator(f"{self.table_selector} tbody tr")
 
