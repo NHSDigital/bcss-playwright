@@ -54,7 +54,6 @@ def select_user(page: Page):
     return _login_as
 
 
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.letters_tests
 def test_self_refer_subject_in_my_hub_for_fit(select_user) -> None:
@@ -174,7 +173,6 @@ def test_self_refer_subject_in_my_hub_for_fit(select_user) -> None:
         )
 
 
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.letters_tests
 def test_invite_self_referral_creates_s83f_batch(select_user) -> None:
@@ -229,7 +227,6 @@ def test_invite_self_referral_creates_s83f_batch(select_user) -> None:
 
 
 # # Note that this "When I view ..." includes 3 steps from above (view active batch list, and filter by type and status), and clicks the batch ID link
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.letters_tests
 def test_s83f_letter_batch_has_three_components(select_user) -> None:
@@ -297,7 +294,6 @@ def test_s83f_letter_batch_has_three_components(select_user) -> None:
     )
 
 
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.letters_tests
 def test_before_confirming_s83f_batch_subject_status_is_s83(select_user) -> None:
@@ -359,7 +355,6 @@ def test_before_confirming_s83f_batch_subject_status_is_s83(select_user) -> None
     )
 
 
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.letters_tests
 def test_confirm_s83f_batch_subject_has_s84_event_and_letters(select_user) -> None:
