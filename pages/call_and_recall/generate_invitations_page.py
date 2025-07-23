@@ -199,8 +199,9 @@ class GenerateInvitationsPage(BasePage):
         self_referrals_text = self.self_referrals_total.text_content()
         if self_referrals_text is None:
             pytest.fail("Failed to read self-referrals total")
+        else:
+            self_referrals_text = self_referrals_text.strip()
 
-        self_referrals_text = self_referrals_text.strip()
         self_referrals_count = int(self_referrals_text)
 
         # Determine if condition is met

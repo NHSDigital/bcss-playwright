@@ -29,7 +29,7 @@ def before_each(page: Page):
     # Go to communications production page
     BasePage(page).go_to_communications_production_page()
 
-@pytest.mark.wip
+
 @pytest.mark.letters_tests
 @pytest.mark.regression
 def test_reprint_and_archive_letter_batch(page: Page) -> None:
