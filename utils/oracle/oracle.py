@@ -160,6 +160,7 @@ class OracleDB:
         """
         conn = self.connect_to_db()
         engine = create_engine("oracle+oracledb://", creator=lambda: conn)
+        df = pd.DataFrame()
         try:
             df = (
                 pd.read_sql(query, engine)
