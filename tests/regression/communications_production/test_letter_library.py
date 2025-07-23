@@ -143,7 +143,6 @@ def test_s83f_att_letter_definition_has_correct_settings(page: Page) -> None:
     Given I log in to BCSS "England" as user role "HubManager"
     When I view the letter library index
     And I view the "S83f-ATT" letter definition
-    And I pause to admire the view for "0" seconds
     Then the letter definition setting "Description" is "Pre-invitation (Self-referral) (FIT)"
     And the letter definition setting "Letter Code" is "S83f-ATT"
     And the letter definition setting "Letter Group" is "Invitation Letters"
@@ -220,8 +219,6 @@ def test_s83f_define_local_letter_reuses_existing_settings(page: Page) -> None:
     assert letter_row is not None, "[ASSERTION FAILED] S83f letter not found"
     letter_row.locator("a").click()
 
-    page.wait_for_timeout(1000)
-
     # Define Local Version using known-good settings
     letter_index_page.click_define_supplementary_letter_button()
     letter_index_page.define_supplementary_letter(
@@ -263,8 +260,6 @@ def test_s83f_att_define_local_letter_reuses_existing_settings(page: Page) -> No
     assert letter_row is not None, "[ASSERTION FAILED] S83f-ATT letter not found"
     letter_row.locator("a").click()
 
-    page.wait_for_timeout(1000)
-
     # Define Local Version using known-good settings
     letter_index_page.click_define_supplementary_letter_button()
     letter_index_page.define_supplementary_letter(
@@ -286,7 +281,6 @@ def test_a183_letter_definition_has_correct_settings(page: Page) -> None:
     Given I log in to BCSS "England" as user role "HubManager"
     When I view the letter library index
     And I view the "A183" letter definition
-    And I pause to admire the view for "0" seconds
     Then the letter definition setting "Description" is "Practitioner Clinic 1st Appointment"
     And the letter definition setting "Letter Code" is "A183"
     And the letter definition setting "Letter Group" is "Practitioner Clinic Letters"
@@ -315,8 +309,7 @@ def test_a183_letter_definition_has_correct_settings(page: Page) -> None:
     letter_row.locator("a").click()
     logging.info("[ACTION] Opened A183 letter definition")
 
-    # Pause and assert settings
-    page.wait_for_timeout(1000)
+    # Assert settings
     letter_detail_page = LetterDefinitionDetailPage(page)
     letter_detail_page.assert_definition_setting(
         "Description", "Practitioner Clinic 1st Appointment"
