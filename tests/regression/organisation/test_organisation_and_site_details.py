@@ -4,8 +4,13 @@ from playwright.sync_api import Page
 from pages.base_page import BasePage
 from pages.organisations import organisations_and_site_details
 from pages.organisations.organisations_page import OrganisationsPage
-from pages.organisations.organisations_and_site_details import OrganisationsAndSiteDetails
-from pages.organisations.list_all_organisations import ListAllOrganisations, OrganisationType
+from pages.organisations.organisations_and_site_details import (
+    OrganisationsAndSiteDetails,
+)
+from pages.organisations.list_all_organisations import (
+    ListAllOrganisations,
+    OrganisationType,
+)
 from utils.user_tools import UserTools
 
 
@@ -31,4 +36,3 @@ def test_check_list_all_organisations_page(page) -> None:
     OrganisationsPage(page).go_to_organisations_and_site_details_page()
     OrganisationsAndSiteDetails(page).go_to_list_all_organisations()
     ListAllOrganisations(page).select_organisation_type_option(OrganisationType.ICB)
-    
