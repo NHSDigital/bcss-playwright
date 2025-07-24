@@ -246,6 +246,26 @@ class OracleSubjectTools(OracleDB):
         end_offset: int = 4,
         nhs_start: int = 9200000000,
     ) -> None:
+        """
+        Creates a batch of test screening subjects using the SSPI stored procedure.
+
+        This method invokes `PKG_SSPI.p_process_pi_subject` in the database, which generates
+        synthetic subjects with varying dates of birth and NHS numbers starting from a given base.
+
+        Args:
+            count (int): Number of subjects to create.
+            screening_centre (str): Code for the target screening centre (e.g., 'BCS01').
+            base_age (int): Age around which the subjects are distributed.
+            start_offset (int, optional): Days before today for earliest DOB (default -2).
+            end_offset (int, optional): Days after today for latest DOB (default 4).
+            nhs_start (int, optional): Starting NHS number for generated subjects (default 9200000000).
+
+        Logs:
+            Error message if subject generation fails.
+
+        Side Effects:
+            Commits to the database; subjects are available for further test flows.
+        """
         conn = self.connect_to_db()
         try:
             cursor = conn.cursor()

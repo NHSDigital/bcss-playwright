@@ -13,7 +13,7 @@ from utils.batch_processing import prepare_and_print_batch
 
 
 @pytest.fixture(scope="function", autouse=True)
-def before_each(page: Page):
+def before_each(page: Page) -> None:
     """
     Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the active batch list page
     """

@@ -104,38 +104,47 @@ class BatchListPage(BasePage):
         logging.info(f"[FILTER] Type filter set to '{option_text}'")
 
     def enter_original_filter(self, search_text: str) -> None:
+        """Enter text in the Original filter and press Enter"""
         self.original_filter.fill(search_text)
         self.original_filter.press("Enter")
 
     def enter_event_code_filter(self, search_text: str) -> None:
+        """Enter text in the Event Code filter and press Enter"""
         self.event_code_filter.fill(search_text)
         self.event_code_filter.press("Enter")
 
     def enter_description_filter(self, search_text: str) -> None:
+        """Enter text in the Description filter and press Enter"""
         self.description_filter.fill(search_text)
         self.description_filter.press("Enter")
 
     def enter_batch_split_by_filter(self, search_text: str) -> None:
+        """Enter text in the 'Batch Split By' filter and press Enter"""
         self.batch_split_by_filter.fill(search_text)
         self.batch_split_by_filter.press("Enter")
 
     def enter_screening_centre_filter(self, search_text: str) -> None:
+        """Enter text in the Screening Centre filter and press Enter"""
         self.screening_centre_filter.fill(search_text)
         self.screening_centre_filter.press("Enter")
 
     def enter_count_filter(self, search_text: str) -> None:
+        """Enter text in the Count filter and press Enter"""
         self.count_filter.fill(search_text)
         self.count_filter.press("Enter")
 
     def enter_deadline_date_filter(self, date: datetime) -> None:
+        """Enter a date in the Deadline Date filter and press Enter"""
         self.click(self.deadline_calendar_picker)
         CalendarPicker(self.page).v2_calendar_picker(date)
 
     def clear_deadline_filter_date(self) -> None:
+        """Clear the date in the Deadline Date filter"""
         self.click(self.deadline_calendar_picker)
         self.click(self.deadline_date_clear_button)
 
     def verify_deadline_date_filter_input(self, expected_text: str) -> None:
+        """Verifies that the Deadline Date filter input has the expected value."""
         expect(self.deadline_date_filter_with_input).to_have_value(expected_text)
 
     def open_letter_batch(
@@ -178,6 +187,23 @@ class BatchListPage(BasePage):
         expect(view_link).to_be_visible()
         view_link.click()
 
+    def select_first_batch_row(self, table_selector: str, timeout_ms: int = 0) -> None:
+        """
+        Clicks the first batch link in the specified batch list table.
+
+        Args:
+            table_selector (str): CSS selector for the table (e.g., "table#batchList").
+            timeout_ms (int): Optional timeout to wait before interaction (default: 0).
+        """
+        first_link = self.page.locator(f"{table_selector} tbody tr td.id a").first
+        if timeout_ms > 0:
+            first_link.wait_for(timeout=timeout_ms)
+
+        assert (
+            first_link.count() > 0
+        ), f"No batch links found in table '{table_selector}'"
+        first_link.click()
+
 
 class ActiveBatchListPage(BatchListPage):
     """Active Batch List Page-specific methods."""
@@ -186,10 +212,8 @@ class ActiveBatchListPage(BatchListPage):
         super().__init__(page, table_selector=BATCH_LIST_SELECTOR)
 
     def select_first_active_batch(self) -> None:
-        """Clicks the first batch ID link in the active batch list."""
-        first_link = self.page.locator(f"{self.table_selector} tbody tr td.id a").first
-        assert first_link.count() > 0, "No active batch links found"
-        first_link.click()
+        """Selects the first active batch in the batch list table."""
+        self.select_first_batch_row(self.table_selector, timeout_ms=10000)
 
     def is_batch_present(self, batch_type: str) -> bool:
         """Checks if a batch of the given type exists in the active batch list."""
@@ -210,13 +234,13 @@ class ActiveBatchListPage(BatchListPage):
         table = TableUtils(self.page, BATCH_LIST_SELECTOR)
         row_count = table.get_row_count()
 
-        for i in range(row_count):
-            row_data = table.get_row_data_with_headers(i)
+        for row in range(row_count):
+            row_data = table.get_row_data_with_headers(row)
             if (
                 row_data.get("Type", "").strip() == "Original"
                 and row_data.get("Status", "").strip() == "Open"
             ):
-                return table.pick_row(i)
+                return table.pick_row(row)
         return None
 
     def assert_s83f_batch_present(self) -> None:
@@ -237,11 +261,8 @@ class ArchivedBatchListPage(BatchListPage):
         super().__init__(page, table_selector=BATCH_LIST_SELECTOR)
 
     def select_first_archived_batch(self) -> None:
-        """Clicks the first batch ID link in the archived batch list."""
-        first_batch_link = self.page.locator("table#batchList tbody tr td.id a").first
-        first_batch_link.wait_for(timeout=10000)
-        assert first_batch_link.count() > 0, "No archived batch links found"
-        first_batch_link.click()
+        """Selects the first archived batch in the batch list table."""
+        self.select_first_batch_row("table#batchList", timeout_ms=10000)
 
     def get_archived_batch_row(
         self, batch_type: str, event_code: str, description: str
@@ -268,8 +289,8 @@ class ArchivedBatchListPage(BatchListPage):
         if row_count == 0:
             return None
 
-        for i in range(row_count):
-            row = rows.nth(i)
+        for row in range(row_count):
+            row = rows.nth(row)
 
             try:
                 type_text = row.locator("td").nth(1).inner_text().strip()

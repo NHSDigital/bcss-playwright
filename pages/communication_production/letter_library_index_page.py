@@ -11,12 +11,22 @@ class LetterLibraryIndexPage(BasePage):
     def __init__(self, page: Page):
         super().__init__(page)
         self.page = page
-        self.table_utils = TableUtils(page, DISPLAY_RS_SELECTOR)
+        self.table_utils = TableUtils(self.page, DISPLAY_RS_SELECTOR)
         # Letter Library Index - page locators, methods
 
-        self.letter_library_index_table = page.locator(DISPLAY_RS_SELECTOR)
-        self.define_supplementary_letter_button = page.locator(
+        self.letter_library_index_table = self.page.locator(DISPLAY_RS_SELECTOR)
+        self.define_supplementary_letter_button = self.page.locator(
             "input.HeaderButtons[value='Define Supplementary Letter']"
+        )
+        self.letter_description_input = self.page.locator('input[name="A_C_LETT_DESC"]')
+        self.destination_dropdown = self.page.locator("#A_C_DESTINATION_ID")
+        self.priority_dropdown = self.page.locator("#A_C_PRIORITY_ID")
+        self.signatory_input = self.page.locator("#A_C_SIGNATORY")
+        self.job_title_input = self.page.locator("#A_C_JOB_TITLE")
+        self.paragraph_input = self.page.locator("#A_C_PARAGRAPH_1")
+        self.save_button = self.page.get_by_role("button", name="Save")
+        self.event_code_input = self.page.get_by_role(
+            "textbox", name="Enter text to filter the list"
         )
 
     def verify_letter_library_index_title(self) -> None:
@@ -62,16 +72,10 @@ class LetterLibraryIndexPage(BasePage):
         Args:
             event_code (str): The event code to filter the list (e.g., 'S1')
         """
-        event_code_input = self.page.get_by_role(
-            "textbox", name="Enter text to filter the list"
-        )
-        expect(event_code_input).to_be_visible()
-        event_code_input.click()
-        event_code_input.fill(event_code)
-        event_code_input.press("Enter")
-
-        # Optional: wait for the filtered list to update
-        self.page.wait_for_timeout(500)  # tweak or replace with smart wait
+        expect(self.event_code_input).to_be_visible()
+        self.event_code_input.click()
+        self.event_code_input.fill(event_code)
+        self.event_code_input.press("Enter")
 
     def click_first_letter_code_link_in_table(self) -> None:
         """Clicks the first link from the Letter Library Index table."""
@@ -108,16 +112,15 @@ class LetterLibraryIndexPage(BasePage):
             job_title (str): Signatory's job title
             paragraph_text (str): Main body text of the letter
         """
-        self.page.locator('input[name="A_C_LETT_DESC"]').fill(description)
-        self.page.locator("#A_C_DESTINATION_ID").select_option(destination_id)
-        self.page.locator("#A_C_PRIORITY_ID").select_option(priority_id)
-        self.page.locator("#A_C_SIGNATORY").fill(signatory)
-        self.page.locator("#A_C_JOB_TITLE").fill(job_title)
-        self.page.locator("#A_C_PARAGRAPH_1").fill(paragraph_text)
+        self.letter_description_input.fill(description)
+        self.destination_dropdown.select_option(destination_id)
+        self.priority_dropdown.select_option(priority_id)
+        self.signatory_input.fill(signatory)
+        self.job_title_input.fill(job_title)
+        self.paragraph_input.fill(paragraph_text)
 
-        # Handle the modal popup when saving
-        self.page.once("dialog", lambda dialog: dialog.accept())
-        self.page.get_by_role("button", name="Save").click()
+        # Save and accept dialog safely
+        self.safe_accept_dialog(self.save_button)
 
 
 class LetterDefinitionDetailPage(BasePage):

@@ -25,6 +25,7 @@ from pages.screening_subject_search.subject_screening_summary_page import (
 from utils.table_util import TableUtils
 from utils.oracle.oracle_specific_functions import get_nhs_no_from_batch_id
 from utils import batch_processing
+from utils import screening_subject_page_searcher
 
 
 # Feature: FIT Self Refer - letter processing
@@ -43,7 +44,7 @@ from utils import batch_processing
 
 
 @pytest.fixture(scope="function", autouse=True)
-def before_each(page: Page):
+def before_each(page: Page) -> None:
     """
     Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the call and recall page
     """
@@ -125,7 +126,7 @@ def test_self_refer_subject_in_my_hub_for_fit(page: Page) -> None:
     subject_screening_page = SubjectScreeningPage(page)
     base_page.click_main_menu_link()
     base_page.go_to_screening_subject_search_page()
-    subject_screening_page.search_by_nhs_number(nhs_number)
+    screening_subject_page_searcher.search_subject_by_nhs_number(page, nhs_number)
     logging.info("[SUBJECT VIEW] Subject loaded in UI")
 
     # Send new kit
@@ -328,10 +329,9 @@ def test_before_confirming_s83f_batch_subject_status_is_s83(page: Page) -> None:
     logging.info(f"[SUBJECT IDENTIFIED] NHS number: {nhs_number}")
 
     # View the subject
-    subject_screening_page = SubjectScreeningPage(page)
     base_page.click_main_menu_link()
     base_page.go_to_screening_subject_search_page()
-    subject_screening_page.search_by_nhs_number(nhs_number)
+    screening_subject_page_searcher.search_subject_by_nhs_number(page, nhs_number)
     logging.info("[SUBJECT VIEW] Subject loaded in UI")
 
     # Assert latest event status is S83
@@ -399,10 +399,9 @@ def test_confirm_s83f_batch_subject_has_s84_event_and_letters(page: Page) -> Non
     batch_processing.prepare_and_print_batch(page, link_text=batch_id)
 
     # View the subject
-    subject_screening_page = SubjectScreeningPage(page)
     base_page.click_main_menu_link()
     base_page.go_to_screening_subject_search_page()
-    subject_screening_page.search_by_nhs_number(nhs_number)
+    screening_subject_page_searcher.search_subject_by_nhs_number(page, nhs_number)
     logging.info("[SUBJECT VIEW] Subject loaded in UI")
 
     # Assert latest event status is S84

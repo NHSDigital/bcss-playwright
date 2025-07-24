@@ -52,12 +52,18 @@ class SubjectScreeningPage(BasePage):
         )
         self.appropriate_code_filter = self.page.get_by_label("Appropriate Code")
         self.gp_practice_in_ccg_filter = self.page.get_by_label("GP Practice in CCG")
-
         self.select_screening_status = self.page.locator("#A_C_ScreeningStatus")
         self.select_episode_status = self.page.locator("#A_C_EpisodeStatus")
         self.select_search_area = self.page.locator("#A_C_SEARCH_DOMAIN")
-
         self.dob_calendar_picker = self.page.locator("#A_C_DOB_From_LinkOrButton")
+        self.send_kit_button = self.page.locator("#self_ref_button")
+        self.send_button = self.page.locator("button[data-testid='sendKitButton']")
+        self.success_button = self.page.locator("button[data-testid='successButton']")
+        self.kit_request_from_dropdown = self.page.locator("#kitRequestFrom")
+        self.previous_kit_dropdown = self.page.locator("#previousKit")
+        self.reason_note_textarea = self.page.locator(
+            "textarea[data-testid='reasonNote']"
+        )
 
     def click_clear_filters_button(self) -> None:
         """Click the 'Clear Filters' button."""
@@ -156,34 +162,13 @@ class SubjectScreeningPage(BasePage):
         """Verifies that the Date of Birth filter input field has the expected value."""
         expect(self.date_of_birth_filter).to_have_value(expected_text)
 
-    def search_by_nhs_number(self, nhs_number: str) -> None:
-        """
-        Searches for a subject using NHS number.
-        Selects 'Whole Database' to bypass modal dialogs triggered by limited search scopes.
-        """
-        # Step 1: Clear any existing filters
-        self.click_clear_filters_button()
-
-        # Step 2: Enter NHS number
-        self.nhs_number_filter.fill(nhs_number)
-        self.nhs_number_filter.press("Tab")
-
-        # Step 3: Select 'Whole Database' to avoid confirmation modal
-        self.select_search_area_option(
-            SearchAreaSearchOptions.SEARCH_AREA_WHOLE_DATABASE.value
-        )
-
-        # Step 4: Run search
-        self.click_search_button()
-
     def click_send_kit_button(self) -> None:
         """
         Clicks the 'Send a kit' button for self-referral.
         Verifies the transition to the 'Send a kit' page and logs errors if that check fails.
         """
-        send_kit_button = self.page.locator("#self_ref_button")
-        expect(send_kit_button).to_be_visible()
-        send_kit_button.click()
+        expect(self.send_kit_button).to_be_visible()
+        self.send_kit_button.click()
 
         try:
             expect(self.page.locator("h1")).to_contain_text("Send a kit")
@@ -201,34 +186,18 @@ class SubjectScreeningPage(BasePage):
         note_text: str = "Test",
     ) -> None:
         """
-        Completes the 'Send a kit' form by:
-        - Selecting who requested the kit
-        - Selecting previous kit status
-        - Entering reason text
-        - Clicking the 'Send a kit' button
-
-        Args:
-            request_from (str): Option to select for who requested the kit.
-            previous_kit_status (str): Reason for replacing or requesting the kit.
-            note_text (str): Free-text note to include with the request.
+        Completes the 'Send a kit' form by selecting dropdowns, filling in text, and confirming via modal.
         """
-        # Fill dropdowns
-        self.page.locator("#kitRequestFrom").select_option(request_from)
-        self.page.locator("#previousKit").select_option(previous_kit_status)
+        self.kit_request_from_dropdown.select_option(request_from)
+        self.previous_kit_dropdown.select_option(previous_kit_status)
+        self.reason_note_textarea.fill(note_text)
 
-        # Fill note text
-        self.page.locator("textarea[data-testid='reasonNote']").fill(note_text)
+        expect(self.send_button).to_be_enabled()
+        self.send_button.click()
 
-        # Wait for button to become enabled before clicking
-        send_button = self.page.locator("button[data-testid='sendKitButton']")
-        expect(send_button).to_be_enabled()
-        send_button.click()
-
-        # Handle confirmation modal if it appears
-        success_button = self.page.locator("button[data-testid='successButton']")
-        if success_button.is_visible():
-            expect(success_button).to_be_enabled()
-            success_button.click()
+        if self.success_button.is_visible():
+            expect(self.success_button).to_be_enabled()
+            self.success_button.click()
             logging.info("[MODAL CLOSED] Success modal dismissed")
         else:
             logging.warning(

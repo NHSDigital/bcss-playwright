@@ -11,25 +11,9 @@ from pages.communication_production.letter_library_index_page import (
     LetterDefinitionDetailPage,
 )
 
-# @BCSSAdditionalTests @LettersTests
-# Feature: Letter Library
-
-# Narrative Description: As a user of BCSS I am able to view national letter definitions,
-# and create local versions
-
-# # Notes: In the Letter Library Index, when you click on a LETTER code, this takes you to the Version History
-# # screen.  When you click on a CSV code, this takes you to the CSV File Format screen.
-
-# -------------------------------------------------------------------------------------------------
-#   S83f : FIT self-referral letters:
-# 	S83f-ATT = pre-invitation letter
-# 	S83f = invitation letter
-# 	S83f-CSV = test kit details
-# -------------------------------------------------------------------------------------------------
-
 
 @pytest.fixture(scope="function", autouse=True)
-def before_each(page: Page):
+def before_each(page: Page) -> None:
     """
     Before every test is executed, this fixture logs in to BCSS as a test user and navigates to the call and recall page
     """

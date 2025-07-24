@@ -2,6 +2,7 @@ from playwright.sync_api import Page
 from pages.base_page import BasePage
 from playwright.sync_api import expect
 import re
+import logging
 
 
 class ManageActiveBatchPage(BasePage):
@@ -19,6 +20,13 @@ class ManageActiveBatchPage(BasePage):
         self.retrieve_button_text = self.page.locator('text="Retrieve"')
         self.confirm_button_text = self.page.locator('text="Confirm Printed"')
         self.reprepare_batch_text = self.page.locator('text="Re-Prepare Batch"')
+        self.button = self.page.get_by_role(
+            "button", name="Retrieve and Confirm Letters"
+        )
+        self.message = self.page.locator(
+            'text="Batch Successfully Archived and Printed"'
+        )
+        self.title_text = self.page.locator("#page-title").inner_text()
 
     def click_prepare_button(self) -> None:
         """Click the Prepare Batch button"""
@@ -40,20 +48,17 @@ class ManageActiveBatchPage(BasePage):
 
     def retrieve_and_confirm_letters(self) -> None:
         """Clicks the Retrieve and Confirm Letters button."""
-        button = self.page.get_by_role("button", name="Retrieve and Confirm Letters")
-        expect(button).to_be_enabled()
-        button.click()
+        expect(self.button).to_be_enabled()
+        self.button.click()
 
     def assert_confirmation_success_message(self) -> None:
         """Verifies the confirmation message is shown after printing."""
-        message = self.page.locator('text="Batch Successfully Archived and Printed"')
-        expect(message).to_be_visible()
+        expect(self.message).to_be_visible()
 
     def get_batch_id(self) -> str:
         """Extracts the batch ID from the page title."""
-        title_text = self.page.locator("#page-title").inner_text()
-        print(f"[DEBUG] Page title text: '{title_text}'")
-        match = re.search(r"\d+", title_text)
+        logging.debug(f"[BATCH ID] Page title text: '{self.title_text}'")
+        match = re.search(r"\d+", self.title_text)
         if match:
             return match.group()
         raise ValueError("Batch ID not found in page title.")
