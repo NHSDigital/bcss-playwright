@@ -1,13 +1,11 @@
+from ast import Or
 import pytest
 from playwright.sync_api import Page
-from classes.organisation import Organisation
-from pages import organisations
 from pages.base_page import BasePage
-from pages.call_and_recall.call_and_recall_page import CallAndRecallPage
-from pages.call_and_recall.invitations_monitoring_page import InvitationsMonitoringPage
-from pages.call_and_recall.invitations_plans_page import InvitationsPlansPage
-from pages.call_and_recall.create_a_plan_page import CreateAPlanPage
+from pages.organisations import organisations_and_site_details
 from pages.organisations.organisations_page import OrganisationsPage
+from pages.organisations.organisations_and_site_details import OrganisationsAndSiteDetails
+from pages.organisations.list_all_organisations import ListAllOrganisations, OrganisationType
 from utils.user_tools import UserTools
 
 
@@ -31,3 +29,6 @@ def test_check_list_all_organisations_page(page) -> None:
     Verifies that the 'List All Organisations' page displays correctly and contains expected elements.
     """
     OrganisationsPage(page).go_to_organisations_and_site_details_page()
+    OrganisationsAndSiteDetails(page).go_to_list_all_organisations()
+    ListAllOrganisations(page).select_organisation_type_option(OrganisationType.ICB)
+    
