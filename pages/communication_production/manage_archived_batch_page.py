@@ -9,7 +9,6 @@ class ManageArchivedBatchPage(BasePage):
     def __init__(self, page: Page):
         super().__init__(page)
         self.page = page
-        self.header = self.page.locator("#page-title")
         self.reprint_button = self.page.locator(
             "input.ReprintButton[value='Reprint Batch']"
         )
@@ -19,7 +18,7 @@ class ManageArchivedBatchPage(BasePage):
 
     def assert_archived_batch_details_visible(self) -> None:
         """Verifies the Manage Archived Batch page has loaded."""
-        expect(self.header).to_have_text("Manage Archived Batch")
+        expect(self.bowel_cancer_screening_page_title).to_have_text("Manage Archived Batch")
 
     def click_reprint_button(self) -> None:
         """Clicks the 'Reprint' button on the Archived Batch details page."""
