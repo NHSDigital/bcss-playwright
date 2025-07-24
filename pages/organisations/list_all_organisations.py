@@ -2,6 +2,7 @@ from playwright.sync_api import Page
 from pages.base_page import BasePage
 from enum import StrEnum
 
+
 class ListAllOrganisations(BasePage):
     """Organisations And Site Details Page locators, and methods for interacting with the page."""
 
@@ -12,7 +13,7 @@ class ListAllOrganisations(BasePage):
         # List All Organisations links
         self.select_organisation_type = self.page.locator("#organisationType")
 
-    def select_organisation_type_option(self, option: str) -> None:  
+    def select_organisation_type_option(self, option: str) -> None:
         """
         This method is designed to select a specific organisation type from the List All Organisations page.
         Args:
@@ -20,7 +21,7 @@ class ListAllOrganisations(BasePage):
         Returns:
             None
         """
-        self.select_organisation_type.select_option(option)  
+        self.select_organisation_type.select_option(option)
 
 
 class OrganisationType(StrEnum):
@@ -31,8 +32,8 @@ class OrganisationType(StrEnum):
     CCG = "1006"
     CARE_TRUST = "1007"
     GP_PRACTICE = "1009"
-    ICB= "1004"
-    IT_CLUSTER="1001"
+    ICB = "1004"
+    IT_CLUSTER = "1001"
     NHS_BOWEL_CANCER_SCREENING_PROGRAMME = "1000"
     NHS_TRUST = "1005"
-    PUBLIC_HEALTH_ENGLAND= "202130"
+    PUBLIC_HEALTH_ENGLAND = "202130"
