@@ -39,21 +39,15 @@ def compose_diagnosis_text_with_reason(
     return item_text
 
 
-# Scenario 1
-@pytest.mark.regression
-@pytest.mark.vpn_required
-@pytest.mark.fobt_diagnosis_date_entry
-def test_screening_centre_manager_records_diagnosis_date_for_subject_with_referral_no_diag(
-    page: Page,
-):
-    # Step 1: Obtain NHS number for a subject matching criteria
-    criteria = {
-        "latest episode type": "FOBT",
-        "latest episode status": "Open",
-        "latest episode has referral date": "Past",
-        "latest episode has diagnosis date": "No",
-        "latest episode diagnosis date reason": "NULL",
-    }
+def prepare_subject_for_test(
+    page: Page, criteria: dict, role: str, select_episode_radio: bool = True
+) -> str:
+    """
+    Queries subject by criteria, logs in with role, navigates to search, and opens profile.
+
+    Returns:
+        str: The subject's NHS number
+    """
     user = User()
     subject = Subject()
     builder = SubjectSelectionQueryBuilder()
@@ -64,17 +58,33 @@ def test_screening_centre_manager_records_diagnosis_date_for_subject_with_referr
     if df.empty:
         raise ValueError("No matching subject found with provided episode criteria.")
 
-    # Step 2: Login and search for subject
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
+    nhs_number = df.iloc[0]["subject_nhs_number"]
+    UserTools.user_login(page, role)
     BasePage(page).go_to_screening_subject_search_page()
+    if select_episode_radio:
+        page.get_by_role("radio", name="Episodes").check()
+    search_subject_episode_by_nhs_number(page, nhs_number)
+    return nhs_number
 
-    # Step 3: Select episode radio button
-    page.get_by_role("radio", name="Episodes").check()
 
-    # Step 4: Search subject and go to profile
-    search_subject_episode_by_nhs_number(page, df.iloc[0]["subject_nhs_number"])
+# Scenario 1
+@pytest.mark.regression
+@pytest.mark.vpn_required
+@pytest.mark.fobt_diagnosis_date_entry
+def test_screening_centre_manager_records_diagnosis_date_for_subject_with_referral_no_diag(
+    page: Page,
+):
+    # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
+    criteria = {
+        "latest episode type": "FOBT",
+        "latest episode status": "Open",
+        "latest episode has referral date": "Past",
+        "latest episode has diagnosis date": "No",
+        "latest episode diagnosis date reason": "NULL",
+    }
+    prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
 
-    # Step 5: Interact with subject page
+    # Step 2: Interact with subject page
     subject_page_s1 = RecordDiagnosisDatePage(page)
     page.get_by_role("button", name="Advance FOBT Screening Episode").click()
     page.get_by_role("button", name="Record Diagnosis Date").click()
@@ -83,7 +93,7 @@ def test_screening_centre_manager_records_diagnosis_date_for_subject_with_referr
     page.get_by_role("link", name="List Episodes").click()
     page.get_by_role("link", name="events").click()
 
-    # Step 6: Assertions
+    # Step 3: Assertions
     subject_event_s1 = SubjectEpisodeEventsAndNotesPage(page)
     event_details = subject_event_s1.get_latest_event_details()
     assert "A50" not in event_details["latest_event_status"]
@@ -103,7 +113,7 @@ def test_screening_centre_manager_records_diagnosis_date_for_subject_with_referr
 @pytest.mark.vpn_required
 @pytest.mark.fobt_diagnosis_date_entry
 def test_cannot_record_diagnosis_date_without_referral(page: Page):
-    # Step 1: Obtain NHS number for a subject matching criteria
+    # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
         "latest episode type": "FOBT",
         "latest episode status": "Open",
@@ -111,27 +121,9 @@ def test_cannot_record_diagnosis_date_without_referral(page: Page):
         "latest episode has diagnosis date": "No",
         "latest episode diagnosis date reason": "NULL",
     }
-    user = User()
-    subject = Subject()
-    builder = SubjectSelectionQueryBuilder()
-    query, bind_vars = builder.build_subject_selection_query(
-        criteria=criteria, user=user, subject=subject, subjects_to_retrieve=1
-    )
-    df = OracleDB().execute_query(query, bind_vars)
-    if df.empty:
-        raise ValueError("No matching subject found with provided episode criteria.")
+    prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
 
-    # Step 2: Login and search for subject
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).go_to_screening_subject_search_page()
-
-    # Step 3: Select episode radio button
-    page.get_by_role("radio", name="Episodes").check()
-
-    # Step 4: Search subject and go to profile
-    search_subject_episode_by_nhs_number(page, df.iloc[0]["subject_nhs_number"])
-
-    # Step 5: Interact with subject page
+    # Step 2: Interact with subject page
     advance_fobt_button_s2 = page.get_by_role(
         "button", name="Advance FOBT Screening Episode"
     )
@@ -140,7 +132,7 @@ def test_cannot_record_diagnosis_date_without_referral(page: Page):
     else:
         print("Advance FOBT Screening Episode Button is disabled, skipping click.")
 
-    # Step 6: Assert that the "Record Diagnosis Date" option is not available
+    # Step 3: Assert that the "Record Diagnosis Date" option is not available
     subject_event_s2 = SubjectEpisodeEventsAndNotesPage(page)
     assert (
         not subject_event_s2.is_record_diagnosis_date_option_available()
@@ -152,7 +144,7 @@ def test_cannot_record_diagnosis_date_without_referral(page: Page):
 @pytest.mark.vpn_required
 @pytest.mark.fobt_diagnosis_date_entry
 def test_cannot_record_diagnosis_date_with_existing_diagnosis(page: Page):
-    # Step 1: Obtain NHS number for a subject matching criteria
+    # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
         "latest episode type": "FOBT",
         "latest episode status": "Open",
@@ -160,27 +152,9 @@ def test_cannot_record_diagnosis_date_with_existing_diagnosis(page: Page):
         "latest episode has diagnosis date": "Yes",
         "latest episode diagnosis date reason": "NULL",
     }
-    user = User()
-    subject = Subject()
-    builder = SubjectSelectionQueryBuilder()
-    query, bind_vars = builder.build_subject_selection_query(
-        criteria=criteria, user=user, subject=subject, subjects_to_retrieve=1
-    )
-    df = OracleDB().execute_query(query, bind_vars)
-    if df.empty:
-        raise ValueError("No matching subject found with provided episode criteria.")
+    prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
 
-    # Step 2: Login and search for subject
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).go_to_screening_subject_search_page()
-
-    # Step 3: Select episode radio button
-    page.get_by_role("radio", name="Episodes").check()
-
-    # Step 4: Search subject and go to profile
-    search_subject_episode_by_nhs_number(page, df.iloc[0]["subject_nhs_number"])
-
-    # Step 5: Interact with subject page
+    # Step 2: Interact with subject page
     advance_fobt_button_s3 = page.get_by_role(
         "button", name="Advance FOBT Screening Episode"
     )
@@ -199,7 +173,7 @@ def test_cannot_record_diagnosis_date_with_existing_diagnosis(page: Page):
     else:
         print("Record Diagnosis Date button is not available, skipping click.")
 
-    # Step 6: Assert that the "Record Diagnosis Date" option is not available
+    # Step 3: Assert that the "Record Diagnosis Date" option is not available
     subject_event_s3 = SubjectEpisodeEventsAndNotesPage(page)
     assert (
         not subject_event_s3.is_record_diagnosis_date_option_available()
@@ -278,7 +252,7 @@ def test_hub_user_can_record_diagnosis_date_with_referral_no_diag(page: Page):
 @pytest.mark.vpn_required
 @pytest.mark.fobt_diagnosis_date_entry
 def test_record_diagnosis_date_no_date_or_reason_alert(page: Page):
-    # Step 1: Obtain NHS number for a subject matching criteria
+    # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
         "latest episode type": "FOBT",
         "latest episode status": "Open",
@@ -286,33 +260,18 @@ def test_record_diagnosis_date_no_date_or_reason_alert(page: Page):
         "latest episode has diagnosis date": "No",
         "latest episode diagnosis date reason": "NULL",
     }
-    user = User()
-    subject = Subject()
-    builder = SubjectSelectionQueryBuilder()
-    query, bind_vars = builder.build_subject_selection_query(
-        criteria=criteria, user=user, subject=subject, subjects_to_retrieve=1
-    )
-    df = OracleDB().execute_query(query, bind_vars)
-    if df.empty:
-        raise ValueError("No matching subject found with provided episode criteria.")
+    prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
 
-    # Step 2: Login and search for subject
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).go_to_screening_subject_search_page()
-
-    # Step 3: Search subject and go to profile
-    search_subject_episode_by_nhs_number(page, df.iloc[0]["subject_nhs_number"])
-
-    # Step 4: Interact with subject page
+    # Step 2: Interact with subject page
     subject_page_s5 = RecordDiagnosisDatePage(page)
     page.get_by_role("button", name="Advance FOBT Screening Episode").click()
     page.get_by_role("button", name="Record Diagnosis Date").click()
     subject_page_s5.click_save_button()
 
-    # Step 5: Do not enter a diagnosis date or reason
+    # Step 3: Do not enter a diagnosis date or reason
     time.sleep(2)  # Pause for 2 seconds to let the process complete
 
-    # Step 6: Assertions
+    # Step 4: Assertions
     alert_message = subject_page_s5.get_alert_message()
     assert (
         "must not be earlier than the referral date" in alert_message
@@ -324,7 +283,7 @@ def test_record_diagnosis_date_no_date_or_reason_alert(page: Page):
 @pytest.mark.vpn_required
 @pytest.mark.fobt_diagnosis_date_entry
 def test_record_diagnosis_date_reason_only(page: Page):
-    # Step 1: Obtain NHS number for a subject matching criteria
+    # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
         "latest episode type": "FOBT",
         "latest episode status": "Open",
@@ -332,24 +291,9 @@ def test_record_diagnosis_date_reason_only(page: Page):
         "latest episode has diagnosis date": "No",
         "latest episode diagnosis date reason": "NULL",
     }
-    user = User()
-    subject = Subject()
-    builder = SubjectSelectionQueryBuilder()
-    query, bind_vars = builder.build_subject_selection_query(
-        criteria=criteria, user=user, subject=subject, subjects_to_retrieve=1
-    )
-    df = OracleDB().execute_query(query, bind_vars)
-    if df.empty:
-        raise ValueError("No matching subject found with provided episode criteria.")
+    prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
 
-    # Step 2: Login and search for subject
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).go_to_screening_subject_search_page()
-
-    # Step 3: Search subject and go to profile
-    search_subject_episode_by_nhs_number(page, df.iloc[0]["subject_nhs_number"])
-
-    # Step 4: Interact with subject page
+    # Step 2: Interact with subject page
     subject_page_s6 = RecordDiagnosisDatePage(page)
     page.get_by_role("button", name="Advance FOBT Screening Episode").click()
     page.get_by_role("button", name="Record Diagnosis Date").click()
@@ -372,24 +316,9 @@ def test_amend_diagnosis_date_without_reason_alert(page: Page):
         "latest episode has diagnosis date": "No",
         "latest episode diagnosis date reason": "NULL",
     }
-    user = User()
-    subject = Subject()
-    builder = SubjectSelectionQueryBuilder()
-    query, bind_vars = builder.build_subject_selection_query(
-        criteria=criteria, user=user, subject=subject, subjects_to_retrieve=1
-    )
-    df = OracleDB().execute_query(query, bind_vars)
-    if df.empty:
-        raise ValueError("No matching subject found with provided episode criteria.")
+    prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
 
-    # Step 2: Login and search for subject
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).go_to_screening_subject_search_page()
-
-    # Step 3: Search subject and go to profile
-    search_subject_episode_by_nhs_number(page, df.iloc[0]["subject_nhs_number"])
-
-    # Step 4: Interact with subject page
+    # Step 2: Interact with subject page
     subject_page_s8 = RecordDiagnosisDatePage(page)
     page.get_by_role("button", name="Advance FOBT Screening Episode").click()
     page.get_by_role("button", name="Record Diagnosis Date").click()
@@ -401,7 +330,7 @@ def test_amend_diagnosis_date_without_reason_alert(page: Page):
     page.get_by_role("link", name="List Episodes").click()
     page.get_by_role("link", name="events").click()
 
-    # Step 5: Assert that the "Record Diagnosis Date" option is available
+    # Step 3: Assert that the "Record Diagnosis Date" option is available
     subject_event_s8 = SubjectEpisodeEventsAndNotesPage(page)
     event_details = subject_event_s8.get_latest_event_details()
     assert "A50" not in event_details["latest_event_status"]
@@ -545,7 +474,7 @@ def get_diagnosis_reason():
 @pytest.mark.vpn_required
 @pytest.mark.fobt_diagnosis_date_entry
 def test_amend_diagnosis_date_no_change_alert(page: Page):
-    # Step 1: Obtain NHS number for a subject matching criteria
+    # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
         "latest episode type": "FOBT",
         "latest episode status": "Open",
@@ -553,24 +482,12 @@ def test_amend_diagnosis_date_no_change_alert(page: Page):
         "latest episode has diagnosis date": "Yes",
         "latest episode diagnosis date reason": "NULL",
     }
-    user = User()
-    subject = Subject()
-    builder = SubjectSelectionQueryBuilder()
-    query, bind_vars = builder.build_subject_selection_query(
-        criteria=criteria, user=user, subject=subject, subjects_to_retrieve=1
-    )
-    df = OracleDB().execute_query(query, bind_vars)
-    if df.empty:
-        raise ValueError("No matching subject found with provided episode criteria.")
+    prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
 
-    # Step 2: Login and search for subject
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).go_to_screening_subject_search_page()
-
-    # Step 3: Search subject and go to profile
+    # Step 2: Search subject and go to profile
     search_subject_episode_by_nhs_number(page, df.iloc[0]["subject_nhs_number"])
 
-    # Step 4: Interact with subject page
+    # Step 3: Interact with subject page
     subject_page_s11 = RecordDiagnosisDatePage(page)
     page.get_by_role("button", name="Advance FOBT Screening Episode").click()
     page.get_by_role("checkbox").check()
@@ -739,7 +656,7 @@ def test_hub_user_cannot_amend_diagnosis_date(page: Page):
 @pytest.mark.vpn_required
 @pytest.mark.fobt_diagnosis_date_entry
 def test_record_and_amend_diagnosis_date_multiple_times(page: Page):
-    # Step 1: Obtain NHS number for a subject matching criteria
+    # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
         "latest episode type": "FOBT",
         "latest episode status": "Open",
@@ -749,25 +666,7 @@ def test_record_and_amend_diagnosis_date_multiple_times(page: Page):
     }
     amend_reason = "Incorrect information previously entered"
     remove_reason = "Patient choice"
-    user = User()
-    subject = Subject()
-    builder = SubjectSelectionQueryBuilder()
-    query, bind_vars = builder.build_subject_selection_query(
-        criteria=criteria, user=user, subject=subject, subjects_to_retrieve=1
-    )
-    df = OracleDB().execute_query(query, bind_vars)
-    if df.empty:
-        raise ValueError("No matching subject found with provided episode criteria.")
-
-    # Step 2: Login and search for subject
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).go_to_screening_subject_search_page()
-
-    # Step 3: Select episode radio button
-    page.get_by_role("radio", name="Episodes").check()
-
-    # Step 4: Search subject and go to profile
-    search_subject_episode_by_nhs_number(page, df.iloc[0]["subject_nhs_number"])
+    prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
     subject_page_s15 = RecordDiagnosisDatePage(page)
 
     # --- First: Record Diagnosis Date (today) ---
