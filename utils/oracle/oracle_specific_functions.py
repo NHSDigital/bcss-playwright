@@ -4,6 +4,10 @@ import pandas as pd
 from datetime import datetime
 from enum import IntEnum
 from typing import Optional
+from typing import Dict
+from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
+from utils.user_tools import UserTools
+from classes.subject import Subject
 
 
 class SqlQueryValues(IntEnum):
@@ -707,3 +711,39 @@ def get_investigation_dataset_polyp_algorithm_size(
     df = OracleDB().execute_query(query, bind_vars)
     polyp_algorithm_size = df["polyp_algorithm_size"].iloc[0] if not df.empty else None
     return polyp_algorithm_size
+
+
+class SubjectSelector:
+    """
+    Provides helper methods for selecting screening subjects based on preconditions
+    required by specific manual cease scenarios.
+    """
+
+    @staticmethod
+    def get_subject_for_manual_cease(criteria: Dict[str, str]) -> str:
+        logging.info(f"[SUBJECT SELECTOR] Searching for subject using criteria: {criteria}")
+
+        # Get user object based on test login
+        user_details = UserTools.retrieve_user("Hub Manager at BCS01")
+        user = UserTools.get_user_object(user_details)
+
+        # Create empty subject stub
+        empty_subject = Subject()
+
+        query_builder = SubjectSelectionQueryBuilder()
+        query, bind_vars = query_builder.build_subject_selection_query(
+            criteria=criteria,
+            user=user,
+            subject=empty_subject,
+        )
+
+        logging.debug(f"[SUBJECT SELECTOR] Executing query:\n{query}\nWith bind variables: {bind_vars}")
+        result_df = OracleDB().execute_query(query, bind_vars)
+
+        if result_df.empty:
+            raise ValueError(f"No subject found matching criteria: {criteria}")
+
+        nhs_number = result_df["subject_nhs_number"].iloc[0]
+        logging.info(f"[SUBJECT SELECTOR] Found subject NHS number: {nhs_number}")
+        return nhs_number
+
