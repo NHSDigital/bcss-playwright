@@ -1,6 +1,7 @@
 import pytest
 import time
-from typing import Optional
+import logging
+from typing import Optional, Callable
 from datetime import datetime
 from datetime import date, timedelta
 from playwright.sync_api import Page, expect
@@ -17,6 +18,8 @@ from utils.oracle.oracle import OracleDB
 from classes.user import User
 from classes.subject import Subject
 from pages.base_page import BasePage
+
+logger = logging.getLogger(__name__)
 
 
 # Helpers
@@ -65,6 +68,44 @@ def prepare_subject_for_test(
         page.get_by_role("radio", name="Episodes").check()
     search_subject_episode_by_nhs_number(page, nhs_number)
     return nhs_number
+
+
+def assert_diagnosis_event_details(
+    event_details: dict,
+    expected_status_not: Optional[str],
+    expected_event: str = "Record Diagnosis Date",
+    expected_reason: Optional[str] = None,
+    assert_today: bool = True,
+    log: Optional[Callable[[str], None]] = None,
+) -> None:
+    if log:
+        log(f"Checking event: {event_details['event']}")
+        log(f"Checking status: {event_details.get('latest_event_status', '')}")
+        log(f"Checking item: {event_details['item']}")
+
+    if expected_status_not is not None:
+        assert expected_status_not not in event_details.get(
+            "latest_event_status", ""
+        ), f"Expected status '{expected_status_not}' to be absent, but got: {event_details.get('latest_event_status')}"
+
+    assert event_details["event"] == expected_event
+
+    if expected_reason is not None:
+        assert (
+            expected_reason in event_details["item"]
+        ), f"Expected reason '{expected_reason}' to be part of item, but got: {event_details['item']}"
+    else:
+        assert (
+            event_details.get("diagnosis_reason") is None
+        ), f"Expected 'diagnosis_reason' to be None, but got: {event_details.get('diagnosis_reason')}"
+
+    assert "Diag Date :" in event_details["item"]
+
+    if assert_today:
+        today_formatted = date.today().strftime("%d %b %Y")
+        assert (
+            today_formatted in event_details["item"]
+        ), f"Expected today's date ({today_formatted}) in item but got: {event_details['item']}"
 
 
 # Scenario 1
@@ -383,16 +424,12 @@ def test_amend_diagnosis_date_with_reason(page: Page):
     # Step 5: Assertions
     subject_event_status_s9 = SubjectEpisodeEventsAndNotesPage(page)
     event_details = subject_event_status_s9.get_latest_event_details()
-    assert "A51" not in event_details.get("latest_event_status", "")
-    assert event_details["event"] == "Record Diagnosis Date"
-    assert (
-        amend_reason in event_details["item"]
-    ), f"Expected reason '{amend_reason}' to be part of item, but got: {event_details['item']}"
-    assert "Diag Date :" in event_details["item"]
-    today_formatted = date.today().strftime("%d %b %Y")  # "21 Jul 2025"
-    assert (
-        today_formatted in event_details["item"]
-    ), f"Expected today's date ({today_formatted}) in item but got: {event_details['item']}"
+    assert_diagnosis_event_details(
+        event_details,
+        expected_status_not="A51",
+        expected_reason=amend_reason,
+        log=logger.debug,
+    )
 
 
 # Scenario 10
@@ -469,12 +506,11 @@ def get_diagnosis_reason():
     return None
 
 
-# Scenario 11
 @pytest.mark.regression
 @pytest.mark.vpn_required
 @pytest.mark.fobt_diagnosis_date_entry
 def test_amend_diagnosis_date_no_change_alert(page: Page):
-    # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
+    # Step 1: Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
         "latest episode type": "FOBT",
         "latest episode status": "Open",
@@ -484,17 +520,14 @@ def test_amend_diagnosis_date_no_change_alert(page: Page):
     }
     prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
 
-    # Step 2: Search subject and go to profile
-    search_subject_episode_by_nhs_number(page, df.iloc[0]["subject_nhs_number"])
-
-    # Step 3: Interact with subject page
+    # Step 2: Interact with subject page
     subject_page_s11 = RecordDiagnosisDatePage(page)
     page.get_by_role("button", name="Advance FOBT Screening Episode").click()
     page.get_by_role("checkbox").check()
     page.get_by_role("button", name="Amend Diagnosis Date").click()
     subject_page_s11.click_save_button()
 
-    # Step 5: Assert alert message
+    # Step 3: Assert alert message
     alert_message = subject_page_s11.get_alert_message()
     expected = "An amended date of diagnosis must not be earlier than the recorded diagnosis date and not in the future."
     assert expected in alert_message, f"Unexpected alert message. Got: {alert_message}"
@@ -681,16 +714,9 @@ def test_record_and_amend_diagnosis_date_multiple_times(page: Page):
     # Step 6: Assertions
     subject_event_s15 = SubjectEpisodeEventsAndNotesPage(page)
     event_details = subject_event_s15.get_latest_event_details()
-    assert "A50" not in event_details["latest_event_status"]
-    assert event_details["event"] == "Record Diagnosis Date"
-    assert (
-        event_details.get("diagnosis_reason") is None
-    ), f"Expected 'diagnosis_reason' to be None, but got: {event_details.get('diagnosis_reason')}"
-    assert "Diag Date :" in event_details["item"]
-    today_formatted = date.today().strftime("%d %b %Y")  # "16 Jul 2025"
-    assert (
-        today_formatted in event_details["item"]
-    ), f"Expected today's date ({today_formatted}) in item but got: {event_details['item']}"
+    assert_diagnosis_event_details(
+        event_details, expected_status_not="A50", expected_reason=None, log=logger.debug
+    )
 
     # --- Second: Amend Diagnosis Date (today, with reason) ---
     # Step 7: Interact with subject page
@@ -708,16 +734,12 @@ def test_record_and_amend_diagnosis_date_multiple_times(page: Page):
     # Step 8: Assertions
     subject_event_status_s15 = SubjectEpisodeEventsAndNotesPage(page)
     event_details = subject_event_status_s15.get_latest_event_details()
-    assert "A51" not in event_details.get("latest_event_status", "")
-    assert event_details["event"] == "Record Diagnosis Date"
-    assert (
-        amend_reason in event_details["item"]
-    ), f"Expected reason '{amend_reason}' to be part of item, but got: {event_details['item']}"
-    assert "Diag Date :" in event_details["item"]
-    today_formatted = date.today().strftime("%d %b %Y")  # "16 Jul 2025"
-    assert (
-        today_formatted in event_details["item"]
-    ), f"Expected today's date ({today_formatted}) in item but got: {event_details['item']}"
+    assert_diagnosis_event_details(
+        event_details,
+        expected_status_not="A51",
+        expected_reason=amend_reason,
+        log=logger.debug,
+    )
 
     # --- Third: Remove Diagnosis Date (clear date, with reason) ---
     # Step 9: Interact with subject page
@@ -772,16 +794,12 @@ def test_record_and_amend_diagnosis_date_multiple_times(page: Page):
     # Step 12: Assertions
     subject_event_status_s15 = SubjectEpisodeEventsAndNotesPage(page)
     event_details = subject_event_status_s15.get_latest_event_details()
-    assert "A51" not in event_details.get("latest_event_status", "")
-    assert event_details["event"] == "Record Diagnosis Date"
-    assert (
-        amend_reason in event_details["item"]
-    ), f"Expected reason '{amend_reason}' to be part of item, but got: {event_details['item']}"
-    assert "Diag Date :" in event_details["item"]
-    today_formatted = date.today().strftime("%d %b %Y")  # "16 Jul 2025"
-    assert (
-        today_formatted in event_details["item"]
-    ), f"Expected today's date ({today_formatted}) in item but got: {event_details['item']}"
+    assert_diagnosis_event_details(
+        event_details,
+        expected_status_not="A51",
+        expected_reason=amend_reason,
+        log=logger.debug,
+    )
 
 
 # Scenario 16
@@ -831,16 +849,9 @@ def test_support_user_can_amend_diagnosis_date_earlier(page: Page):
     # Step 6: Assertions
     subject_event_s16 = SubjectEpisodeEventsAndNotesPage(page)
     event_details = subject_event_s16.get_latest_event_details()
-    assert "A50" not in event_details["latest_event_status"]
-    assert event_details["event"] == "Record Diagnosis Date"
-    assert (
-        event_details.get("diagnosis_reason") is None
-    ), f"Expected 'diagnosis_reason' to be None, but got: {event_details.get('diagnosis_reason')}"
-    assert "Diag Date :" in event_details["item"]
-    today_formatted = date.today().strftime("%d %b %Y")  # "16 Jul 2025"
-    assert (
-        today_formatted in event_details["item"]
-    ), f"Expected today's date ({today_formatted}) in item but got: {event_details['item']}"
+    assert_diagnosis_event_details(
+        event_details, expected_status_not="A50", expected_reason=None, log=logger.debug
+    )
 
     # --- Second: Amend Diagnosis Date (yesterday, with reason) ---
     # Step 7: Interact with subject page
