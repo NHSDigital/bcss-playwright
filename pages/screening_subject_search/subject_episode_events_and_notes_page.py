@@ -11,14 +11,26 @@ class SubjectEpisodeEventsAndNotesPage(BasePage):
         super().__init__(page)
         self.page = page
         # List of episode events and notes - page locators
-        self.latest_event_status_cell = self.page.locator("table >> td.epihdr_data").nth(0)  # if it's the first one
-        self.latest_event_cell = self.page.get_by_role("cell", name="Record Diagnosis Date", exact=True)
-        self.latest_diagnosis_cell = self.page.locator("td[align='center']:has-text('Diag Date :')")
+        self.latest_event_status_cell = self.page.locator(
+            "table >> td.epihdr_data"
+        ).nth(
+            0
+        )  # if it's the first one
+        self.latest_event_cell = self.page.get_by_role(
+            "cell", name="Record Diagnosis Date", exact=True
+        )
+        self.latest_diagnosis_cell = self.page.locator(
+            "td[align='center']:has-text('Diag Date :')"
+        )
 
         # Episode details (Replace with actual selectors only for scenario 17)
         self.latest_episode_status = self.page.locator("#latestEpisodeStatus")
-        self.latest_episode_has_diagnosis_date = self.page.locator("#latestEpisodeHasDiagnosisDate")
-        self.latest_episode_diagnosis_reason = self.page.locator("#latestEpisodeDiagnosisDateReason")
+        self.latest_episode_has_diagnosis_date = self.page.locator(
+            "#latestEpisodeHasDiagnosisDate"
+        )
+        self.latest_episode_diagnosis_reason = self.page.locator(
+            "#latestEpisodeDiagnosisDateReason"
+        )
         self.process_sspi_update_button = self.page.get_by_text("Process SSPI Update")
         self.deduction_reason_dropdown = self.page.locator("#deductionReason")
         self.confirm_sspi_update_button = self.page.get_by_text("Confirm")
@@ -49,15 +61,14 @@ class SubjectEpisodeEventsAndNotesPage(BasePage):
     def validate_event_status_is_not_A50(self, event_details: dict) -> None:
         """Validates that latest_event_status does not contain 'A50'."""
         latest_status = event_details.get("latest_event_status")
-
         logging.info(f"Validating Latest Event Status: {latest_status}")
 
         if latest_status is None:
             pytest.fail("Missing 'latest_event_status' in event_details.")
-
-        if "A50" in latest_status:
-            pytest.fail(f"Invalid status detected: 'A50' is not allowed. Received: '{latest_status}'")
-
+        elif "A50" in str(latest_status):
+            pytest.fail(
+                f"Invalid status detected: 'A50' is not allowed. Received: '{latest_status}'"
+            )
         logging.info(f"Status '{latest_status}' is allowed.")
 
     def is_record_diagnosis_date_option_available(self) -> bool:
@@ -68,7 +79,9 @@ class SubjectEpisodeEventsAndNotesPage(BasePage):
             bool: True if the option is available, False otherwise.
         """
         try:
-            return self.page.get_by_role("button", name="Record Diagnosis Date").is_visible()
+            return self.page.get_by_role(
+                "button", name="Record Diagnosis Date"
+            ).is_visible()
         except Exception as e:
             logging.error(f"Error checking for 'Record Diagnosis Date' option: {e}")
             return False
@@ -81,7 +94,9 @@ class SubjectEpisodeEventsAndNotesPage(BasePage):
             bool: True if the option is available, False otherwise.
         """
         try:
-            return self.page.get_by_role("button", name="Amend Diagnosis Date").is_visible()
+            return self.page.get_by_role(
+                "button", name="Amend Diagnosis Date"
+            ).is_visible()
         except Exception as e:
             logging.error(f"Error checking for 'Amend Diagnosis Date' option: {e}")
             return False
