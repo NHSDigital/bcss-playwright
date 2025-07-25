@@ -108,6 +108,38 @@ def assert_diagnosis_event_details(
         ), f"Expected today's date ({today_formatted}) in item but got: {event_details['item']}"
 
 
+def amend_diagnosis_date_with_reason(
+    page: Page,
+    reason_code: str,
+    date: Optional[datetime] = None,
+    click_back_steps: int = 2,
+) -> None:
+    """
+    Navigates back, amends diagnosis date with a reason, and opens the events page.
+
+    Args:
+        page (Page): Playwright page object
+        reason_code (str): The dropdown value to select for reason
+        date (Optional[datetime]): The date to enter in the field. Defaults to today.
+        click_back_steps (int): How many times to click the 'Back' link
+    """
+    for _ in range(click_back_steps):
+        page.get_by_role("link", name="Back", exact=True).click()
+
+    subject_page = RecordDiagnosisDatePage(page)
+    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("checkbox").check()
+    page.get_by_role("button", name="Amend Diagnosis Date").click()
+
+    if date is None:
+        date = datetime.today()
+    subject_page.enter_date_in_diagnosis_date_field(date)
+    page.locator("#reason").select_option(reason_code)
+    subject_page.click_save_button()
+    page.get_by_role("link", name="List Episodes").click()
+    page.get_by_role("link", name="events").click()
+
+
 # Scenario 1
 @pytest.mark.regression
 @pytest.mark.vpn_required
@@ -720,16 +752,7 @@ def test_record_and_amend_diagnosis_date_multiple_times(page: Page):
 
     # --- Second: Amend Diagnosis Date (today, with reason) ---
     # Step 7: Interact with subject page
-    [page.get_by_role("link", name="Back", exact=True).click() for _ in range(2)]
-    subject_page_s15 = RecordDiagnosisDatePage(page)
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
-    page.get_by_role("checkbox").check()
-    page.get_by_role("button", name="Amend Diagnosis Date").click()
-    subject_page_s15.enter_date_in_diagnosis_date_field(datetime.today())
-    page.locator("#reason").select_option("305501")
-    subject_page_s15.click_save_button()
-    page.get_by_role("link", name="List Episodes").click()
-    page.get_by_role("link", name="events").click()
+    amend_diagnosis_date_with_reason(page, reason_code="305501")
 
     # Step 8: Assertions
     subject_event_status_s15 = SubjectEpisodeEventsAndNotesPage(page)
@@ -780,16 +803,7 @@ def test_record_and_amend_diagnosis_date_multiple_times(page: Page):
 
     # --- Fourth: Amend Diagnosis Date again (today, with reason) ---
     # Step 11: Interact with subject page
-    [page.get_by_role("link", name="Back", exact=True).click() for _ in range(2)]
-    subject_page_s15 = RecordDiagnosisDatePage(page)
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
-    page.get_by_role("checkbox").check()
-    page.get_by_role("button", name="Amend Diagnosis Date").click()
-    subject_page_s15.enter_date_in_diagnosis_date_field(datetime.today())
-    page.locator("#reason").select_option("305501")
-    subject_page_s15.click_save_button()
-    page.get_by_role("link", name="List Episodes").click()
-    page.get_by_role("link", name="events").click()
+    amend_diagnosis_date_with_reason(page, reason_code="305501")
 
     # Step 12: Assertions
     subject_event_status_s15 = SubjectEpisodeEventsAndNotesPage(page)
