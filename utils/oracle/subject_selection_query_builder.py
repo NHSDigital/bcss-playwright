@@ -57,6 +57,34 @@ from classes.lynch_incident_episode_type import (
 from classes.prevalent_incident_status_type import PrevalentIncidentStatusType
 from classes.notify_event_status import NotifyEventStatus
 from classes.yes_no_type import YesNoType
+from classes.episode_sub_type import EpisodeSubType
+from classes.episode_status_type import EpisodeStatusType
+from classes.episode_status_reason_type import EpisodeStatusReasonType
+from classes.recall_calculation_method_type import RecallCalculationMethodType
+from classes.recall_episode_type import RecallEpisodeType
+from classes.recall_surveillance_type import RecallSurveillanceType
+from classes.event_code_type import EventCodeType
+from classes.has_referral_date import HasReferralDate
+from classes.diagnosis_date_reason_type import DiagnosisDateReasonType
+from classes.yes_no import YesNo
+from classes.diagnostic_test_referral_type import DiagnosticTestReferralType
+from classes.reason_for_onward_referral_type import ReasonForOnwardReferralType
+from classes.reason_for_symptomatic_referral_type import (
+    ReasonForSymptomaticReferralType,
+)
+from classes.asa_grade_type import ASAGradeType
+from classes.scan_type import ScanType
+from classes.metastases_present_type import MetastasesPresentType
+from classes.metastases_location_type import MetastasesLocationType
+from classes.final_pretreatment_t_category_type import FinalPretreatmentTCategoryType
+from classes.final_pretreatment_n_category_type import FinalPretreatmentNCategoryType
+from classes.final_pretreatment_m_category_type import FinalPretreatmentMCategoryType
+from classes.reason_no_treatment_received_type import ReasonNoTreatmentReceivedType
+from classes.location_type import LocationType
+from classes.previously_excised_tumour_type import PreviouslyExcisedTumourType
+from classes.treatment_type import TreatmentType
+from classes.treatment_given import TreatmentGiven
+from classes.cancer_treatment_intent import CancerTreatmentIntent
 
 
 class SubjectSelectionQueryBuilder:
@@ -89,6 +117,8 @@ class SubjectSelectionQueryBuilder:
         self.criteria_value_count = 0
 
         self.xt = "xt"
+        self.ap = "ap"
+        self.tk = "tk"
         self.ap = "ap"
 
         # Repeated Strings:
@@ -486,6 +516,8 @@ class SubjectSelectionQueryBuilder:
                 self._add_criteria_diagnostic_test_has_result()
             case SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_HAS_OUTCOME:
                 self._add_criteria_diagnostic_test_has_outcome_of_result()
+            case SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_FAILED:
+                self._add_criteria_diagnostic_test_failed()
             case SubjectSelectionCriteriaKey.DIAGNOSTIC_TEST_INTENDED_EXTENT:
                 self._add_criteria_diagnostic_test_intended_extent()
             case (
@@ -619,6 +651,21 @@ class SubjectSelectionQueryBuilder:
             case SubjectSelectionCriteriaKey.NOTIFY_ARCHIVED_MESSAGE_STATUS:
                 self._add_criteria_notify_archived_message_status()
             # ------------------------------------------------------------------------
+            # 📝 Referrals
+            # ------------------------------------------------------------------------
+            case SubjectSelectionCriteriaKey.REASON_FOR_ONWARD_REFERRAL:
+                self._add_criteria_onward_referral_reason("complete_reason_id")
+            case SubjectSelectionCriteriaKey.REFER_FROM_SYMPTOMATIC_REASON:
+                self._add_criteria_onward_referral_reason(
+                    "refer_from_surgery_reason_id"
+                )
+            case SubjectSelectionCriteriaKey.REFER_ANOTHER_DIAGNOSTIC_TEST_TYPE:
+                self._add_criteria_onward_referral_type("referral_procedure_group_id")
+            case SubjectSelectionCriteriaKey.REFER_FROM_SYMPTOMATIC_TYPE:
+                self._add_criteria_onward_referral_type("refer_from_surgery_type_id")
+            case SubjectSelectionCriteriaKey.REASON_FOR_SYMPTOMATIC_REFERRAL:
+                self._add_criteria_symptomatic_referral_reason()
+            # ------------------------------------------------------------------------
             # 🛑 Fallback: Unmatched Criteria Key
             # ------------------------------------------------------------------------
             case _:
@@ -705,8 +752,8 @@ class SubjectSelectionQueryBuilder:
                 value = "pkg_parameters.f_get_national_param_val (10)"
 
             self.sql_where.append(
-                f"AND pkg_bcss_common.f_get_ss_lower_age_limit (ss.screening_subject_id) "
-                f"{comparator} {value}"
+                f" AND pkg_bcss_common.f_get_ss_lower_age_limit (ss.screening_subject_id) "
+                f" {comparator} {value} "
             )
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
@@ -726,8 +773,8 @@ class SubjectSelectionQueryBuilder:
                 value = "35"
 
             self.sql_where.append(
-                f"AND pkg_bcss_common.f_get_lynch_lower_age_limit (ss.screening_subject_id) "
-                f"{comparator} {value}"
+                f" AND pkg_bcss_common.f_get_lynch_lower_age_limit (ss.screening_subject_id) "
+                f" {comparator} {value} "
             )
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
@@ -749,7 +796,7 @@ class SubjectSelectionQueryBuilder:
 
             self._add_join_to_latest_episode()
             self.sql_where.append(
-                f" AND ep.episode_type_id {self.criteria_comparator}{episode_type.valid_value_id}"
+                f" AND ep.episode_type_id {self.criteria_comparator} {episode_type.valid_value_id} "
             )
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
@@ -761,29 +808,17 @@ class SubjectSelectionQueryBuilder:
         Translates a human-readable episode sub-type string into an internal numeric ID.
         """
         try:
-            value = self.criteria_value.lower()
-            comparator = self.criteria_comparator
-
-            # Simulated EpisodeSubType enum mapping
-            episode_subtype_map = {
-                "routine screening": 10,
-                "urgent referral": 11,
-                "pre-assessment": 12,
-                "follow-up": 13,
-                "surveillance": 14,
-                # Add more mappings as needed
-            }
-
-            if value not in episode_subtype_map:
-                raise ValueError(f"Unknown episode sub-type: {value}")
-
-            episode_subtype_id = episode_subtype_map[value]
-
-            # Add SQL condition using the mapped ID
-            self.sql_where.append(
-                f"AND ep.episode_subtype_id {comparator} {episode_subtype_id}"
+            episode_sub_type = EpisodeSubType.by_description_case_insensitive(
+                self.criteria_value
             )
-
+            if episode_sub_type is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+            self._add_join_to_latest_episode()
+            self.sql_where.append(
+                f" AND ep.episode_subtype_id {self.criteria_comparator}{episode_sub_type.get_id()}"
+            )
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
@@ -794,31 +829,17 @@ class SubjectSelectionQueryBuilder:
         Translates a human-readable episode status into an internal numeric ID.
         """
         try:
-            value = self.criteria_value.lower()
-            comparator = self.criteria_comparator
-
-            # Simulated EpisodeStatusType mapping
-            episode_status_map = {
-                "active": 100,
-                "completed": 101,
-                "pending": 102,
-                "cancelled": 103,
-                "invalid": 104,
-                "open": 11352,
-                "closed": 11353,
-                "paused": 11354,
-                # Add actual mappings as needed
-            }
-
-            if value not in episode_status_map:
-                raise ValueError(f"Unknown episode status: {value}")
-
-            episode_status_id = episode_status_map[value]
-
-            self.sql_where.append(
-                f"AND ep.episode_status_id {comparator} {episode_status_id}"
+            episode_status = EpisodeStatusType.by_description_case_insensitive(
+                self.criteria_value
             )
-
+            if episode_status is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+            self._add_join_to_latest_episode()
+            self.sql_where.append(
+                f" AND ep.episode_status_id {self.criteria_comparator}{episode_status.get_id()} "
+            )
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
@@ -829,31 +850,23 @@ class SubjectSelectionQueryBuilder:
         Allows for explicit mapping or handling of NULL where no status reason is recorded.
         """
         try:
-            value = self.criteria_value.lower()
-
-            # Simulated EpisodeStatusReasonType enum
-            episode_status_reason_map = {
-                "completed screening": 200,
-                "no longer eligible": 201,
-                "deceased": 202,
-                "moved away": 203,
-                "null": None,  # Special case to represent SQL IS NULL
-                # Extend as needed
-            }
-
-            if value not in episode_status_reason_map:
-                raise ValueError(f"Unknown episode status reason: {value}")
-
-            status_reason_id = episode_status_reason_map[value]
-
-            if status_reason_id is None:
-                self.sql_where.append("AND ep.episode_status_reason_id IS NULL")
-            else:
-                comparator = self.criteria_comparator
-                self.sql_where.append(
-                    f"AND ep.episode_status_reason_id {comparator} {status_reason_id}"
+            episode_status_reason = (
+                EpisodeStatusReasonType.by_description_case_insensitive(
+                    self.criteria_value
                 )
-
+            )
+            if episode_status_reason is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+            self._add_join_to_latest_episode()
+            self.sql_where += " AND ep.episode_status_reason_id "
+            if episode_status_reason == EpisodeStatusReasonType.NULL:
+                self.sql_where.append(self._SQL_IS_NULL)
+            else:
+                self.sql_where.append(
+                    f" {self.criteria_comparator} {episode_status_reason.get_id()} "
+                )
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
@@ -864,30 +877,23 @@ class SubjectSelectionQueryBuilder:
         Handles mapped descriptions or nulls for closed episodes with no recall method.
         """
         try:
-            value = self.criteria_value.lower()
-
-            # Simulated enum-like mapping
-            recall_calc_method_map = {
-                "standard": 300,
-                "accelerated": 301,
-                "paused": 302,
-                "null": None,  # For episodes with no recall method
-                # Extend with real values as needed
-            }
-
-            if value not in recall_calc_method_map:
-                raise ValueError(f"Unknown recall calculation method: {value}")
-
-            method_id = recall_calc_method_map[value]
-
-            if method_id is None:
-                self.sql_where.append("AND ep.recall_calculation_method_id IS NULL")
-            else:
-                comparator = self.criteria_comparator
-                self.sql_where.append(
-                    f"AND ep.recall_calculation_method_id {comparator} {method_id}"
+            recall_calc_method = (
+                RecallCalculationMethodType.by_description_case_insensitive(
+                    self.criteria_value
                 )
-
+            )
+            if recall_calc_method is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+            self._add_join_to_latest_episode()
+            self.sql_where.append(" AND ep.recall_calculation_method_id ")
+            if recall_calc_method == RecallCalculationMethodType.NULL:
+                self.sql_where.append(self._SQL_IS_NULL)
+            else:
+                self.sql_where.append(
+                    f"{self.criteria_comparator}{recall_calc_method.get_id()}"
+                )
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
@@ -897,29 +903,21 @@ class SubjectSelectionQueryBuilder:
         Supports mapped descriptions and IS NULL.
         """
         try:
-            value = self.criteria_value.lower()
-
-            recall_episode_type_map = {
-                "referral": 1,
-                "invitation": 2,
-                "reminder": 3,
-                "episode_end": 4,
-                "null": None,
-            }
-
-            if value not in recall_episode_type_map:
-                raise ValueError(f"Unknown recall episode type: {value}")
-
-            type_id = recall_episode_type_map[value]
-
-            if type_id is None:
-                self.sql_where.append("AND ep.recall_episode_type_id IS NULL")
-            else:
-                comparator = self.criteria_comparator
-                self.sql_where.append(
-                    f"AND ep.recall_episode_type_id {comparator} {type_id}"
+            recall_episode_type = RecallEpisodeType.by_description_case_insensitive(
+                self.criteria_value
+            )
+            if recall_episode_type is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
                 )
-
+            self._add_join_to_latest_episode()
+            self.sql_where.append(" AND ep.recall_episode_type_id ")
+            if recall_episode_type == RecallEpisodeType.NULL:
+                self.sql_where.append(self._SQL_IS_NULL)
+            else:
+                self.sql_where.append(
+                    f"{self.criteria_comparator}{recall_episode_type.get_id()}"
+                )
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
@@ -929,28 +927,25 @@ class SubjectSelectionQueryBuilder:
         Supports mapped descriptions and null values.
         """
         try:
-            value = self.criteria_value.lower()
-
-            recall_surv_type_map = {
-                "routine": 500,
-                "enhanced": 501,
-                "annual": 502,
-                "null": None,
-            }
-
-            if value not in recall_surv_type_map:
-                raise ValueError(f"Unknown recall surveillance type: {value}")
-
-            surv_id = recall_surv_type_map[value]
-
-            if surv_id is None:
-                self.sql_where.append("AND ep.recall_polyp_surv_type_id IS NULL")
-            else:
-                comparator = self.criteria_comparator
-                self.sql_where.append(
-                    f"AND ep.recall_polyp_surv_type_id {comparator} {surv_id}"
+            recall_surveillance_type = (
+                RecallSurveillanceType.by_description_case_insensitive(
+                    self.criteria_value
                 )
-
+            )
+            if recall_surveillance_type is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+            self._add_join_to_latest_episode()
+            self.sql_where.append(" AND ep.recall_polyp_surv_type_id ")
+            if recall_surveillance_type == RecallSurveillanceType.NULL:
+                self.sql_where.append(
+                    f"IS {recall_surveillance_type.get_description()}"
+                )
+            else:
+                self.sql_where.append(
+                    f"{self.criteria_comparator}{recall_surveillance_type.get_id()}"
+                )
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
@@ -981,33 +976,23 @@ class SubjectSelectionQueryBuilder:
         Adds a filter checking whether the given event code appears in the latest episode's event list.
         Uses EXISTS or NOT EXISTS depending on the flag.
         """
+        self._add_join_to_latest_episode()
+        criteria_words = self.criteria_value.split(" ")
         try:
-            code = self.criteria_value.strip().split()[0].upper()
-
-            # Simulated EventCodeType registry
-            event_code_map = {
-                "EV101": 701,
-                "EV102": 702,
-                "EV900": 799,
-                # ...extend with real mappings
-            }
-
-            if code not in event_code_map:
-                raise ValueError(f"Unknown event code: {code}")
-
-            event_code_id = event_code_map[code]
-
-            exists_clause = "EXISTS" if event_is_included else self._SQL_NOT_EXISTS
-
+            event_code = EventCodeType.by_code(criteria_words[0].upper())
+            if event_code is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+            if event_is_included:
+                self.sql_where.append(" AND EXISTS ( SELECT 'evc' ")
+            else:
+                self.sql_where.append(" AND NOT EXISTS ( SELECT 'evc' ")
             self.sql_where.append(
-                f"""AND {exists_clause} (
-        SELECT 'evc'
-        FROM ep_events_t evc
-        WHERE evc.event_code_id = {event_code_id}
-        AND evc.subject_epis_id = ep.subject_epis_id
-    )"""
+                f"   FROM ep_events_t evc "
+                f"   WHERE evc.event_code_id = {event_code.get_id()} "
+                f"   AND evc.subject_epis_id = ep.subject_epis_id) "
             )
-
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
@@ -1016,33 +1001,23 @@ class SubjectSelectionQueryBuilder:
         Adds a filter that checks whether the specified event status is present
         in the latest episode. Uses EXISTS or NOT EXISTS depending on the flag.
         """
+        self._add_join_to_latest_episode()
+        criteria_words = self.criteria_value.split(" ")
         try:
-            code = self.criteria_value.strip().split()[0].upper()
-
-            # Simulated EventStatusType code-to-ID map
-            event_status_code_map = {
-                "ES01": 600,
-                "ES02": 601,
-                "ES03": 602,
-                "ES99": 699,
-                # Extend with actual mappings
-            }
-
-            if code not in event_status_code_map:
-                raise ValueError(f"Unknown event status code: {code}")
-
-            status_id = event_status_code_map[code]
-            exists_clause = "EXISTS" if event_is_included else self._SQL_NOT_EXISTS
-
+            event_status = EventStatusType.get_by_code(criteria_words[0].upper())
+            if event_status is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+            if event_is_included:
+                self.sql_where.append(" AND EXISTS ( SELECT 'ev' ")
+            else:
+                self.sql_where.append(" AND NOT EXISTS ( SELECT 'ev' ")
             self.sql_where.append(
-                f"""AND {exists_clause} (
-        SELECT 'ev'
-        FROM ep_events_t ev
-        WHERE ev.event_status_id = {status_id}
-        AND ev.subject_epis_id = ep.subject_epis_id
-    )"""
+                f"   FROM ep_events_t ev "
+                f"   WHERE ev.event_status_id = {event_status.id} "
+                f"   AND ev.subject_epis_id = ep.subject_epis_id) "
             )
-
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
@@ -1057,8 +1032,8 @@ class SubjectSelectionQueryBuilder:
 
             # Simulated TestKitClass enum
             test_kit_class_map = {
-                "GFOBT": 800,
-                "FIT": 801,
+                "GFOBT": 208098,
+                "FIT": 208099,
                 # Extend as needed
             }
 
@@ -1114,22 +1089,23 @@ class SubjectSelectionQueryBuilder:
         Adds a filter for the presence or timing of referral_date in the latest episode.
         Accepts values: yes, no, past, more_than_28_days_ago, within_the_last_28_days.
         """
+        self._add_join_to_latest_episode()
         try:
-            value = self.criteria_value.strip().lower()
-
-            clause_map = {
-                "yes": "ep.referral_date IS NOT NULL",
-                "no": "ep.referral_date IS NULL",
-                "past": "ep.referral_date < trunc(sysdate)",
-                "more_than_28_days_ago": "(ep.referral_date + 28) < trunc(sysdate)",
-                "within_the_last_28_days": "(ep.referral_date + 28) > trunc(sysdate)",
-            }
-
-            if value not in clause_map:
-                raise ValueError(f"Unknown referral date condition: {value}")
-
-            self.sql_where.append(f"AND {clause_map[value]}")
-
+            criteria = HasReferralDate.by_description(self.criteria_value.lower())
+            if criteria == HasReferralDate.PAST:
+                self.sql_where.append(" AND ep.referral_date < trunc(sysdate)  ")
+            elif criteria == HasReferralDate.MORE_THAN_28_DAYS_AGO:
+                self.sql_where.append(" AND (ep.referral_date + 28) < trunc(sysdate)  ")
+            elif criteria == HasReferralDate.WITHIN_THE_LAST_28_DAYS:
+                self.sql_where.append(" AND (ep.referral_date + 28) > trunc(sysdate)  ")
+            elif criteria == HasReferralDate.YES:
+                self.sql_where.append(" AND ep.referral_date IS NOT NULL ")
+            elif criteria == HasReferralDate.NO:
+                self.sql_where.append(" AND ep.referral_date IS NULL ")
+            else:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
@@ -1193,30 +1169,26 @@ class SubjectSelectionQueryBuilder:
         Supports symbolic matches (via ID) and special values: NULL, NOT_NULL.
         """
         try:
-            value = self.criteria_value.strip().lower()
-            comparator = self.criteria_comparator
-
-            # Simulated DiagnosisDateReasonType
-            reason_map = {
-                "patient informed": 900,
-                "clinician notified": 901,
-                "screening outcome": 902,
-                "null": "NULL",
-                "not_null": "NOT NULL",
-                # Extend as needed
-            }
-
-            if value not in reason_map:
-                raise ValueError(f"Unknown diagnosis date reason: {value}")
-
-            resolved = reason_map[value]
-            if resolved in ("NULL", "NOT NULL"):
-                self.sql_where.append(f"AND ep.diagnosis_date_reason_id IS {resolved}")
+            diagnosis_date_reason = (
+                DiagnosisDateReasonType.by_description_case_insensitive(
+                    self.criteria_value
+                )
+            )
+            if diagnosis_date_reason is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+            self._add_join_to_latest_episode()
+            self.sql_where.append(" AND ep.diagnosis_date_reason_id ")
+            if diagnosis_date_reason in (
+                DiagnosisDateReasonType.NULL,
+                DiagnosisDateReasonType.NOT_NULL,
+            ):
+                self.sql_where.append(f"IS {diagnosis_date_reason.get_description()}")
             else:
                 self.sql_where.append(
-                    f"AND ep.diagnosis_date_reason_id {comparator} {resolved}"
+                    f"{self.criteria_comparator}{diagnosis_date_reason.get_valid_value_id()}"
                 )
-
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
@@ -1247,6 +1219,30 @@ class SubjectSelectionQueryBuilder:
     )"""
             )
 
+        except Exception:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+
+    def _add_criteria_diagnostic_test_failed(self) -> None:
+        """
+        Adds a SQL WHERE clause for diagnostic tests that have failed or not, based on self.criteria_value.
+        Uses self.sql_where.append() to build the clause.
+        """
+        try:
+            test_failed = YesNo.by_description_case_insensitive(self.criteria_value)
+            no_result_comparator = " = "
+            failure_reasons_comparator = "OR EXISTS"
+            if test_failed == YesNo.NO:
+                no_result_comparator = " != "
+                failure_reasons_comparator = "AND NOT EXISTS"
+            self.sql_where.append(
+                f" AND ({self.xt}.result_id {no_result_comparator} 20311 "
+            )
+            self.sql_where.append(
+                f"{failure_reasons_comparator} (SELECT 1 FROM ds_failure_reason_t xtfr "
+            )
+            self.sql_where.append(f" WHERE xtfr.ext_test_id = {self.xt}.ext_test_id ")
+            self.sql_where.append(" AND xtfr.deleted_flag = 'N' ")
+            self.sql_where.append(" AND xtfr.failure_reason_id != 18500)) ")
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
@@ -1488,14 +1484,14 @@ class SubjectSelectionQueryBuilder:
         """
         try:
             value = self.criteria_value.strip().lower()
-
             if value == "yes":
-                self.sql_where.append("AND tk.reading_flag = 'Y'")
+                self.sql_where.append(f" AND /*rf*/ {self.tk}.reading_flag = 'Y' ")
             elif value == "no":
-                self.sql_where.append("AND tk.reading_flag = 'N'")
+                self.sql_where.append(f" AND /*rf*/ {self.tk}.reading_flag = 'N' ")
             else:
-                raise ValueError(f"Invalid value for kit has been read: {value}")
-
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
 
@@ -1525,9 +1521,13 @@ class SubjectSelectionQueryBuilder:
             value = self.criteria_value.strip().lower()
 
             if value == "yes":
-                self.sql_where.append("AND tk.analyser_error_code IS NOT NULL")
+                self.sql_where.append(
+                    f" AND /*aec*/ {self.tk}.analyser_error_code IS NOT NULL "
+                )
             elif value == "no":
-                self.sql_where.append("AND tk.analyser_error_code IS NULL")
+                self.sql_where.append(
+                    " AND /*aec*/ {self.tk}.analyser_error_code IS NULL "
+                )
             else:
                 raise ValueError(
                     f"Invalid value for analyser result code presence: {value}"
@@ -1594,7 +1594,7 @@ class SubjectSelectionQueryBuilder:
             slot_type_id = AppointmentSlotType.get_id(value)
 
             self.sql_where.append(
-                f"AND ap.appointment_slot_type_id {comparator} {slot_type_id}"
+                f" AND /*ast*/ {self.ap}.appointment_slot_type_id {comparator} {slot_type_id} "
             )
 
         except Exception:
@@ -1613,7 +1613,7 @@ class SubjectSelectionQueryBuilder:
             status_id = AppointmentStatusType.get_id(value)
 
             self.sql_where.append(
-                f"AND ap.appointment_status_id {comparator} {status_id}"
+                f" AND /*as*/ {self.ap}.appointment_status_id {comparator} {status_id} "
             )
 
         except Exception:
@@ -1770,9 +1770,9 @@ class SubjectSelectionQueryBuilder:
             self.sql_where.append(f"AND {xt}.result_id ")
 
             if result == DiagnosticTestHasResult.YES:
-                self.sql_where.append("IS NOT NULL")
+                self.sql_where.append(self._SQL_IS_NOT_NULL)
             elif result == DiagnosticTestHasResult.NO:
-                self.sql_where.append("IS NULL")
+                self.sql_where.append(self._SQL_IS_NULL)
             else:
                 result_id = DiagnosticTestHasResult.get_id(value)
                 self.sql_where.append(f"= {result_id}")
@@ -1793,9 +1793,9 @@ class SubjectSelectionQueryBuilder:
             self.sql_where.append(f"AND {xt}.outcome_of_result_id ")
 
             if outcome == DiagnosticTestHasOutcomeOfResult.YES:
-                self.sql_where.append("IS NOT NULL")
+                self.sql_where.append(self._SQL_IS_NOT_NULL)
             elif outcome == DiagnosticTestHasOutcomeOfResult.NO:
-                self.sql_where.append("IS NULL")
+                self.sql_where.append(self._SQL_IS_NULL)
             else:
                 outcome_id = DiagnosticTestHasOutcomeOfResult.get_id(value)
                 self.sql_where.append(f"= {outcome_id}")
@@ -2084,12 +2084,12 @@ class SubjectSelectionQueryBuilder:
         """
         try:
             # Assumes criteriaValue contains both comparator and numeric literal, e.g., '>= 2'
-            comparator_clause = self.criteria_value.strip()
+            criteria_value = self.criteria_value.strip()
 
             self.sql_where.append(
                 "AND (SELECT COUNT(*) FROM SUPPORTING_NOTES_T snt "
                 "WHERE snt.screening_subject_id = ss.screening_subject_id) "
-                f"{comparator_clause}"
+                f"{criteria_value} "
             )
 
         except Exception:
@@ -2125,15 +2125,15 @@ class SubjectSelectionQueryBuilder:
         Filters based on symptomatic surgery result value or presence.
         """
         try:
-            column = "xt.surgery_result_id"
+            column = f"{self.xt}.surgery_result_id"
             value = self.criteria_value.strip().lower()
 
             if value == "null":
-                self.sql_where.append(f"AND {column} IS NULL")
+                self.sql_where.append(f" AND {column} IS NULL ")
             else:
                 result_id = SymptomaticProcedureResultType.get_id(self.criteria_value)
                 self.sql_where.append(
-                    f"AND {column} {self.criteria_comparator} {result_id}"
+                    f" AND {column} {self.criteria_comparator} {result_id} "
                 )
 
         except Exception:
@@ -2144,7 +2144,7 @@ class SubjectSelectionQueryBuilder:
         Filters based on screening referral type ID or null presence.
         """
         try:
-            column = "xt.screening_referral_type_id"
+            column = f"{self.xt}.screening_referral_type_id"
             value = self.criteria_value.strip().lower()
 
             if value == "null":
@@ -2248,11 +2248,11 @@ class SubjectSelectionQueryBuilder:
             else:
                 clause = "EXISTS"
 
-            self.sql_where.append(f"AND {clause} (")
+            self.sql_where.append(f" AND {clause} (")
             self.sql_where.append(
-                "SELECT 1 FROM notify_message_queue nmq "
-                "INNER JOIN notify_message_definition nmd ON nmd.message_definition_id = nmq.message_definition_id "
-                "WHERE nmq.nhs_number = c.nhs_number "
+                " SELECT 1 FROM notify_message_queue nmq "
+                " INNER JOIN notify_message_definition nmd ON nmd.message_definition_id = nmq.message_definition_id "
+                " WHERE nmq.nhs_number = c.nhs_number "
             )
 
             # Simulate getNotifyMessageEventStatusIdFromCriteria()
@@ -2260,10 +2260,10 @@ class SubjectSelectionQueryBuilder:
             self.sql_where.append(f"AND nmd.event_status_id = {event_status_id} ")
 
             if status != "none":
-                self.sql_where.append(f"AND nmq.message_status = '{status}' ")
+                self.sql_where.append(f" AND nmq.message_status = '{status}' ")
 
             if "code" in parts and parts["code"]:
-                self.sql_where.append(f"AND nmd.message_code = '{parts['code']}' ")
+                self.sql_where.append(f" AND nmd.message_code = '{parts['code']}' ")
 
             self.sql_where.append(")")
 
@@ -2307,7 +2307,7 @@ class SubjectSelectionQueryBuilder:
         Filters based on whether the subject previously had cancer.
         """
         try:
-            answer = YesNoType.from_description(self.criteria_value)
+            answer = YesNoType.by_description_case_insensitive(self.criteria_value)
             condition = "'Y'" if answer == YesNoType.YES else "'N'"
 
             self.sql_where.append(
@@ -2321,7 +2321,7 @@ class SubjectSelectionQueryBuilder:
         Filters subjects based on whether they have a temporary address on record.
         """
         try:
-            answer = YesNoType.from_description(self.criteria_value)
+            answer = YesNoType.by_description_case_insensitive(self.criteria_value)
 
             if answer == YesNoType.YES:
                 self.sql_from.append(
@@ -2353,39 +2353,54 @@ class SubjectSelectionQueryBuilder:
     def _add_criteria_cads_asa_grade(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
+        asa_grade = ASAGradeType.by_description_case_insensitive(self.criteria_value)
+        if asa_grade is None:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
         self.sql_where.append(
-            "AND cads.asa_grade_id = ASAGradeType.by_description_case_insensitive(self.criteria_value).id"
+            f" AND cads.asa_grade_id = {asa_grade.get_valid_value_id()} "
         )
 
     def _add_criteria_cads_staging_scans(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
         self._add_join_to_cancer_audit_dataset_staging_scan()
-        self.sql_where.append(
-            "AND cads.staging_scans_done_id = YesNoType.by_description_case_insensitive(self.criteria_value).id"
-        )
+        yes_no = YesNoType.by_description_case_insensitive(self.criteria_value)
+        if yes_no is None:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+        self.sql_where.append(f" AND cads.staging_scans_done_id = {yes_no.get_id()} ")
 
     def _add_criteria_cads_type_of_scan(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
         self._add_join_to_cancer_audit_dataset_staging_scan()
-        self.sql_where.append(
-            "AND dcss.type_of_scan_id = ScanType.by_description_case_insensitive(self.criteria_value).id"
-        )
+        scan_type = ScanType.by_description_case_insensitive(self.criteria_value)
+        if scan_type is None:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+        self.sql_where.append(f" AND dcss.type_of_scan_id = {scan_type.get_id()} ")
 
     def _add_criteria_cads_metastases_present(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
+        metastases_present_type = MetastasesPresentType.by_description_case_insensitive(
+            self.criteria_value
+        )
+        if metastases_present_type is None:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
         self.sql_where.append(
-            "AND cads.metastases_found_id = MetastasesPresentType.by_description_case_insensitive(self.criteria_value).id"
+            f" AND cads.metastases_found_id = {metastases_present_type.get_id()} "
         )
 
     def _add_criteria_cads_metastases_location(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
         self._add_join_to_cancer_audit_dataset_metastasis()
+        metastases_location = MetastasesLocationType.by_description_case_insensitive(
+            self.criteria_value
+        )
+        if metastases_location is None:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
         self.sql_where.append(
-            "AND dcm.location_of_metastasis_id = MetastasesLocationType.by_description_case_insensitive(self.criteria_value).id"
+            f" AND dcm.location_of_metastasis_id = {metastases_location.get_id()} "
         )
 
     def _add_criteria_cads_metastases_other_location(self, other_location: str) -> None:
@@ -2393,90 +2408,138 @@ class SubjectSelectionQueryBuilder:
         self._add_join_to_cancer_audit_dataset()
         self._add_join_to_cancer_audit_dataset_metastasis()
         self.sql_where.append(
-            f"AND dcm.other_location_of_metastasis = '{other_location}'"
+            f" AND dcm.other_location_of_metastasis = '{other_location}' "
         )
 
     def _add_criteria_cads_final_pre_treatment_t_category(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
+        final_pretreatment_t_category = (
+            FinalPretreatmentTCategoryType.by_description_case_insensitive(
+                self.criteria_value
+            )
+        )
+        if final_pretreatment_t_category is None:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
         self.sql_where.append(
-            "AND cads.final_pre_treat_t_category_id = FinalPretreatmentTCategoryType.by_description_case_insensitive(self.criteria_value).id"
+            f" AND cads.final_pre_treat_t_category_id = {final_pretreatment_t_category.get_id()} "
         )
 
     def _add_criteria_cads_final_pre_treatment_n_category(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
+        final_pretreatment_n_category = (
+            FinalPretreatmentNCategoryType.by_description_case_insensitive(
+                self.criteria_value
+            )
+        )
+        if final_pretreatment_n_category is None:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
         self.sql_where.append(
-            "AND cads.final_pre_treat_n_category_id = FinalPretreatmentNCategoryType.by_description_case_insensitive(self.criteria_value).id"
+            f" AND cads.final_pre_treat_n_category_id = {final_pretreatment_n_category.get_id()} "
         )
 
     def _add_criteria_cads_final_pre_treatment_m_category(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
+        final_pretreatment_m_category = (
+            FinalPretreatmentMCategoryType.by_description_case_insensitive(
+                self.criteria_value
+            )
+        )
+        if final_pretreatment_m_category is None:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
         self.sql_where.append(
-            "AND cads.final_pre_treat_m_category_id = FinalPretreatmentMCategoryType.by_description_case_insensitive(self.criteria_value).id"
+            f" AND cads.final_pre_treat_m_category_id = {final_pretreatment_m_category.get_id()} "
         )
 
     def _add_criteria_cads_treatment_received(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
-        self.sql_where.append(
-            "AND cads.treatment_received_id = YesNoType.by_description_case_insensitive(self.criteria_value).id"
-        )
+        yes_no = YesNoType.by_description_case_insensitive(self.criteria_value)
+        if yes_no is None:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+        self.sql_where.append(f" AND cads.treatment_received_id = {yes_no.get_id()} ")
 
     def _add_criteria_cads_reason_no_treatment_received(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
+        reason_no_treatment_recieved = (
+            ReasonNoTreatmentReceivedType.by_description_case_insensitive(
+                self.criteria_value
+            )
+        )
+        if reason_no_treatment_recieved is None:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
         self.sql_where.append(
-            "AND cads.reason_no_treatment_id = ReasonNoTreatmentReceivedType.by_description_case_insensitive(self.criteria_value).id"
+            f" AND cads.reason_no_treatment_id = {reason_no_treatment_recieved.get_id()} "
         )
 
     def _add_criteria_cads_tumour_location(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
         self._add_join_to_cancer_audit_dataset_tumour()
-        self.sql_where.append(
-            "AND dctu.location_id = LocationType.by_description_case_insensitive(self.criteria_value).id"
-        )
+        location = LocationType.by_description_case_insensitive(self.criteria_value)
+        if location is None:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
+        self.sql_where.append(f" AND dctu.location_id = {location.get_id()} ")
 
     def _add_criteria_cads_tumour_height_of_tumour_above_anal_verge(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
         self._add_join_to_cancer_audit_dataset_tumour()
         self.sql_where.append(
-            "AND dctu.height_above_anal_verge = {self.criteria_value}"
+            " AND dctu.height_above_anal_verge = {self.criteria_value} "
         )
 
     def _add_criteria_cads_tumour_previously_excised_tumour(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
         self._add_join_to_cancer_audit_dataset_tumour()
+        previously_excised_tumor = (
+            PreviouslyExcisedTumourType.by_description_case_insensitive(
+                self.criteria_value
+            )
+        )
+        if previously_excised_tumor is None:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
         self.sql_where.append(
-            "AND dctu.recurrence_id = PreviouslyExcisedTumourType.by_description_case_insensitive(self.criteria_value).id"
+            f" AND dctu.recurrence_id = {previously_excised_tumor.get_id()} "
         )
 
     def _add_criteria_cads_treatment_type(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
         self._add_join_to_cancer_audit_dataset_treatment()
+        treatment = TreatmentType.by_description_case_insensitive(self.criteria_value)
+        if treatment is None:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
         self.sql_where.append(
-            "AND dctr.treatment_category_id = TreatmentType.by_description_case_insensitive(self.criteria_value).id"
+            f" AND dctr.treatment_category_id = {treatment.get_id()} "
         )
 
     def _add_criteria_cads_treatment_given(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
         self._add_join_to_cancer_audit_dataset_treatment()
+        treatment = TreatmentGiven.by_description_case_insensitive(self.criteria_value)
+        if treatment is None:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
         self.sql_where.append(
-            "AND dctr.treatment_procedure_id = TreatmentGiven.by_description_case_insensitive(self.criteria_value).id"
+            f" AND dctr.treatment_procedure_id = {treatment.get_id()} "
         )
 
     def _add_criteria_cads_cancer_treatment_intent(self) -> None:
         self._add_join_to_latest_episode()
         self._add_join_to_cancer_audit_dataset()
         self._add_join_to_cancer_audit_dataset_treatment()
+        cancer_treatment_intent = CancerTreatmentIntent.by_description_case_insensitive(
+            self.criteria_value
+        )
+        if cancer_treatment_intent is None:
+            raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
         self.sql_where.append(
-            "AND dctr.treatment_intent_id = CancerTreatmentIntent.by_description_case_insensitive(self.criteria_value).id"
+            f" AND dctr.treatment_intent_id = {cancer_treatment_intent.get_id()} "
         )
 
     def _add_join_to_cancer_audit_dataset_staging_scan(self) -> None:
@@ -3502,6 +3565,92 @@ class SubjectSelectionQueryBuilder:
             raise SelectionBuilderException(
                 self.criteria_key_name, self.criteria_value
             ) from e
+
+    def _add_criteria_onward_referral_type(
+        self, onward_referral_type_field_name: str
+    ) -> None:
+        """
+        Adds a SQL WHERE clause for the specified onward referral type field based on the criteria value.
+        """
+        self.sql_where.append(f" AND {self.xt}.{onward_referral_type_field_name} ")
+        if self.criteria_value.lower() == "null":
+            self.sql_where.append(self._SQL_IS_NULL)
+        else:
+            try:
+                referral_type = (
+                    DiagnosticTestReferralType.by_description_case_insensitive(
+                        self.criteria_value
+                    )
+                )
+                if referral_type is None:
+                    raise SelectionBuilderException(
+                        self.criteria_key_name, self.criteria_value
+                    )
+                self.sql_where.append(
+                    f" {self.criteria_comparator} {referral_type.get_id()} "
+                )
+            except Exception:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+
+    def _add_criteria_onward_referral_reason(
+        self, onward_referral_reason_field_name: str
+    ) -> None:
+        """
+        Adds a SQL WHERE clause for the specified onward referral reason field based on the criteria value.
+        Appends the clause to self.sql_where. If the criteria value is 'null', checks for NULL in the field.
+        Otherwise, matches the field against the valid value ID for the reason.
+        """
+        self.sql_where.append(f" AND {self.xt}.{onward_referral_reason_field_name} ")
+        if self.criteria_value.lower() == "null":
+            self.sql_where.append("IS NULL")
+        else:
+            try:
+                referral_reason = (
+                    ReasonForOnwardReferralType.by_description_case_insensitive(
+                        self.criteria_value
+                    )
+                )
+                if referral_reason is None:
+                    raise SelectionBuilderException(
+                        self.criteria_key_name, self.criteria_value
+                    )
+                self.sql_where.append(
+                    f"{self.criteria_comparator}{referral_reason.get_id()}"
+                )
+            except Exception:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+
+    def _add_criteria_symptomatic_referral_reason(self) -> None:
+        """
+        Adds a SQL WHERE clause for the symptomatic referral reason in the diagnostic test table.
+        Appends the clause to self.sql_where. If the criteria value is 'null', checks for NULL in the field.
+        Otherwise, matches the field against the valid value ID for the reason.
+        """
+        self.sql_where.append(f" AND {self.xt}.complete_reason_id ")
+        if self.criteria_value.lower() == "null":
+            self.sql_where.append("IS NULL")
+        else:
+            try:
+                referral_reason = (
+                    ReasonForSymptomaticReferralType.by_description_case_insensitive(
+                        self.criteria_value
+                    )
+                )
+                if referral_reason is None:
+                    raise SelectionBuilderException(
+                        self.criteria_key_name, self.criteria_value
+                    )
+                self.sql_where.append(
+                    f"{self.criteria_comparator}{referral_reason.get_id()}"
+                )
+            except Exception:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
 
     def _add_check_comparing_date_with_earliest_or_latest_event_date(
         self,
