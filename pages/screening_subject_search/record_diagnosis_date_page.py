@@ -15,7 +15,12 @@ class RecordDiagnosisDatePage(BasePage):
         self.save_button = self.page.get_by_role("button", name="Save")
 
     def get_alert_message(self) -> str:
-
+        """
+        Retrieves the visible alert message from the page, if any.
+        Returns:
+        str: The inner text of the alert element if it's visible;
+             otherwise, an empty string.
+        """
         self.alert_message = self.page.get_by_role("alert")
         if self.alert_message.is_visible():
             return self.alert_message.inner_text()
