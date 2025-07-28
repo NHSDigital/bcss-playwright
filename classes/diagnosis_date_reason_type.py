@@ -32,10 +32,12 @@ class DiagnosisDateReasonType(Enum):
 
     @property
     def valid_value_id(self) -> Optional[int]:
+        """Returns the valid value ID for the reason for diagnosis date."""
         return self._valid_value_id
 
     @property
     def description(self) -> str:
+        """Returns the description for the reason for diagnosis date."""
         return self._description
 
     @classmethod
@@ -51,6 +53,7 @@ class DiagnosisDateReasonType(Enum):
 
     @classmethod
     def by_description(cls, description: str) -> Optional["DiagnosisDateReasonType"]:
+        """Returns the DiagnosisDateReasonType matching the given description."""
         cls._build_maps()
         return cls._descriptions.get(description)
 
@@ -58,6 +61,7 @@ class DiagnosisDateReasonType(Enum):
     def by_description_case_insensitive(
         cls, description: str
     ) -> Optional["DiagnosisDateReasonType"]:
+        """Returns the DiagnosisDateReasonType matching the given description. (case-insensitive)"""
         cls._build_maps()
         return cls._lowercase_descriptions.get(description.lower())
 
@@ -65,11 +69,14 @@ class DiagnosisDateReasonType(Enum):
     def by_valid_value_id(
         cls, valid_value_id: Optional[int]
     ) -> Optional["DiagnosisDateReasonType"]:
+        """Returns the DiagnosisDateReasonType matching the given valid value ID."""
         cls._build_maps()
         return cls._valid_value_ids.get(valid_value_id)
 
     def get_valid_value_id(self) -> Optional[int]:
+        """Returns the valid value ID for the reason for diagnosis date reason."""
         return self._valid_value_id
 
     def get_description(self) -> str:
+        """Returns the description for the reason for diagnosis date reason."""
         return self._description
