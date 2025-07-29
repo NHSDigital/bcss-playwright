@@ -5,7 +5,7 @@ from utils.calendar_picker import CalendarPicker
 
 
 class RecordDiagnosisDatePage(BasePage):
-    """Record Diagnosis Date Page locators, and methods for interacting with the page."""
+    """Record Diagnosis Date Page locators, and methods for interacting with the page"""
 
     def __init__(self, page: Page):
         super().__init__(page)
