@@ -16,8 +16,8 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         )
         self.calendar_button = self.page.get_by_role("button", name="Calendar")
         self.test_type_dropdown = self.page.locator("#UI_EXT_TEST_TYPE_2233")
+        self.test_type_dropdown_2 = self.page.locator("#UI_EXT_TEST_TYPE_4325")
         self.advance_checkbox = self.page.get_by_label("There are some events available which should only be used in exceptional circumstances. If you wish to see them, check this box")
-
         self.invite_for_diagnostic_test_button = self.page.get_by_role(
             "button", name="Invite for Diagnostic Test >>"
         )
@@ -39,6 +39,9 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         self.record_diagnosis_date_button = self.page.get_by_role(
             "button", name="Record Diagnosis Date"
         )
+        self.record_contact_with_patient_button = self.page.get_by_role(
+            "button", name="Record Contact with Patient"
+        )
 
     def select_advance_check(self) -> None:
         """Selects the 'Advance FOBT' checkbox."""
@@ -57,6 +60,10 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
     def select_test_type_dropdown_option(self, text: str) -> None:
         """Select the test type from the dropdown."""
         self.test_type_dropdown.select_option(label=text)
+
+    def select_test_type_dropdown_option_2(self, text: str) -> None:
+        """Select the test type from the dropdown."""
+        self.test_type_dropdown_2.select_option(label=text)
 
     def click_invite_for_diagnostic_test_button(self) -> None:
         """Click the 'Invite for Diagnostic Test' button."""
@@ -107,3 +114,7 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
     def click_record_diagnosis_date_button(self) -> None:
         """Click the 'Record Diagnosis Date' button."""
         self.click(self.record_diagnosis_date_button)
+
+    def click_record_contact_with_patient_button(self) -> None:
+        """Click the 'Record Contact with Patient' button."""
+        self.click(self.record_contact_with_patient_button)
