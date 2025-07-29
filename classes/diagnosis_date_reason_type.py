@@ -61,7 +61,7 @@ class DiagnosisDateReasonType(Enum):
     def by_description_case_insensitive(
         cls, description: str
     ) -> Optional["DiagnosisDateReasonType"]:
-        """Returns the DiagnosisDateReasonType matching the given description. (case-insensitive)"""
+        """Returns the DiagnosisDateReasonType matching the given description. (case-insensitive)."""
         cls._build_maps()
         return cls._lowercase_descriptions.get(description.lower())
 
