@@ -43,7 +43,7 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         )
 
     def check_advance_checkbox(self) -> None:
-        """Selects the 'Advance FOBT' checkbox."""
+        """Selects the 'Advance FOBT' checkbox"""
         self.advance_checkbox.check()
 
     def click_suitable_for_endoscopic_test_button(self) -> None:
