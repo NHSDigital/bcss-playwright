@@ -78,5 +78,5 @@ class DiagnosisDateReasonType(Enum):
         return self._valid_value_id
 
     def get_description(self) -> str:
-        """Returns the description for the reason for diagnosis date reason."""
+        """Returns the description for the reason for diagnosis date reason"""
         return self._description
