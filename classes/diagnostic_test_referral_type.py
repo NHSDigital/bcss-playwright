@@ -26,6 +26,12 @@ class DiagnosticTestReferralType(Enum):
 
     @classmethod
     def _build_maps(cls) -> None:
+        """
+        Initializes internal lookup maps for DiagnosticTestReferralType enum members.
+
+        It ensures these maps are built only once per class, using `hasattr` to prevent
+        redundant reinitialization.
+        """
         if not hasattr(cls, "_descriptions"):
             cls._descriptions: Dict[str, DiagnosticTestReferralType] = {}
             cls._lowercase_descriptions: Dict[str, DiagnosticTestReferralType] = {}

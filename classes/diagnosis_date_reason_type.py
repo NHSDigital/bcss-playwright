@@ -19,7 +19,7 @@ class DiagnosisDateReasonType(Enum):
     PATIENT_CHOICE = (305522, "Patient choice")
     PATIENT_COULD_NOT_BE_CONTACTED = (305505, "Patient could not be contacted")
     PATIENT_DECEASED = (305503, "Patient deceased")
-    PATIENT_DECLINIED_ALL_APPOINTMENTS = (305520, "Patient declined all appointments")
+    PATIENT_DECLINED_ALL_APPOINTMENTS = (305520, "Patient declined all appointments")
     PATIENT_EMIGRATED = (305504, "Patient emigrated")
     REOPENED_OLD_EPISODE_DATE_UNKNOWN = (305502, "Reopened old episode, date unknown")
     SSPI_UPDATE_PATIENT_DECEASED = (305525, "SSPI update - patient deceased")
@@ -47,6 +47,12 @@ class DiagnosisDateReasonType(Enum):
 
     @classmethod
     def _build_maps(cls) -> None:
+        """
+        Initializes internal lookup maps for DiagnosisDateReasonType enum members.
+
+        It ensures these maps are built only once per class, using `hasattr` to prevent
+        redundant reinitialization.
+        """
         if not hasattr(cls, "_descriptions"):
             cls._descriptions: Dict[str, DiagnosisDateReasonType] = {}
             cls._lowercase_descriptions: Dict[str, DiagnosisDateReasonType] = {}

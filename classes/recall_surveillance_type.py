@@ -11,7 +11,10 @@ class RecallSurveillanceType(Enum):
     INTERMEDIATE_RISK = (11431, "Intermediate Risk")
     LNPCP = (305612, "LNPCP")
     HIGH_RISK_FINDINGS = (305613, "High-risk findings")
-    NULL = (None, "Null")
+    NULL = (
+        None,
+        "Null",
+    )  # The valid value id for this is None, and the descition is "Null"
 
     def __init__(self, valid_value_id: Optional[int], description: str):
         self._valid_value_id: Optional[int] = valid_value_id
@@ -29,6 +32,12 @@ class RecallSurveillanceType(Enum):
 
     @classmethod
     def _build_maps(cls) -> None:
+        """
+        Initializes internal lookup maps for RecallSurveillanceType enum members.
+
+        It ensures these maps are built only once per class, using `hasattr` to prevent
+        redundant reinitialization.
+        """
         if not hasattr(cls, "_descriptions"):
             cls._descriptions: Dict[str, RecallSurveillanceType] = {}
             cls._lowercase_descriptions: Dict[str, RecallSurveillanceType] = {}

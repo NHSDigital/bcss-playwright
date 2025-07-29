@@ -20,6 +20,12 @@ class YesNo(Enum):
 
     @classmethod
     def _build_maps(cls) -> None:
+        """
+        Initializes internal lookup maps for YesNo enum members.
+
+        It ensures these maps are built only once per class, using `hasattr` to prevent
+        redundant reinitialization.
+        """
         if not hasattr(cls, "_descriptions"):
             cls._descriptions: Dict[str, YesNo] = {}
             cls._lowercase_descriptions: Dict[str, YesNo] = {}

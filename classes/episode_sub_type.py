@@ -51,9 +51,10 @@ class EpisodeSubType(Enum):
     @classmethod
     def _build_maps(cls) -> None:
         """
-        Builds internal lookup maps for descriptions and valid value IDs.
+        Initializes internal lookup maps for EpisodeSubType enum members.
 
-        This method is called automatically before lookups.
+        It ensures these maps are built only once per class, using `hasattr` to prevent
+        redundant reinitialization.
         """
         if not hasattr(cls, "_descriptions"):
             cls._descriptions: Dict[str, EpisodeSubType] = {}

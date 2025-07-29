@@ -92,6 +92,12 @@ class EpisodeStatusReasonType(Enum):
 
     @classmethod
     def _build_maps(cls) -> None:
+        """
+        Initializes internal lookup maps for EpisodeStatusReasonType enum members.
+
+        It ensures these maps are built only once per class, using `hasattr` to prevent
+        redundant reinitialization.
+        """
         if not hasattr(cls, "_descriptions"):
             cls._descriptions: Dict[str, EpisodeStatusReasonType] = {}
             cls._lowercase_descriptions: Dict[str, EpisodeStatusReasonType] = {}
@@ -137,6 +143,6 @@ class EpisodeStatusReasonType(Enum):
 
     def get_description(self) -> str:
         """
-        Returns
+        Returns the description for the episode status reason.
         """
         return self._description

@@ -405,6 +405,12 @@ class EventCodeType(Enum):
 
     @classmethod
     def _build_maps(cls) -> None:
+        """
+        Initializes internal lookup maps for EventCodeType enum members.
+
+        It ensures these maps are built only once per class, using `hasattr` to prevent
+        redundant reinitialization.
+        """
         if not hasattr(cls, "_codes"):
             cls._codes: Dict[str, EventCodeType] = {}
             cls._descriptions: Dict[str, EventCodeType] = {}
