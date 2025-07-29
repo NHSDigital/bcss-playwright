@@ -82,7 +82,7 @@ class SubjectEpisodeEventsAndNotesPage(BasePage):
 
     def is_record_diagnosis_date_option_available(self) -> bool:
         """
-        Check if the 'Record Diagnosis Date' option is available on the page.
+        Check if the 'Record Diagnosis Date' option is available on the page
 
         Returns:
             bool: True if the option is available, False otherwise.
