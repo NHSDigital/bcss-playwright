@@ -2,9 +2,17 @@ import pytest
 import time
 import logging
 from typing import Optional, Callable
+import logging
+from typing import Optional, Callable
 from datetime import datetime
 from datetime import date, timedelta
 from playwright.sync_api import Page, expect
+from pages.screening_subject_search.subject_episode_events_and_notes_page import (
+    SubjectEpisodeEventsAndNotesPage,
+)
+from pages.screening_subject_search.record_diagnosis_date_page import (
+    RecordDiagnosisDatePage,
+)
 from pages.screening_subject_search.subject_episode_events_and_notes_page import (
     SubjectEpisodeEventsAndNotesPage,
 )
@@ -60,6 +68,8 @@ def prepare_subject_for_test(
     if df.empty:
         raise ValueError("No matching subject found with provided episode criteria.")
 
+    nhs_number = df.iloc[0]["subject_nhs_number"]
+    UserTools.user_login(page, role)
     nhs_number = df.iloc[0]["subject_nhs_number"]
     UserTools.user_login(page, role)
     BasePage(page).go_to_screening_subject_search_page()
@@ -172,14 +182,21 @@ def test_screening_centre_manager_records_diagnosis_date_for_subject_with_referr
     prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
 
     # Step 2: Interact with subject page
+    # Step 2: Interact with subject page
     subject_page_s1 = RecordDiagnosisDatePage(page)
+    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name="Record Diagnosis Date").click()
+    subject_page_s1.enter_date_in_diagnosis_date_field(datetime.today())
     page.get_by_role("button", name="Advance FOBT Screening Episode").click()
     page.get_by_role("button", name="Record Diagnosis Date").click()
     subject_page_s1.enter_date_in_diagnosis_date_field(datetime.today())
     subject_page_s1.click_save_button()
     page.get_by_role("link", name="List Episodes").click()
     page.get_by_role("link", name="events").click()
+    page.get_by_role("link", name="List Episodes").click()
+    page.get_by_role("link", name="events").click()
 
+    # Step 3: Assertions
     # Step 3: Assertions
     subject_event_s1 = SubjectEpisodeEventsAndNotesPage(page)
     event_details = subject_event_s1.get_latest_event_details()
@@ -188,8 +205,15 @@ def test_screening_centre_manager_records_diagnosis_date_for_subject_with_referr
     assert (
         event_details.get("diagnosis_reason") is None
     ), f"Expected 'diagnosis_reason' to be None, but got: {event_details.get('diagnosis_reason')}"
+    assert (
+        event_details.get("diagnosis_reason") is None
+    ), f"Expected 'diagnosis_reason' to be None, but got: {event_details.get('diagnosis_reason')}"
     assert "Diag Date :" in event_details["item"]
     today_formatted = date.today().strftime("%d %b %Y")  # "16 Jul 2025"
+    assert (
+        today_formatted in event_details["item"]
+    ), f"Expected today's date ({today_formatted}) in item but got: {event_details['item']}"
+
     assert (
         today_formatted in event_details["item"]
     ), f"Expected today's date ({today_formatted}) in item but got: {event_details['item']}"
@@ -229,13 +253,26 @@ def test_cannot_record_diagnosis_date_without_referral(page: Page) -> None:
     advance_fobt_button_s2 = page.get_by_role(
         "button", name="Advance FOBT Screening Episode"
     )
+        "latest episode diagnosis date reason": "NULL",
+    }
+    prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
+
+    # Step 2: Interact with subject page
+    advance_fobt_button_s2 = page.get_by_role(
+        "button", name="Advance FOBT Screening Episode"
+    )
     if advance_fobt_button_s2.is_visible() and advance_fobt_button_s2.is_enabled():
         advance_fobt_button_s2.click()
     else:
         print("Advance FOBT Screening Episode Button is disabled, skipping click.")
 
     # Step 3: Assert that the "Record Diagnosis Date" option is not available
+    # Step 3: Assert that the "Record Diagnosis Date" option is not available
     subject_event_s2 = SubjectEpisodeEventsAndNotesPage(page)
+    assert (
+        not subject_event_s2.is_record_diagnosis_date_option_available()
+    ), "Record Diagnosis Date option should not be available for subjects without a referral date"
+
     assert (
         not subject_event_s2.is_record_diagnosis_date_option_available()
     ), "Record Diagnosis Date option should not be available for subjects without a referral date"
@@ -275,10 +312,25 @@ def test_cannot_record_diagnosis_date_with_existing_diagnosis(page: Page) -> Non
     advance_fobt_button_s3 = page.get_by_role(
         "button", name="Advance FOBT Screening Episode"
     )
+        "latest episode diagnosis date reason": "NULL",
+    }
+    prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
+
+    # Step 2: Interact with subject page
+    advance_fobt_button_s3 = page.get_by_role(
+        "button", name="Advance FOBT Screening Episode"
+    )
     if advance_fobt_button_s3.is_visible() and advance_fobt_button_s3.is_enabled():
         advance_fobt_button_s3.click()
     else:
         print("Advance FOBT Screening Episode Button is disabled, skipping click.")
+    record_diagnosis_button_s3 = page.get_by_role(
+        "button", name="Record Diagnosis Date"
+    )
+    if (
+        record_diagnosis_button_s3.is_visible()
+        and record_diagnosis_button_s3.is_enabled()
+    ):
     record_diagnosis_button_s3 = page.get_by_role(
         "button", name="Record Diagnosis Date"
     )
@@ -291,7 +343,12 @@ def test_cannot_record_diagnosis_date_with_existing_diagnosis(page: Page) -> Non
         print("Record Diagnosis Date button is not available, skipping click.")
 
     # Step 3: Assert that the "Record Diagnosis Date" option is not available
+    # Step 3: Assert that the "Record Diagnosis Date" option is not available
     subject_event_s3 = SubjectEpisodeEventsAndNotesPage(page)
+    assert (
+        not subject_event_s3.is_record_diagnosis_date_option_available()
+    ), "Record Diagnosis Date option should not be available for subjects with an existing diagnosis date"
+
     assert (
         not subject_event_s3.is_record_diagnosis_date_option_available()
     ), "Record Diagnosis Date option should not be available for subjects with an existing diagnosis date"
@@ -324,6 +381,7 @@ def test_hub_user_can_record_diagnosis_date_with_referral_no_diag(page: Page) ->
         "latest episode has referral date": "Past",
         "latest episode has diagnosis date": "No",
         "latest episode diagnosis date reason": "NULL",
+        "latest episode diagnosis date reason": "NULL",
     }
     user = User()
     subject = Subject()
@@ -345,6 +403,7 @@ def test_hub_user_can_record_diagnosis_date_with_referral_no_diag(page: Page) ->
     # Step 4: Interact with subject page
     subject_page_s4 = RecordDiagnosisDatePage(page)
     page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
 
     # Step 5: Assert it's visible and enabled
     record_diagnosis_button_s4 = page.get_by_role(
@@ -358,9 +417,23 @@ def test_hub_user_can_record_diagnosis_date_with_referral_no_diag(page: Page) ->
         record_diagnosis_button_s4,
         "Expected 'Record Diagnosis Date' button to be enabled",
     ).to_be_enabled()
+    record_diagnosis_button_s4 = page.get_by_role(
+        "button", name="Record Diagnosis Date"
+    )
+    expect(
+        record_diagnosis_button_s4,
+        "Expected 'Record Diagnosis Date' button to be visible",
+    ).to_be_visible()
+    expect(
+        record_diagnosis_button_s4,
+        "Expected 'Record Diagnosis Date' button to be enabled",
+    ).to_be_enabled()
     record_diagnosis_button_s4.click()
     subject_page_s4.enter_date_in_diagnosis_date_field(datetime.today())
+    subject_page_s4.enter_date_in_diagnosis_date_field(datetime.today())
     subject_page_s4.click_save_button()
+    page.get_by_role("link", name="List Episodes").click()
+    page.get_by_role("link", name="events").click()
     page.get_by_role("link", name="List Episodes").click()
     page.get_by_role("link", name="events").click()
 
@@ -372,8 +445,15 @@ def test_hub_user_can_record_diagnosis_date_with_referral_no_diag(page: Page) ->
     assert (
         event_details.get("diagnosis_reason") is None
     ), f"Expected 'diagnosis_reason' to be None, but got: {event_details.get('diagnosis_reason')}"
+    assert (
+        event_details.get("diagnosis_reason") is None
+    ), f"Expected 'diagnosis_reason' to be None, but got: {event_details.get('diagnosis_reason')}"
     assert "Diag Date :" in event_details["item"]
     today_formatted = date.today().strftime("%d %b %Y")  # "16 Jul 2025"
+    assert (
+        today_formatted in event_details["item"]
+    ), f"Expected today's date ({today_formatted}) in item but got: {event_details['item']}"
+
     assert (
         today_formatted in event_details["item"]
     ), f"Expected today's date ({today_formatted}) in item but got: {event_details['item']}"
@@ -411,16 +491,29 @@ def test_record_diagnosis_date_no_date_or_reason_alert(page: Page) -> None:
     prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
 
     # Step 2: Interact with subject page
+        "latest episode diagnosis date reason": "NULL",
+    }
+    prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
+
+    # Step 2: Interact with subject page
     subject_page_s5 = RecordDiagnosisDatePage(page)
+    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name="Record Diagnosis Date").click()
     page.get_by_role("button", name="Advance FOBT Screening Episode").click()
     page.get_by_role("button", name="Record Diagnosis Date").click()
     subject_page_s5.click_save_button()
 
     # Step 3: Do not enter a diagnosis date or reason
+    # Step 3: Do not enter a diagnosis date or reason
     time.sleep(2)  # Pause for 2 seconds to let the process complete
 
     # Step 4: Assertions
+    # Step 4: Assertions
     alert_message = subject_page_s5.get_alert_message()
+    assert (
+        "must not be earlier than the referral date" in alert_message
+    ), f"Unexpected alert message: {alert_message}"
+
     assert (
         "must not be earlier than the referral date" in alert_message
     ), f"Unexpected alert message: {alert_message}"
@@ -458,11 +551,21 @@ def test_record_diagnosis_date_reason_only(page: Page) -> None:
     prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
 
     # Step 2: Interact with subject page
+        "latest episode diagnosis date reason": "NULL",
+    }
+    prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
+
+    # Step 2: Interact with subject page
     subject_page_s6 = RecordDiagnosisDatePage(page)
+    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name="Record Diagnosis Date").click()
     page.get_by_role("button", name="Advance FOBT Screening Episode").click()
     page.get_by_role("button", name="Record Diagnosis Date").click()
     page.select_option("select#reason", label="Reopened old episode, date unknown")
     subject_page_s6.click_save_button()
+    page.get_by_role("link", name="List Episodes").click()
+    page.get_by_role("link", name="events").click()
+
     page.get_by_role("link", name="List Episodes").click()
     page.get_by_role("link", name="events").click()
 
@@ -498,23 +601,35 @@ def test_amend_diagnosis_date_without_reason_alert(page: Page) -> None:
     prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
 
     # Step 2: Interact with subject page
+        "latest episode diagnosis date reason": "NULL",
+    }
+    prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
+
+    # Step 2: Interact with subject page
     subject_page_s8 = RecordDiagnosisDatePage(page)
+    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name="Record Diagnosis Date").click()
     page.get_by_role("button", name="Advance FOBT Screening Episode").click()
     page.get_by_role("button", name="Record Diagnosis Date").click()
     # Get yesterday's date
     subject_page_s8.enter_date_in_diagnosis_date_field(
         datetime.today() - timedelta(days=1)
+        datetime.today() - timedelta(days=1)
     )
     subject_page_s8.click_save_button()
     page.get_by_role("link", name="List Episodes").click()
     page.get_by_role("link", name="events").click()
+    page.get_by_role("link", name="List Episodes").click()
+    page.get_by_role("link", name="events").click()
 
+    # Step 3: Assert that the "Record Diagnosis Date" option is available
     # Step 3: Assert that the "Record Diagnosis Date" option is available
     subject_event_s8 = SubjectEpisodeEventsAndNotesPage(page)
     event_details = subject_event_s8.get_latest_event_details()
     assert "A50" not in event_details["latest_event_status"]
     assert event_details["event"] == "Record Diagnosis Date"
     assert "Diag Date :" in event_details["item"]
+
 
 
 # Scenario 9
@@ -567,17 +682,29 @@ def test_amend_diagnosis_date_with_reason(page: Page) -> None:
     # Step 4: Interact with subject page
     subject_page_s9 = RecordDiagnosisDatePage(page)
     page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
     page.get_by_role("checkbox").check()
+    page.get_by_role("button", name="Amend Diagnosis Date").click()
+    subject_page_s9.enter_date_in_diagnosis_date_field(datetime.today())
     page.get_by_role("button", name="Amend Diagnosis Date").click()
     subject_page_s9.enter_date_in_diagnosis_date_field(datetime.today())
     page.locator("#reason").select_option("305501")
     subject_page_s9.click_save_button()
     page.get_by_role("link", name="List Episodes").click()
     page.get_by_role("link", name="events").click()
+    page.get_by_role("link", name="List Episodes").click()
+    page.get_by_role("link", name="events").click()
 
     # Step 5: Assertions
     subject_event_status_s9 = SubjectEpisodeEventsAndNotesPage(page)
     event_details = subject_event_status_s9.get_latest_event_details()
+    assert_diagnosis_event_details(
+        event_details,
+        expected_status_not="A51",
+        expected_reason=amend_reason,
+        log=logger.debug,
+    )
+
     assert_diagnosis_event_details(
         event_details,
         expected_status_not="A51",
@@ -614,6 +741,7 @@ def test_amend_diagnosis_date_remove_date_with_reason(page: Page) -> None:
         "latest episode has referral date": "Past",
         "latest episode has diagnosis date": "Yes",
         "latest episode diagnosis date reason": "NULL",
+        "latest episode diagnosis date reason": "NULL",
     }
     remove_reason = "Patient choice"
     user = User()
@@ -636,7 +764,9 @@ def test_amend_diagnosis_date_remove_date_with_reason(page: Page) -> None:
     # Step 4: Interact with subject page
     subject_page_s10 = RecordDiagnosisDatePage(page)
     page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
     page.get_by_role("checkbox").check()
+    page.get_by_role("button", name="Amend Diagnosis Date").click()
     page.get_by_role("button", name="Amend Diagnosis Date").click()
     page.locator("#diagnosisDate").fill("")
     date_field = page.locator("#diagnosisDate")
@@ -648,6 +778,8 @@ def test_amend_diagnosis_date_remove_date_with_reason(page: Page) -> None:
     subject_page_s10.click_save_button()
     page.get_by_role("link", name="List Episodes").click()
     page.get_by_role("link", name="events").click()
+    page.get_by_role("link", name="List Episodes").click()
+    page.get_by_role("link", name="events").click()
 
     # Step 5: Assertions
     subject_event_status_s10 = SubjectEpisodeEventsAndNotesPage(page)
@@ -655,6 +787,18 @@ def test_amend_diagnosis_date_remove_date_with_reason(page: Page) -> None:
     assert "A52" not in event_details.get("latest_event_status", "")
     assert event_details["event"] == "Record Diagnosis Date"
     diagnosis_reason = get_diagnosis_reason()
+    diagnosis_date = "TRUE"
+    event_details["item"] = compose_diagnosis_text_with_reason(
+        diagnosis_date, diagnosis_reason
+    )
+    # Static value comparison
+    event_details["item1"] = compose_diagnosis_text_with_reason(
+        "16 Jul 2025", "Patient choice"
+    )
+    assert (
+        remove_reason in event_details["item1"]
+    ), f"Expected reason '{remove_reason}' to be part of item, but got: {event_details['item1']}"
+
     diagnosis_date = "TRUE"
     event_details["item"] = compose_diagnosis_text_with_reason(
         diagnosis_date, diagnosis_reason
@@ -708,16 +852,24 @@ def test_amend_diagnosis_date_no_change_alert(page: Page) -> None:
     prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
 
     # Step 2: Interact with subject page
+    prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
+
+    # Step 2: Interact with subject page
     subject_page_s11 = RecordDiagnosisDatePage(page)
     page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
     page.get_by_role("checkbox").check()
+    page.get_by_role("button", name="Amend Diagnosis Date").click()
     page.get_by_role("button", name="Amend Diagnosis Date").click()
     subject_page_s11.click_save_button()
 
     # Step 3: Assert alert message
+    # Step 3: Assert alert message
     alert_message = subject_page_s11.get_alert_message()
     expected = "An amended date of diagnosis must not be earlier than the recorded diagnosis date and not in the future."
+    expected = "An amended date of diagnosis must not be earlier than the recorded diagnosis date and not in the future."
     assert expected in alert_message, f"Unexpected alert message. Got: {alert_message}"
+
 
 
 # Scenario 12
@@ -748,6 +900,7 @@ def test_amend_diagnosis_date_no_change_with_reason_alert(page: Page) -> None:
         "latest episode has referral date": "Past",
         "latest episode has diagnosis date": "Yes",
         "latest episode diagnosis date reason": "Incorrect information previously entered",
+        "latest episode diagnosis date reason": "Incorrect information previously entered",
     }
     user = User()
     subject = Subject()
@@ -769,7 +922,10 @@ def test_amend_diagnosis_date_no_change_with_reason_alert(page: Page) -> None:
     # Step 4: Interact with subject page
     subject_page_s12 = RecordDiagnosisDatePage(page)
     page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
     page.get_by_role("checkbox").check()
+    page.get_by_role("button", name="Amend Diagnosis Date").click()
+    subject_page_s12.enter_date_in_diagnosis_date_field(datetime.today())
     page.get_by_role("button", name="Amend Diagnosis Date").click()
     subject_page_s12.enter_date_in_diagnosis_date_field(datetime.today())
     page.locator("#reason").select_option("305501")
@@ -809,6 +965,7 @@ def test_amend_diagnosis_date_no_change_with_reason_only_alert(page: Page) -> No
         "latest episode status": "Open",
         "latest episode has referral date": "Past",
         "latest episode has diagnosis date": "No",
+        "latest episode has diagnosis date": "No",
         # Do not filter by reason value, but ensure it's not NULL in SQL
     }
     user = User()
@@ -819,14 +976,25 @@ def test_amend_diagnosis_date_no_change_with_reason_only_alert(page: Page) -> No
         user=user,
         subject=subject,
         subjects_to_retrieve=10,  # get more to filter
+        criteria=criteria,
+        user=user,
+        subject=subject,
+        subjects_to_retrieve=10,  # get more to filter
     )
     # Add NOT NULL filter for diagnosis date reason
     query = query.replace(
         "latest_episode_diagnosis_date_reason = :latest_episode_diagnosis_date_reason",
         "latest_episode_diagnosis_date_reason IS NOT NULL",
     )
+    query = query.replace(
+        "latest_episode_diagnosis_date_reason = :latest_episode_diagnosis_date_reason",
+        "latest_episode_diagnosis_date_reason IS NOT NULL",
+    )
     df = OracleDB().execute_query(query, bind_vars)
     if df.empty:
+        raise ValueError(
+            "No matching subject found with provided episode criteria and non-null reason."
+        )
         raise ValueError(
             "No matching subject found with provided episode criteria and non-null reason."
         )
@@ -841,14 +1009,18 @@ def test_amend_diagnosis_date_no_change_with_reason_only_alert(page: Page) -> No
     # Step 4: Interact with subject page
     subject_page_s13 = RecordDiagnosisDatePage(page)
     page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
     page.get_by_role("checkbox").check()
+    page.get_by_role("button", name="Amend Diagnosis Date").click()
     page.get_by_role("button", name="Amend Diagnosis Date").click()
     subject_page_s13.click_save_button()
 
     # Step 5: Assert alert message
     alert_message = subject_page_s13.get_alert_message()
     expected = "The date of diagnosis must not be earlier than the referral date"
+    expected = "The date of diagnosis must not be earlier than the referral date"
     assert expected in alert_message, f"Unexpected alert message. Got: {alert_message}"
+
 
 
 # Scenario 14
@@ -892,8 +1064,15 @@ def test_hub_user_cannot_amend_diagnosis_date(page: Page) -> None:
         "latest_episode_diagnosis_date_reason = :latest_episode_diagnosis_date_reason",
         "latest_episode_diagnosis_date_reason IS NOT NULL",
     )
+    query = query.replace(
+        "latest_episode_diagnosis_date_reason = :latest_episode_diagnosis_date_reason",
+        "latest_episode_diagnosis_date_reason IS NOT NULL",
+    )
     df = OracleDB().execute_query(query, bind_vars)
     if df.empty:
+        raise ValueError(
+            "No matching subject found with provided episode criteria and non-null reason."
+        )
         raise ValueError(
             "No matching subject found with provided episode criteria and non-null reason."
         )
@@ -909,6 +1088,9 @@ def test_hub_user_cannot_amend_diagnosis_date(page: Page) -> None:
     advance_fobt_button_s14 = page.get_by_role(
         "button", name="Advance FOBT Screening Episode"
     )
+    advance_fobt_button_s14 = page.get_by_role(
+        "button", name="Advance FOBT Screening Episode"
+    )
     if advance_fobt_button_s14.is_visible() and advance_fobt_button_s14.is_enabled():
         advance_fobt_button_s14.click()
     else:
@@ -916,6 +1098,10 @@ def test_hub_user_cannot_amend_diagnosis_date(page: Page) -> None:
 
     # Step 5: Assert that the "Amend Diagnosis Date" option is not available
     subject_amend_s14 = SubjectEpisodeEventsAndNotesPage(page)
+    assert (
+        not subject_amend_s14.is_amend_diagnosis_date_option_available()
+    ), "Amend Diagnosis Date option should not be available for hub users"
+
     assert (
         not subject_amend_s14.is_amend_diagnosis_date_option_available()
     ), "Amend Diagnosis Date option should not be available for hub users"
@@ -950,9 +1136,11 @@ def test_record_and_amend_diagnosis_date_multiple_times(page: Page) -> None:
         "latest episode has referral date": "Past",
         "latest episode has diagnosis date": "No",
         "latest episode diagnosis date reason": "NULL",
+        "latest episode diagnosis date reason": "NULL",
     }
     amend_reason = "Incorrect information previously entered"
     remove_reason = "Patient choice"
+    prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
     prepare_subject_for_test(page, criteria, role="Screening Centre Manager at BCS001")
     subject_page_s15 = RecordDiagnosisDatePage(page)
 
@@ -964,10 +1152,15 @@ def test_record_and_amend_diagnosis_date_multiple_times(page: Page) -> None:
     subject_page_s15.click_save_button()
     page.get_by_role("link", name="List Episodes").click()
     page.get_by_role("link", name="events").click()
+    page.get_by_role("link", name="List Episodes").click()
+    page.get_by_role("link", name="events").click()
 
     # Step 3 Assertions
     subject_event_s15 = SubjectEpisodeEventsAndNotesPage(page)
     event_details = subject_event_s15.get_latest_event_details()
+    assert_diagnosis_event_details(
+        event_details, expected_status_not="A50", expected_reason=None, log=logger.debug
+    )
     assert_diagnosis_event_details(
         event_details, expected_status_not="A50", expected_reason=None, log=logger.debug
     )
@@ -985,13 +1178,21 @@ def test_record_and_amend_diagnosis_date_multiple_times(page: Page) -> None:
         expected_reason=amend_reason,
         log=logger.debug,
     )
+    assert_diagnosis_event_details(
+        event_details,
+        expected_status_not="A51",
+        expected_reason=amend_reason,
+        log=logger.debug,
+    )
 
     # --- Third: Remove Diagnosis Date (clear date, with reason) ---
     # Step 6: Interact with subject page
     [page.get_by_role("link", name="Back", exact=True).click() for _ in range(2)]
     subject_page_s15 = RecordDiagnosisDatePage(page)
     page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
     page.get_by_role("checkbox").check()
+    page.get_by_role("button", name="Amend Diagnosis Date").click()
     page.get_by_role("button", name="Amend Diagnosis Date").click()
     page.locator("#diagnosisDate").fill("")
     date_field = page.locator("#diagnosisDate")
@@ -1001,6 +1202,8 @@ def test_record_and_amend_diagnosis_date_multiple_times(page: Page) -> None:
     page.locator("html").click()
     page.locator("#reason").select_option("305522")
     subject_page_s15.click_save_button()
+    page.get_by_role("link", name="List Episodes").click()
+    page.get_by_role("link", name="events").click()
     page.get_by_role("link", name="List Episodes").click()
     page.get_by_role("link", name="events").click()
 
@@ -1022,6 +1225,17 @@ def test_record_and_amend_diagnosis_date_multiple_times(page: Page) -> None:
     assert (
         remove_reason in event_details["item1"]
     ), f"Expected reason '{remove_reason}' to be part of item, but got: {event_details['item1']}"
+    # Use helper method to format the diagnosis item
+    event_details["item"] = compose_diagnosis_text_with_reason(
+        diagnosis_date, diagnosis_reason
+    )
+    # Set expected item1 string for validation
+    event_details["item1"] = compose_diagnosis_text_with_reason(
+        "16 Jul 2025", "Patient choice"
+    )
+    assert (
+        remove_reason in event_details["item1"]
+    ), f"Expected reason '{remove_reason}' to be part of item, but got: {event_details['item1']}"
 
     # --- Fourth: Amend Diagnosis Date again (today, with reason) ---
     # Step 8: Interact with subject page
@@ -1030,6 +1244,13 @@ def test_record_and_amend_diagnosis_date_multiple_times(page: Page) -> None:
     # Step 9: Assertions
     subject_event_status_s15 = SubjectEpisodeEventsAndNotesPage(page)
     event_details = subject_event_status_s15.get_latest_event_details()
+    assert_diagnosis_event_details(
+        event_details,
+        expected_status_not="A51",
+        expected_reason=amend_reason,
+        log=logger.debug,
+    )
+
     assert_diagnosis_event_details(
         event_details,
         expected_status_not="A51",
@@ -1066,6 +1287,7 @@ def test_support_user_can_amend_diagnosis_date_earlier(page: Page) -> None:
         "latest episode has referral date": "Past",
         "latest episode has diagnosis date": "No",
         "latest episode diagnosis date reason": "NULL",
+        "latest episode diagnosis date reason": "NULL",
     }
     amend_reason = "Incorrect information previously entered"
     user = User()
@@ -1094,7 +1316,12 @@ def test_support_user_can_amend_diagnosis_date_earlier(page: Page) -> None:
     page.get_by_role("button", name="Advance FOBT Screening Episode").click()
     page.get_by_role("button", name="Record Diagnosis Date").click()
     subject_page_s16.enter_date_in_diagnosis_date_field(datetime.today())
+    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name="Record Diagnosis Date").click()
+    subject_page_s16.enter_date_in_diagnosis_date_field(datetime.today())
     subject_page_s16.click_save_button()
+    page.get_by_role("link", name="List Episodes").click()
+    page.get_by_role("link", name="events").click()
     page.get_by_role("link", name="List Episodes").click()
     page.get_by_role("link", name="events").click()
 
@@ -1104,19 +1331,27 @@ def test_support_user_can_amend_diagnosis_date_earlier(page: Page) -> None:
     assert_diagnosis_event_details(
         event_details, expected_status_not="A50", expected_reason=None, log=logger.debug
     )
+    assert_diagnosis_event_details(
+        event_details, expected_status_not="A50", expected_reason=None, log=logger.debug
+    )
 
     # --- Second: Amend Diagnosis Date (yesterday, with reason) ---
     # Step 7: Interact with subject page
     [page.get_by_role("link", name="Back", exact=True).click() for _ in range(2)]
     subject_page_s16 = RecordDiagnosisDatePage(page)
     page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
     page.get_by_role("checkbox").check()
     page.get_by_role("button", name="Amend Diagnosis Date").click()
+    page.get_by_role("button", name="Amend Diagnosis Date").click()
     subject_page_s16.enter_date_in_diagnosis_date_field(
+        datetime.today() - timedelta(days=1)
         datetime.today() - timedelta(days=1)
     )
     page.locator("#reason").select_option("305501")
     subject_page_s16.click_save_button()
+    page.get_by_role("link", name="List Episodes").click()
+    page.get_by_role("link", name="events").click()
     page.get_by_role("link", name="List Episodes").click()
     page.get_by_role("link", name="events").click()
 
@@ -1128,7 +1363,11 @@ def test_support_user_can_amend_diagnosis_date_earlier(page: Page) -> None:
     assert (
         amend_reason in event_details["item"]
     ), f"Expected reason '{amend_reason}' to be part of item, but got: {event_details['item']}"
+    assert (
+        amend_reason in event_details["item"]
+    ), f"Expected reason '{amend_reason}' to be part of item, but got: {event_details['item']}"
     assert "Diag Date :" in event_details["item"]
+
 
 
 # Scenario 17
@@ -1159,6 +1398,7 @@ def test_sspi_cease_for_death_closes_episode(page: Page) -> None:
         "latest episode has referral date": "WITHIN_THE_LAST_28_DAYS",
         "latest episode has diagnosis date": "No",
         "latest episode diagnosis date reason": "NULL",
+        "latest episode diagnosis date reason": "NULL",
     }
     deduction_reason = "Death"
     expected_status = "Closed"
@@ -1173,12 +1413,19 @@ def test_sspi_cease_for_death_closes_episode(page: Page) -> None:
     query = query.replace(
         "latest_episode_has_referral_date = :latest_episode_has_referral_date",
         "latest_episode_referral_date >= :min_referral_date",
+        "latest_episode_referral_date >= :min_referral_date",
+    )
+    bind_vars["min_referral_date"] = (date.today() - timedelta(days=28)).strftime(
+        "%Y-%m-%d"
     )
     bind_vars["min_referral_date"] = (date.today() - timedelta(days=28)).strftime(
         "%Y-%m-%d"
     )
     df = OracleDB().execute_query(query, bind_vars)
     if df.empty:
+        raise ValueError(
+            "No matching subject found with provided episode criteria and recent referral date."
+        )
         raise ValueError(
             "No matching subject found with provided episode criteria and recent referral date."
         )
@@ -1200,6 +1447,9 @@ def test_sspi_cease_for_death_closes_episode(page: Page) -> None:
     # Step 6: Assertions
     assert updated_details["latest_episode_status"] == expected_status
     assert updated_details["latest_episode_has_diagnosis_date"] == "No"
+    assert (
+        updated_details["latest_episode_diagnosis_date_reason"] == expected_diag_reason
+    )
     assert (
         updated_details["latest_episode_diagnosis_date_reason"] == expected_diag_reason
     )
