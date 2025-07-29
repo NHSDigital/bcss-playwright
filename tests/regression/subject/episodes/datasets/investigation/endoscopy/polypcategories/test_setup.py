@@ -115,6 +115,7 @@ def test_setup_subjects_as_a99(page: Page, subjects_to_run_for: int) -> None:
     LogoutPage(page).log_out()
 
 
+@pytest.mark.setup
 @pytest.mark.vpn_required
 def test_setup_subjects_as_a259(page: Page, subjects_to_run_for: int) -> None:
     """
@@ -122,27 +123,27 @@ def test_setup_subjects_as_a259(page: Page, subjects_to_run_for: int) -> None:
     """
     page = page.context.new_page()
     page.goto("/")
-    criteria = {
-        "latest episode status": "open",
-        "latest episode latest investigation dataset": "colonoscopy_new",
-        "latest episode started": "less than 4 years ago",
-    }
-    user = User()
-    subject = Subject()
+    # criteria = {
+    #     "latest episode status": "open",
+    #     "latest episode latest investigation dataset": "colonoscopy_new",
+    #     "latest episode started": "less than 4 years ago",
+    # }
+    # user = User()
+    # subject = Subject()
 
-    builder = SubjectSelectionQueryBuilder()
+    # builder = SubjectSelectionQueryBuilder()
 
-    query, bind_vars = builder.build_subject_selection_query(
-        criteria=criteria,
-        user=user,
-        subject=subject,
-        subjects_to_retrieve=subjects_to_run_for,
-    )
+    # query, bind_vars = builder.build_subject_selection_query(
+    #     criteria=criteria,
+    #     user=user,
+    #     subject=subject,
+    #     subjects_to_retrieve=subjects_to_run_for,
+    # )
 
-    df = OracleDB().execute_query(query, bind_vars)
+    # df = OracleDB().execute_query(query, bind_vars)
 
-    if df.shape[0] == subjects_to_run_for:
-        pytest.skip("Enough subjects found, no need to run test setup")
+    # if df.shape[0] == subjects_to_run_for:
+    #     pytest.skip("Enough subjects found, no need to run test setup")
 
     criteria = {
         "latest event status": "S9",

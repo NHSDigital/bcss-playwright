@@ -379,7 +379,7 @@ class InvestigationDatasetCompletion:
         self.fill_endoscopy_information(endoscopy_information)
 
         # Completion Proof Information
-        if completion_information:
+        if completion_information is not None:
             logging.info("Filling out completion proof information")
             InvestigationDatasetsPage(
                 self.page
@@ -397,19 +397,29 @@ class InvestigationDatasetCompletion:
             failure_information["failure reasons"],
         )
 
-        if polyp_information:
+        if polyp_information is not None:
             for polyp_number, polyp_info in enumerate(polyp_information, start=1):
                 logging.info(f"Filling out polyp {polyp_number} information")
                 self.fill_polyp_x_information(polyp_info, polyp_number)
 
-        if polyp_intervention:
-            for polyp_number, polyp_intervention_info in enumerate(
+        if polyp_intervention is not None:
+            for polyp_number, intervention_entry in enumerate(
                 polyp_intervention, start=1
             ):
-                logging.info(f"Filling out polyp {polyp_number} intervention")
-                self.fill_polyp_x_intervention(polyp_intervention_info, polyp_number)
+                if isinstance(intervention_entry, list):
+                    logging.info(
+                        f"Filling multiple interventions for polyp {polyp_number}"
+                    )
+                    self.fill_polyp_x_multiple_interventions(
+                        intervention_entry, polyp_number
+                    )
+                else:
+                    logging.info(
+                        f"Filling single intervention for polyp {polyp_number}"
+                    )
+                    self.fill_polyp_x_intervention(intervention_entry, polyp_number)
 
-        if polyp_histology:
+        if polyp_histology is not None:
             for polyp_number, polyp_histology_info in enumerate(
                 polyp_histology, start=1
             ):
@@ -624,6 +634,67 @@ class InvestigationDatasetCompletion:
                         value,
                     )
 
+    def fill_polyp_x_multiple_interventions(
+        self, interventions: list[dict], polyp_number: int
+    ) -> None:
+        """
+        Fills out multiple interventions for the given polyp.
+
+        Args:
+            interventions (list): A list of intervention dictionaries.
+            polyp_number (int): The 1-based index of the polyp.
+        """
+        for i, intervention in enumerate(interventions, start=1):
+            InvestigationDatasetsPage(self.page).click_polyp_add_intervention_button(
+                polyp_number
+            )
+            for key, value in intervention.items():
+                match key:
+                    case "modality":
+                        DatasetFieldUtil(
+                            self.page
+                        ).populate_select_locator_for_field_inside_div(
+                            "Modality",
+                            f"divPolypTherapy{polyp_number}_{i}Section",
+                            value,
+                        )
+                    case "device":
+                        DatasetFieldUtil(
+                            self.page
+                        ).populate_select_locator_for_field_inside_div(
+                            "Device", f"divPolypTherapy{polyp_number}_{i}Section", value
+                        )
+                    case "excised":
+                        DatasetFieldUtil(
+                            self.page
+                        ).populate_select_locator_for_field_inside_div(
+                            "Excised", f"divPolypResected{polyp_number}_{i}", value
+                        )
+                    case "retrieved":
+                        DatasetFieldUtil(
+                            self.page
+                        ).populate_select_locator_for_field_inside_div(
+                            "Retrieved",
+                            f"divPolypTherapy{polyp_number}_{i}Section",
+                            value,
+                        )
+                    case "excision technique":
+                        DatasetFieldUtil(
+                            self.page
+                        ).populate_select_locator_for_field_inside_div(
+                            self.excision_technique_string,
+                            f"divPolypTherapy{polyp_number}_{i}Section",
+                            value,
+                        )
+                    case "polyp appears fully resected endoscopically":
+                        DatasetFieldUtil(
+                            self.page
+                        ).populate_select_locator_for_field_inside_div(
+                            "Polyp appears fully resected endoscopically",
+                            f"divPolypAppearsFullyResected{polyp_number}_{i}",
+                            value,
+                        )
+
     def fill_polyp_x_histology(self, polyp_histology: dict, polyp_number: int) -> None:
         """
         Fills out the polyp histology section of the investigation dataset.
@@ -633,6 +704,17 @@ class InvestigationDatasetCompletion:
         """
         for key, value in polyp_histology.items():
             match key:
+                case "pathology lost":
+                    InvestigationDatasetsPage(self.page).assert_dialog_text(
+                        "Please consider raising an AVI", True
+                    )
+                    InvestigationDatasetsPage(self.page).populate_select_by_id(
+                        "POLYP_PATHOLOGY_LOST", polyp_number, value
+                    )
+                case "reason pathology lost":
+                    InvestigationDatasetsPage(self.page).populate_select_by_id(
+                        "POLYP_PATHOLOGY_LOST_REASON", polyp_number, value
+                    )
                 case "date of receipt":
                     DatasetFieldUtil(
                         self.page

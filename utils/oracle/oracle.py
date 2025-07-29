@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 import pandas as pd
 import logging
+from typing import Optional
 
 
 class OracleDB:
@@ -179,7 +180,7 @@ class OracleDB:
         return df
 
     def execute_stored_procedure(
-        self, procedure: str, params: list = [None]
+        self, procedure: str, params: Optional[list] = None
     ) -> None:  # To use when "exec xxxx" (stored procedures)
         """
         This is to be used whenever we need to execute a stored procedure.
