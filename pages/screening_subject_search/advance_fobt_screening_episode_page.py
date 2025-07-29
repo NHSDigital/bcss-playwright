@@ -5,7 +5,7 @@ import pytest
 
 
 class AdvanceFOBTScreeningEpisodePage(BasePage):
-    """Advance FOBT Screening Episode Page locators, and methods for interacting with the page."""
+    """Advance FOBT Screening Episode Page locators and methods for interacting with the page."""
 
     def __init__(self, page: Page):
         super().__init__(page)
@@ -16,6 +16,7 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         )
         self.calendar_button = self.page.get_by_role("button", name="Calendar")
         self.test_type_dropdown = self.page.locator("#UI_EXT_TEST_TYPE_2233")
+        self.test_type_dropdown_2 = self.page.locator("#UI_EXT_TEST_TYPE_4325")
         self.advance_checkbox = self.page.get_by_label("There are some events available which should only be used in exceptional circumstances. If you wish to see them, check this box")
 
         self.invite_for_diagnostic_test_button = self.page.get_by_role(
