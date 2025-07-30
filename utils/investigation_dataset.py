@@ -396,6 +396,25 @@ class InvestigationDatasetCompletion:
             failure_information["failure reasons"],
         )
 
+        self.process_polyps(polyp_information, polyp_intervention, polyp_histology)
+
+        logging.info("Saving the investigation dataset")
+        InvestigationDatasetsPage(self.page).check_dataset_complete_checkbox()
+        InvestigationDatasetsPage(self.page).click_save_dataset_button()
+
+    def process_polyps(
+        self,
+        polyp_information: Optional[list] = None,
+        polyp_intervention: Optional[list] = None,
+        polyp_histology: Optional[list] = None,
+    ) -> None:
+        """
+        This method is in charge of processing any polyps to be added to the dataset.
+        Args:
+            polyp_information (Optional[list]): An optional list containing the polyp information to be filled in the form.
+            polyp_intervention (Optional[list]): An optional list containing the polyp intervention to be filled in the form.
+            polyp_histology (Optional[list]): An optional list containing the polyp histology to be filled in the form.
+        """
         # Polyp Information
         if polyp_information is not None:
             for polyp_number, polyp_info in enumerate(polyp_information, start=1):
@@ -427,10 +446,6 @@ class InvestigationDatasetCompletion:
             ):
                 logging.info(f"Filling out polyp {polyp_number} histology")
                 self.fill_polyp_x_histology(polyp_histology_info, polyp_number)
-
-        logging.info("Saving the investigation dataset")
-        InvestigationDatasetsPage(self.page).check_dataset_complete_checkbox()
-        InvestigationDatasetsPage(self.page).click_save_dataset_button()
 
     def fill_endoscopy_information(self, endoscopy_information: dict) -> None:
         """
