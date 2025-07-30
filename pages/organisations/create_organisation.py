@@ -1,5 +1,5 @@
 import logging
-from playwright.sync_api import Page,expect
+from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 
 
@@ -45,7 +45,8 @@ class CreateOrganisation(BasePage):
             None
         """
         logging.info("Clicking Start Date Calendar on Create Organisation page")
-        self.start_date_calendar.click()    
+        self.start_date_calendar.click()
+
     def fill_audit_reason(self, text: str) -> None:
         """
         This method is designed to fill in the Audit Reason field on the Create Organisation page.
@@ -53,7 +54,8 @@ class CreateOrganisation(BasePage):
             None
         """
         logging.info("Filling Audit Reason on Create Organisation page")
-        self.audit_reason.fill(text)    
+        self.audit_reason.fill(text)
+
     def click_save_button(self) -> None:
         """
         This method is designed to click the Save button on the Create Organisation page.
@@ -64,8 +66,8 @@ class CreateOrganisation(BasePage):
         self.save_button.click()
 
     def verify_success_message(self) -> None:
-        """ Verifies that the success message is displayed after saving the organisation.  
-     
-        """
+        """Verifies that the success message is displayed after saving the organisation."""
         logging.info("Verifying success message on Create Organisation page")
-        expect(self.page.locator("th")).to_contain_text("The action was performed successfully")
+        expect(self.page.locator("th")).to_contain_text(
+            "The action was performed successfully"
+        )

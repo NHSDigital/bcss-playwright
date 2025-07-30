@@ -17,14 +17,12 @@ class ListAllSites(BasePage):
         # List All Organisations links
         self.select_site_type = self.page.locator("#siteTypeId")
         self.create_new_site = self.page.get_by_role("button", name="Create New Site")
-        
 
     def select_site_type_option(self, option: str) -> None:
         """
         This method is designed to select a specific site type from the List All Sites page.
         """
         self.select_site_type.select_option(option)
-
 
     def click_create_new_site(self) -> None:
         """Clicks the 'Create New Org' button."""
