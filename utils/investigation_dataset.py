@@ -572,6 +572,14 @@ class InvestigationDatasetCompletion:
                         f"divLeftInSitu{polyp_number}",
                         value,
                     )
+                case "reason left in situ":
+                    DatasetFieldUtil(
+                        self.page
+                    ).populate_select_locator_for_field_inside_div(
+                        "Reason Left in Situ",
+                        f"divLeftInSituReason{polyp_number}",
+                        value,
+                    )
 
     def fill_polyp_x_intervention(
         self, polyp_intervention: dict, polyp_number: int
@@ -631,6 +639,14 @@ class InvestigationDatasetCompletion:
                     ).populate_select_locator_for_field_inside_div(
                         "Polyp appears fully resected endoscopically",
                         f"divPolypAppearsFullyResected{polyp_number}_1",
+                        value,
+                    )
+                case "intervention success":
+                    DatasetFieldUtil(
+                        self.page
+                    ).populate_select_locator_for_field_inside_div(
+                        "Intervention Success",
+                        f"divResectionSuccess{polyp_number}_1",
                         value,
                     )
 
@@ -694,6 +710,14 @@ class InvestigationDatasetCompletion:
                             f"divPolypAppearsFullyResected{polyp_number}_{i}",
                             value,
                         )
+                    case "intervention success":
+                        DatasetFieldUtil(
+                            self.page
+                        ).populate_select_locator_for_field_inside_div(
+                            "Intervention Success",
+                            f"divResectionSuccess{polyp_number}_{i}",
+                            value,
+                        )
 
     def fill_polyp_x_histology(self, polyp_histology: dict, polyp_number: int) -> None:
         """
@@ -702,6 +726,7 @@ class InvestigationDatasetCompletion:
         Args:
             polyp_histology (dict): A dictionary containing the polyp 1 histology to be filled in the form.
         """
+        self.click_show_histology_details_if_present(polyp_number)
         for key, value in polyp_histology.items():
             match key:
                 case "pathology lost":
@@ -803,6 +828,22 @@ class InvestigationDatasetCompletion:
                         f"divTumourFindings{polyp_number}_1",
                         value,
                     )
+
+    def click_show_histology_details_if_present(self, polyp_number: int) -> None:
+        """
+        This method checks if the relevant "Show details" link for a polyp histology is present.
+        If it is then it clicks it.
+
+        Args:
+            polyp_number (int): The polyp number for the histology you want to check
+        """
+        dynamic_id = f"anchorPolypHistology{polyp_number}_1"
+        locator = self.page.locator(f"#{dynamic_id}")
+
+        if locator.count() > 0:
+            text = locator.inner_text().strip()
+            if text == "Show details":
+                locator.click()
 
 
 class AfterInvestigationDatasetComplete:

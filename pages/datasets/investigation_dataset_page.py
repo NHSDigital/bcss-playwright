@@ -807,3 +807,20 @@ class ReasonPathologyLostOptions(StrEnum):
 
     LOST_IN_TRANSIT = "200561~~204337"
     DESTROYED_DURING_PROCESSING = "200562~~204337"
+
+
+class PolypInterventionSuccessOptions(StrEnum):
+    """Enum for polyp intervention success options"""
+
+    SUCCESSFUL = "17200"
+    UNSUCCESSFUL = "17201"
+
+
+class PolypReasonLeftInSituOptions(StrEnum):
+    """Enum for reasons a polyp was left in situ"""
+
+    POLYP_TYPE = "200556"
+    REQUIRES_ANOTHER_PROCEDURE = "200557"
+    REQUIRES_SURGICAL_RESECTION = "200558"
+    CANNOT_FIND_POLYP_ON_WITHDRAWAL = "200559"
+    CLINICAL_DECISION_NOT_TO_EXCISE = "203082"
