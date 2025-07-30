@@ -366,14 +366,13 @@ class InvestigationDatasetCompletion:
 
         # Drug Information
         InvestigationDatasetsPage(self.page).click_show_drug_information()
-        if drug_information.get("drug_type1"):
-            logging.info("Filling out drug information")
-            InvestigationDatasetsPage(self.page).select_drug_type_option1(
-                drug_information["drug_type1"]
-            )
-            InvestigationDatasetsPage(self.page).fill_drug_type_dose1(
-                drug_information["drug_dose1"]
-            )
+        logging.info("Filling out drug information")
+        InvestigationDatasetsPage(self.page).select_drug_type_option1(
+            drug_information["drug_type1"]
+        )
+        InvestigationDatasetsPage(self.page).fill_drug_type_dose1(
+            drug_information["drug_dose1"]
+        )
 
         logging.info("Filling out endoscopy information")
         self.fill_endoscopy_information(endoscopy_information)
@@ -397,11 +396,13 @@ class InvestigationDatasetCompletion:
             failure_information["failure reasons"],
         )
 
+        # Polyp Information
         if polyp_information is not None:
             for polyp_number, polyp_info in enumerate(polyp_information, start=1):
                 logging.info(f"Filling out polyp {polyp_number} information")
                 self.fill_polyp_x_information(polyp_info, polyp_number)
 
+        # Polyp Intervention
         if polyp_intervention is not None:
             for polyp_number, intervention_entry in enumerate(
                 polyp_intervention, start=1
@@ -419,6 +420,7 @@ class InvestigationDatasetCompletion:
                     )
                     self.fill_polyp_x_intervention(intervention_entry, polyp_number)
 
+        # Polyp Histology
         if polyp_histology is not None:
             for polyp_number, polyp_histology_info in enumerate(
                 polyp_histology, start=1
