@@ -1,6 +1,6 @@
-from ast import Or
+from ast import List, Or
 import pytest
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 from pages.organisations import organisations_and_site_details
 from pages.organisations.organisations_page import OrganisationsPage
@@ -11,7 +11,14 @@ from pages.organisations.list_all_organisations import (
     ListAllOrganisations,
     OrganisationType,
 )
+from pages.organisations.create_organisation import CreateOrganisation
+from pages.organisations.view_organisation import ViewOrganisation
+from pages.organisations.list_all_sites import ListAllSites, SiteType
+from pages.organisations.create_site import CreateSite
 from utils.user_tools import UserTools
+from utils.table_util import TableUtils
+from utils.calendar_picker import CalendarPicker
+from datetime import datetime
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -28,7 +35,7 @@ def before_each(page: Page):
 
 @pytest.mark.regression
 @pytest.mark.organisations_users_and_contacts_tests
-@pytest.mark.wip
+@pytest.mark.organisations_and_contacts_build_level_tests
 def test_check_list_all_organisations_page(page) -> None:
     """
     Verifies that the 'List All Organisations' page displays correctly and contains expected elements.
@@ -36,3 +43,75 @@ def test_check_list_all_organisations_page(page) -> None:
     OrganisationsPage(page).go_to_organisations_and_site_details_page()
     OrganisationsAndSiteDetails(page).go_to_list_all_organisations()
     ListAllOrganisations(page).select_organisation_type_option(OrganisationType.ICB)
+    ListAllOrganisations(page).click_first_link_in_table()
+    ViewOrganisation(page).verify_page_title()
+
+
+@pytest.mark.regression
+@pytest.mark.organisations_users_and_contacts_tests
+@pytest.mark.organisations_and_contacts_develop_level_tests
+def test_create_new_icb_z9z1s_using_create_new_org(page) -> None:
+    """
+    Verifies that the 'Create New Organisation' functionality works correctly for creating a new ICB organisation.
+    """
+    OrganisationsPage(page).go_to_organisations_and_site_details_page()
+    OrganisationsAndSiteDetails(page).go_to_list_all_organisations()
+    ListAllOrganisations(page).select_organisation_type_option(OrganisationType.ICB)
+    ListAllOrganisations(page).click_create_new_org()
+    CreateOrganisation(page).organisation_code.fill("Z9Z1S")
+    CreateOrganisation(page).organisation_name.fill("Test ANANA ICB")
+    CreateOrganisation(page).click_start_date_calendar()
+    CalendarPicker(page).select_day(datetime.today())
+    CreateOrganisation(page).audit_reason.fill("Automated ANANA Test ")
+    CreateOrganisation(page).click_save_button()
+    CreateOrganisation(page).verify_success_message()
+
+
+@pytest.mark.regression
+@pytest.mark.organisations_users_and_contacts_tests
+@pytest.mark.organisations_and_contacts_develop_level_tests
+def test_create_new_nhs_trust_site_z9z1x_using_ccreate_site(page) -> None:
+    """
+    Verifies that the 'Create New Site' functionality works correctly for creating a new NHS Trust site.
+    """
+    OrganisationsPage(page).go_to_organisations_and_site_details_page()
+    OrganisationsAndSiteDetails(page).go_to_list_all_sites()
+    ListAllSites(page).select_site_type_option(SiteType.NHS_TRUST_SITE)
+    ListAllSites(page).click_create_new_site()
+    CreateSite(page).fill_site_code("Z9Z1X")
+    CreateSite(page).fill_site_name("TEST ANANA NHS TRUST SITE")
+    CreateSite(page).click_start_date_calendar()
+    CalendarPicker(page).select_day(datetime.today())
+    CreateSite(page).fill_audit_reason("Automated ANANA Test")
+    CreateSite(page).click_save_button()
+    CreateSite(page).verify_success_message()
+
+
+@pytest.mark.regression
+@pytest.mark.organisations_users_and_contacts_tests
+@pytest.mark.organisations_and_contacts_develop_level_tests
+def test_view_and_edit_organisation_values_z9z1s(page) -> None:
+    """
+    Verifies that the 'View and Edit Organisation' functionality works correctly for an existing ICB organisation.
+    """
+    OrganisationsPage(page).go_to_organisations_and_site_details_page()
+    OrganisationsAndSiteDetails(page).go_to_list_all_organisations()
+    ListAllOrganisations(page).select_organisation_type_option(OrganisationType.ICB)
+    ListAllOrganisations(page).search_organisation_code("Z9Z1S")
+    ListAllOrganisations(page).click_first_link_in_table()
+    ViewOrganisation(page).verify_organisation_type_details("Z9Z1S")
+    ViewOrganisation(page).verify_organisation_code_details("ICB")
+    ViewOrganisation(page).click_edit_button()
+    ViewOrganisation(page).verify_organisation_type_details("Z9Z1S")
+    ViewOrganisation(page).verify_organisation_code_details("ICB")
+
+
+@pytest.mark.regression
+@pytest.mark.organisations_users_and_contacts_tests
+@pytest.mark.organisations_and_contacts_develop_level_tests
+def test_remove_all_created_organisation(page) -> None:
+    """
+    Verifies that the 'View and Edit Organisation' functionality works correctly for an existing ICB organisation.
+    """
+    OrganisationsPage(page).go_to_organisations_and_site_details_page()
+    OrganisationsAndSiteDetails(page).go_to_list_all_organisations()

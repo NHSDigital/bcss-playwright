@@ -1,6 +1,8 @@
+import logging
 from playwright.sync_api import Page
 from pages.base_page import BasePage
 from enum import StrEnum
+from utils.table_util import TableUtils
 
 
 class ListAllOrganisations(BasePage):
@@ -9,9 +11,13 @@ class ListAllOrganisations(BasePage):
     def __init__(self, page: Page):
         super().__init__(page)
         self.page = page
+        # Initialize TableUtils for the table with id="displayRS"
+        self.list_all_org_table = TableUtils(page, "#listAllOrgsTable")
 
         # List All Organisations links
         self.select_organisation_type = self.page.locator("#organisationType")
+        self.create_new_org = self.page.get_by_role("button", name="Create New Org")
+        self.search_org_code = self.page.locator('input[name="ORG_CODE"]')
 
     def select_organisation_type_option(self, option: str) -> None:
         """
@@ -21,7 +27,32 @@ class ListAllOrganisations(BasePage):
         Returns:
             None
         """
+        logging.info(f"Selecting Organisation Type: {option}")
         self.select_organisation_type.select_option(option)
+
+    def click_first_link_in_table(self) -> None:
+        """Clicks the first Org Code link from the List All Orgs table."""
+        logging.info(
+            "Clicking the first Org Code link in the List All Organisations table"
+        )
+        self.list_all_org_table.click_first_link_in_column("Org Code↑")
+
+    def click_create_new_org(self) -> None:
+        """Clicks the 'Create New Org' button."""
+        logging.info("Clicking the 'Create New Org' button")
+        self.create_new_org.click()
+
+    def search_organisation_code(self, org_code: str) -> None:
+        """
+        This method is designed to search for an organisation by its code.
+        Args:
+            org_code (str): The organisation code to search for.
+        Returns:
+            None
+        """
+        logging.info(f"Searching for Organisation with code: {org_code}")
+        self.search_org_code.fill(org_code)
+        self.search_org_code.press("Enter")
 
 
 class OrganisationType(StrEnum):
