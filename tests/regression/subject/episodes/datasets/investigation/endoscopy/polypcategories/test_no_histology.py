@@ -15,7 +15,6 @@ from pages.datasets.investigation_dataset_page import (
     PolypInterventionExcisionTechniqueOptions,
     PolypTypeOptions,
     SerratedLesionSubTypeOptions,
-    PolypExcisionCompleteOptions,
     PolypDysplasiaOptions,
     YesNoUncertainOptions,
     AdenomaSubTypeOptions,
@@ -66,6 +65,52 @@ failure_information = {
 completion_information = {
     "completion proof": CompletionProofOptions.VIDEO_APPENDIX,
 }
+
+
+polyp_intervention_for_scenarios_o_p = [
+    [
+        {
+            "modality": PolypInterventionModalityOptions.EMR,
+            "device": PolypInterventionDeviceOptions.HOT_SNARE,
+        },
+        {
+            "modality": PolypInterventionModalityOptions.BIOPSY,
+            "device": PolypInterventionDeviceOptions.COLD_SNARE,
+            "intervention success": PolypInterventionSuccessOptions.SUCCESSFUL,
+        },
+    ]
+]
+
+polyp_histology_for_scenarios_o_p = [
+    {
+        "date of receipt": datetime.today(),
+        "date of reporting": datetime.today(),
+        "pathology provider": -1,
+        "pathologist": -1,
+        "polyp type": PolypTypeOptions.ADENOMA,
+        "adenoma sub type": AdenomaSubTypeOptions.VILLOUS_ADENOMA,
+        "polyp dysplasia": PolypDysplasiaOptions.HIGH_GRADE_DYSPLASIA,
+        "polyp carcinoma": YesNoUncertainOptions.UNCERTAIN,
+    }
+]
+
+
+polyp_intervention_for_sceanrios_r_s = [
+    {
+        "modality": PolypInterventionModalityOptions.POLYPECTOMY,
+        "device": PolypInterventionDeviceOptions.COLD_SNARE,
+        "excised": YesNoOptions.YES,
+        "retrieved": YesNoOptions.YES,
+        "excision technique": PolypInterventionExcisionTechniqueOptions.PIECE_MEAL,
+    }
+]
+
+polyp_histology_for_sceanrios_r_s = [
+    {
+        "pathology lost": YesNoOptions.YES,
+        "reason pathology lost": ReasonPathologyLostOptions.LOST_IN_TRANSIT,
+    }
+]
 
 
 @pytest.mark.vpn_required
@@ -1015,33 +1060,6 @@ def test_identify_polyp_category_no_histology_o(
         }
     ]
 
-    polyp_1_intervention = [
-        [
-            {
-                "modality": PolypInterventionModalityOptions.EMR,
-                "device": PolypInterventionDeviceOptions.HOT_SNARE,
-            },
-            {
-                "modality": PolypInterventionModalityOptions.BIOPSY,
-                "device": PolypInterventionDeviceOptions.COLD_SNARE,
-                "intervention success": PolypInterventionSuccessOptions.SUCCESSFUL,
-            },
-        ]
-    ]
-
-    polyp_1_histology = [
-        {
-            "date of receipt": datetime.today(),
-            "date of reporting": datetime.today(),
-            "pathology provider": -1,
-            "pathologist": -1,
-            "polyp type": PolypTypeOptions.ADENOMA,
-            "adenoma sub type": AdenomaSubTypeOptions.VILLOUS_ADENOMA,
-            "polyp dysplasia": PolypDysplasiaOptions.HIGH_GRADE_DYSPLASIA,
-            "polyp carcinoma": YesNoUncertainOptions.UNCERTAIN,
-        }
-    ]
-
     complete_and_assert_investigation(
         page,
         general_information,
@@ -1052,8 +1070,8 @@ def test_identify_polyp_category_no_histology_o(
         expected_category=None,
         expected_size="17",
         polyp_information=polyp_1_information,
-        polyp_intervention=polyp_1_intervention,
-        polyp_histology=polyp_1_histology,
+        polyp_intervention=polyp_intervention_for_scenarios_o_p,
+        polyp_histology=polyp_histology_for_scenarios_o_p,
         completion_information=completion_information,
     )
 
@@ -1094,33 +1112,6 @@ def test_identify_polyp_category_no_histology_p(
         }
     ]
 
-    polyp_1_intervention = [
-        [
-            {
-                "modality": PolypInterventionModalityOptions.EMR,
-                "device": PolypInterventionDeviceOptions.HOT_SNARE,
-            },
-            {
-                "modality": PolypInterventionModalityOptions.BIOPSY,
-                "device": PolypInterventionDeviceOptions.COLD_SNARE,
-                "intervention success": PolypInterventionSuccessOptions.SUCCESSFUL,
-            },
-        ]
-    ]
-
-    polyp_1_histology = [
-        {
-            "date of receipt": datetime.today(),
-            "date of reporting": datetime.today(),
-            "pathology provider": -1,
-            "pathologist": -1,
-            "polyp type": PolypTypeOptions.ADENOMA,
-            "adenoma sub type": AdenomaSubTypeOptions.VILLOUS_ADENOMA,
-            "polyp dysplasia": PolypDysplasiaOptions.HIGH_GRADE_DYSPLASIA,
-            "polyp carcinoma": YesNoUncertainOptions.UNCERTAIN,
-        }
-    ]
-
     complete_and_assert_investigation(
         page,
         general_information,
@@ -1131,8 +1122,8 @@ def test_identify_polyp_category_no_histology_p(
         expected_category=None,
         expected_size="12",
         polyp_information=polyp_1_information,
-        polyp_intervention=polyp_1_intervention,
-        polyp_histology=polyp_1_histology,
+        polyp_intervention=polyp_intervention_for_scenarios_o_p,
+        polyp_histology=polyp_histology_for_scenarios_o_p,
         completion_information=completion_information,
     )
 
@@ -1249,23 +1240,6 @@ def test_identify_polyp_category_no_histology_r(
         }
     ]
 
-    polyp_intervention = [
-        {
-            "modality": PolypInterventionModalityOptions.POLYPECTOMY,
-            "device": PolypInterventionDeviceOptions.COLD_SNARE,
-            "excised": YesNoOptions.YES,
-            "retrieved": YesNoOptions.YES,
-            "excision technique": PolypInterventionExcisionTechniqueOptions.PIECE_MEAL,
-        }
-    ]
-
-    polyp_histology = [
-        {
-            "pathology lost": YesNoOptions.YES,
-            "reason pathology lost": ReasonPathologyLostOptions.LOST_IN_TRANSIT,
-        }
-    ]
-
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
@@ -1273,8 +1247,8 @@ def test_identify_polyp_category_no_histology_r(
         failure_information=failure_information,
         polyp_information=polyp_information,
         completion_information=completion_information,
-        polyp_intervention=polyp_intervention,
-        polyp_histology=polyp_histology,
+        polyp_intervention=polyp_intervention_for_sceanrios_r_s,
+        polyp_histology=polyp_histology_for_sceanrios_r_s,
     )
 
     try:
@@ -1296,8 +1270,8 @@ def test_identify_polyp_category_no_histology_r(
         expected_category=other_polyp_string,
         expected_size="6",
         polyp_information=polyp_information,
-        polyp_intervention=polyp_intervention,
-        polyp_histology=polyp_histology,
+        polyp_intervention=polyp_intervention_for_sceanrios_r_s,
+        polyp_histology=polyp_histology_for_sceanrios_r_s,
         completion_information=completion_information,
     )
 
@@ -1336,23 +1310,6 @@ def test_identify_polyp_category_no_histology_s(
         }
     ]
 
-    polyp_intervention = [
-        {
-            "modality": PolypInterventionModalityOptions.POLYPECTOMY,
-            "device": PolypInterventionDeviceOptions.COLD_SNARE,
-            "excised": YesNoOptions.YES,
-            "retrieved": YesNoOptions.YES,
-            "excision technique": PolypInterventionExcisionTechniqueOptions.PIECE_MEAL,
-        }
-    ]
-
-    polyp_histology = [
-        {
-            "pathology lost": YesNoOptions.YES,
-            "reason pathology lost": ReasonPathologyLostOptions.LOST_IN_TRANSIT,
-        }
-    ]
-
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
         drug_information=drug_information,
@@ -1360,8 +1317,8 @@ def test_identify_polyp_category_no_histology_s(
         failure_information=failure_information,
         polyp_information=polyp_information,
         completion_information=completion_information,
-        polyp_intervention=polyp_intervention,
-        polyp_histology=polyp_histology,
+        polyp_intervention=polyp_intervention_for_sceanrios_r_s,
+        polyp_histology=polyp_histology_for_sceanrios_r_s,
     )
 
     try:
