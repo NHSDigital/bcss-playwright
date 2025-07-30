@@ -172,7 +172,7 @@ class SubjectSelectionQueryBuilder:
 
     def _build_select_clause(self) -> None:
         """
-        This methods build the 'SELECT' section of the SQL query
+        This method builds the 'SELECT' section of the SQL query
         """
         columns: list[str] = [
             "ss.screening_subject_id",
