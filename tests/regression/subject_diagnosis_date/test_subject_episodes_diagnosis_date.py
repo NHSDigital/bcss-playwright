@@ -164,8 +164,8 @@ def test_screening_centre_manager_records_diagnosis_date_for_subject_with_referr
     page: Page,
 ) -> None:
     """
-    Tests that a screening centre manager records a diagnosis date of today for a subject who HAS a referral date and does NOT yet have a diagnosis date recorded
-    Given I log in to BCSS "England" as user role "Screening Centre Manager"
+    Tests that verify screening centre manager records a diagnosis date of today for a subject who HAS a referral date
+    and does NOT yet have a diagnosis date recorded.
     """
     # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
@@ -207,8 +207,7 @@ def test_screening_centre_manager_records_diagnosis_date_for_subject_with_referr
 @pytest.mark.fobt_diagnosis_date_entry_tests
 def test_cannot_record_diagnosis_date_without_referral(page: Page) -> None:
     """
-    Tests that a screening centre user cannot record a diagnosis date for a subject who does NOT have a referral date
-    Given I log in to BCSS "England" as user role "Screening Centre Manager"
+    Tests that verify screening centre user cannot record a diagnosis date for a subject who does NOT have a referral date.
     """
     # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
@@ -242,8 +241,8 @@ def test_cannot_record_diagnosis_date_without_referral(page: Page) -> None:
 @pytest.mark.fobt_diagnosis_date_entry_tests
 def test_cannot_record_diagnosis_date_with_existing_diagnosis(page: Page) -> None:
     """
-    Tests that A screening centre user cannot record a diagnosis date for a subject who HAS a referral date and already has a diagnosis date recorded
-    Given I log in to BCSS "England" as user role "Screening Centre Manager"
+    Tests that verify A screening centre user cannot record a diagnosis date for a subject who HAS a referral date
+    and already has a diagnosis date recorded.
     """
     # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
@@ -287,8 +286,8 @@ def test_cannot_record_diagnosis_date_with_existing_diagnosis(page: Page) -> Non
 @pytest.mark.fobt_diagnosis_date_entry_tests
 def test_hub_user_can_record_diagnosis_date_with_referral_no_diag(page: Page) -> None:
     """
-    Tests that a hub user can record a diagnosis date for a subject who HAS a referral date and does NOT yet have a diagnosis date recorded
-    Given I log in to BCSS "England" as user role "Hub Manager"
+    Tests that verify A hub user can record a diagnosis date for a subject who HAS a referral date
+    and does NOT yet have a diagnosis date recorded.
     """
     # Step 1: Obtain NHS number for a subject matching criteria
     criteria = {
@@ -358,8 +357,7 @@ def test_hub_user_can_record_diagnosis_date_with_referral_no_diag(page: Page) ->
 @pytest.mark.fobt_diagnosis_date_entry_tests
 def test_record_diagnosis_date_no_date_or_reason_alert(page: Page) -> None:
     """
-    Tests that Record Diagnosis Date : enter no date or reason
-    Given I log in to BCSS "England" as user role "Screening Centre Manager"
+    Tests that verify Record Diagnosis Date with enter no date or reason.
     """
     # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
@@ -393,8 +391,7 @@ def test_record_diagnosis_date_no_date_or_reason_alert(page: Page) -> None:
 @pytest.mark.fobt_diagnosis_date_entry_tests
 def test_record_diagnosis_date_reason_only(page: Page) -> None:
     """
-    Tests that Record Diagnosis Date : enter no date but give a reason
-    Given I log in to BCSS "England" as user role "Screening Centre Manager"
+    Tests that verify Record Diagnosis Date with enter no date but give a reason.
     """
     # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
@@ -426,8 +423,7 @@ def test_record_diagnosis_date_reason_only(page: Page) -> None:
 @pytest.mark.fobt_diagnosis_date_entry_tests
 def test_amend_diagnosis_date_without_reason_alert(page: Page) -> None:
     """
-    Tests that Amend Diagnosis Date : amend date, but don't give a reason
-    Given I log in to BCSS "England" as user role "Screening Centre Manager"
+    Tests that verify mend Diagnosis Date with amend date, but don't give a reason.
     """
     # Step 1: Obtain NHS number for a subject matching criteria
     criteria = {
@@ -465,8 +461,7 @@ def test_amend_diagnosis_date_without_reason_alert(page: Page) -> None:
 @pytest.mark.fobt_diagnosis_date_entry_tests
 def test_amend_diagnosis_date_with_reason(page: Page) -> None:
     """
-    Tests that Amend Diagnosis Date : amend date, and give a reason
-    Given I log in to BCSS "England" as user role "Screening Centre Manager"
+    Tests that verify Amend Diagnosis Date with amend date, and give a reason.
     """
     # Step 1: Obtain NHS number for a subject matching criteria
     criteria = {
@@ -522,8 +517,7 @@ def test_amend_diagnosis_date_with_reason(page: Page) -> None:
 @pytest.mark.fobt_diagnosis_date_entry_tests
 def test_amend_diagnosis_date_remove_date_with_reason(page: Page) -> None:
     """
-    Tests that a Amend Diagnosis Date : remove existing date, give a reason
-    Given I log in to BCSS "England" as user role "Screening Centre Manager"
+    Tests that verify Amend Diagnosis Date with remove existing date, give a reason.
     """
     # Step 1: Obtain NHS number for a subject matching criteria
     criteria = {
@@ -602,8 +596,7 @@ def get_diagnosis_reason() -> Optional[str]:
 @pytest.mark.fobt_diagnosis_date_entry_tests
 def test_amend_diagnosis_date_no_change_alert(page: Page) -> None:
     """
-    Tests that Amend Diagnosis Date : no change to data, starting with date but no reason
-    Given I log in to BCSS "England" as user role "Screening Centre Manager"
+    Tests that verify Amend Diagnosis Date with no change to data, starting with date but no reason.
     """
     # Step 1: Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
@@ -634,9 +627,9 @@ def test_amend_diagnosis_date_no_change_alert(page: Page) -> None:
 @pytest.mark.fobt_diagnosis_date_entry_tests
 def test_amend_diagnosis_date_no_change_with_reason_alert(page: Page) -> None:
     """
-    Tests that Amend Diagnosis Date : no change to data, starting with date and reason
-    Note: When amending a diagnosis date, the only valid reason is "Incorrect information previously entered", so to make no change to a subject with both date and reason, find someone who already has this reason.
-    Given I log in to BCSS "England" as user role "Screening Centre Manager"
+    Tests that verify Amend Diagnosis Date with no change to data, starting with date and reason.
+    Note: When amending a diagnosis date, the only valid reason is "Incorrect information previously entered",
+    so to make no change to a subject with both date and reason, find someone who already has this reason.
     """
     # Step 1: Obtain NHS number for a subject matching criteria
     criteria = {
@@ -687,8 +680,7 @@ def test_amend_diagnosis_date_no_change_with_reason_alert(page: Page) -> None:
 @pytest.mark.fobt_diagnosis_date_entry_tests
 def test_amend_diagnosis_date_no_change_with_reason_only_alert(page: Page) -> None:
     """
-    Tests that Amend Diagnosis Date : no change to data, starting with no date but a reason
-    Given I log in to BCSS "England" as user role "Screening Centre Manager"
+    Tests that verify Amend Diagnosis Date with no change to data, starting with no date but a reason.
     """
     # Step 1: Obtain NHS number for a subject matching criteria
     criteria = {
@@ -744,8 +736,7 @@ def test_amend_diagnosis_date_no_change_with_reason_only_alert(page: Page) -> No
 @pytest.mark.fobt_diagnosis_date_entry_tests
 def test_hub_user_cannot_amend_diagnosis_date(page: Page) -> None:
     """
-    Tests that a Amend Diagnosis Date : hub user can't do this
-    Given I log in to BCSS "England" as user role "Hub Manager"
+    Tests that verify Amend Diagnosis Date with Hub user can't do this.
     """
     # Step 1: Obtain NHS number for a subject matching criteria (diagnosis date reason is NOT NULL)
     criteria = {
@@ -801,8 +792,7 @@ def test_hub_user_cannot_amend_diagnosis_date(page: Page) -> None:
 @pytest.mark.fobt_diagnosis_date_entry_tests
 def test_record_and_amend_diagnosis_date_multiple_times(page: Page) -> None:
     """
-    Tests that a Record a Diagnosis Date then amend it a few times.
-    Given I log in to BCSS "England" as user role "Screening Centre Manager"
+    Tests that verify Record a Diagnosis Date then amend it a few times.
     """
     # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
@@ -905,8 +895,7 @@ def test_record_and_amend_diagnosis_date_multiple_times(page: Page) -> None:
 @pytest.mark.fobt_diagnosis_date_entry_tests
 def test_support_user_can_amend_diagnosis_date_earlier(page: Page) -> None:
     """
-    Tests that a A support user can amend a date to make it earlier
-    Given I log in to BCSS "England" as user role "BCSS Support SC"
+    Tests that verify a support user can amend a date to make it earlier.
     """
     # Step 1: Obtain NHS number for a subject matching criteria
     criteria = {
@@ -986,8 +975,8 @@ def test_support_user_can_amend_diagnosis_date_earlier(page: Page) -> None:
 @pytest.mark.fobt_diagnosis_date_entry_tests
 def test_sspi_cease_for_death_closes_episode(page: Page) -> None:
     """
-    Tests that a SSPI cease for death closes an episode with a referral date but no diagnosis date, date of death is within 28 days of the referral date
-    Given I log in to BCSS "England" as user role "Screening Centre Manager"
+    Tests that a SSPI cease for death closes an episode with a referral date but no diagnosis date,
+    date of death is within 28 days of the referral date.
     """
     # Step 1: Obtain NHS number for a subject matching criteria
     criteria = {
