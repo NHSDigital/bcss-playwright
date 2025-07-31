@@ -134,7 +134,7 @@ def test_identify_polyp_category_no_histology_a(
     page: Page,
 ) -> None:
     """
-    This test identifies a polyp category where excision was attempted but there is no histology. (BCSS-5109 - A)
+    Scenario: A [BCSS-5109] Excised not retrieved, polyp category = LNPCP
     """
     df = get_subject_with_investigation_dataset_ready()
     nhs_no = df.iloc[0]["subject_nhs_number"]
@@ -186,7 +186,7 @@ def test_identify_polyp_category_no_histology_b(
     page: Page,
 ) -> None:
     """
-    This test identifies a polyp category where excision was attempted but there is no histology. (BCSS-5109 - B)
+    Scenario: B [BCSS-5109] Excised not retrieved, polyp category = Advanced colorectal polyp
     """
     df = get_subject_with_investigation_dataset_ready()
     nhs_no = df.iloc[0]["subject_nhs_number"]
@@ -242,7 +242,7 @@ def test_identify_polyp_category_no_histology_c(
     page: Page,
 ) -> None:
     """
-    This test identifies a polyp category where excision was attempted but there is no histology. (BCSS-5109 - C)
+    Scenario: C [BCSS-5109] Excised not retrieved, polyp category = Other polyp
     """
     df = get_subject_with_investigation_dataset_ready()
     nhs_no = df.iloc[0]["subject_nhs_number"]
@@ -299,7 +299,7 @@ def test_identify_polyp_category_no_histology_d(
     page: Page,
 ) -> None:
     """
-    This test identifies a polyp category where excision was attempted but there is no histology. (BCSS-5109 - D)
+    Scenario: D [BCSS-5109] Excised not retrieved, polyp category = Advanced colorectal polyp
     """
     df = get_subject_with_investigation_dataset_ready()
     nhs_no = df.iloc[0]["subject_nhs_number"]
@@ -357,7 +357,7 @@ def test_identify_polyp_category_no_histology_e(
     page: Page,
 ) -> None:
     """
-    This test identifies a polyp category where excision was attempted but there is no histology. (BCSS-5109 - E)
+    Scenario: E [BCSS-5109] Excised not retrieved, polyp category = Premalignant polyp
     """
     df = get_subject_with_investigation_dataset_ready()
     nhs_no = df.iloc[0]["subject_nhs_number"]
@@ -414,7 +414,7 @@ def test_identify_polyp_category_no_histology_f(
     page: Page,
 ) -> None:
     """
-    This test identifies a polyp category where excision was attempted but there is no histology. (BCSS-5109 - F)
+    Scenario: F [BCSS-5109] Pathology lost, polyp category = LNPCP
     """
     df = get_subject_with_investigation_dataset_ready()
     nhs_no = df.iloc[0]["subject_nhs_number"]
@@ -479,7 +479,7 @@ def test_identify_polyp_category_no_histology_g(
     page: Page,
 ) -> None:
     """
-    This test identifies a polyp category where excision was attempted but there is no histology. (BCSS-5109 - G)
+    Scenario: G [BCSS-5109] Pathology lost, polyp category = Advanced colorectal polyp
     """
     df = get_subject_with_investigation_dataset_ready()
     nhs_no = df.iloc[0]["subject_nhs_number"]
@@ -543,7 +543,7 @@ def test_identify_polyp_category_no_histology_h(
     page: Page,
 ) -> None:
     """
-    This test identifies a polyp category where excision was attempted but there is no histology. (BCSS-5109 - H)
+    Scenario: H [BCSS-5109] Pathology lost, polyp category = Other polyp
     """
     df = get_subject_with_investigation_dataset_ready()
     nhs_no = df.iloc[0]["subject_nhs_number"]
@@ -609,7 +609,7 @@ def test_identify_polyp_category_no_histology_i(
     page: Page,
 ) -> None:
     """
-    This test identifies a polyp category where excision was attempted but there is no histology. (BCSS-5109 - I)
+    Scenario: I [BCSS-5109] Pathology lost, polyp category = Advanced colorectal polyp
     """
     df = get_subject_with_investigation_dataset_ready()
     nhs_no = df.iloc[0]["subject_nhs_number"]
@@ -675,7 +675,7 @@ def test_identify_polyp_category_no_histology_j(
     page: Page,
 ) -> None:
     """
-    This test identifies a polyp category where excision was attempted but there is no histology. (BCSS-5109 - J)
+    Scenario: J [BCSS-5109] Pathology lost, polyp category = Premalignant polyp
     """
     df = get_subject_with_investigation_dataset_ready()
     nhs_no = df.iloc[0]["subject_nhs_number"]
@@ -740,7 +740,7 @@ def test_identify_polyp_category_no_histology_k(
     page: Page,
 ) -> None:
     """
-    This test identifies a polyp category where excision was attempted but there is no histology. (BCSS-5109 - K)
+    Scenario: K [BCSS-5109] Tissue destruction, polyp category = LNPCP
     """
     df = get_subject_with_investigation_dataset_ready()
     nhs_no = df.iloc[0]["subject_nhs_number"]
@@ -801,7 +801,7 @@ def test_identify_polyp_category_no_histology_l(
     page: Page,
 ) -> None:
     """
-    This test identifies a polyp category where excision was attempted but there is no histology. (BCSS-5109 - L)
+    Scenario: L [BCSS-5109] Tissue destruction, polyp category = Advanced colorectal polyp
     """
     df = get_subject_with_investigation_dataset_ready()
     nhs_no = df.iloc[0]["subject_nhs_number"]
@@ -862,7 +862,7 @@ def test_identify_polyp_category_no_histology_m(
     page: Page,
 ) -> None:
     """
-    This test identifies a polyp category where excision was attempted but there is no histology. (BCSS-5109 - M)
+    Scenario: M [BCSS-5109] Tissue destruction, polyp category = Other polyp
     """
     df = get_subject_with_investigation_dataset_ready()
     nhs_no = df.iloc[0]["subject_nhs_number"]
@@ -923,7 +923,7 @@ def test_identify_polyp_category_no_histology_n(
     page: Page,
 ) -> None:
     """
-    This test identifies a polyp category where excision was attempted but there is no histology. (BCSS-5109 - N)
+    Scenario: N [BCSS-5109] Tissue destruction, polyp category = Premalignant polyp
     """
     df = get_subject_with_investigation_dataset_ready()
     nhs_no = df.iloc[0]["subject_nhs_number"]
@@ -1003,7 +1003,7 @@ def test_identify_polyp_category_no_histology_o(
     page: Page,
 ) -> None:
     """
-    This test identifies a polyp category where excision was attempted but there is no histology. (BCSS-5109 - O)
+    Scenario: O [BCSS-5109] Biopsy without tissue destruction, polyp category = null
     """
     df = get_subject_with_investigation_dataset_ready()
     nhs_no = df.iloc[0]["subject_nhs_number"]
@@ -1052,7 +1052,7 @@ def test_identify_polyp_category_no_histology_p(
     page: Page,
 ) -> None:
     """
-    This test identifies a polyp category where excision was attempted but there is no histology. (BCSS-5109 - P)
+    Scenario: P [BCSS-5109] Biopsy without tissue destruction, polyp category = null
     """
     df = get_subject_with_investigation_dataset_ready()
     nhs_no = df.iloc[0]["subject_nhs_number"]
@@ -1102,7 +1102,7 @@ def test_identify_polyp_category_no_histology_q(
     page: Page,
 ) -> None:
     """
-    This test identifies a polyp category where excision was attempted but there is no histology. (BCSS-5109 - Q)
+    Scenario: Q - Check Secondary Piece for No Histology
     """
     df = get_subject_with_a99_status()
 
@@ -1181,7 +1181,7 @@ def test_identify_polyp_category_no_histology_r(
     page: Page,
 ) -> None:
     """
-    This test identifies a polyp category where excision was attempted but there is no histology. (BCSS-5109 - R)
+    Scenario: R - Check Secondary Piece for No Histology
     """
     df = get_subject_with_a99_status()
 
@@ -1252,7 +1252,7 @@ def test_identify_polyp_category_no_histology_s(
     page: Page,
 ) -> None:
     """
-    This test identifies a polyp category where excision was attempted but there is no histology. (BCSS-5109 - S)
+    Scenario: S - Check Secondary Piece for No Histology
     """
     df = get_subject_with_a99_status()
 
