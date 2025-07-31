@@ -2,7 +2,7 @@ import logging
 import pytest
 from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
-
+from typing import Dict
 
 class SubjectEpisodeEventsAndNotesPage(BasePage):
     """Episode Events and Notes Page locators, and methods for interacting with the page."""
@@ -92,7 +92,7 @@ class SubjectEpisodeEventsAndNotesPage(BasePage):
                 "button", name="Record Diagnosis Date"
             ).is_visible()
         except Exception as e:
-            logging.error(f"Error checking for 'Record Diagnosis Date' option: {e}")
+            logging.error(f"Record Diagnosis Date option not found: {e}")
             return False
 
     def is_amend_diagnosis_date_option_available(self) -> bool:
@@ -110,7 +110,7 @@ class SubjectEpisodeEventsAndNotesPage(BasePage):
             logging.error(f"Error checking for 'Amend Diagnosis Date' option: {e}")
             return False
 
-    def process_sspi_update_for_death(self, deduction_reason: str):
+    def process_sspi_update_for_death(self, deduction_reason: str) -> None:
         """
         Submits an SSPI update for a death-related deduction reason through the UI workflow.
 
@@ -126,15 +126,15 @@ class SubjectEpisodeEventsAndNotesPage(BasePage):
         self.deduction_reason_dropdown.select_option(label=deduction_reason)
         self.confirm_sspi_update_button.click()
 
-    def get_latest_episode_details(self):
+    def get_latest_episode_details(self) -> Dict[str, str]:
         """
-        Retrieves details of the latest episode from the UI elements.
+        Retrieve details of the latest episode from the UI elements.
 
         Returns:
-        dict: A dictionary containing:
-            - 'latest_episode_status' (str): The status text of the latest episode.
-            - 'latest_episode_has_diagnosis_date' (str): Indicator text of whether a diagnosis date is present.
-            - 'latest_episode_diagnosis_date_reason' (str): Reason text explaining the diagnosis date status.
+            Dict[str, str]: A dictionary containing:
+                - 'latest_episode_status': The status text of the latest episode.
+                - 'latest_episode_has_diagnosis_date': Indicator of whether a diagnosis date is present.
+                - 'latest_episode_diagnosis_date_reason': Reason explaining the diagnosis date status.
         """
         return {
             "latest_episode_status": self.latest_episode_status.inner_text(),
