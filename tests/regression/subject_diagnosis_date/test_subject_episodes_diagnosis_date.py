@@ -20,7 +20,8 @@ from classes.subject import Subject
 from pages.base_page import BasePage
 
 logger = logging.getLogger(__name__)
-
+ADVANCE_FOBT_BUTTON_NAME = "Advance FOBT Screening Episode"
+AMEND_DIAGNOSIS_DATE_BUTTON_NAME = "Amend Diagnosis Date"
 
 # Helpers
 def compose_diagnosis_text_with_reason(
@@ -48,8 +49,14 @@ def prepare_subject_for_test(
     """
     Queries subject by criteria, logs in with role, navigates to search, and opens profile.
 
+    Args:
+        page (Page): The page object representing the browser or UI interface.
+        criteria (dict): Dictionary of criteria used to query the subject.
+        role (str): The role used for logging in (e.g., "clinician", "admin").
+        select_episode_radio (bool, optional): Flag to determine if the episode radio button should be selected. Defaults to True.
+
     Returns:
-        str: The subject's NHS number
+        str: The subject's NHS number.
     """
     user = User()
     subject = Subject()
@@ -80,6 +87,12 @@ def assert_diagnosis_event_details(
 ) -> None:
     """
     Asserts that diagnosis event details match expected values for event name, status, reason, and date.
+
+    Args:
+        event_name (str): The expected name of the diagnosis event.
+        status (str): The expected status of the event.
+        reason (str): The expected reason associated with the diagnosis.
+        date (str): The expected date of the diagnosis event.
     """
     if log:
         log(f"Checking event: {event_details['event']}")
@@ -130,9 +143,9 @@ def amend_diagnosis_date_with_reason(
         page.get_by_role("link", name="Back", exact=True).click()
 
     subject_page = RecordDiagnosisDatePage(page)
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name=ADVANCE_FOBT_BUTTON_NAME).click()
     page.get_by_role("checkbox").check()
-    page.get_by_role("button", name="Amend Diagnosis Date").click()
+    page.get_by_role("button", name=AMEND_DIAGNOSIS_DATE_BUTTON_NAME).click()
 
     if date is None:
         date = datetime.today()
@@ -146,16 +159,13 @@ def amend_diagnosis_date_with_reason(
 # Scenario 1
 @pytest.mark.regression
 @pytest.mark.vpn_required
-@pytest.mark.fobt_diagnosis_date_entry
+@pytest.mark.fobt_diagnosis_date_entry_tests
 def test_screening_centre_manager_records_diagnosis_date_for_subject_with_referral_no_diag(
     page: Page,
 ) -> None:
     """
-    Tests that a Screening Centre Manager is able to input a diagnosis date for a subject
-    who already has a referral date recorded but no existing diagnosis date.
-
-    This ensures that the interface and underlying logic correctly handle the case
-    where diagnosis is added after referral, maintaining data integrity and expected workflow.
+    Tests that a screening centre manager records a diagnosis date of today for a subject who HAS a referral date and does NOT yet have a diagnosis date recorded
+    Given I log in to BCSS "England" as user role "Screening Centre Manager"
     """
     # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
@@ -169,7 +179,7 @@ def test_screening_centre_manager_records_diagnosis_date_for_subject_with_referr
 
     # Step 2: Interact with subject page
     subject_page_s1 = RecordDiagnosisDatePage(page)
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name=ADVANCE_FOBT_BUTTON_NAME).click()
     page.get_by_role("button", name="Record Diagnosis Date").click()
     subject_page_s1.enter_date_in_diagnosis_date_field(datetime.today())
     subject_page_s1.click_save_button()
@@ -194,14 +204,11 @@ def test_screening_centre_manager_records_diagnosis_date_for_subject_with_referr
 # Scenario 2
 @pytest.mark.regression
 @pytest.mark.vpn_required
-@pytest.mark.fobt_diagnosis_date_entry
+@pytest.mark.fobt_diagnosis_date_entry_tests
 def test_cannot_record_diagnosis_date_without_referral(page: Page) -> None:
     """
-    Tests that the system prevents a Screening Centre Manager from entering a diagnosis date
-    for a subject who has no referral date recorded.
-
-    This ensures compliance with workflow rules that require a referral to precede diagnosis,
-    and helps confirm that validation logic blocks improper data entry.
+    Tests that a screening centre user cannot record a diagnosis date for a subject who does NOT have a referral date
+    Given I log in to BCSS "England" as user role "Screening Centre Manager"
     """
     # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
@@ -215,7 +222,7 @@ def test_cannot_record_diagnosis_date_without_referral(page: Page) -> None:
 
     # Step 2: Interact with subject page
     advance_fobt_button_s2 = page.get_by_role(
-        "button", name="Advance FOBT Screening Episode"
+        "button", name=ADVANCE_FOBT_BUTTON_NAME
     )
     if advance_fobt_button_s2.is_visible() and advance_fobt_button_s2.is_enabled():
         advance_fobt_button_s2.click()
@@ -232,14 +239,11 @@ def test_cannot_record_diagnosis_date_without_referral(page: Page) -> None:
 # Scenario 3
 @pytest.mark.regression
 @pytest.mark.vpn_required
-@pytest.mark.fobt_diagnosis_date_entry
+@pytest.mark.fobt_diagnosis_date_entry_tests
 def test_cannot_record_diagnosis_date_with_existing_diagnosis(page: Page) -> None:
     """
-    Tests that the system blocks attempts to re-enter a diagnosis date for a subject
-    who already has one recorded.
-
-    This ensures data consistency by preventing overwriting or duplication,
-    and verifies that business rules enforce a single diagnosis event per subject.
+    Tests that A screening centre user cannot record a diagnosis date for a subject who HAS a referral date and already has a diagnosis date recorded
+    Given I log in to BCSS "England" as user role "Screening Centre Manager"
     """
     # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
@@ -253,7 +257,7 @@ def test_cannot_record_diagnosis_date_with_existing_diagnosis(page: Page) -> Non
 
     # Step 2: Interact with subject page
     advance_fobt_button_s3 = page.get_by_role(
-        "button", name="Advance FOBT Screening Episode"
+        "button", name=ADVANCE_FOBT_BUTTON_NAME
     )
     if advance_fobt_button_s3.is_visible() and advance_fobt_button_s3.is_enabled():
         advance_fobt_button_s3.click()
@@ -280,14 +284,11 @@ def test_cannot_record_diagnosis_date_with_existing_diagnosis(page: Page) -> Non
 # Scenario 4
 @pytest.mark.regression
 @pytest.mark.vpn_required
-@pytest.mark.fobt_diagnosis_date_entry
+@pytest.mark.fobt_diagnosis_date_entry_tests
 def test_hub_user_can_record_diagnosis_date_with_referral_no_diag(page: Page) -> None:
     """
-    Tests that a Hub User is able to successfully record a diagnosis date for a subject
-    who has a referral date but no existing diagnosis date.
-
-    This verifies that the interface and system logic support valid data entry under these conditions,
-    ensuring that the workflow proceeds smoothly when diagnosis follows referral in expected order.
+    Tests that a hub user can record a diagnosis date for a subject who HAS a referral date and does NOT yet have a diagnosis date recorded
+    Given I log in to BCSS "England" as user role "Hub Manager"
     """
     # Step 1: Obtain NHS number for a subject matching criteria
     criteria = {
@@ -316,7 +317,7 @@ def test_hub_user_can_record_diagnosis_date_with_referral_no_diag(page: Page) ->
 
     # Step 4: Interact with subject page
     subject_page_s4 = RecordDiagnosisDatePage(page)
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name=ADVANCE_FOBT_BUTTON_NAME).click()
 
     # Step 5: Assert it's visible and enabled
     record_diagnosis_button_s4 = page.get_by_role(
@@ -354,14 +355,11 @@ def test_hub_user_can_record_diagnosis_date_with_referral_no_diag(page: Page) ->
 # Scenario 5
 @pytest.mark.regression
 @pytest.mark.vpn_required
-@pytest.mark.fobt_diagnosis_date_entry
+@pytest.mark.fobt_diagnosis_date_entry_tests
 def test_record_diagnosis_date_no_date_or_reason_alert(page: Page) -> None:
     """
-    Tests that an alert is triggered when a Screening Centre Manager attempts to record a diagnosis
-    date without providing either a date or a reason.
-
-    This ensures that proper validation occurs, preventing incomplete or ambiguous entries,
-    and reinforces system rules that require at least one of those fields to be present for submission.
+    Tests that Record Diagnosis Date : enter no date or reason
+    Given I log in to BCSS "England" as user role "Screening Centre Manager"
     """
     # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
@@ -375,12 +373,13 @@ def test_record_diagnosis_date_no_date_or_reason_alert(page: Page) -> None:
 
     # Step 2: Interact with subject page
     subject_page_s5 = RecordDiagnosisDatePage(page)
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name=ADVANCE_FOBT_BUTTON_NAME).click()
     page.get_by_role("button", name="Record Diagnosis Date").click()
     subject_page_s5.click_save_button()
 
     # Step 3: Do not enter a diagnosis date or reason
     time.sleep(2)  # Pause for 2 seconds to let the process complete
+    #expect(locator).to_be_visible()
 
     # Step 4: Assertions
     alert_message = subject_page_s5.get_alert_message()
@@ -392,15 +391,11 @@ def test_record_diagnosis_date_no_date_or_reason_alert(page: Page) -> None:
 # Scenario 6
 @pytest.mark.regression
 @pytest.mark.vpn_required
-@pytest.mark.fobt_diagnosis_date_entry
+@pytest.mark.fobt_diagnosis_date_entry_tests
 def test_record_diagnosis_date_reason_only(page: Page) -> None:
     """
-    Tests that a Screening Centre Manager can successfully record a diagnosis entry
-    using only a reason, without specifying an actual diagnosis date.
-
-    This ensures that the system accepts valid reason-only entries and correctly bypasses
-    the date field when required, supporting flexible workflows and edge cases such as
-    diagnosis pending or unavailable dates.
+    Tests that Record Diagnosis Date : enter no date but give a reason
+    Given I log in to BCSS "England" as user role "Screening Centre Manager"
     """
     # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
@@ -414,7 +409,7 @@ def test_record_diagnosis_date_reason_only(page: Page) -> None:
 
     # Step 2: Interact with subject page
     subject_page_s6 = RecordDiagnosisDatePage(page)
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name=ADVANCE_FOBT_BUTTON_NAME).click()
     page.get_by_role("button", name="Record Diagnosis Date").click()
     page.select_option("select#reason", label="Reopened old episode, date unknown")
     subject_page_s6.click_save_button()
@@ -429,14 +424,11 @@ def test_record_diagnosis_date_reason_only(page: Page) -> None:
 # Scenario 8
 @pytest.mark.regression
 @pytest.mark.vpn_required
-@pytest.mark.fobt_diagnosis_date_entry
+@pytest.mark.fobt_diagnosis_date_entry_tests
 def test_amend_diagnosis_date_without_reason_alert(page: Page) -> None:
     """
-    Tests that an alert is shown when a user attempts to amend an existing diagnosis date
-    without providing a reason for the change.
-
-    This verifies that the system enforces proper audit requirements, ensuring any date modifications
-    are accompanied by a justification to maintain transparency and data integrity.
+    Tests that Amend Diagnosis Date : amend date, but don't give a reason
+    Given I log in to BCSS "England" as user role "Screening Centre Manager"
     """
     # Step 1: Obtain NHS number for a subject matching criteria
     criteria = {
@@ -450,7 +442,7 @@ def test_amend_diagnosis_date_without_reason_alert(page: Page) -> None:
 
     # Step 2: Interact with subject page
     subject_page_s8 = RecordDiagnosisDatePage(page)
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name=ADVANCE_FOBT_BUTTON_NAME).click()
     page.get_by_role("button", name="Record Diagnosis Date").click()
     # Get yesterday's date
     subject_page_s8.enter_date_in_diagnosis_date_field(
@@ -471,14 +463,11 @@ def test_amend_diagnosis_date_without_reason_alert(page: Page) -> None:
 # Scenario 9
 @pytest.mark.regression
 @pytest.mark.vpn_required
-@pytest.mark.fobt_diagnosis_date_entry
+@pytest.mark.fobt_diagnosis_date_entry_tests
 def test_amend_diagnosis_date_with_reason(page: Page) -> None:
     """
-    Tests that a user can successfully amend an existing diagnosis date
-    when a valid reason for the change is provided.
-
-    This confirms that the system allows legitimate updates to diagnosis records
-    with proper justification, supporting transparency and maintaining auditability.
+    Tests that Amend Diagnosis Date : amend date, and give a reason
+    Given I log in to BCSS "England" as user role "Screening Centre Manager"
     """
     # Step 1: Obtain NHS number for a subject matching criteria
     criteria = {
@@ -508,9 +497,9 @@ def test_amend_diagnosis_date_with_reason(page: Page) -> None:
 
     # Step 4: Interact with subject page
     subject_page_s9 = RecordDiagnosisDatePage(page)
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name=ADVANCE_FOBT_BUTTON_NAME).click()
     page.get_by_role("checkbox").check()
-    page.get_by_role("button", name="Amend Diagnosis Date").click()
+    page.get_by_role("button", name=AMEND_DIAGNOSIS_DATE_BUTTON_NAME).click()
     subject_page_s9.enter_date_in_diagnosis_date_field(datetime.today())
     page.locator("#reason").select_option("305501")
     subject_page_s9.click_save_button()
@@ -531,14 +520,11 @@ def test_amend_diagnosis_date_with_reason(page: Page) -> None:
 # Scenario 10
 @pytest.mark.regression
 @pytest.mark.vpn_required
-@pytest.mark.fobt_diagnosis_date_entry
+@pytest.mark.fobt_diagnosis_date_entry_tests
 def test_amend_diagnosis_date_remove_date_with_reason(page: Page) -> None:
     """
-    Tests that a user can remove an existing diagnosis date from a subject's record
-    when a valid reason for the removal is provided.
-
-    This confirms that the system permits legitimate deletion or clearance of diagnosis dates
-    with proper justification, supporting data correction workflows while ensuring audit trail integrity.
+    Tests that a Amend Diagnosis Date : remove existing date, give a reason
+    Given I log in to BCSS "England" as user role "Screening Centre Manager"
     """
     # Step 1: Obtain NHS number for a subject matching criteria
     criteria = {
@@ -568,9 +554,9 @@ def test_amend_diagnosis_date_remove_date_with_reason(page: Page) -> None:
 
     # Step 4: Interact with subject page
     subject_page_s10 = RecordDiagnosisDatePage(page)
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name=ADVANCE_FOBT_BUTTON_NAME).click()
     page.get_by_role("checkbox").check()
-    page.get_by_role("button", name="Amend Diagnosis Date").click()
+    page.get_by_role("button", name=AMEND_DIAGNOSIS_DATE_BUTTON_NAME).click()
     page.locator("#diagnosisDate").fill("")
     date_field = page.locator("#diagnosisDate")
     date_field.click()
@@ -600,10 +586,13 @@ def test_amend_diagnosis_date_remove_date_with_reason(page: Page) -> None:
         remove_reason in event_details["item1"]
     ), f"Expected reason '{remove_reason}' to be part of item, but got: {event_details['item1']}"
 
-def get_diagnosis_reason():
+def get_diagnosis_reason() -> Optional[str]:
     """
     Simulates retrieval of a diagnosis reason.
     In this stub version, it always returns None.
+
+    Returns:
+        Optional[str]: The diagnosis reason if available, otherwise None.
     """
     return None
 
@@ -611,14 +600,11 @@ def get_diagnosis_reason():
 # Scenario 11
 @pytest.mark.regression
 @pytest.mark.vpn_required
-@pytest.mark.fobt_diagnosis_date_entry
+@pytest.mark.fobt_diagnosis_date_entry_tests
 def test_amend_diagnosis_date_no_change_alert(page: Page) -> None:
     """
-    Tests that the system displays an alert when a user attempts to amend a diagnosis date
-    without making any actual changes.
-
-    This ensures proper user feedback is provided to prevent redundant submissions,
-    and confirms the interface logic detects unchanged input to maintain efficiency and clarity.
+    Tests that Amend Diagnosis Date : no change to data, starting with date but no reason
+    Given I log in to BCSS "England" as user role "Screening Centre Manager"
     """
     # Step 1: Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
@@ -632,9 +618,9 @@ def test_amend_diagnosis_date_no_change_alert(page: Page) -> None:
 
     # Step 2: Interact with subject page
     subject_page_s11 = RecordDiagnosisDatePage(page)
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name=ADVANCE_FOBT_BUTTON_NAME).click()
     page.get_by_role("checkbox").check()
-    page.get_by_role("button", name="Amend Diagnosis Date").click()
+    page.get_by_role("button", name=AMEND_DIAGNOSIS_DATE_BUTTON_NAME).click()
     subject_page_s11.click_save_button()
 
     # Step 3: Assert alert message
@@ -644,17 +630,14 @@ def test_amend_diagnosis_date_no_change_alert(page: Page) -> None:
 
 
 # Scenario 12
-@pytest.mark.regression
+#@pytest.mark.regression
 @pytest.mark.vpn_required
-@pytest.mark.fobt_diagnosis_date_entry
+@pytest.mark.fobt_diagnosis_date_entry_tests
 def test_amend_diagnosis_date_no_change_with_reason_alert(page: Page) -> None:
     """
-    Tests that the system displays an alert when a user attempts to amend a diagnosis date
-    without making any actual changes to the date, even if a reason is provided.
-
-    This verifies that the system correctly detects unchanged input and responds with appropriate
-    feedback to avoid unnecessary submissions, while enforcing that true amendments involve
-    a substantive update beyond just supplying a reason.
+    Tests that Amend Diagnosis Date : no change to data, starting with date and reason
+    Note: When amending a diagnosis date, the only valid reason is "Incorrect information previously entered", so to make no change to a subject with both date and reason, find someone who already has this reason.
+    Given I log in to BCSS "England" as user role "Screening Centre Manager"
     """
     # Step 1: Obtain NHS number for a subject matching criteria
     criteria = {
@@ -683,32 +666,30 @@ def test_amend_diagnosis_date_no_change_with_reason_alert(page: Page) -> None:
 
     # Step 4: Interact with subject page
     subject_page_s12 = RecordDiagnosisDatePage(page)
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name=ADVANCE_FOBT_BUTTON_NAME).click()
     page.get_by_role("checkbox").check()
-    page.get_by_role("button", name="Amend Diagnosis Date").click()
+    page.get_by_role("button", name=AMEND_DIAGNOSIS_DATE_BUTTON_NAME).click()
     subject_page_s12.enter_date_in_diagnosis_date_field(datetime.today())
     page.locator("#reason").select_option("305501")
     subject_page_s12.click_save_button()
 
     # Step 5: Assert alert message
     alert_message = subject_page_s12.get_alert_message()
-    expected = "An amended date of diagnosis must not be earlier than the recorded diagnosis date and not in the future."
-    assert alert_message, "Expected alert message but got an empty string."
-    assert expected in alert_message, f"Unexpected alert message. Got: {alert_message}"
+    expected = (
+    "An amended date of diagnosis must not be earlier than the recorded diagnosis date and not in the future. "
+    "Please raise a support call to enter an earlier diagnosis date."
+    )
+    assert alert_message == expected, f"Expected '{expected}' but got '{alert_message}'"
 
 
 # Scenario 13
 @pytest.mark.regression
 @pytest.mark.vpn_required
-@pytest.mark.fobt_diagnosis_date_entry
+@pytest.mark.fobt_diagnosis_date_entry_tests
 def test_amend_diagnosis_date_no_change_with_reason_only_alert(page: Page) -> None:
     """
-    Tests that an alert is shown when a user attempts to amend a diagnosis record by
-    providing only a reason without making any actual changes to the diagnosis date itself.
-
-    This validates that the system detects non-substantive amendments and prompts the user
-    appropriately, ensuring that entries with unchanged data but supplied reasons do not proceed
-    without meaningful updates.
+    Tests that Amend Diagnosis Date : no change to data, starting with no date but a reason
+    Given I log in to BCSS "England" as user role "Screening Centre Manager"
     """
     # Step 1: Obtain NHS number for a subject matching criteria
     criteria = {
@@ -747,9 +728,9 @@ def test_amend_diagnosis_date_no_change_with_reason_only_alert(page: Page) -> No
 
     # Step 4: Interact with subject page
     subject_page_s13 = RecordDiagnosisDatePage(page)
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name=ADVANCE_FOBT_BUTTON_NAME).click()
     page.get_by_role("checkbox").check()
-    page.get_by_role("button", name="Amend Diagnosis Date").click()
+    page.get_by_role("button", name=AMEND_DIAGNOSIS_DATE_BUTTON_NAME).click()
     subject_page_s13.click_save_button()
 
     # Step 5: Assert alert message
@@ -761,15 +742,11 @@ def test_amend_diagnosis_date_no_change_with_reason_only_alert(page: Page) -> No
 # Scenario 14
 @pytest.mark.regression
 @pytest.mark.vpn_required
-@pytest.mark.fobt_diagnosis_date_entry
+@pytest.mark.fobt_diagnosis_date_entry_tests
 def test_hub_user_cannot_amend_diagnosis_date(page: Page) -> None:
     """
-    Tests that a Hub User is restricted from amending an existing diagnosis date
-    for a subject in the system.
-
-    This ensures that role-based access control is correctly enforced, confirming
-    that only authorized user types—such as Screening Centre Managers—are permitted
-    to make changes to diagnosis records.
+    Tests that a Amend Diagnosis Date : hub user can't do this
+    Given I log in to BCSS "England" as user role "Hub Manager"
     """
     # Step 1: Obtain NHS number for a subject matching criteria (diagnosis date reason is NOT NULL)
     criteria = {
@@ -805,7 +782,7 @@ def test_hub_user_cannot_amend_diagnosis_date(page: Page) -> None:
 
     # Step 4: Interact with subject page
     advance_fobt_button_s14 = page.get_by_role(
-        "button", name="Advance FOBT Screening Episode"
+        "button", name=ADVANCE_FOBT_BUTTON_NAME
     )
     if advance_fobt_button_s14.is_visible() and advance_fobt_button_s14.is_enabled():
         advance_fobt_button_s14.click()
@@ -822,15 +799,11 @@ def test_hub_user_cannot_amend_diagnosis_date(page: Page) -> None:
 # Scenario 15
 @pytest.mark.regression
 @pytest.mark.vpn_required
-@pytest.mark.fobt_diagnosis_date_entry
+@pytest.mark.fobt_diagnosis_date_entry_tests
 def test_record_and_amend_diagnosis_date_multiple_times(page: Page) -> None:
     """
-    Tests that a user can record an initial diagnosis date for a subject and subsequently
-    amend that date multiple times, provided each amendment includes a valid reason.
-
-    This confirms that the system supports iterative updates to diagnosis records with
-    appropriate audit measures, ensuring both flexibility in data entry and integrity
-    through reason-based validation for each change.
+    Tests that a Record a Diagnosis Date then amend it a few times.
+    Given I log in to BCSS "England" as user role "Screening Centre Manager"
     """
     # Step 1: # Query subject by criteria, log in, navigate to search page, select "Episodes" radio button, and open subject profile
     criteria = {
@@ -847,7 +820,7 @@ def test_record_and_amend_diagnosis_date_multiple_times(page: Page) -> None:
 
     # --- First: Record Diagnosis Date (today) ---
     # Step 2: Interact with subject page
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name=ADVANCE_FOBT_BUTTON_NAME).click()
     page.get_by_role("button", name="Record Diagnosis Date").click()
     subject_page_s15.enter_date_in_diagnosis_date_field(datetime.today())
     subject_page_s15.click_save_button()
@@ -879,9 +852,9 @@ def test_record_and_amend_diagnosis_date_multiple_times(page: Page) -> None:
     # Step 6: Interact with subject page
     [page.get_by_role("link", name="Back", exact=True).click() for _ in range(2)]
     subject_page_s15 = RecordDiagnosisDatePage(page)
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name=ADVANCE_FOBT_BUTTON_NAME).click()
     page.get_by_role("checkbox").check()
-    page.get_by_role("button", name="Amend Diagnosis Date").click()
+    page.get_by_role("button", name=AMEND_DIAGNOSIS_DATE_BUTTON_NAME).click()
     page.locator("#diagnosisDate").fill("")
     date_field = page.locator("#diagnosisDate")
     date_field.click()
@@ -930,14 +903,11 @@ def test_record_and_amend_diagnosis_date_multiple_times(page: Page) -> None:
 # Scenario 16
 @pytest.mark.regression
 @pytest.mark.vpn_required
-@pytest.mark.fobt_diagnosis_date_entry
+@pytest.mark.fobt_diagnosis_date_entry_tests
 def test_support_user_can_amend_diagnosis_date_earlier(page: Page) -> None:
     """
-    Tests that a Support User is permitted to amend a diagnosis date to an earlier value
-    than one previously recorded, assuming proper justification is provided.
-
-    This validates that system permissions and business rules allow date revisions under
-    support-level access, ensuring flexibility in correcting records while preserving audit requirements.
+    Tests that a A support user can amend a date to make it earlier
+    Given I log in to BCSS "England" as user role "BCSS Support SC"
     """
     # Step 1: Obtain NHS number for a subject matching criteria
     criteria = {
@@ -971,7 +941,7 @@ def test_support_user_can_amend_diagnosis_date_earlier(page: Page) -> None:
 
     # --- First: Record Diagnosis Date (today) ---
     # Step 5: Interact with subject page
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name=ADVANCE_FOBT_BUTTON_NAME).click()
     page.get_by_role("button", name="Record Diagnosis Date").click()
     subject_page_s16.enter_date_in_diagnosis_date_field(datetime.today())
     subject_page_s16.click_save_button()
@@ -989,9 +959,9 @@ def test_support_user_can_amend_diagnosis_date_earlier(page: Page) -> None:
     # Step 7: Interact with subject page
     [page.get_by_role("link", name="Back", exact=True).click() for _ in range(2)]
     subject_page_s16 = RecordDiagnosisDatePage(page)
-    page.get_by_role("button", name="Advance FOBT Screening Episode").click()
+    page.get_by_role("button", name=ADVANCE_FOBT_BUTTON_NAME).click()
     page.get_by_role("checkbox").check()
-    page.get_by_role("button", name="Amend Diagnosis Date").click()
+    page.get_by_role("button", name=AMEND_DIAGNOSIS_DATE_BUTTON_NAME).click()
     subject_page_s16.enter_date_in_diagnosis_date_field(
         datetime.today() - timedelta(days=1)
     )
@@ -1014,14 +984,11 @@ def test_support_user_can_amend_diagnosis_date_earlier(page: Page) -> None:
 # Scenario 17
 #@pytest.mark.regression
 @pytest.mark.vpn_required
-@pytest.mark.fobt_diagnosis_date_entry
+@pytest.mark.fobt_diagnosis_date_entry_tests
 def test_sspi_cease_for_death_closes_episode(page: Page) -> None:
     """
-    Tests that when the SSPI (Specialist Service Provision Interface) records a 'cease for death'
-    event, the corresponding patient episode is automatically marked as closed.
-
-    Ensures that system logic correctly responds to death-related cessation by updating the
-    episode status, thus maintaining data integrity and preventing further updates to the record.
+    Tests that a SSPI cease for death closes an episode with a referral date but no diagnosis date, date of death is within 28 days of the referral date
+    Given I log in to BCSS "England" as user role "Screening Centre Manager"
     """
     # Step 1: Obtain NHS number for a subject matching criteria
     criteria = {
