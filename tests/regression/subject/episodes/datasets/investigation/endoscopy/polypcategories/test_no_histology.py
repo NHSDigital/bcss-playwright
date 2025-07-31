@@ -44,6 +44,7 @@ from utils.datasets.investigation_datasets import (
     get_default_endoscopy_information,
     complete_and_assert_investigation,
 )
+from pytest import FixtureRequest
 
 lnpcp_string = "LNPCP"
 advanced_colorectal_polyp_string = "Advanced colorectal polyp"
@@ -113,6 +114,19 @@ polyp_histology_for_sceanrios_r_s = [
 ]
 
 
+@pytest.fixture(scope="function", autouse=True)
+def before_test(page: Page, request: FixtureRequest) -> None:
+    """
+    Before every test is executed, this fixture:
+    - Logs into BCSS as a Screening Centre Manager at BCS001
+    - Navigates to the screening subject search page
+    """
+    if request.node.get_closest_marker("skip_before_test"):
+        return
+    UserTools.user_login(page, "Screening Centre Manager at BCS001")
+    BasePage(page).go_to_screening_subject_search_page()
+
+
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
@@ -126,9 +140,6 @@ def test_identify_polyp_category_no_histology_a(
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"NHS Number: {nhs_no}")
 
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).click_main_menu_link()
-    BasePage(page).go_to_screening_subject_search_page()
     search_subject_episode_by_nhs_number(page, nhs_no)
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
@@ -181,9 +192,6 @@ def test_identify_polyp_category_no_histology_b(
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"NHS Number: {nhs_no}")
 
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).click_main_menu_link()
-    BasePage(page).go_to_screening_subject_search_page()
     search_subject_episode_by_nhs_number(page, nhs_no)
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
@@ -240,9 +248,6 @@ def test_identify_polyp_category_no_histology_c(
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"NHS Number: {nhs_no}")
 
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).click_main_menu_link()
-    BasePage(page).go_to_screening_subject_search_page()
     search_subject_episode_by_nhs_number(page, nhs_no)
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
@@ -300,9 +305,6 @@ def test_identify_polyp_category_no_histology_d(
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"NHS Number: {nhs_no}")
 
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).click_main_menu_link()
-    BasePage(page).go_to_screening_subject_search_page()
     search_subject_episode_by_nhs_number(page, nhs_no)
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
@@ -361,9 +363,6 @@ def test_identify_polyp_category_no_histology_e(
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"NHS Number: {nhs_no}")
 
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).click_main_menu_link()
-    BasePage(page).go_to_screening_subject_search_page()
     search_subject_episode_by_nhs_number(page, nhs_no)
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
@@ -421,9 +420,6 @@ def test_identify_polyp_category_no_histology_f(
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"NHS Number: {nhs_no}")
 
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).click_main_menu_link()
-    BasePage(page).go_to_screening_subject_search_page()
     search_subject_episode_by_nhs_number(page, nhs_no)
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
@@ -489,9 +485,6 @@ def test_identify_polyp_category_no_histology_g(
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"NHS Number: {nhs_no}")
 
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).click_main_menu_link()
-    BasePage(page).go_to_screening_subject_search_page()
     search_subject_episode_by_nhs_number(page, nhs_no)
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
@@ -556,9 +549,6 @@ def test_identify_polyp_category_no_histology_h(
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"NHS Number: {nhs_no}")
 
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).click_main_menu_link()
-    BasePage(page).go_to_screening_subject_search_page()
     search_subject_episode_by_nhs_number(page, nhs_no)
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
@@ -625,9 +615,6 @@ def test_identify_polyp_category_no_histology_i(
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"NHS Number: {nhs_no}")
 
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).click_main_menu_link()
-    BasePage(page).go_to_screening_subject_search_page()
     search_subject_episode_by_nhs_number(page, nhs_no)
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
@@ -694,9 +681,6 @@ def test_identify_polyp_category_no_histology_j(
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"NHS Number: {nhs_no}")
 
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).click_main_menu_link()
-    BasePage(page).go_to_screening_subject_search_page()
     search_subject_episode_by_nhs_number(page, nhs_no)
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
@@ -762,9 +746,6 @@ def test_identify_polyp_category_no_histology_k(
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"NHS Number: {nhs_no}")
 
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).click_main_menu_link()
-    BasePage(page).go_to_screening_subject_search_page()
     search_subject_episode_by_nhs_number(page, nhs_no)
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
@@ -826,9 +807,6 @@ def test_identify_polyp_category_no_histology_l(
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"NHS Number: {nhs_no}")
 
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).click_main_menu_link()
-    BasePage(page).go_to_screening_subject_search_page()
     search_subject_episode_by_nhs_number(page, nhs_no)
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
@@ -890,9 +868,6 @@ def test_identify_polyp_category_no_histology_m(
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"NHS Number: {nhs_no}")
 
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).click_main_menu_link()
-    BasePage(page).go_to_screening_subject_search_page()
     search_subject_episode_by_nhs_number(page, nhs_no)
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
@@ -954,9 +929,6 @@ def test_identify_polyp_category_no_histology_n(
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"NHS Number: {nhs_no}")
 
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).click_main_menu_link()
-    BasePage(page).go_to_screening_subject_search_page()
     search_subject_episode_by_nhs_number(page, nhs_no)
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
@@ -1037,9 +1009,6 @@ def test_identify_polyp_category_no_histology_o(
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"NHS Number: {nhs_no}")
 
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).click_main_menu_link()
-    BasePage(page).go_to_screening_subject_search_page()
     search_subject_episode_by_nhs_number(page, nhs_no)
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
@@ -1089,9 +1058,6 @@ def test_identify_polyp_category_no_histology_p(
     nhs_no = df.iloc[0]["subject_nhs_number"]
     logging.info(f"NHS Number: {nhs_no}")
 
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    BasePage(page).click_main_menu_link()
-    BasePage(page).go_to_screening_subject_search_page()
     search_subject_episode_by_nhs_number(page, nhs_no)
 
     SubjectScreeningSummaryPage(page).click_datasets_link()
@@ -1128,6 +1094,7 @@ def test_identify_polyp_category_no_histology_p(
     )
 
 
+@pytest.mark.skip_before_test
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
@@ -1206,6 +1173,7 @@ def test_identify_polyp_category_no_histology_q(
     )
 
 
+@pytest.mark.skip_before_test
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.investigation_dataset_tests
@@ -1276,6 +1244,7 @@ def test_identify_polyp_category_no_histology_r(
     )
 
 
+@pytest.mark.skip_before_test
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.investigation_dataset_tests

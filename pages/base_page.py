@@ -256,10 +256,17 @@ class BasePage:
         If no dialog appears, logs an error.
         Args:
             expected_text (str): The text that should be present in the dialog.
+            accept (bool): Set to True if you want to accept the dialog, by deafult is is set to False.
         """
         self._dialog_assertion_error = None
 
         def handle_dialog(dialog: Dialog, accept: bool = False):
+            """
+            Handles the dialog and asserts that the dialog contains the expected text.
+            Args:
+                dialog (Dialog): the playwright dialog object
+                accept (bool): Set to True if you want to accept the dialog, by deafult is is set to False.
+            """
             logging.info(f"Dialog appeared with message: {dialog.message}")
             actual_text = dialog.message
             try:
