@@ -378,8 +378,7 @@ def test_record_diagnosis_date_no_date_or_reason_alert(page: Page) -> None:
     subject_page_s5.click_save_button()
 
     # Step 3: Do not enter a diagnosis date or reason
-    time.sleep(2)  # Pause for 2 seconds to let the process complete
-    #expect(locator).to_be_visible()
+    expect(page.get_by_role("alert")).to_be_visible()
 
     # Step 4: Assertions
     alert_message = subject_page_s5.get_alert_message()
