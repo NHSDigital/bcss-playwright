@@ -1,4 +1,5 @@
 from ast import List, Or
+from re import L
 import pytest
 from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
@@ -18,6 +19,10 @@ from pages.organisations.create_site import CreateSite
 from utils.user_tools import UserTools
 from utils.table_util import TableUtils
 from utils.calendar_picker import CalendarPicker
+from utils.oracle.oracle_specific_functions import (
+    delete_organisations_created_for_test,
+    delete_sites_created_for_test,
+)
 from datetime import datetime
 
 
@@ -111,7 +116,31 @@ def test_view_and_edit_organisation_values_z9z1s(page) -> None:
 @pytest.mark.organisations_and_contacts_develop_level_tests
 def test_remove_all_created_organisation(page) -> None:
     """
-    Verifies that the 'View and Edit Organisation' functionality works correctly for an existing ICB organisation.
+    Verifies that the 'Remove All Created Organisation' functionality works correctly
     """
     OrganisationsPage(page).go_to_organisations_and_site_details_page()
+    delete_organisations_created_for_test(["Z9Z1S"])
     OrganisationsAndSiteDetails(page).go_to_list_all_organisations()
+    ListAllOrganisations(page).select_organisation_type_option(OrganisationType.CCG)
+    ListAllOrganisations(page).search_organisation_code("Z9Z1X")
+    ListAllOrganisations(page).verify_no_organisation_record_found(
+        "Sorry, no records match your search criteria. Please refine your search and try again."
+    )
+
+
+@pytest.mark.regression
+@pytest.mark.organisations_users_and_contacts_tests
+@pytest.mark.organisations_and_contacts_develop_level_tests
+@pytest.mark.wip
+def test_remove_all_created_sites(page) -> None:
+    """
+    Verifies that the 'Remove All Created Sites' functionality works correctly
+    """
+    OrganisationsPage(page).go_to_organisations_and_site_details_page()
+    delete_sites_created_for_test(["Z9Z1X"])
+    OrganisationsAndSiteDetails(page).go_to_list_all_sites()
+    ListAllSites(page).select_site_type_option(SiteType.NHS_TRUST_SITE)
+    ListAllSites(page).search_site_code("Z9Z1X")
+    ListAllSites(page).verify_no_site_record_found(
+        "Sorry, no records match your search criteria. Please refine your search and try again."
+    )

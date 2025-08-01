@@ -14,9 +14,10 @@ class ListAllSites(BasePage):
         # Initialize TableUtils for the table with id="displayRS"
         self.list_all_org_table = TableUtils(page, "#listAllOrgsTable")
 
-        # List All Organisations links
+        # List All Site links
         self.select_site_type = self.page.locator("#siteTypeId")
         self.create_new_site = self.page.get_by_role("button", name="Create New Site")
+        self.site_code = self.page.locator('input[name="SITE_CODE"]')
 
     def select_site_type_option(self, option: str) -> None:
         """
@@ -27,6 +28,23 @@ class ListAllSites(BasePage):
     def click_create_new_site(self) -> None:
         """Clicks the 'Create New Org' button."""
         self.create_new_site.click()
+
+    def search_site_code(self, site_code: str) -> None:
+        """
+        This method is designed to search for an site by its code.
+        Args:
+            org_code (str): The site code to search for.
+        Returns:
+            None
+        """
+        logging.info(f"Searching for Site with code: {site_code}")
+        self.site_code.fill(site_code)
+        self.site_code.press("Enter")
+
+    def verify_no_site_record_found(self, text: str) -> None:
+        """Verifies that no site record is found."""
+        logging.info("Verifying that no site record is found")
+        expect(self.page.locator('form[name="frm"]')).to_contain_text(text)
 
 
 class SiteType(StrEnum):

@@ -1,5 +1,5 @@
 import logging
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 from enum import StrEnum
 from utils.table_util import TableUtils
@@ -53,6 +53,11 @@ class ListAllOrganisations(BasePage):
         logging.info(f"Searching for Organisation with code: {org_code}")
         self.search_org_code.fill(org_code)
         self.search_org_code.press("Enter")
+
+    def verify_no_organisation_record_found(self, text: str) -> None:
+        """Verifies that no organisation record is found."""
+        logging.info("Verifying that no organisation record is found")
+        expect(self.page.locator('form[name="frm"]')).to_contain_text(text)
 
 
 class OrganisationType(StrEnum):
