@@ -37,8 +37,8 @@ class SubjectsToBeInvitedWithTemporaryAddressPage(BasePage):
         self.nhs_filter.fill(search_text)
         self.nhs_filter.press("Enter")
 
-    def assertRecordsVisible(self, nhs_no: str, expectedVisible: bool) -> None:
-        logging.info(f"Attempting to check if records for {nhs_no} are visible : {expectedVisible}")
+    def assertRecordsVisible(self, nhs_no: str, expected_visible: bool) -> None:
+        logging.info(f"Attempting to check if records for {nhs_no} are visible : {expected_visible}")
 
         subject_summary_link = self.page.get_by_role(
             "link", name = NHSNumberTools().spaced_nhs_number(nhs_no)
@@ -46,25 +46,25 @@ class SubjectsToBeInvitedWithTemporaryAddressPage(BasePage):
 
         logging.info(f"subject_summary_link.is_visible() : {subject_summary_link.is_visible()}")
         if (
-            expectedVisible != subject_summary_link.is_visible()
+            expected_visible != subject_summary_link.is_visible()
         ):
             raise ValueError(
-                f"Record for {NHSNumberTools().spaced_nhs_number(nhs_no)} does not have expected visibility : {expectedVisible}.  Was in fact {subject_summary_link.is_visible()}."
+                f"Record for {NHSNumberTools().spaced_nhs_number(nhs_no)} does not have expected visibility : {expected_visible}.  Was in fact {subject_summary_link.is_visible()}."
             )
 
-    def filterByReviewed(self, filterValue: str) -> None:
-        logging.info(f"Filter reviewed column by : {filterValue}")
+    def filterByReviewed(self, filter_value: str) -> None:
+        logging.info(f"Filter reviewed column by : {filter_value}")
 
-        filterBox = self.page.locator("#reviewedFilter")
-        filterBox.click()
-        filterBox.select_option(filterValue)
+        filter_box = self.page.locator("#reviewedFilter")
+        filter_box.click()
+        filter_box.select_option(filter_value)
 
     def reviewSubject(self, nhs_no: str, reviewed: bool) -> None:
         logging.info(f"Mark subject {nhs_no} as reviewed: {reviewed}")
 
         row = self.page.locator(f'tr:has-text("{NHSNumberTools().spaced_nhs_number(nhs_no)}")')
-        lastCell = row.get_by_role("cell").nth(-1)
-        checkbox = lastCell.get_by_role("checkbox")
+        last_cell = row.get_by_role("cell").nth(-1)
+        checkbox = last_cell.get_by_role("checkbox")
         checkbox.set_checked(reviewed)
 
     def click_subject_link(self, nhs_no: str) -> None:
