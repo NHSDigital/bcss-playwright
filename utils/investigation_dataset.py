@@ -367,14 +367,8 @@ class InvestigationDatasetCompletion:
             )
 
         # Drug Information
-        self.investigation_datasets_pom.click_show_drug_information()
-        logging.info("Filling out drug information")
-        self.investigation_datasets_pom.select_drug_type_option1(
-            drug_information["drug_type1"]
-        )
-        self.investigation_datasets_pom.fill_drug_type_dose1(
-            drug_information["drug_dose1"]
-        )
+        InvestigationDatasetsPage(self.page).click_show_drug_information()
+        self.fill_out_drug_information(drug_information)
 
         logging.info("Filling out endoscopy information")
         self.fill_endoscopy_information(endoscopy_information)
@@ -403,6 +397,25 @@ class InvestigationDatasetCompletion:
         logging.info("Saving the investigation dataset")
         self.investigation_datasets_pom.check_dataset_complete_checkbox()
         self.investigation_datasets_pom.click_save_dataset_button()
+
+    def fill_out_drug_information(self, drug_information: dict) -> None:
+        """
+        This method completes the drug information section of the investigation dataset.
+        Args:
+            drug_information (dict): A dictionary containing the drug types and dosages.
+        """
+        logging.info("Filling out drug information")
+        for key, value in drug_information.items():
+            if key.startswith("drug_type"):
+                index = key[len("drug_type") :]
+                logging.info(f"Adding drug type {index}")
+                select_locator = f"#UI_BOWEL_PREP_DRUG{index}"
+                self.page.select_option(select_locator, value)
+            elif key.startswith("drug_dose"):
+                index = key[len("drug_dose") :]
+                logging.info(f"Adding drug dose {index}")
+                input_locator = f"#UI_BOWEL_PREP_DRUG_DOSE{index}"
+                self.page.fill(input_locator, value)
 
     def process_polyps(
         self,
@@ -780,13 +793,13 @@ class InvestigationDatasetCompletion:
                         "Pathology Provider",
                         f"divPolypHistology{polyp_number}_1Details",
                     )
-                    self.investigation_datasets_pom.select_loopup_option_index(value)
+                    self.investigation_datasets_pom.select_lookup_option_index(value)
                 case "pathologist":
                     DatasetFieldUtil(self.page).click_lookup_link_inside_div(
                         "Pathologist",
                         f"divPolypHistology{polyp_number}_1Details",
                     )
-                    self.investigation_datasets_pom.select_loopup_option_index(value)
+                    self.investigation_datasets_pom.select_lookup_option_index(value)
                 case "polyp type":
                     DatasetFieldUtil(
                         self.page

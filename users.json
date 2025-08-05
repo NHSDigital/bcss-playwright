@@ -50,5 +50,83 @@
       "Coventry and Warwickshire Bowel Cancer Screening Centre, MultiOrgUser",
       "Wolverhampton Bowel Cancer Screening Centre, MultiOrgUser"
     ]
+  },
+  "Hub Director State Registered": {
+    "username": "BCSS414",
+    "roles": [
+      "Hub Director State Registered, England"
+    ]
+  },
+  "Hub Manager": {
+    "username": "BCSS402",
+    "roles": [
+      "Hub Manager, England"
+    ]
+  },
+  "Team Leader": {
+    "username": "BCSS403",
+    "roles": [
+      "Team Leader, England"
+    ]
+  },
+  "Senior Screening Assistant": {
+    "username": "BCSS404",
+    "roles": [
+      "Senior Screening Assistant, England"
+    ]
+  },
+  "Screening Assistant": {
+    "username": "BCSS412",
+    "roles": [
+      "Senior Screening Assistant, England"
+    ]
+  },
+  "Screening Practitioner": {
+    "username": "BCSS326",
+    "roles": [
+      "Screening Practitioner, England"
+    ]
+  },
+  "Assistant Screening Practitioner": {
+    "username": "BCSS324",
+    "roles": [
+      "Assistant Screening Practitioner, England"
+    ]
+  },
+  "BCSS Support - SC": {
+    "username": "BCSS307",
+    "roles": [
+      "BCSS Support - SC, England"
+    ]
+  },
+  "Screening Coordinator at BCS001": {
+    "username": "BCSS121",
+    "roles": [
+      "Screening Coordinator at BCS001, England"
+    ]
+  },
+  "Screening Practioner at BCS001": {
+    "username": "BCSS121",
+    "roles": [
+      "Screening Practioner at BCS001, England"
+    ]
+  },
+  "Screening Centre Clerk": {
+    "username": "BCSS119",
+    "roles": [
+      "Screening Centre Clerk, England"
+    ]
+  },
+  "National Data Analyst": {
+    "username": "BCSS212",
+    "roles": [
+      "National Data Analyst, England"
+    ]
+  },
+  "National QA User": {
+    "username": "BCSS263",
+    "roles": [
+      "National QA User, England"
+    ]
   }
 }
