@@ -675,41 +675,33 @@ class InvestigationDatasetsPage(BasePage):
 
         label_elements = section.locator(".label").all()
         label_texts = [label.inner_text() for label in label_elements]
-
         normalized_labels = [
             normalize_label(label) for label in label_texts if normalize_label(label)
         ]
+
+        def label_matches(field_normalized: str, idx: int) -> bool:
+            if visible is True:
+                return label_elements[idx].is_visible()
+            if visible is False:
+                field_container = label_elements[idx].locator(
+                    "xpath=ancestor::*[contains(@class, 'row') or contains(@class, 'field')][1]"
+                )
+                is_container_visible = field_container.is_visible()
+                logging.info(
+                    f"Label visible: {label_elements[idx].is_visible()}, "
+                    f"Container visible: {is_container_visible} → Effective: {is_container_visible}"
+                )
+                return not is_container_visible
+            return True  # visibility doesn't matter
 
         for field_name in field_names:
             field_normalized = normalize_label(field_name)
             match_found = False
 
             for i, label in enumerate(normalized_labels):
-                if field_normalized in label:
-                    if visible is True:
-                        if label_elements[i].is_visible():
-                            match_found = True
-                            break
-                    elif visible is False:
-                        # Get the closest visible container (e.g., the wrapping field row)
-                        field_container = label_elements[i].locator(
-                            "xpath=ancestor::*[contains(@class, 'row') or contains(@class, 'field')][1]"
-                        )
-
-                        is_container_visible = field_container.is_visible()
-
-                        logging.info(
-                            f"Label visible: {label_elements[i].is_visible()}, "
-                            f"Container visible: {is_container_visible} → Effective: {is_container_visible}"
-                        )
-
-                        if not is_container_visible:
-                            match_found = True
-                            break
-                    else:
-                        # visibility doesn't matter
-                        match_found = True
-                        break
+                if field_normalized in label and label_matches(field_normalized, i):
+                    match_found = True
+                    break
 
             logging.info(
                 f"Checking for field '{field_name}' (visible={visible}) → Match found: {match_found}"
