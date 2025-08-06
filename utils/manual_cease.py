@@ -7,6 +7,8 @@ from datetime import datetime, date
 from playwright.sync_api import Page
 from enum import IntEnum
 
+BTN_REQUEST_CEASE_SELECTOR = "input[name='BTN_REQUEST_CEASE']"
+
 
 def create_manual_cease_ready_subject(
     screening_centre: str = "BCS002", base_age: int = 75
@@ -77,13 +79,13 @@ def process_manual_cease_with_disclaimer(
 
     try:
         # Check if Request Cease button is visible
-        page.locator("input[name='BTN_REQUEST_CEASE']").wait_for(timeout=3000)
+        page.locator(BTN_REQUEST_CEASE_SELECTOR).wait_for(timeout=3000)
         logging.info(
             "[CHECK] 'Request Cease' button is present — proceeding with steps 1-3"
         )
 
         # Step 1: Click "Request Cease"
-        page.locator("input[name='BTN_REQUEST_CEASE']").click()
+        page.locator(BTN_REQUEST_CEASE_SELECTOR).click()
         logging.info("[STEP 1] Clicked 'Request Cease'")
 
         # Step 2: Select reason
@@ -136,7 +138,7 @@ def process_manual_cease_immediate(
     logging.info("[MANUAL CEASE] Starting full cease workflow")
 
     # Step 1: Click "Request Cease"
-    page.locator("input[name='BTN_REQUEST_CEASE']").click()
+    page.locator(BTN_REQUEST_CEASE_SELECTOR).click()
     logging.info("[STEP 1] Clicked 'Request Cease'")
 
     # Step 2: Select reason from dropdown
@@ -169,7 +171,7 @@ def process_manual_cease_immediate(
         logging.info("[STEP 4] Clicked 'Save Request Cease'")
     else:
         logging.error("[STEP 4] No cease confirmation button found!")
-        raise Exception("Cease button not found on the page")
+        raise RuntimeError("Cease button not found on the page")
 
 
 # Markers for special assertions

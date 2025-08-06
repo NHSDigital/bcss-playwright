@@ -558,7 +558,6 @@ def test_manual_cease_from_already_ceased_subject_for_informal_death(
     )
 
 
-@pytest.mark.wip
 @pytest.mark.vpn_required
 @pytest.mark.manual_cease
 @pytest.mark.regression
