@@ -29,9 +29,9 @@ The `create_manual_cease_ready_subject` method creates a subject with Inactive s
 
 ### Arguments
 
-  screening_centre:
+  screening_center:
     Type: str
-    Screening centre to associate with the subject. Defaults to "BCS002".
+    Screening center to associate with the subject. Defaults to "BCS002".
 
   base_age:
     Type: int
