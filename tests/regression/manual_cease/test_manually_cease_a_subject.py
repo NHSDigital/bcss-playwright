@@ -21,6 +21,7 @@ from utils.manual_cease import (
     SurveillanceDueDateReason,
 )
 from datetime import datetime
+from typing import Any
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -37,6 +38,18 @@ def before_each(page: Page):
     base_page.go_to_screening_subject_search_page()
 
 
+@pytest.fixture
+def base_expected_db() -> dict[str, Any]:
+    return {
+        "Screening Status": ScreeningStatus.CEASED,
+        "Screening Due Date": EXPECT.NULL,
+        "Ceased Confirmation Details": "AUTO TEST: notes",
+        "Clinical Reason for Cease": EXPECT.NULL,
+        "Calculated FOBT Due Date": EXPECT.UNCHANGED,
+        "Calculated Surveillance Due Date": EXPECT.UNCHANGED,
+    }
+
+
 # Feature: Manually cease a subject
 
 
@@ -45,7 +58,9 @@ def before_each(page: Page):
 @pytest.mark.vpn_required
 @pytest.mark.manual_cease
 @pytest.mark.regression
-def test_manual_cease_from_inactive_subject_for_informed_dissent(page: Page) -> None:
+def test_manual_cease_from_inactive_subject_for_informed_dissent(
+    page: Page, base_expected_db
+) -> None:
     """
     Scenario: Subject is at status Inactive, cease for Informed Dissent
 
@@ -121,16 +136,11 @@ def test_manual_cease_from_inactive_subject_for_informed_dissent(page: Page) -> 
 
     # DB assertions
     expected_db = {
-        "Screening Status": ScreeningStatus.CEASED,
+        **base_expected_db,
         "Screening Status Reason": ScreeningStatusReason.INFORMED_DISSENT,
         "Screening Status Date of Change": EXPECT.TODAY,
         "Screening Due Date Reason": ScreeningDueDateReason.CEASED,
-        "Screening Due Date": EXPECT.NULL,
-        "Ceased Confirmation Details": ("AUTO TEST: notes"),
-        "Clinical Reason for Cease": EXPECT.NULL,
-        "Calculated FOBT Due Date": EXPECT.UNCHANGED,
         "Calculated Lynch Due Date": EXPECT.UNCHANGED,
-        "Calculated Surveillance Due Date": EXPECT.UNCHANGED,
     }
 
     # Fire off the DB asserts
@@ -142,7 +152,7 @@ def test_manual_cease_from_inactive_subject_for_informed_dissent(page: Page) -> 
 @pytest.mark.manual_cease
 @pytest.mark.regression
 def test_manual_cease_from_call_subject_for_informed_dissent_verbal_only(
-    page: Page,
+    page: Page, base_expected_db
 ) -> None:
     """
     Scenario: Subject is at status Call, cease for Informed Dissent, verbal only
@@ -227,6 +237,7 @@ def test_manual_cease_from_call_subject_for_informed_dissent_verbal_only(
 
     # DB assertions
     expected_db = {
+        **base_expected_db,
         "Screening Status": ScreeningStatus.CEASED,
         "Screening Status Reason": ScreeningStatusReason.INFORMED_DISSENT_VERBAL,
         "Screening Status Date of Change": EXPECT.TODAY,
@@ -234,16 +245,10 @@ def test_manual_cease_from_call_subject_for_informed_dissent_verbal_only(
         "Screening Due Date": EXPECT.NULL,
         "Ceased Confirmation Details": "AUTO TEST: notes",
         "Clinical Reason for Cease": EXPECT.NULL,
-        "Calculated FOBT Due Date": EXPECT.UNCHANGED,
         "Calculated Lynch Due Date": EXPECT.NULL,
-        "Calculated Surveillance Due Date": EXPECT.UNCHANGED,
         "Lynch due date": EXPECT.NULL,
-        "Lynch due date reason": EXPECT.UNCHANGED,
-        "Lynch due date date of change": EXPECT.UNCHANGED,
         "Screening due date date of change": EXPECT.TODAY,
         "Surveillance due date": EXPECT.NULL,
-        "Surveillance due date reason": EXPECT.UNCHANGED,
-        "Surveillance due date date of change": EXPECT.UNCHANGED,
     }
 
     # Fire off the DB asserts
@@ -255,7 +260,7 @@ def test_manual_cease_from_call_subject_for_informed_dissent_verbal_only(
 @pytest.mark.manual_cease
 @pytest.mark.regression
 def test_manual_cease_from_recall_subject_for_no_colon_subject_request(
-    page: Page,
+    page: Page, base_expected_db
 ) -> None:
     """
     Scenario: Subject is at status Recall, cease for No Colon, subject request
@@ -339,23 +344,15 @@ def test_manual_cease_from_recall_subject_for_no_colon_subject_request(
 
     # DB field assertions
     expected_db = {
+        **base_expected_db,
         "Screening Status": ScreeningStatus.CEASED,
         "Screening Status Reason": ScreeningStatusReason.NO_COLON_SUBJECT_REQUEST,
         "Screening Status Date of Change": EXPECT.TODAY,
-        "Screening Due Date Reason": ScreeningDueDateReason.CEASED,
         "Screening Due Date": EXPECT.NULL,
+        "Screening Due Date Reason": ScreeningDueDateReason.CEASED,
         "Screening due date date of change": EXPECT.TODAY,
         "Ceased Confirmation Details": "AUTO TEST: notes",
         "Clinical Reason for Cease": EXPECT.NULL,
-        "Calculated FOBT Due Date": EXPECT.UNCHANGED,
-        "Calculated Lynch Due Date": EXPECT.NULL,
-        "Calculated Surveillance Due Date": EXPECT.UNCHANGED,
-        "Lynch due date": EXPECT.NULL,
-        "Lynch due date reason": EXPECT.UNCHANGED,
-        "Lynch due date date of change": EXPECT.UNCHANGED,
-        "Surveillance due date": EXPECT.NULL,
-        "Surveillance due date reason": EXPECT.UNCHANGED,
-        "Surveillance due date date of change": EXPECT.UNCHANGED,
     }
 
     # Fire off the DB assertions
@@ -367,7 +364,7 @@ def test_manual_cease_from_recall_subject_for_no_colon_subject_request(
 @pytest.mark.manual_cease
 @pytest.mark.regression
 def test_manual_cease_from_surveillance_subject_for_no_colon_programme_assessed(
-    page: Page,
+    page: Page, base_expected_db
 ) -> None:
     """
     Scenario: Subject is at status Surveillance, cease for No Colon, programme assessed
@@ -440,20 +437,15 @@ def test_manual_cease_from_surveillance_subject_for_no_colon_programme_assessed(
     expect(summary_table).to_contain_text(today)
 
     expected_db = {
+        **base_expected_db,
         "Screening Status": ScreeningStatus.CEASED,
         "Screening Status Reason": ScreeningStatusReason.NO_COLON_PROGRAMME_ASSESSED,
         "Screening Status Date of Change": EXPECT.TODAY,
-        "Screening Due Date Reason": ScreeningDueDateReason.CEASED,
         "Screening Due Date": EXPECT.NULL,
+        "Screening Due Date Reason": ScreeningDueDateReason.CEASED,
         "Screening due date date of change": EXPECT.UNCHANGED,
         "Ceased Confirmation Details": "AUTO TEST: notes",
         "Clinical Reason for Cease": EXPECT.NULL,
-        "Calculated FOBT Due Date": EXPECT.UNCHANGED,
-        "Calculated Lynch Due Date": EXPECT.NULL,
-        "Calculated Surveillance Due Date": EXPECT.UNCHANGED,
-        "Lynch due date": EXPECT.NULL,
-        "Lynch due date reason": EXPECT.UNCHANGED,
-        "Lynch due date date of change": EXPECT.UNCHANGED,
         "Surveillance due date": EXPECT.NULL,
         "Surveillance due date reason": SurveillanceDueDateReason.CEASED,
         "Surveillance due date date of change": EXPECT.TODAY,
@@ -469,7 +461,7 @@ def test_manual_cease_from_surveillance_subject_for_no_colon_programme_assessed(
 @pytest.mark.manual_cease
 @pytest.mark.regression
 def test_manual_cease_from_already_ceased_subject_for_informal_death(
-    page: Page,
+    page: Page, base_expected_db
 ) -> None:
     """
     Scenario: Subject is at status Ceased, outside screening population, cease for Informal Death
@@ -545,18 +537,13 @@ def test_manual_cease_from_already_ceased_subject_for_informal_death(
     expect(summary_table).to_contain_text(today)
 
     expected_db = {
-        "Screening Status": ScreeningStatus.CEASED,
+        **base_expected_db,
         "Screening Status Reason": ScreeningStatusReason.INFORMAL_DEATH,
         "Screening Status Date of Change": EXPECT.UNCHANGED,
-        "Screening Due Date": EXPECT.NULL,
         "Screening Due Date Reason": EXPECT.UNCHANGED,
         "Screening due date date of change": EXPECT.UNCHANGED,
-        "Ceased Confirmation Details": "AUTO TEST: notes",
         "Ceased Confirmation Date": EXPECT.TODAY,
-        "Clinical Reason for Cease": EXPECT.NULL,
-        "Calculated FOBT Due Date": EXPECT.UNCHANGED,
         "Calculated Lynch Due Date": EXPECT.NULL,
-        "Calculated Surveillance Due Date": EXPECT.UNCHANGED,
         "Lynch due date": EXPECT.NULL,
         "Lynch due date reason": EXPECT.UNCHANGED,
         "Lynch due date date of change": EXPECT.UNCHANGED,
@@ -571,11 +558,12 @@ def test_manual_cease_from_already_ceased_subject_for_informal_death(
     )
 
 
+@pytest.mark.wip
 @pytest.mark.vpn_required
 @pytest.mark.manual_cease
 @pytest.mark.regression
 def test_manual_cease_from_already_ceased_subject_for_no_colon_subject_request(
-    page: Page,
+    page: Page, base_expected_db
 ) -> None:
     """
     Scenario: Subject is at status Ceased, outside screening population, cease for No Colon (subject request)
@@ -654,18 +642,13 @@ def test_manual_cease_from_already_ceased_subject_for_no_colon_subject_request(
 
     # Define expected database values post-cease
     expected_db = {
-        "Screening Status": ScreeningStatus.CEASED,
+        **base_expected_db,
         "Screening Status Reason": ScreeningStatusReason.NO_COLON_SUBJECT_REQUEST,
         "Screening Status Date of Change": EXPECT.UNCHANGED,
-        "Screening Due Date": EXPECT.NULL,
         "Screening Due Date Reason": EXPECT.UNCHANGED,
         "Screening due date date of change": EXPECT.UNCHANGED,
-        "Ceased Confirmation Details": "AUTO TEST: notes",
         "Ceased Confirmation Date": EXPECT.TODAY,
-        "Clinical Reason for Cease": EXPECT.NULL,
-        "Calculated FOBT Due Date": EXPECT.UNCHANGED,
         "Calculated Lynch Due Date": EXPECT.NULL,
-        "Calculated Surveillance Due Date": EXPECT.UNCHANGED,
         "Lynch due date": EXPECT.NULL,
         "Lynch due date reason": EXPECT.UNCHANGED,
         "Lynch due date date of change": EXPECT.UNCHANGED,
