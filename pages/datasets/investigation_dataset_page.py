@@ -679,7 +679,7 @@ class InvestigationDatasetsPage(BasePage):
             normalize_label(label) for label in label_texts if normalize_label(label)
         ]
 
-        def label_matches(field_normalized: str, idx: int) -> bool:
+        def label_matches(idx: int) -> bool:
             if visible is True:
                 return label_elements[idx].is_visible()
             if visible is False:
@@ -699,7 +699,7 @@ class InvestigationDatasetsPage(BasePage):
             match_found = False
 
             for i, label in enumerate(normalized_labels):
-                if field_normalized in label and label_matches(field_normalized, i):
+                if field_normalized in label and label_matches(i):
                     match_found = True
                     break
 
