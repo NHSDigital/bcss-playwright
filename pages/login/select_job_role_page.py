@@ -14,7 +14,6 @@ class SelectJobRolePage(BasePage):
     def select_option_for_job_role(self, job_role: str) -> None:
         """
         Selects a job from the job role dropdown
-
         Args:
             job_role (str): This is the text of the role you want to select (e.g. Screening Practitioner)
         """

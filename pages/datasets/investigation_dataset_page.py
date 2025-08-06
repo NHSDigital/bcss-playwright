@@ -1,3 +1,4 @@
+import re
 from playwright.sync_api import Page, expect, Locator
 from pages.base_page import BasePage
 from enum import StrEnum
@@ -7,7 +8,6 @@ from utils.oracle.oracle_specific_functions import (
 )
 from typing import Optional
 import logging
-import re
 
 
 class InvestigationDatasetsPage(BasePage):
@@ -354,7 +354,6 @@ class InvestigationDatasetsPage(BasePage):
         """
         This method is designed to select a pathologist from the pathologist options.
         It clicks on the pathologist link and selects the given option by index.
-
         Args:
             option (int): The index of the option to select from the pathologist options.
         """
@@ -370,7 +369,6 @@ class InvestigationDatasetsPage(BasePage):
         """
         This method is designed to select a lookup option by index.
         It clicks on the lookup link and selects the given option by index.
-
         Args:
             option (int): The index of the option to select from the lookup options.
         """
@@ -394,7 +392,6 @@ class InvestigationDatasetsPage(BasePage):
         """
         This method asserts that the polyp size is as expected.
         It retrieves the polyp size from the page and compares it with the expected value.
-
         Args:
             polyp_number (int): The number of the polyp to check (1 or 2).
             expected_value (int): The expected value of the polyp size.
@@ -426,7 +423,6 @@ class InvestigationDatasetsPage(BasePage):
         """
         This method asserts that the polyp category is as expected.
         It retrieves the polyp category from the page and compares it with the expected value.
-
         Args:
             polyp_number (int): The number of the polyp to check (1 or 2).
             expected_value (str): The expected value of the polyp category.
@@ -474,7 +470,6 @@ class InvestigationDatasetsPage(BasePage):
     def click_polyp_add_intervention_button(self, polyp_number: int) -> None:
         """
         Clicks the add intervention button for the specified polyp number.
-
         Args:
             polyp_number (int): The number of the polyp.
         """
@@ -490,15 +485,12 @@ class InvestigationDatasetsPage(BasePage):
     ) -> None:
         """
         Populates a <select> element using a predictable ID pattern based on field name and polyp number.
-
         This method is useful when label-based selectors (e.g., using `right-of(:text(...))`) are unreliable
         due to ambiguous or repeated text labels on the page.
-
         Args:
             field_base (str): The base name of the field (e.g., "POLYP_PATHOLOGY_LOST").
             polyp_number (int): The polyp index (e.g., 1 for the first polyp).
             option (str): The value to be selected from the dropdown.
-
         Example:
             populate_select_by_id("POLYP_PATHOLOGY_LOST", 1, YesNoOptions.YES)
             # Selects 'Yes' in <select id="UI_POLYP_PATHOLOGY_LOST1_1">
@@ -519,14 +511,12 @@ class InvestigationDatasetsPage(BasePage):
     def is_dataset_section_present(self, dataset_section_name: str) -> bool | None:
         """
         Checks if a section of the investigation dataset is present
-
         Args:
             dataset_section_name (str): The name of the section you want to check
                 - Investigation Dataset
                 - Drug Information
                 - Endoscopy Information
                 - etc...
-
         Returns:
             bool: True if it is present, False if it is not
         """
@@ -550,13 +540,10 @@ class InvestigationDatasetsPage(BasePage):
     def get_dataset_section(self, dataset_section_name: str) -> Locator | None:
         """
         Retrieves a dataset section by matching its header text.
-
         Searches through all elements representing dataset sections, looking for one whose
         first <h4> header text matches the provided section name (case-insensitive).
-
         Args:
             dataset_section_name (str): The name of the dataset section to locate.
-
         Returns:
             Locator | None: A Playwright Locator for the matching section, or None if not found.
         """
@@ -583,17 +570,13 @@ class InvestigationDatasetsPage(BasePage):
     ) -> Locator | None:
         """
         Retrieves a specific subsection within a dataset section by matching the subsection's header text.
-
         The method first searches through elements with the `.DatasetSubSection` class.
         If the subsection is not found, it continues searching within `.DatasetSubSectionGroup` elements.
-
         Args:
             dataset_section_name (str): The name of the dataset section that contains the subsection.
             dataset_subsection_name (str): The name of the subsection to locate.
-
         Returns:
             Locator | None: A Playwright Locator for the found subsection, or None if not found.
-
         Raises:
             ValueError: If the specified dataset section cannot be found.
         """
@@ -647,7 +630,6 @@ class InvestigationDatasetsPage(BasePage):
     ) -> bool:
         """
         Checks if the given fields are present in a section or subsection, with optional visibility checks.
-
         Args:
             section_name (str): The name of the dataset section.
             subsection_name (str | None): The name of the subsection, if any.
@@ -656,7 +638,6 @@ class InvestigationDatasetsPage(BasePage):
                 - True → fields must be visible
                 - False → fields must be not visible
                 - None → visibility doesn't matter (just check presence)
-
         Returns:
             bool: True if all conditions are met; False otherwise.
         """
@@ -680,6 +661,13 @@ class InvestigationDatasetsPage(BasePage):
         ]
 
         def label_matches(idx: int) -> bool:
+            """
+            Checks if the label at the given index matches the visibility condition.
+            Args:
+                idx (int): The index of the label to check.
+            Returns:
+                bool: True if the label matches the visibility condition, False otherwise.
+            """
             if visible is True:
                 return label_elements[idx].is_visible()
             if visible is False:
@@ -726,7 +714,6 @@ class InvestigationDatasetsPage(BasePage):
             drug_type (str): The drug type to check
             drug_number (int): The number of the drug type cell to check.
             expected_text (str): The expected text content of the cell.
-
         Returns:
             bool: True if the visibility matches the expectation, False otherwise.
         """
@@ -738,12 +725,10 @@ class InvestigationDatasetsPage(BasePage):
     ) -> bool:
         """
         Checks the visibility of the drug dose input cell.
-
         Args:
             drug_type (str): The drug type to check
             drug_number (int): The number of the drug dose cell to check.
             visible (bool): True if the field should be visible, False if it should not.
-
         Returns:
             bool: True if the visibility matches the expectation, False otherwise.
         """
@@ -755,12 +740,10 @@ class InvestigationDatasetsPage(BasePage):
     ) -> None:
         """
         Asserts that the drug type input cell contains the expected text.
-
         Args:
             drug_type (str): The drug type to check
             drug_number (int): The number of the drug type cell to check.
             expected_text (str): The expected text content of the cell.
-
         Raises:
             AssertionError: If the actual text does not match the expected text.
         """
@@ -778,12 +761,10 @@ class InvestigationDatasetsPage(BasePage):
     ) -> None:
         """
         Asserts that the drug dose input cell contains the expected text.
-
         Args:
             drug_type (str): The drug type to check
             drug_number (int): The number of the drug dose cell to check.
             expected_text (str): The expected text content of the cell.
-
         Raises:
             AssertionError: If the actual text does not match the expected text.
         """
@@ -799,7 +780,6 @@ class InvestigationDatasetsPage(BasePage):
     def get_drug_type_locator(self, drug_type: str, drug_number: int) -> Locator:
         """
         Returns the locator for the matching drug type and number
-
         Args:
             drug_type (str): The drug type to check
             drug_number (int): The number of the drug to check
@@ -815,7 +795,6 @@ class InvestigationDatasetsPage(BasePage):
     def get_drug_dose_locator(self, drug_type: str, drug_number: int) -> Locator:
         """
         Returns the locator for the matching drug type and number
-
         Args:
             drug_type (str): The drug type to check
             drug_number (int): The number of the drug to check
@@ -833,7 +812,6 @@ class InvestigationDatasetsPage(BasePage):
     ) -> None:
         """
         Asserts that the options in the drug type dropdown are as expected.
-
         Args:
             drug_type (str): The drug type to check
             drug_number (int): The number of the drug to check
@@ -861,7 +839,6 @@ class InvestigationDatasetsPage(BasePage):
     ) -> None:
         """
         Loops through a dictionary of drug types/doses and calls the relevant assertion methods
-
         Args:
             drug_information (dict): A dictionary containing all drug types and dosages to assert
             drug_type_label (str): The type of drug to do the assertion against. E.g. 'Bowel Preparation Administered'
@@ -879,12 +856,12 @@ class InvestigationDatasetsPage(BasePage):
 
         max_drug_number = max(drug_numbers)
 
-        for i in range(1, max_drug_number + 1):
-            drug_type = drug_information.get(f"drug_type{i}")
-            drug_dose = drug_information.get(f"drug_dose{i}")
+        for drug_index in range(1, max_drug_number + 1):
+            drug_type = drug_information.get(f"drug_type{drug_index}")
+            drug_dose = drug_information.get(f"drug_dose{drug_index}")
 
             if drug_type is not None:
-                self.assert_drug_type_text(drug_type_label, i, drug_type)
+                self.assert_drug_type_text(drug_type_label, drug_index, drug_type)
 
                 # Match-case to assert drug dose unit
                 match drug_type:
@@ -920,15 +897,16 @@ class InvestigationDatasetsPage(BasePage):
                         expected_unit = None
 
                 if expected_unit is not None:
-                    self.assert_drug_dose_unit_text(drug_type_label, i, expected_unit)
+                    self.assert_drug_dose_unit_text(
+                        drug_type_label, drug_index, expected_unit
+                    )
 
             if drug_dose is not None:
-                self.assert_drug_dose_text(drug_type_label, i, drug_dose)
+                self.assert_drug_dose_text(drug_type_label, drug_index, drug_dose)
 
     def get_drug_dose_unit_locator(self, drug_type: str, drug_number: int) -> Locator:
         """
         Returns the locator for the matching drug type and number
-
         Args:
             drug_type (str): The drug type to check
             drug_number (int): The number of the drug to check
@@ -946,12 +924,10 @@ class InvestigationDatasetsPage(BasePage):
     ) -> None:
         """
         Asserts that the drug dose unit contains the expected text.
-
         Args:
             drug_type (str): The drug type to check
             drug_number (int): The number of the drug dose cell to check.
             expected_text (str): The expected text content of the cell.
-
         Raises:
             AssertionError: If the actual text does not match the expected text.
         """

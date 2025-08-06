@@ -11,10 +11,8 @@ class DatasetFieldUtil:
     def get_input_locator_for_field(self, text: str) -> Locator:
         """
         Matches input elements that are to the right of any element matching the inner selector, at any vertical position.
-
         Args:
             text (str): The text of the element you want to get the input locator of
-
         Returns:
             Locator: the locator of the input
         """
@@ -23,7 +21,6 @@ class DatasetFieldUtil:
     def populate_input_locator_for_field(self, text: str, value: str) -> None:
         """
         Inputs a value into an input to the right of any element matching the inner selector, at any vertical position.
-
         Args:
             text (str): The text of the element you want to get the input locator of
             value (str): The value you want to input
@@ -34,10 +31,8 @@ class DatasetFieldUtil:
     def get_select_locator_for_field(self, text: str) -> Locator:
         """
         Matches select elements that are to the right of any element matching the inner selector, at any vertical position.
-
         Args:
             text (str): The text of the element you want to get the select locator of
-
         Returns:
             Locator: the locator of the input
         """
@@ -46,7 +41,6 @@ class DatasetFieldUtil:
     def populate_select_locator_for_field(self, text: str, option: str) -> None:
         """
         Matches select elements that are to the right of any element matching the inner selector, at any vertical position.
-
         Args:
             text (str): The text of the element you want to get the select locator of.
             option (str): The option you want to select
@@ -57,11 +51,9 @@ class DatasetFieldUtil:
     def get_input_locator_for_field_inside_div(self, text: str, div: str) -> Locator:
         """
         Matches input elements that are to the right of any element matching the inner selector, at any vertical position.
-
         Args:
             text (str): The text of the element you want to get the input locator of
             div (str): The ID of the DIV the text belongs in
-
         Returns:
             Locator: the locator of the input
         """
@@ -73,7 +65,6 @@ class DatasetFieldUtil:
     ) -> None:
         """
         Inputs a value into an input to the right of any element matching the inner selector, at any vertical position.
-
         Args:
             text (str): The text of the element you want to get the input locator of
             div (str): The ID of the DIV the text belongs in
@@ -85,11 +76,9 @@ class DatasetFieldUtil:
     def get_select_locator_for_field_inside_div(self, text: str, div: str) -> Locator:
         """
         Matches select elements that are to the right of any element matching the inner selector, at any vertical position.
-
         Args:
             text (str): The text of the element you want to get the select locator of
             div (str): The ID of the DIV the text belongs in
-
         Returns:
             Locator: the locator of the input
         """
@@ -101,7 +90,6 @@ class DatasetFieldUtil:
     ) -> None:
         """
         Matches select elements that are to the right of any element matching the inner selector, at any vertical position.
-
         Args:
             text (str): The text of the element you want to get the select locator of.
             div (str): The ID of the DIV the text belongs in
@@ -114,7 +102,6 @@ class DatasetFieldUtil:
         """
         Finds and clicks the 'lookup' link (anchor tag) that is in the same row/section
         as the provided label text within a given div container.
-
         Args:
             text (str): The label text that appears before the 'lookup' link (e.g., "Pathology Provider")
             div (str): The ID of the outer div container to scope the search within
@@ -132,12 +119,10 @@ class DatasetFieldUtil:
         """
         Asserts that the first visible field to the right of the cell containing `text` has the expected value,
         ensuring it is in the same row (not just visually to the right).
-
         Args:
             text (str): The label or text on the left-hand side.
             expected_text (str): The text expected in the cell to the right.
             div (str, optional): The ID of the container DIV. Defaults to None.
-
         Raises:
             AssertionError: If the expected text is not found.
         """
@@ -200,12 +185,10 @@ class DatasetFieldUtil:
     ) -> None:
         """
         Asserts that the select dropdown to the right of the cell containing `text` includes all expected values.
-
         Args:
             text (str): The label or text on the left-hand side.
             expected_values (List[str]): List of expected dropdown values.
             div (str, optional): The ID of the container DIV. Defaults to None.
-
         Raises:
             AssertionError: If the select element is not found or expected values are missing.
         """
@@ -255,12 +238,10 @@ class DatasetFieldUtil:
     ) -> None:
         """
         Asserts that the checkbox to the right of a given label is either ticked or unticked.
-
         Args:
             text (str): The label or text on the left-hand side.
             expected_state (str): Either "Ticked" or "Unticked".
             div (Optional[str]): Optional ID of a container DIV.
-
         Raises:
             AssertionError: If checkbox is not found or its state doesn't match.
         """
@@ -294,12 +275,10 @@ class DatasetFieldUtil:
     ) -> None:
         """
         Asserts that the selected radio button to the right of a label with the given text matches the expected value.
-
         Args:
             text (str): The label or text on the left-hand side.
             expected_value (str): The expected label/text of the selected radio button.
             div (Optional[str]): Optional ID of a container DIV.
-
         Raises:
             AssertionError: If no radio button is selected, or the selected one doesn't match expected.
         """
@@ -317,8 +296,8 @@ class DatasetFieldUtil:
             raise AssertionError(f'No radio buttons found to the right of "{text}".')
 
         found_match = False
-        for i in range(radio_buttons.count()):
-            radio = radio_buttons.nth(i)
+        for radio_button_index in range(radio_buttons.count()):
+            radio = radio_buttons.nth(radio_button_index)
             if radio.is_checked():
                 # Try to find the label next to the radio
                 label = radio.evaluate_handle(
@@ -352,14 +331,12 @@ class DatasetFieldUtil:
         """
         Asserts that the (first) checkbox immediately to the right of a label with
         the given text is enabled/disabled as expected.
-
         Args:
             text (str): Visible label or text on the left-hand side.
             should_be_enabled (bool): True if the checkbox is expected to be
                 enabled (interactive); False if it is expected to be disabled.
             div (Optional[str]): Optional ID of a container DIV that scopes the
                 search. Useful when the same label appears more than once.
-
         Raises:
             AssertionError: If the checkbox isn’t found, or its enabled/disabled
                 state doesn’t match the expectation.

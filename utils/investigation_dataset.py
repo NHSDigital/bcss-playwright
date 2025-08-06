@@ -465,7 +465,6 @@ class InvestigationDatasetCompletion:
     def fill_endoscopy_information(self, endoscopy_information: dict) -> None:
         """
         Fills out the endoscopy information section of the investigation dataset.
-
         Args:
             endoscopy_information (dict): A dictionary containing the endoscopy information to be filled in the form.
         """
@@ -551,7 +550,6 @@ class InvestigationDatasetCompletion:
     ) -> None:
         """
         Fills out the polyp information section of the investigation dataset for any polyp.
-
         Args:
             polyp_1_information (dict): A dictionary containing the polyp 1 information to be filled in the form.
         """
@@ -618,7 +616,6 @@ class InvestigationDatasetCompletion:
     ) -> None:
         """
         Fills out the polyp 1 intervention section of the investigation dataset.
-
         Args:
             polyp_1_intervention (dict): A dictionary containing the polyp 1 intervention to be filled in the form.
         """
@@ -687,7 +684,6 @@ class InvestigationDatasetCompletion:
     ) -> None:
         """
         Fills out multiple interventions for the given polyp.
-
         Args:
             interventions (list): A list of intervention dictionaries.
             polyp_number (int): The 1-based index of the polyp.
@@ -754,7 +750,6 @@ class InvestigationDatasetCompletion:
     def fill_polyp_x_histology(self, polyp_histology: dict, polyp_number: int) -> None:
         """
         Fills out the polyp histology section of the investigation dataset.
-
         Args:
             polyp_histology (dict): A dictionary containing the polyp 1 histology to be filled in the form.
         """
@@ -861,7 +856,6 @@ class InvestigationDatasetCompletion:
         """
         This method checks if the relevant "Show details" link for a polyp histology is present.
         If it is then it clicks it.
-
         Args:
             polyp_number (int): The polyp number for the histology you want to check
         """

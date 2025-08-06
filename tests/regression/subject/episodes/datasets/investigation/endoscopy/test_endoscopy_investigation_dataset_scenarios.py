@@ -168,7 +168,6 @@ def test_check_different_hub_roles_access_to_edit_endoscopy_investigation_datase
 ) -> None:
     """
     Scenario: Check different hub roles' access to edit an endoscopy investigation dataset
-
     This scenario only checks roles which have permission to at least view a dataset.
     """
     nhs_no = get_subject_with_incomplete_endoscopy_investigation_dataset()
@@ -243,7 +242,6 @@ def test_check_different_screening_centre_roles_access_to_edit_endoscopy_investi
 ) -> None:
     """
     Scenario: Check different screening centre roles' access to edit an endoscopy investigation dataset
-
     This scenario only checks roles which have permission to at least view a dataset.
     """
     nhs_no = get_subject_with_incomplete_endoscopy_investigation_dataset()
@@ -331,7 +329,6 @@ def test_check_different_national_and_qa_roles_access_to_edit_endoscopy_investig
 ) -> None:
     """
     Scenario: Check different national and QA roles' access to edit an endoscopy investigation dataset
-
     This scenario only checks roles which have permission to at least view a dataset.
     """
     nhs_no = get_subject_with_incomplete_endoscopy_investigation_dataset()
@@ -365,8 +362,7 @@ def test_check_correct_sections_displayed_in_colonoscopy_investigation_dataset(
     page: Page,
 ) -> None:
     """
-    Check the correct sections are displayed in new Colonoscopy investigation dataset
-
+    Scenario: Check the correct sections are displayed in new Colonoscopy investigation dataset
     This scenario just checks that the dataset contains the expected sections and that they are labelled for an endoscopy dataset rather than a radiology dataset.
     """
     nhs_no = get_subject_with_new_colonoscopy_investigation_dataset()
@@ -469,8 +465,7 @@ def test_check_field_visibility_and_default_values_in_colonoscopy_investigation_
     page: Page,
 ) -> None:
     """
-    Check field visibility and default values in the Investigation Dataset section of a new Colonoscopy investigation dataset
-
+    Scenario: Check field visibility and default values in the Investigation Dataset section of a new Colonoscopy investigation dataset
     The top section of the investigation dataset, labelled Investigation Dataset but referred to as the Diagnostic Test section in the spec, contains mostly read-only fields.  This scenario checks that the expected fields are included, and carries out limited checks of the default values (many of these values can only be sensibly tested in a scenario which creates the test from scratch).
     """
     nhs_no = get_subject_with_new_colonoscopy_investigation_dataset()
@@ -644,7 +639,6 @@ def test_check_cross_field_validation_is_mandatory_at_completion(page: Page) -> 
 def test_check_behaviour_of_aspirant_endoscopist_fields(page: Page) -> None:
     """
     Scenario: Check the behaviour of the Aspirant Endoscopist fields
-
     This tests:
     > Aspirant Endoscopist Not Present field is enabled until an Aspirant Endoscopist is selected
     > If Aspirant Endoscopist Not Present is ticked, it is automatically unticked and disabled when an Aspirant Endoscopist is selected
@@ -843,17 +837,14 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
 ) -> None:
     """
     Scenario: Check the behaviour of the Bowel Preparation Administered fields in the Drug Information section in an incomplete endoscopy investigation dataset
-
     This scenario tests:
     > The contents of dropdown lists.
     > The default values of fields.
     > The visibility of drug type/dose fields.
     > The correct dose units are displayed.
-
     Immediate validation:
     > A "drug administered" field cannot be set to "No" or null if associated drugs and doses are listed.
     > Dose values must be within the valid range for the drug type, and have the valid number of decimal places (although invalid values are not removed).
-
     "On save" validation:
     > Bowel Preparation Administered cannot be set to "No" if the Endoscopist Defined Extent is beyond Rectum. (The reverse of this is not tested as this scenario does not save changes).
     > The same drug type cannot be selected more than once
@@ -1253,10 +1244,8 @@ def check_role_access_to_edit_investigation_dataset(
 ) -> None:
     """
     Verifies whether a user with a specific role has access to edit the Investigation Dataset.
-
     This function logs in as a given user role, navigates to the subject's investigation dataset,
     and asserts the visibility of the "Edit Dataset" button based on expected access.
-
     Args:
         page (Page): The Playwright page object for interacting with the UI.
         nhs_no (str): NHS number used to search for the subject.
@@ -1264,7 +1253,6 @@ def check_role_access_to_edit_investigation_dataset(
         edit_access (bool): True if the role is expected to have edit access; False otherwise.
         role_logging (str): Descriptive log message for tracking which role is being tested.
         role_type (Optional[str]): Optional job role selection (e.g., if multiple job roles exist).
-
     Raises:
         AssertionError: If the visibility of the "Edit Dataset" button does not match the expected access.
     """
@@ -1311,7 +1299,6 @@ def get_subject_with_incomplete_endoscopy_investigation_dataset() -> str:
     Gets a subject with the following criteria:
         "latest episode status": "open"
         "latest episode latest investigation dataset": "endoscopy_incomplete"
-
     Returns:
         str: The nhs number of a subject matching the criteria
     """
@@ -1342,7 +1329,6 @@ def get_subject_with_new_colonoscopy_investigation_dataset() -> str:
     Gets a subject with the following criteria:
         "latest episode status": "open",
         "latest episode latest investigation dataset": "colonoscopy_new",
-
     Returns:
         str: The nhs number of a subject matching the criteria
     """
