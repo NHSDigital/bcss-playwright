@@ -1,4 +1,4 @@
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page, Locator
 from pages.base_page import BasePage
 from typing import Dict
 
@@ -11,57 +11,39 @@ class SpineSearchPage:
         self.page = page
         self.spine_url = "https://bcss-bcss-18680-ddc-bcss.k8s-nonprod.texasplatform.uk/servlet/SpineSearchScreen"
 
+        # Define locators
+        self.retrieve_data_link = self.page.get_by_role("link", name="Retrieve Data from Spine")
+        self.demographics_radio = self.page.get_by_role("radio", name="Demographics")
+        self.date_of_birth_field = self.page.locator("#dateOfBirth")
+
+        # Represents the calendar cell for the 6th day in the date picker
+        self.date = self.page.get_by_role("cell", name="6").first
+
+        self.surname_field = self.page.locator("#surname")
+        self.forename_field = self.page.locator("#forename")
+        self.gender_dropdown = self.page.locator("#gender")
+        self.postcode_field = self.page.locator("#postcode")
+        self.search_button = self.page.get_by_role("button", name="Search")
+        self.alert_message = self.page.get_by_role("alert")
+
     def navigate_to_spine_search(self):
-        """
-        Navigates to the Spine Search screen by clicking the appropriate link and
-        loading the target URL.
-        """
-        self.page.get_by_role("link", name="Retrieve Data from Spine").click()
+        self.retrieve_data_link.click()
         self.page.goto(self.spine_url)
 
     def select_demographic_search(self):
-        """
-        Selects the 'Demographics' radio button to enable demographic-based search.
-        """
-        self.page.get_by_role("radio", name="Demographics").check()
+        self.demographics_radio.check()
 
     def enter_search_criteria(self, dob: str, surname: str, forename: str, gender: str, postcode: str):
-        """Fills in demographic search fields with user details."""
-        # Date of Birth
-        self.page.locator("#dateOfBirth").click()
-        self.page.get_by_role("cell", name="6").first.click()
-
-        # Surname
-        self.page.locator("#surname").fill(surname)
-
-        # Forename
-        self.page.locator("#forename").fill(forename)
-
-        # Gender
+        self.date_of_birth_field.click()
+        self.date.click()
+        self.surname_field.fill(surname)
+        self.forename_field.fill(forename)
         gender_option = {"Male": "1", "Female": "2"}.get(gender, "1")
-        self.page.locator("#gender").select_option(gender_option)
-
-        # Postcode
-        self.page.locator("#postcode").fill(postcode)
+        self.gender_dropdown.select_option(gender_option)
+        self.postcode_field.fill(postcode)
 
     def perform_search(self):
-        """
-        Clicks the 'Search' button to initiate the demographic search.
-        """
-        self.page.get_by_role("button", name="Search").click()
-
+        self.search_button.click()
 
     def get_spine_alert_message(self) -> str:
-        """
-        Retrieve the visible alert message from the page, if any.
-
-        Returns:
-            str: The inner text of the alert element if it's visible;
-            otherwise, an empty string.
-        """
-        self.alert_message = self.page.get_by_role("alert")
-        if self.alert_message.is_visible():
-            return self.alert_message.inner_text()
-        else:
-            return ""
-
+        return self.alert_message.inner_text() if self.alert_message.is_visible() else ""
