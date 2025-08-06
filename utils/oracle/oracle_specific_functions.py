@@ -716,34 +716,48 @@ def get_investigation_dataset_polyp_algorithm_size(
 class SubjectSelector:
     """
     Provides helper methods for selecting screening subjects based on preconditions
-    required by specific manual cease scenarios.
+    required by specific scenarios.
     """
 
     @staticmethod
-    def get_subject_for_manual_cease(criteria: Dict[str, str]) -> str:
-        logging.info(f"[SUBJECT SELECTOR] Searching for subject using criteria: {criteria}")
+    def get_subject_for_manual_cease(criteria: dict) -> str:
+        """
+        Retrieves a subject NHS number suitable for manual cease,
+        based on dynamically provided selection criteria.
 
-        # Get user object based on test login
-        user_details = UserTools.retrieve_user("Hub Manager at BCS01")
+        Args:
+            criteria (dict): Dictionary of filtering conditions to select a subject.
+
+        Returns:
+            str: The NHS number of the selected subject.
+
+        Raises:
+            ValueError: If no subject is found matching the criteria.
+        """
+        logging.info(
+            f"[SUBJECT SELECTOR] Searching for subject using criteria: {criteria}"
+        )
+
+        hub_code = criteria.get("subject hub code", "BCS02")
+        user_details = UserTools.retrieve_user(f"Hub Manager at {hub_code}")
         user = UserTools.get_user_object(user_details)
-
-        # Create empty subject stub
-        empty_subject = Subject()
+        subject = Subject()
 
         query_builder = SubjectSelectionQueryBuilder()
         query, bind_vars = query_builder.build_subject_selection_query(
             criteria=criteria,
             user=user,
-            subject=empty_subject,
+            subject=subject,
         )
 
-        logging.debug(f"[SUBJECT SELECTOR] Executing query:\n{query}\nWith bind variables: {bind_vars}")
+        logging.debug(
+            f"[SUBJECT SELECTOR] Executing query:\n{query}\nWith bind variables: {bind_vars}"
+        )
         result_df = OracleDB().execute_query(query, bind_vars)
 
         if result_df.empty:
-            raise ValueError(f"No subject found matching criteria: {criteria}")
+            raise ValueError("No subject found for manual cease.")
 
-        nhs_number = result_df["subject_nhs_number"].iloc[0]
+        nhs_number = result_df.iloc[0]["subject_nhs_number"]
         logging.info(f"[SUBJECT SELECTOR] Found subject NHS number: {nhs_number}")
         return nhs_number
-
