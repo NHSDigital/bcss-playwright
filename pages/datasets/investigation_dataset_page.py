@@ -847,7 +847,11 @@ class InvestigationDatasetsPage(BasePage):
         drug_numbers = [
             int(match.group(1))
             for key in drug_information
-            if (match := re.match(r"drug_(?:dose|type)(\d+)", key))
+            if (
+                match := re.match(
+                    r"(?:drug|other_drug|antibiotic_drug)_(?:dose|type)(\d+)", key
+                )
+            )
         ]
 
         if not drug_numbers:
@@ -857,8 +861,16 @@ class InvestigationDatasetsPage(BasePage):
         max_drug_number = max(drug_numbers)
 
         for drug_index in range(1, max_drug_number + 1):
-            drug_type = drug_information.get(f"drug_type{drug_index}")
-            drug_dose = drug_information.get(f"drug_dose{drug_index}")
+            drug_type = (
+                drug_information.get(f"drug_type{drug_index}")
+                or drug_information.get(f"other_drug_type{drug_index}")
+                or drug_information.get(f"antibiotic_drug_type{drug_index}")
+            )
+            drug_dose = (
+                drug_information.get(f"drug_dose{drug_index}")
+                or drug_information.get(f"other_drug_dose{drug_index}")
+                or drug_information.get(f"antibiotic_drug_dose{drug_index}")
+            )
 
             if drug_type is not None:
                 self.assert_drug_type_text(drug_type_label, drug_index, drug_type)
@@ -891,8 +903,25 @@ class InvestigationDatasetsPage(BasePage):
                         | DrugTypeOptions.FLEET_PHOSPHO_SODA
                     ):
                         expected_unit = "Mls Solution"
-                    case DrugTypeOptions.OTHER:
+                    case (
+                        DrugTypeOptions.OTHER
+                        | AntibioticsAdministeredDrugTypeOptions.OTHER_ANTIBIOTIC
+                    ):
                         expected_unit = ""
+                    case (
+                        AntibioticsAdministeredDrugTypeOptions.AMOXYCILLIN
+                        | AntibioticsAdministeredDrugTypeOptions.CEFOTAXIME
+                        | AntibioticsAdministeredDrugTypeOptions.VANCOMYCIN
+                    ):
+                        expected_unit = "g"
+                    case (
+                        AntibioticsAdministeredDrugTypeOptions.CIPROFLAXACIN
+                        | AntibioticsAdministeredDrugTypeOptions.CO_AMOXICLAV
+                        | AntibioticsAdministeredDrugTypeOptions.GENTAMICIN
+                        | AntibioticsAdministeredDrugTypeOptions.METRONIDAZOLE
+                        | AntibioticsAdministeredDrugTypeOptions.TEICOPLANIN
+                    ):
+                        expected_unit = "mg"
                     case _:
                         expected_unit = None
 
@@ -1276,3 +1305,17 @@ class PolypReasonLeftInSituOptions(StrEnum):
     REQUIRES_SURGICAL_RESECTION = "200558"
     CANNOT_FIND_POLYP_ON_WITHDRAWAL = "200559"
     CLINICAL_DECISION_NOT_TO_EXCISE = "203082"
+
+
+class AntibioticsAdministeredDrugTypeOptions(StrEnum):
+    """Enum for antobiotics administered drug type options"""
+
+    AMOXYCILLIN = "17941~g"
+    CEFOTAXIME = "17950~g"
+    CIPROFLAXACIN = "17945~mg"
+    CO_AMOXICLAV = "17951~mg"
+    GENTAMICIN = "17942~mg"
+    METRONIDAZOLE = "17949~mg"
+    TEICOPLANIN = "17944~mg"
+    VANCOMYCIN = "17943~g"
+    OTHER_ANTIBIOTIC = "305493"

@@ -17,6 +17,7 @@ from pages.datasets.investigation_dataset_page import (
     ReasonPathologyLostOptions,
     DrugTypeOptions,
     YesNoDrugOptions,
+    AntibioticsAdministeredDrugTypeOptions,
 )
 from classes.user import User
 from classes.subject import Subject
@@ -865,25 +866,7 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
     > A drug type cannot be entered without a dose (*).
     > A dose cannot be entered without a drug type (*).
     """
-    criteria = {
-        "latest episode status": "open",
-        "latest episode latest investigation dataset": "colonoscopy_new",
-        "subject age": "< 70",
-    }
-    user = User()
-    subject = Subject()
-
-    builder = SubjectSelectionQueryBuilder()
-
-    query, bind_vars = builder.build_subject_selection_query(
-        criteria=criteria,
-        user=user,
-        subject=subject,
-        subjects_to_retrieve=1,
-    )
-
-    df = OracleDB().execute_query(query, bind_vars)
-    nhs_no = df.iloc[0]["subject_nhs_number"]
+    nhs_no = get_subject_younger_than_70_with_new_colonsocopy_dataset()
     logging.info(f"NHS Number: {nhs_no}")
 
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
@@ -1248,23 +1231,31 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
     LogoutPage(page).log_out()
 
 
+@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.vpn_required
 @pytest.mark.investigation_dataset_tests
 @pytest.mark.bcss_additional_tests
 @pytest.mark.colonoscopy_dataset_tests
-def test_check_behaviour_of_aspirant_endoscopist_fields_in_incomplete_dataset(
+def test_check_behaviour_of_antibiotics_administered_fields_in_incomplete_dataset(
     page: Page,
 ) -> None:
     """
-    Scenario: Check the behaviour of the Aspirant Endoscopist fields
-    This tests:
-    > Aspirant Endoscopist Not Present field is enabled until an Aspirant Endoscopist is selected
-    > If Aspirant Endoscopist Not Present is ticked, it is automatically unticked and disabled when an Aspirant Endoscopist is selected
-    > Aspirant Endoscopist Participation is only displayed if an Aspirant Endoscopist is selected
-    > Aspirant Endoscopist Participation is only displayed if an Aspirant Endoscopist defaults to Operator
+    Scenario: Check the behaviour of the Antibiotics Administered fields in the Drug Information section in an incomplete endoscopy investigation dataset
+    This checks:
+    > The contents of dropdown lists
+    > The default values of fields
+    > The visibility of drug type/dose fields
+    > The dose units
+    > A "drug administered" field cannot be set to "No" or null if associated drugs and doses are listed
+    > The same drug type cannot be selected more than once
+    > Validation of dose values
     """
-    nhs_no = get_subject_with_new_colonoscopy_investigation_dataset()
+    nhs_no = get_subject_younger_than_70_with_new_colonsocopy_dataset()
+
+    logging.info(
+        "STEP: Antibiotics Administered Type and Dose fields are not displayed if Antibiotics Administered = No"
+    )
 
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
 
@@ -1278,39 +1269,286 @@ def test_check_behaviour_of_aspirant_endoscopist_fields_in_incomplete_dataset(
         "Investigation Datasets"
     )
 
-    assert (
-        InvestigationDatasetsPage(page).are_fields_on_page(
-            "Investigation Dataset", None, ["Aspirant Endoscopist"]
-        )
-    ) is True, "Aspirant Endoscopist field is not visible when it should be"
-    logging.info("Aspirant Endoscopist field is visible")
-
-    assert (
-        InvestigationDatasetsPage(page).are_fields_on_page(
-            "Investigation Dataset",
-            None,
-            ["Aspirant Endoscopist Participation"],
-            visible=False,
-        )
-    ) is True, (
-        "Aspirant Endoscopist Participation field is visible when it should not be"
+    InvestigationDatasetsPage(page).click_show_drug_information()
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
+        "Antibiotics Administered", "divDrugDetails", YesNoOptions.YES
     )
-    logging.info("Aspirant Endoscopist Participation field is not visible")
-
-    InvestigationDatasetsPage(page).check_aspirant_endoscopist_not_present()
-    DatasetFieldUtil(page).assert_checkbox_to_right_is_ticked_or_not(
-        "Aspirant Endoscopist lookup", "Ticked"
-    )
-    InvestigationDatasetsPage(page).select_aspirant_endoscopist_option_index(-1)
-    DatasetFieldUtil(page).assert_checkbox_to_right_is_enabled(
-        "Aspirant Endoscopist lookup", False
-    )
-
     DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
-        "Aspirant Endoscopist Participation", "Operator"
+        "Antibiotics Administered", "Yes"
     )
-    DatasetFieldUtil(page).assert_select_to_right_has_values(
-        "Aspirant Endoscopist Participation", ["Operator", "Spectator"]
+
+    assert (
+        InvestigationDatasetsPage(page).check_visibility_of_drug_type(
+            "Antibiotics Administered", 1, True
+        )
+    ) is True, "The first Antibiotics Administered drug type input cell is not visible"
+    logging.info("The first Antibiotics Administered drug type input cell is visible")
+
+    assert (
+        InvestigationDatasetsPage(page).check_visibility_of_drug_dose(
+            "Antibiotics Administered", 1, True
+        )
+    ) is True, "The first Antibiotics Administered drug dose input cell is not visible"
+    logging.info("The first Antibiotics Administered drug dose input cell is visible")
+
+    InvestigationDatasetsPage(page).assert_drug_type_text(
+        "Antibiotics Administered", 1, ""
+    )
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        "Antibiotics Administered", 1, ""
+    )
+
+    list_of_options = [
+        "Amoxycillin",
+        "Cefotaxime",
+        "Ciproflaxacin",
+        "Co-amoxiclav",
+        "Gentamicin",
+        "Metronidazole",
+        "Teicoplanin",
+        "Vancomycin",
+        "Other antibiotic",
+    ]
+    InvestigationDatasetsPage(page).assert_drug_type_options(
+        "Antibiotics Administered", 1, list_of_options
+    )
+
+    logging.info(
+        "STEP: Cannot change Antibiotics Administered to No or null if a Type and Dose have been recorded"
+    )
+
+    drug_information = {
+        "antibiotic_drug_type1": AntibioticsAdministeredDrugTypeOptions.AMOXYCILLIN,
+        "antibiotic_drug_dose1": "1",
+    }
+
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_type_text(
+        "Antibiotics Administered",
+        1,
+        AntibioticsAdministeredDrugTypeOptions.AMOXYCILLIN,
+    )
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        "Antibiotics Administered", 1, "1"
+    )
+
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "You cannot set Antibiotics Administered to this value as Antibiotics exist"
+    )
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
+        "Antibiotics Administered", "divDrugDetails", YesNoOptions.NO
+    )
+    DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
+        "Antibiotics Administered", "Yes"
+    )
+
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "You cannot set Antibiotics Administered to this value as Antibiotics exist"
+    )
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
+        "Antibiotics Administered", "divDrugDetails", ""
+    )
+    DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
+        "Antibiotics Administered", "Yes"
+    )
+
+    logging.info(
+        "STEP: Can change Antibiotics Administered to No if neither Types nor Doses have been recorded"
+    )
+
+    drug_information = {
+        "antibiotic_drug_type1": "",
+        "antibiotic_drug_dose1": "",
+    }
+
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
+        "Antibiotics Administered", "divDrugDetails", YesNoOptions.NO
+    )
+    DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
+        "Antibiotics Administered", "No"
+    )
+
+    logging.info(
+        "STEP: Dose must be within the allowed range of values, and have the right number of decimal places"
+    )
+
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
+        "Antibiotics Administered", "divDrugDetails", YesNoOptions.YES
+    )
+    DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
+        "Antibiotics Administered", "Yes"
+    )
+
+    InvestigationDatasetsPage(page).assert_dialog_text("You cannot enter a value of 0")
+    drug_information = {
+        "antibiotic_drug_dose1": "0",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        "Antibiotics Administered", 1, "0"
+    )
+
+    drug_information = {
+        "antibiotic_drug_dose1": "0.01",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        "Antibiotics Administered", 1, "0.01"
+    )
+
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "Number cannot have more than 2 decimal places"
+    )
+    drug_information = {
+        "antibiotic_drug_dose1": "1.123",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        "Antibiotics Administered", 1, "1.123"
+    )
+
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "Number cannot be greater than 9999999"
+    )
+    drug_information = {
+        "antibiotic_drug_dose1": "10000000",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        "Antibiotics Administered", 1, "10000000"
+    )
+
+    drug_information = {
+        "antibiotic_drug_dose1": "9999999.99",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        "Antibiotics Administered", 1, "9999999.99"
+    )
+
+    logging.info("STEP: Cannot save a dataset with a drug Type but no Dose")
+
+    drug_information = {
+        "antibiotic_drug_type1": "",
+        "antibiotic_drug_dose1": "",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    drug_information = {
+        "antibiotic_drug_type1": AntibioticsAdministeredDrugTypeOptions.AMOXYCILLIN,
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "Please enter a dose for this drug"
+    )
+    InvestigationDatasetsPage(page).click_save_dataset_button()
+    InvestigationDatasetsPage(page).assert_drug_type_text(
+        "Antibiotics Administered",
+        1,
+        AntibioticsAdministeredDrugTypeOptions.AMOXYCILLIN,
+    )
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        "Antibiotics Administered", 1, ""
+    )
+
+    logging.info("STEP: Cannot save a dataset with a drug Dose but no Type")
+
+    drug_information = {
+        "antibiotic_drug_type1": "",
+        "antibiotic_drug_dose1": "",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    drug_information = {
+        "antibiotic_drug_dose1": "1",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "To delete the drug you must also remove the drug dose"
+    )
+    InvestigationDatasetsPage(page).click_save_dataset_button()
+    InvestigationDatasetsPage(page).assert_drug_type_text(
+        "Antibiotics Administered", 1, ""
+    )
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        "Antibiotics Administered", 1, "1"
+    )
+
+    logging.info("STEP: The same drug cannot be entered more than once")
+
+    drug_information = {
+        "antibiotic_drug_type1": "",
+        "antibiotic_drug_dose1": "",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    drug_information = {
+        "antibiotic_drug_type1": AntibioticsAdministeredDrugTypeOptions.AMOXYCILLIN,
+        "antibiotic_drug_dose1": "1",
+        "antibiotic_drug_type2": AntibioticsAdministeredDrugTypeOptions.AMOXYCILLIN,
+        "antibiotic_drug_dose2": "2",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "You may not select the same Antibiotic more than once."
+    )
+    InvestigationDatasetsPage(page).click_save_dataset_button()
+    InvestigationDatasetsPage(page).assert_drug_type_text(
+        "Antibiotics Administered",
+        1,
+        AntibioticsAdministeredDrugTypeOptions.AMOXYCILLIN,
+    )
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        "Antibiotics Administered", 1, "1"
+    )
+    InvestigationDatasetsPage(page).assert_drug_type_text(
+        "Antibiotics Administered",
+        2,
+        AntibioticsAdministeredDrugTypeOptions.AMOXYCILLIN,
+    )
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        "Antibiotics Administered", 2, "2"
+    )
+
+    logging.info(
+        "STEP: Check that all drug Types can be entered, and the correct Dose units and, for drug type 'Other' an inline warning message, are displayed"
+    )
+
+    drug_information = {
+        "antibiotic_drug_type2": "",
+        "antibiotic_drug_dose2": "",
+        "antibiotic_drug_type1": "",
+        "antibiotic_drug_dose1": "",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    drug_information = {
+        "antibiotic_drug_type1": AntibioticsAdministeredDrugTypeOptions.AMOXYCILLIN,
+        "antibiotic_drug_dose1": "0.01",
+        "antibiotic_drug_type2": AntibioticsAdministeredDrugTypeOptions.CEFOTAXIME,
+        "antibiotic_drug_dose2": "2.2",
+        "antibiotic_drug_type3": AntibioticsAdministeredDrugTypeOptions.CIPROFLAXACIN,
+        "antibiotic_drug_dose3": "3.33",
+        "antibiotic_drug_type4": AntibioticsAdministeredDrugTypeOptions.CO_AMOXICLAV,
+        "antibiotic_drug_dose4": "4",
+        "antibiotic_drug_type5": AntibioticsAdministeredDrugTypeOptions.GENTAMICIN,
+        "antibiotic_drug_dose5": "5",
+        "antibiotic_drug_type6": AntibioticsAdministeredDrugTypeOptions.METRONIDAZOLE,
+        "antibiotic_drug_dose6": "6.06",
+        "antibiotic_drug_type7": AntibioticsAdministeredDrugTypeOptions.TEICOPLANIN,
+        "antibiotic_drug_dose7": "7",
+        "antibiotic_drug_type8": AntibioticsAdministeredDrugTypeOptions.VANCOMYCIN,
+        "antibiotic_drug_dose8": "8.88",
+        "antibiotic_drug_type9": AntibioticsAdministeredDrugTypeOptions.OTHER_ANTIBIOTIC,
+        "antibiotic_drug_dose9": "9999999.99",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_all_drug_information(
+        drug_information, "Antibiotics Administered"
     )
     LogoutPage(page).log_out()
 
@@ -1416,6 +1654,38 @@ def get_subject_with_new_colonoscopy_investigation_dataset() -> str:
     criteria = {
         "latest episode status": "open",
         "latest episode latest investigation dataset": "colonoscopy_new",
+    }
+    user = User()
+    subject = Subject()
+
+    builder = SubjectSelectionQueryBuilder()
+
+    query, bind_vars = builder.build_subject_selection_query(
+        criteria=criteria,
+        user=user,
+        subject=subject,
+        subjects_to_retrieve=1,
+    )
+
+    df = OracleDB().execute_query(query, bind_vars)
+    nhs_no = df.iloc[0]["subject_nhs_number"]
+    logging.info(f"NHS Number: {nhs_no}")
+    return nhs_no
+
+
+def get_subject_younger_than_70_with_new_colonsocopy_dataset() -> str:
+    """
+    Gets a subject with the following criteria:
+        "latest episode status": "open",
+        "latest episode latest investigation dataset": "colonoscopy_new",
+        "subject age": "< 70"
+    Returns:
+        str: The nhs number of a subject matching the criteria
+    """
+    criteria = {
+        "latest episode status": "open",
+        "latest episode latest investigation dataset": "colonoscopy_new",
+        "subject age": "< 70",
     }
     user = User()
     subject = Subject()
