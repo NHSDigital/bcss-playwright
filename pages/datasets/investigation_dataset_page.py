@@ -942,6 +942,13 @@ class InvestigationDatasetsPage(BasePage):
 
 
 def normalize_label(text: str) -> str:
+    """
+    Normalizes a label by removing extra whitespace and converting to lowercase.
+    Args:
+        text (str): The label text to normalize.
+    Returns:
+        str: The normalized label text.
+    """
     return re.sub(r"\s+", " ", text.replace("\xa0", " ")).strip().lower()
 
 

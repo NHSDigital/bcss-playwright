@@ -7,7 +7,6 @@ class SelectJobRolePage(BasePage):
 
     def __init__(self, page: Page):
         super().__init__(page)
-        self.page = page
         self.select_job_dropdown = self.page.locator("#selRole")
         self.continue_button = self.page.locator("#SelectButton")
 

@@ -120,8 +120,8 @@ class DatasetFieldUtil:
         Asserts that the first visible field to the right of the cell containing `text` has the expected value,
         ensuring it is in the same row (not just visually to the right).
         Args:
-            text (str): The label or text on the left-hand side.
-            expected_text (str): The text expected in the cell to the right.
+            text (str): The text in the left-hand cell.
+            expected_text (str): The expected value in the adjacent right-hand cell.
             div (str, optional): The ID of the container DIV. Defaults to None.
         Raises:
             AssertionError: If the expected text is not found.

@@ -181,7 +181,7 @@ def test_check_different_hub_roles_access_to_edit_endoscopy_investigation_datase
     check_role_access_to_edit_investigation_dataset(
         page,
         nhs_no,
-        role="Hub Director State Registered",
+        role="Hub Director State Registered at BCS03",
         edit_access=False,
         role_logging="ROLE: Hub Director - state registered : view only",
     )
@@ -191,7 +191,7 @@ def test_check_different_hub_roles_access_to_edit_endoscopy_investigation_datase
     check_role_access_to_edit_investigation_dataset(
         page,
         nhs_no,
-        role="Hub Manager",
+        role="Hub Manager at BCS01",
         edit_access=False,
         role_logging="ROLE: Hub Manager : view only",
     )
@@ -211,7 +211,7 @@ def test_check_different_hub_roles_access_to_edit_endoscopy_investigation_datase
     check_role_access_to_edit_investigation_dataset(
         page,
         nhs_no,
-        role="Team Leader",
+        role="Team Leader at BCS01",
         edit_access=False,
         role_logging="ROLE: Team Leader : view only",
     )
@@ -221,7 +221,7 @@ def test_check_different_hub_roles_access_to_edit_endoscopy_investigation_datase
     check_role_access_to_edit_investigation_dataset(
         page,
         nhs_no,
-        role="Senior Screening Assistant",
+        role="Senior Screening Assistant at BCS01",
         edit_access=False,
         role_logging="ROLE: Senior Screening Assistant : view only",
     )
@@ -231,7 +231,7 @@ def test_check_different_hub_roles_access_to_edit_endoscopy_investigation_datase
     check_role_access_to_edit_investigation_dataset(
         page,
         nhs_no,
-        role="Screening Assistant",
+        role="Screening Assistant at BCS02",
         edit_access=False,
         role_logging="ROLE: Screening Assistant : view only",
     )
@@ -276,7 +276,7 @@ def test_check_different_screening_centre_roles_access_to_edit_endoscopy_investi
     check_role_access_to_edit_investigation_dataset(
         page,
         nhs_no,
-        role="Screening Practioner at BCS001",
+        role="Screening Practitioner at BCS001",
         edit_access=True,
         role_logging="ROLE: Screening Practitioner (SP) : edit",
         role_type="Screening Practitioner",
@@ -287,7 +287,7 @@ def test_check_different_screening_centre_roles_access_to_edit_endoscopy_investi
     check_role_access_to_edit_investigation_dataset(
         page,
         nhs_no,
-        role="Assistant Screening Practitioner",
+        role="Assistant Screening Practitioner at BCS001",
         edit_access=True,
         role_logging="ROLE: Assistant Screening Practitioner (ASP) : edit",
     )
@@ -297,7 +297,7 @@ def test_check_different_screening_centre_roles_access_to_edit_endoscopy_investi
     check_role_access_to_edit_investigation_dataset(
         page,
         nhs_no,
-        role="BCSS Support - SC",
+        role="BCSS Support - SC at BCS001",
         edit_access=True,
         role_logging="ROLE: BCSS Support - SC : edit",
     )
@@ -318,7 +318,7 @@ def test_check_different_screening_centre_roles_access_to_edit_endoscopy_investi
     check_role_access_to_edit_investigation_dataset(
         page,
         nhs_no,
-        role="Screening Centre Clerk",
+        role="Screening Centre Clerk at BCS001",
         edit_access=False,
         role_logging="ROLE: Screening Centre Clerk : view only",
         role_type="Screening Centre Clerk",
@@ -344,7 +344,7 @@ def test_check_different_national_and_qa_roles_access_to_edit_endoscopy_investig
     check_role_access_to_edit_investigation_dataset(
         page,
         nhs_no,
-        role="National Data Analyst",
+        role="National Data Analyst at BCS0",
         edit_access=False,
         role_logging="ROLE: National Data Analyst : view only",
     )
@@ -354,7 +354,7 @@ def test_check_different_national_and_qa_roles_access_to_edit_endoscopy_investig
     check_role_access_to_edit_investigation_dataset(
         page,
         nhs_no,
-        role="National QA User",
+        role="National QA User at BCS0",
         edit_access=False,
         role_logging="ROLE: National QA User : view only",
     )
@@ -1275,7 +1275,7 @@ def check_role_access_to_edit_investigation_dataset(
 
     if (
         role == "Specialist Screening Practitioner at BCS009 & BCS001"
-        or role == "Assistant Screening Practitioner"
+        or role == "Assistant Screening Practitioner at BCS001"
     ):
         OrganisationSwitchPage(page).select_organisation_by_id("BCS001")
         OrganisationSwitchPage(page).click_continue()
