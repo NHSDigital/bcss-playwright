@@ -6,20 +6,17 @@ from pages.base_page import BasePage
 from utils.oracle.oracle_specific_functions import SubjectSelector
 from utils.oracle.oracle import OracleDB
 from pages.base_page import BasePage
+from pages.manual_cease.manual_cease_page import ManualCeasePage
 from utils import screening_subject_page_searcher
 from utils.user_tools import UserTools
-from utils.manual_cease import (
-    process_manual_cease_immediate,
-    process_manual_cease_with_disclaimer,
-    verify_manual_cease_db_fields_dynamic,
-    EXPECT,
-)
+from utils.manual_cease import EXPECT
 from utils.manual_cease import (
     ScreeningStatus,
     ScreeningStatusReason,
     ScreeningDueDateReason,
     SurveillanceDueDateReason,
 )
+from utils.manual_cease import ManualCeaseTools
 from datetime import datetime
 from typing import Any
 
@@ -56,7 +53,7 @@ def base_expected_db() -> dict[str, Any]:
 # These scenarios just check that manually ceasing a subject (either immediately or via a disclaimer letter) from different statuses correctly sets their screening status and status reason.
 # Screening due date reason is always set to "Ceased" during a manual cease, even if the SDD is not changing.
 @pytest.mark.vpn_required
-@pytest.mark.manual_cease
+@pytest.mark.manual_cease_tests
 @pytest.mark.regression
 def test_manual_cease_from_inactive_subject_for_informed_dissent(
     page: Page, base_expected_db
@@ -107,9 +104,7 @@ def test_manual_cease_from_inactive_subject_for_informed_dissent(
             "[SUBJECT NOT FOUND] Creating fallback subject for manual cease"
         )
 
-        from utils.manual_cease import create_manual_cease_ready_subject
-
-        nhs_number = create_manual_cease_ready_subject(
+        nhs_number = ManualCeaseTools.create_manual_cease_ready_subject(
             screening_centre=user_details["hub_code"], base_age=75
         )
 
@@ -120,19 +115,22 @@ def test_manual_cease_from_inactive_subject_for_informed_dissent(
     logging.info("[SUBJECT VIEW] Subject loaded in UI")
 
     # Manually cease subject with specified reason
-    process_manual_cease_with_disclaimer(page, reason="Informed Dissent")
+    manual_cease_page = ManualCeasePage(page)
+    ManualCeaseTools.process_manual_cease_with_disclaimer(
+        manual_cease_page, reason="Informed Dissent"
+    )
     logging.info("[CEASE ACTION] Manual cease triggered")
 
     # Perform UI field assertions
     today = datetime.today().strftime("%d/%m/%Y")  # Get today's date in required format
 
     # Define the shared locator
-    summary_table = page.locator("#screeningSummaryTable")
+    manual_cease_page = ManualCeasePage(page)
 
     # UI Assertions
-    expect(summary_table).to_contain_text("Ceased")
-    expect(summary_table).to_contain_text("Informed Dissent")
-    expect(summary_table).to_contain_text(today)
+    expect(manual_cease_page.summary_table).to_contain_text("Ceased")
+    expect(manual_cease_page.summary_table).to_contain_text("Informed Dissent")
+    expect(manual_cease_page.summary_table).to_contain_text(today)
 
     # DB assertions
     expected_db = {
@@ -144,12 +142,12 @@ def test_manual_cease_from_inactive_subject_for_informed_dissent(
     }
 
     # Fire off the DB asserts
-    verify_manual_cease_db_fields_dynamic(nhs_number, expected_db)
+    ManualCeaseTools.verify_manual_cease_db_fields_dynamic(nhs_number, expected_db)
     logging.info("[ASSERTIONS COMPLETE] Manual cease scenario validated successfully")
 
 
 @pytest.mark.vpn_required
-@pytest.mark.manual_cease
+@pytest.mark.manual_cease_tests
 @pytest.mark.regression
 def test_manual_cease_from_call_subject_for_informed_dissent_verbal_only(
     page: Page, base_expected_db
@@ -209,10 +207,7 @@ def test_manual_cease_from_call_subject_for_informed_dissent_verbal_only(
         logging.warning(
             "[SUBJECT NOT FOUND] Creating fallback subject for manual cease"
         )
-
-        from utils.manual_cease import create_manual_cease_ready_subject
-
-        nhs_number = create_manual_cease_ready_subject(
+        nhs_number = ManualCeaseTools.create_manual_cease_ready_subject(
             screening_centre=user_details["hub_code"], base_age=75
         )
 
@@ -223,17 +218,22 @@ def test_manual_cease_from_call_subject_for_informed_dissent_verbal_only(
     logging.info("[SUBJECT VIEW] Subject loaded in UI")
 
     # Manually cease subject with specified reason
-    process_manual_cease_immediate(page, reason="Informed Dissent (verbal only)")
+    manual_cease_page = ManualCeasePage(page)
+    ManualCeaseTools.process_manual_cease_immediate(
+        manual_cease_page, reason="Informed Dissent (verbal only)"
+    )
     logging.info("[CEASE ACTION] Manual cease triggered")
 
-    # Perform UI field assertions
+    # Define the shared locator and today's date
     today = datetime.today().strftime("%d/%m/%Y")  # Get today's date in required format
-    summary_table = page.locator("#screeningSummaryTable")
+    manual_cease_page = ManualCeasePage(page)
 
     # UI Assertions
-    expect(summary_table).to_contain_text("Ceased")
-    expect(summary_table).to_contain_text("Informed Dissent (verbal only)")
-    expect(summary_table).to_contain_text(today)
+    expect(manual_cease_page.summary_table).to_contain_text("Ceased")
+    expect(manual_cease_page.summary_table).to_contain_text(
+        "Informed Dissent (verbal only)"
+    )
+    expect(manual_cease_page.summary_table).to_contain_text(today)
 
     # DB assertions
     expected_db = {
@@ -252,12 +252,12 @@ def test_manual_cease_from_call_subject_for_informed_dissent_verbal_only(
     }
 
     # Fire off the DB asserts
-    verify_manual_cease_db_fields_dynamic(nhs_number, expected_db)
+    ManualCeaseTools.verify_manual_cease_db_fields_dynamic(nhs_number, expected_db)
     logging.info("[ASSERTIONS COMPLETE] Manual cease scenario validated successfully")
 
 
 @pytest.mark.vpn_required
-@pytest.mark.manual_cease
+@pytest.mark.manual_cease_tests
 @pytest.mark.regression
 def test_manual_cease_from_recall_subject_for_no_colon_subject_request(
     page: Page, base_expected_db
@@ -319,9 +319,7 @@ def test_manual_cease_from_recall_subject_for_no_colon_subject_request(
         logging.warning(
             "[SUBJECT NOT FOUND] Creating fallback subject for manual cease"
         )
-        from utils.manual_cease import create_manual_cease_ready_subject
-
-        nhs_number = create_manual_cease_ready_subject(
+        nhs_number = ManualCeaseTools.create_manual_cease_ready_subject(
             screening_centre=user_details["hub_code"], base_age=75
         )
         logging.info(f"[SUBJECT CREATED] Fallback NHS number: {nhs_number}")
@@ -331,16 +329,22 @@ def test_manual_cease_from_recall_subject_for_no_colon_subject_request(
     logging.info("[SUBJECT VIEW] Subject loaded in UI")
 
     # Perform manual cease with specified reason
-    process_manual_cease_with_disclaimer(page, reason="No Colon (subject request)")
+    manual_cease_page = ManualCeasePage(page)
+    ManualCeaseTools.process_manual_cease_with_disclaimer(
+        manual_cease_page, reason="No Colon (subject request)"
+    )
     logging.info("[CEASE ACTION] Manual cease triggered")
 
-    # UI assertions
+    # Define the shared locator and today's date
     today = datetime.today().strftime("%d/%m/%Y")
-    summary_table = page.locator("#screeningSummaryTable")
+    manual_cease_page = ManualCeasePage(page)
 
-    expect(summary_table).to_contain_text("Ceased")
-    expect(summary_table).to_contain_text("No Colon (subject request)")
-    expect(summary_table).to_contain_text(today)
+    # UI assertions
+    expect(manual_cease_page.summary_table).to_contain_text("Ceased")
+    expect(manual_cease_page.summary_table).to_contain_text(
+        "No Colon (subject request)"
+    )
+    expect(manual_cease_page.summary_table).to_contain_text(today)
 
     # DB field assertions
     expected_db = {
@@ -356,12 +360,12 @@ def test_manual_cease_from_recall_subject_for_no_colon_subject_request(
     }
 
     # Fire off the DB assertions
-    verify_manual_cease_db_fields_dynamic(nhs_number, expected_db)
+    ManualCeaseTools.verify_manual_cease_db_fields_dynamic(nhs_number, expected_db)
     logging.info("[ASSERTIONS COMPLETE] Manual cease scenario validated successfully")
 
 
 @pytest.mark.vpn_required
-@pytest.mark.manual_cease
+@pytest.mark.manual_cease_tests
 @pytest.mark.regression
 def test_manual_cease_from_surveillance_subject_for_no_colon_programme_assessed(
     page: Page, base_expected_db
@@ -415,9 +419,8 @@ def test_manual_cease_from_surveillance_subject_for_no_colon_programme_assessed(
         logging.info(f"[SUBJECT FOUND] Retrieved NHS number: {nhs_number}")
     except ValueError:
         logging.warning("[SUBJECT NOT FOUND] Creating fallback subject")
-        from utils.manual_cease import create_manual_cease_ready_subject
 
-        nhs_number = create_manual_cease_ready_subject(
+        nhs_number = ManualCeaseTools.create_manual_cease_ready_subject(
             screening_centre=user_details["hub_code"],
             base_age=76,
         )
@@ -426,15 +429,22 @@ def test_manual_cease_from_surveillance_subject_for_no_colon_programme_assessed(
     screening_subject_page_searcher.search_subject_by_nhs_number(page, nhs_number)
     logging.info("[SUBJECT VIEW] Subject loaded in UI")
 
-    process_manual_cease_immediate(page, reason="No Colon (programme assessed)")
+    manual_cease_page = ManualCeasePage(page)
+    ManualCeaseTools.process_manual_cease_immediate(
+        manual_cease_page, reason="No Colon (programme assessed)"
+    )
     logging.info("[CEASE ACTION] Manual cease triggered")
 
+    # Define the shared locator and today's date
     today = datetime.today().strftime("%d/%m/%Y")
-    summary_table = page.locator("#screeningSummaryTable")
+    manual_cease_page = ManualCeasePage(page)
 
-    expect(summary_table).to_contain_text("Ceased")
-    expect(summary_table).to_contain_text("No Colon (programme assessed)")
-    expect(summary_table).to_contain_text(today)
+    # UI Assertions
+    expect(manual_cease_page.summary_table).to_contain_text("Ceased")
+    expect(manual_cease_page.summary_table).to_contain_text(
+        "No Colon (programme assessed)"
+    )
+    expect(manual_cease_page.summary_table).to_contain_text(today)
 
     expected_db = {
         **base_expected_db,
@@ -451,14 +461,14 @@ def test_manual_cease_from_surveillance_subject_for_no_colon_programme_assessed(
         "Surveillance due date date of change": EXPECT.TODAY,
     }
 
-    verify_manual_cease_db_fields_dynamic(nhs_number, expected_db)
+    ManualCeaseTools.verify_manual_cease_db_fields_dynamic(nhs_number, expected_db)
     logging.info(
         "[ASSERTIONS COMPLETE] Surveillance cease scenario validated successfully"
     )
 
 
 @pytest.mark.vpn_required
-@pytest.mark.manual_cease
+@pytest.mark.manual_cease_tests
 @pytest.mark.regression
 def test_manual_cease_from_already_ceased_subject_for_informal_death(
     page: Page, base_expected_db
@@ -515,9 +525,8 @@ def test_manual_cease_from_already_ceased_subject_for_informal_death(
         logging.info(f"[SUBJECT FOUND] Retrieved NHS number: {nhs_number}")
     except ValueError:
         logging.warning("[SUBJECT NOT FOUND] Creating fallback ceased subject")
-        from utils.manual_cease import create_manual_cease_ready_subject
 
-        nhs_number = create_manual_cease_ready_subject(
+        nhs_number = ManualCeaseTools.create_manual_cease_ready_subject(
             screening_centre=user_details["hub_code"],
             base_age=77,
         )
@@ -526,15 +535,20 @@ def test_manual_cease_from_already_ceased_subject_for_informal_death(
     screening_subject_page_searcher.search_subject_by_nhs_number(page, nhs_number)
     logging.info("[SUBJECT VIEW] Subject loaded in UI")
 
-    process_manual_cease_immediate(page, reason="Informal Death")
+    manual_cease_page = ManualCeasePage(page)
+    ManualCeaseTools.process_manual_cease_immediate(
+        manual_cease_page, reason="Informal Death"
+    )
     logging.info("[CEASE ACTION] Manual cease triggered")
 
+    # Define the shared locator and today's date
     today = datetime.today().strftime("%d/%m/%Y")
-    summary_table = page.locator("#screeningSummaryTable")
+    manual_cease_page = ManualCeasePage(page)
 
-    expect(summary_table).to_contain_text("Ceased")
-    expect(summary_table).to_contain_text("Informal Death")
-    expect(summary_table).to_contain_text(today)
+    # UI Assertions
+    expect(manual_cease_page.summary_table).to_contain_text("Ceased")
+    expect(manual_cease_page.summary_table).to_contain_text("Informal Death")
+    expect(manual_cease_page.summary_table).to_contain_text(today)
 
     expected_db = {
         **base_expected_db,
@@ -552,14 +566,14 @@ def test_manual_cease_from_already_ceased_subject_for_informal_death(
         "Surveillance due date date of change": EXPECT.UNCHANGED,
     }
 
-    verify_manual_cease_db_fields_dynamic(nhs_number, expected_db)
+    ManualCeaseTools.verify_manual_cease_db_fields_dynamic(nhs_number, expected_db)
     logging.info(
         "[ASSERTIONS COMPLETE] Informal Death cease scenario validated successfully"
     )
 
 
 @pytest.mark.vpn_required
-@pytest.mark.manual_cease
+@pytest.mark.manual_cease_tests
 @pytest.mark.regression
 def test_manual_cease_from_already_ceased_subject_for_no_colon_subject_request(
     page: Page, base_expected_db
@@ -618,9 +632,8 @@ def test_manual_cease_from_already_ceased_subject_for_no_colon_subject_request(
     except ValueError:
         # If no matching subject exists, create a fallback one
         logging.warning("[SUBJECT NOT FOUND] Creating fallback ceased subject")
-        from utils.manual_cease import create_manual_cease_ready_subject
 
-        nhs_number = create_manual_cease_ready_subject(
+        nhs_number = ManualCeaseTools.create_manual_cease_ready_subject(
             screening_centre=user_details["hub_code"],
             base_age=75,
         )
@@ -631,13 +644,20 @@ def test_manual_cease_from_already_ceased_subject_for_no_colon_subject_request(
     logging.info("[SUBJECT VIEW] Subject loaded in UI")
 
     # Manually cease the subject with the specified reason
-    process_manual_cease_with_disclaimer(page, reason="No Colon (subject request)")
+    manual_cease_page = ManualCeasePage(page)
+    ManualCeaseTools.process_manual_cease_with_disclaimer(
+        manual_cease_page, reason="No Colon (subject request)"
+    )
     logging.info("[CEASE ACTION] Manual cease triggered")
 
-    # Validate UI contains updated cease information
-    summary_table = page.locator("#screeningSummaryTable")
-    expect(summary_table).to_contain_text("Ceased")
-    expect(summary_table).to_contain_text("No Colon (subject request)")
+    # Define shared locator
+    manual_cease_page = ManualCeasePage(page)
+
+    # UI Assertions
+    expect(manual_cease_page.summary_table).to_contain_text("Ceased")
+    expect(manual_cease_page.summary_table).to_contain_text(
+        "No Colon (subject request)"
+    )
 
     # Define expected database values post-cease
     expected_db = {
@@ -657,5 +677,5 @@ def test_manual_cease_from_already_ceased_subject_for_no_colon_subject_request(
     }
 
     # Verify database updates match expected values
-    verify_manual_cease_db_fields_dynamic(nhs_number, expected_db)
+    ManualCeaseTools.verify_manual_cease_db_fields_dynamic(nhs_number, expected_db)
     logging.info("[ASSERTIONS COMPLETE] No Colon cease scenario validated successfully")

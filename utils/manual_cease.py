@@ -1,177 +1,246 @@
 import logging
-from playwright.sync_api import Page
 import pandas as pd
 from utils.oracle.oracle import OracleDB
 from pages.base_page import BasePage
 from datetime import datetime, date
-from playwright.sync_api import Page
 from enum import IntEnum
-
-BTN_REQUEST_CEASE_SELECTOR = "input[name='BTN_REQUEST_CEASE']"
-
-
-def create_manual_cease_ready_subject(
-    screening_centre: str = "BCS002", base_age: int = 75
-) -> str:
-    """
-    Creates a subject with 'Inactive' screening status suitable for manual cease.
-    Executes timeline progression to match expected system behavior.
-
-    Args:
-        screening_centre (str): Screening centre code for subject association.
-        base_age (int): Minimum age to filter subject candidates.
-
-    Returns:
-        str: NHS number of the created subject.
-    """
-    from utils.oracle.oracle import OracleSubjectTools  # import here to avoid circulars
-
-    oracle_subject = OracleSubjectTools()
-    oracle_subject.create_subjects_via_sspi(
-        count=1,
-        screening_centre=screening_centre,
-        base_age=base_age,
-        start_offset=-2,
-        end_offset=3,
-        nhs_start=9300000000,
-    )
-
-    query = """
-        SELECT s.SUBJECT_NHS_NUMBER
-        FROM SCREENING_SUBJECT_T s
-        WHERE s.SCREENING_STATUS_ID = 4002
-        ORDER BY s.SUBJECT_NHS_NUMBER DESC
-        FETCH FIRST 1 ROWS ONLY
-    """
-    df = OracleDB().execute_query(query)
-
-    if df.empty:
-        raise RuntimeError("No Inactive subject found post creation")
-
-    nhs_number = df.iloc[0]["subject_nhs_number"]
-    logging.info(f"[SUBJECT CREATED - INACTIVE] NHS number: {nhs_number}")
-
-    nhs_df = pd.DataFrame({"subject_nhs_number": [nhs_number]})
-    OracleDB().exec_bcss_timed_events(nhs_df)
-
-    logging.info(
-        f"[TIMED EVENTS COMPLETE] Subject ready for manual cease: {nhs_number}"
-    )
-    return nhs_number
-
-
+from pages.manual_cease.manual_cease_page import ManualCeasePage
 from playwright.sync_api import TimeoutError
 
 
-def process_manual_cease_with_disclaimer(
-    page: Page, reason: str = "Informed Dissent"
-) -> None:
+class ManualCeaseTools:
     """
-    Executes the full (non-immediate) manual cease workflow via UI, including:
-    - Optional steps: Requesting cease, selecting reason, saving
-    - Required steps: Sending disclaimer letter, recording return, finalizing cease
-
-    Args:
-        page (Page): Playwright page object representing the browser session.
-        reason (str): Cease reason to select from the dropdown.
+    This class provides utility functions for handling manual ceases in the BCSS system.
+    It includes methods to create subjects ready for manual cease and to process manual ceases.
     """
-    logging.info("[MANUAL CEASE] Starting full cease workflow")
 
-    try:
-        # Check if Request Cease button is visible
-        page.locator(BTN_REQUEST_CEASE_SELECTOR).wait_for(timeout=3000)
-        logging.info(
-            "[CHECK] 'Request Cease' button is present — proceeding with steps 1-3"
+    # Map readable labels to real DB columns
+    _DYNAMIC_COLUMN_MAP = {
+        "Screening Status": "screening_status_id",
+        "Screening Status Reason": "ss_reason_for_change_id",
+        "Screening Status Date of Change": "screening_status_change_date",
+        "Screening Due Date Reason": "sdd_reason_for_change_id",
+        "Screening Due Date": "screening_due_date",
+        "Ceased Confirmation Details": "ceased_confirmation_details",
+        "Ceased Confirmation Date": "ceased_confirmation_recd_date",
+        "Clinical Reason for Cease": "lynch_sdd_reason_for_change_id",
+        "Calculated FOBT Due Date": "calculated_sdd",
+        "Calculated Lynch Due Date": "lynch_calculated_sdd",
+        "Calculated Surveillance Due Date": "calculated_sdd",
+        "Lynch due date": "lynch_screening_due_date",
+        "Lynch due date reason": "lynch_sdd_reason_for_change_id",
+        "Lynch due date date of change": "lynch_sdd_change_date",
+        "Screening due date date of change": "screening_status_change_date",
+        "Surveillance due date": "surveillance_screen_due_date",
+        "Surveillance due date reason": "sdd_reason_for_change_id",
+        "Surveillance due date date of change": "surveillance_sdd_change_date",
+    }
+
+    @staticmethod
+    def create_manual_cease_ready_subject(
+        screening_centre: str = "BCS002", base_age: int = 75
+    ) -> str:
+        """
+        Creates a subject with 'Inactive' screening status suitable for manual cease.
+        Executes timeline progression to match expected system behavior.
+
+        Args:
+            screening_centre (str): Screening centre code for subject association.
+            base_age (int): Minimum age to filter subject candidates.
+
+        Returns:
+            str: NHS number of the created subject.
+        """
+        from utils.oracle.oracle import (
+            OracleSubjectTools,
+        )  # import here to avoid circulars
+
+        oracle_subject = OracleSubjectTools()
+        oracle_subject.create_subjects_via_sspi(
+            count=1,
+            screening_centre=screening_centre,
+            base_age=base_age,
+            start_offset=-2,
+            end_offset=3,
+            nhs_start=9300000000,
         )
 
+        query = """
+            SELECT s.SUBJECT_NHS_NUMBER
+            FROM SCREENING_SUBJECT_T s
+            WHERE s.SCREENING_STATUS_ID = 4002
+            ORDER BY s.SUBJECT_NHS_NUMBER DESC
+            FETCH FIRST 1 ROWS ONLY
+        """
+        df = OracleDB().execute_query(query)
+
+        if df.empty:
+            raise RuntimeError("No Inactive subject found post creation")
+
+        nhs_number = df.iloc[0]["subject_nhs_number"]
+        logging.info(f"[SUBJECT CREATED - INACTIVE] NHS number: {nhs_number}")
+
+        nhs_df = pd.DataFrame({"subject_nhs_number": [nhs_number]})
+        OracleDB().exec_bcss_timed_events(nhs_df)
+
+        logging.info(
+            f"[TIMED EVENTS COMPLETE] Subject ready for manual cease: {nhs_number}"
+        )
+        return nhs_number
+
+    @staticmethod
+    def process_manual_cease_with_disclaimer(
+        manual_cease_page: ManualCeasePage, reason: str = "Informed Dissent"
+    ) -> None:
+        """
+        Executes the full (non-immediate) manual cease workflow via UI, including:
+        - Optional steps: Requesting cease, selecting reason, saving
+        - Required steps: Sending disclaimer letter, recording return, finalizing cease
+
+        Args:
+            page (Page): Playwright page object representing the browser session.
+            reason (str): Cease reason to select from the dropdown.
+        """
+        logging.info("[MANUAL CEASE] Starting full cease workflow")
+
+        try:
+            # Check if Request Cease button is visible (if not, move to step 4)
+            manual_cease_page.request_cease_button.wait_for(timeout=3000)
+            logging.info(
+                "[CHECK] 'Request Cease' button is present — proceeding with steps 1-3"
+            )
+
+            # Step 1: Click "Request Cease"
+            manual_cease_page.request_cease_button.click()
+            logging.info("[STEP 1] Clicked 'Request Cease'")
+
+            # Step 2: Select reason
+            manual_cease_page.cease_reason_dropdown.select_option(label=reason)
+            logging.info(f"[STEP 2] Selected cease reason: {reason}")
+
+            # Step 3: Save cease request
+            manual_cease_page.save_request_cease_button.click()
+            logging.info("[STEP 3] Clicked 'Save Request Cease'")
+
+        except TimeoutError:
+            logging.info(
+                "[CHECK] 'Request Cease' button not found — skipping steps 1-3"
+            )
+
+        # Step 4: Record Disclaimer Letter Sent
+        manual_cease_page.record_disclaimer_sent_button.click()
+        logging.info("[STEP 4] Clicked 'Record Disclaimer Letter Sent'")
+
+        # Step 5: Confirm manual sending of disclaimer letter
+        manual_cease_page.confirm_disclaimer_sent_button.click()
+        logging.info("[STEP 5] Confirmed disclaimer letter sent")
+
+        # Step 6: Record Return of Disclaimer letter
+        manual_cease_page.record_return_disclaimer_button.click()
+        logging.info("[STEP 6] Clicked 'Record Return of Disclaimer Letter'")
+
+        # Step 7: Final confirmation (Record Informed Dissent screen)
+        manual_cease_page.notes_field.fill("AUTO TEST: notes")
+        today_str = datetime.today().strftime("%d/%m/%Y")
+        manual_cease_page.date_confirmed_field.fill(today_str)
+        logging.info(f"[STEP 7] Entered date: {today_str} and note")
+
+        BasePage(manual_cease_page.page).safe_accept_dialog(
+            manual_cease_page.confirm_cease_button
+        )
+        logging.info("[STEP 8] Clicked 'Confirm Cease'")
+
+    @staticmethod
+    def process_manual_cease_immediate(
+        manual_cease_page: ManualCeasePage, reason: str = "Informed Dissent"
+    ) -> None:
+        """
+        Executes the manual cease workflow via UI. Handles both standard and simplified cease paths:
+        - Clicks 'Request Cease'
+        - Selects cease reason from dropdown
+        - Conditionally enters notes and date if visible
+        - Clicks either 'Confirm Cease' or 'Save Request Cease'
+
+        Args:
+            page (Page): Playwright page object representing the browser session.
+            reason (str): Cease reason to select from the dropdown.
+        """
+        logging.info("[MANUAL CEASE] Starting full cease workflow")
+
         # Step 1: Click "Request Cease"
-        page.locator(BTN_REQUEST_CEASE_SELECTOR).click()
+        manual_cease_page.request_cease_button.click()
         logging.info("[STEP 1] Clicked 'Request Cease'")
 
-        # Step 2: Select reason
-        page.locator("#A_C_RequestCeaseReason").select_option(label=reason)
+        # Step 2: Select reason from dropdown
+        manual_cease_page.cease_reason_dropdown.select_option(label=reason)
         logging.info(f"[STEP 2] Selected cease reason: {reason}")
 
-        # Step 3: Save cease request
-        page.locator("input[name='BTN_SAVE']").click()
-        logging.info("[STEP 3] Clicked 'Save Request Cease'")
+        # Step 3: Conditionally enter notes and today's date
+        today_str = datetime.today().strftime("%d/%m/%Y")
 
-    except TimeoutError:
-        logging.info("[CHECK] 'Request Cease' button not found — skipping steps 1-3")
+        if manual_cease_page.notes_textbox.is_visible():
+            manual_cease_page.notes_textbox.fill("AUTO TEST: notes")
+            logging.info("[STEP 3] Entered note")
 
-    # Step 4: Record Disclaimer Letter Sent
-    page.get_by_role("button", name="Record Disclaimer Letter Sent").click()
-    logging.info("[STEP 4] Clicked 'Record Disclaimer Letter Sent'")
+        if manual_cease_page.date_confirmed_field.is_visible():
+            manual_cease_page.date_confirmed_field.fill(today_str)
+            logging.info(f"[STEP 3] Entered date: {today_str}")
 
-    # Step 5: Confirm manual sending of disclaimer letter
-    page.get_by_role("button", name="Confirm").click()
-    logging.info("[STEP 5] Confirmed disclaimer letter sent")
+        # Step 4: Confirm cease via available button
+        if manual_cease_page.confirm_cease_button.is_visible():
+            BasePage(manual_cease_page.page).safe_accept_dialog(
+                manual_cease_page.confirm_cease_button
+            )
+            logging.info("[STEP 4] Clicked 'Confirm Cease'")
+        elif manual_cease_page.save_request_cease_button.is_visible():
+            manual_cease_page.save_request_cease_button.click()
+            logging.info("[STEP 4] Clicked 'Save Request Cease'")
+        else:
+            logging.error("[STEP 4] No cease confirmation button found!")
+            raise RuntimeError("Cease button not found on the page")
 
-    # Step 6: Record Return of Disclaimer letter
-    page.get_by_role("button", name="Record Return of Disclaimer Letter").click()
-    logging.info("[STEP 6] Clicked 'Record Return of Disclaimer Letter'")
+    @staticmethod
+    def verify_manual_cease_db_fields_dynamic(
+        nhs_number: str, expected: dict[str, object]
+    ) -> None:
+        """
+        Dynamically builds SELECT query based on only expected fields.
+        Prevents breakage when invalid columns are present in static map.
+        """
+        cols_sql = ",\n    ".join(
+            f'{ManualCeaseTools._DYNAMIC_COLUMN_MAP[label]} AS "{label}"'
+            for label in expected
+            if label in ManualCeaseTools._DYNAMIC_COLUMN_MAP
+        )
 
-    # Step 7: Final confirmation (Record Informed Dissent screen)
-    page.get_by_label("Notes").fill("AUTO TEST: notes")
-    today_str = datetime.today().strftime("%d/%m/%Y")
-    page.get_by_label("Date Confirmed").fill(today_str)
-    logging.info(f"[STEP 7] Entered date: {today_str} and note")
+        query = f"""
+            SELECT
+                {cols_sql}
+            FROM SCREENING_SUBJECT_T
+            WHERE SUBJECT_NHS_NUMBER = :nhs_number
+        """
 
-    BasePage(page).safe_accept_dialog(page.get_by_role("button", name="Confirm Cease"))
-    logging.info("[STEP 8] Clicked 'Confirm Cease'")
+        df = OracleDB().execute_query(query, {"nhs_number": nhs_number})
+        if df.empty:
+            raise AssertionError(f"No DB record for NHS {nhs_number}")
 
+        row = df.iloc[0]
 
-def process_manual_cease_immediate(
-    page: Page, reason: str = "Informed Dissent"
-) -> None:
-    """
-    Executes the manual cease workflow via UI. Handles both standard and simplified cease paths:
-    - Clicks 'Request Cease'
-    - Selects cease reason from dropdown
-    - Conditionally enters notes and date if visible
-    - Clicks either 'Confirm Cease' or 'Save Request Cease'
+        for label, exp in expected.items():
+            actual = row[label]
 
-    Args:
-        page (Page): Playwright page object representing the browser session.
-        reason (str): Cease reason to select from the dropdown.
-    """
-    logging.info("[MANUAL CEASE] Starting full cease workflow")
+            if exp is EXPECT.TODAY:
+                today_str = date.today().isoformat()
+                assert str(actual).startswith(today_str), f"{label}: expected today"
 
-    # Step 1: Click "Request Cease"
-    page.locator(BTN_REQUEST_CEASE_SELECTOR).click()
-    logging.info("[STEP 1] Clicked 'Request Cease'")
+            elif exp is EXPECT.NULL:
+                assert pd.isna(actual), f"{label}: expected NULL"
 
-    # Step 2: Select reason from dropdown
-    page.locator("#A_C_RequestCeaseReason").select_option(label=reason)
-    logging.info(f"[STEP 2] Selected cease reason: {reason}")
+            elif exp is EXPECT.UNCHANGED:
+                _ = actual  # pass if exists
 
-    # Step 3: Conditionally enter notes and today's date
-    notes_locator = page.get_by_role("textbox", name="Notes (up to 500 char)")
-    date_locator = page.get_by_label("Date Confirmed")
-
-    today_str = datetime.today().strftime("%d/%m/%Y")
-
-    if notes_locator.is_visible():
-        notes_locator.fill("AUTO TEST: notes")
-        logging.info("[STEP 3] Entered note")
-
-    if date_locator.is_visible():
-        date_locator.fill(today_str)
-        logging.info(f"[STEP 3] Entered date: {today_str}")
-
-    # Step 4: Confirm cease via available button
-    confirm_button = page.get_by_role("button", name="Confirm Cease")
-    save_button = page.locator("input[name='BTN_SAVE'][value='Save Request Cease']")
-
-    if confirm_button.is_visible():
-        BasePage(page).safe_accept_dialog(confirm_button)
-        logging.info("[STEP 4] Clicked 'Confirm Cease'")
-    elif save_button.is_visible():
-        save_button.click()
-        logging.info("[STEP 4] Clicked 'Save Request Cease'")
-    else:
-        logging.error("[STEP 4] No cease confirmation button found!")
-        raise RuntimeError("Cease button not found on the page")
+            else:
+                assert actual == exp, f"{label}: expected {exp!r}, got {actual!r}"
 
 
 # Markers for special assertions
@@ -180,72 +249,6 @@ class EXPECT:
     NULL = object()  # DB value must be NULL
     UNCHANGED = object()  # Column must exist (no change)
     MATCH_USER_ID = object()  # Must be an integer user ID
-
-
-# Map readable labels to real DB columns
-_DYNAMIC_COLUMN_MAP = {
-    "Screening Status": "screening_status_id",
-    "Screening Status Reason": "ss_reason_for_change_id",
-    "Screening Status Date of Change": "screening_status_change_date",
-    "Screening Due Date Reason": "sdd_reason_for_change_id",
-    "Screening Due Date": "screening_due_date",
-    "Ceased Confirmation Details": "ceased_confirmation_details",
-    "Ceased Confirmation Date": "ceased_confirmation_recd_date",
-    "Clinical Reason for Cease": "lynch_sdd_reason_for_change_id",
-    "Calculated FOBT Due Date": "calculated_sdd",
-    "Calculated Lynch Due Date": "lynch_calculated_sdd",
-    "Calculated Surveillance Due Date": "calculated_sdd",
-    "Lynch due date": "lynch_screening_due_date",
-    "Lynch due date reason": "lynch_sdd_reason_for_change_id",
-    "Lynch due date date of change": "lynch_sdd_change_date",
-    "Screening due date date of change": "screening_status_change_date",
-    "Surveillance due date": "surveillance_screen_due_date",
-    "Surveillance due date reason": "sdd_reason_for_change_id",
-    "Surveillance due date date of change": "surveillance_sdd_change_date",
-}
-
-
-def verify_manual_cease_db_fields_dynamic(
-    nhs_number: str, expected: dict[str, object]
-) -> None:
-    """
-    Dynamically builds SELECT query based on only expected fields.
-    Prevents breakage when invalid columns are present in static map.
-    """
-    cols_sql = ",\n    ".join(
-        f'{_DYNAMIC_COLUMN_MAP[label]} AS "{label}"'
-        for label in expected
-        if label in _DYNAMIC_COLUMN_MAP
-    )
-
-    query = f"""
-        SELECT
-            {cols_sql}
-        FROM SCREENING_SUBJECT_T
-        WHERE SUBJECT_NHS_NUMBER = :nhs_number
-    """
-
-    df = OracleDB().execute_query(query, {"nhs_number": nhs_number})
-    if df.empty:
-        raise AssertionError(f"No DB record for NHS {nhs_number}")
-
-    row = df.iloc[0]
-
-    for label, exp in expected.items():
-        actual = row[label]
-
-        if exp is EXPECT.TODAY:
-            today_str = date.today().isoformat()
-            assert str(actual).startswith(today_str), f"{label}: expected today"
-
-        elif exp is EXPECT.NULL:
-            assert pd.isna(actual), f"{label}: expected NULL"
-
-        elif exp is EXPECT.UNCHANGED:
-            _ = actual  # pass if exists
-
-        else:
-            assert actual == exp, f"{label}: expected {exp!r}, got {actual!r}"
 
 
 class ScreeningStatus(IntEnum):
