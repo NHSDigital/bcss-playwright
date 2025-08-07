@@ -51,6 +51,11 @@ drug_information = get_default_drug_information()
 endoscopy_information = get_default_endoscopy_information()
 
 
+@pytest.mark.regression
+@pytest.mark.vpn_required
+@pytest.mark.investigation_dataset_tests
+@pytest.mark.bcss_additional_tests
+@pytest.mark.colonoscopy_dataset_tests
 @pytest.mark.skip(reason="Marked with ignore tag in the Selenium Framework")
 def test_record_a_dataset_with_100_polyps_or_more(
     page: Page,
@@ -160,6 +165,7 @@ def test_record_a_dataset_with_100_polyps_or_more(
 
 
 @pytest.mark.regression
+@pytest.mark.vpn_required
 @pytest.mark.investigation_dataset_tests
 @pytest.mark.bcss_additional_tests
 @pytest.mark.colonoscopy_dataset_tests
@@ -234,6 +240,7 @@ def test_check_different_hub_roles_access_to_edit_endoscopy_investigation_datase
 
 
 @pytest.mark.regression
+@pytest.mark.vpn_required
 @pytest.mark.investigation_dataset_tests
 @pytest.mark.bcss_additional_tests
 @pytest.mark.colonoscopy_dataset_tests
@@ -321,6 +328,7 @@ def test_check_different_screening_centre_roles_access_to_edit_endoscopy_investi
 
 
 @pytest.mark.regression
+@pytest.mark.vpn_required
 @pytest.mark.investigation_dataset_tests
 @pytest.mark.bcss_additional_tests
 @pytest.mark.colonoscopy_dataset_tests
@@ -355,6 +363,7 @@ def test_check_different_national_and_qa_roles_access_to_edit_endoscopy_investig
 
 
 @pytest.mark.regression
+@pytest.mark.vpn_required
 @pytest.mark.investigation_dataset_tests
 @pytest.mark.bcss_additional_tests
 @pytest.mark.colonoscopy_dataset_tests
@@ -458,6 +467,7 @@ def test_check_correct_sections_displayed_in_colonoscopy_investigation_dataset(
 
 
 @pytest.mark.regression
+@pytest.mark.vpn_required
 @pytest.mark.investigation_dataset_tests
 @pytest.mark.bcss_additional_tests
 @pytest.mark.colonoscopy_dataset_tests
@@ -554,6 +564,7 @@ def test_check_field_visibility_and_default_values_in_colonoscopy_investigation_
 
 
 @pytest.mark.regression
+@pytest.mark.vpn_required
 @pytest.mark.investigation_dataset_tests
 @pytest.mark.bcss_additional_tests
 @pytest.mark.colonoscopy_dataset_tests
@@ -633,6 +644,7 @@ def test_check_cross_field_validation_is_mandatory_at_completion(page: Page) -> 
 
 
 @pytest.mark.regression
+@pytest.mark.vpn_required
 @pytest.mark.investigation_dataset_tests
 @pytest.mark.bcss_additional_tests
 @pytest.mark.colonoscopy_dataset_tests
@@ -696,6 +708,7 @@ def test_check_behaviour_of_aspirant_endoscopist_fields(page: Page) -> None:
 
 
 @pytest.mark.regression
+@pytest.mark.vpn_required
 @pytest.mark.investigation_dataset_tests
 @pytest.mark.bcss_additional_tests
 @pytest.mark.colonoscopy_dataset_tests
@@ -829,6 +842,7 @@ def test_check_dropdown_lists_and_default_values_for_drug_information(
 
 
 @pytest.mark.regression
+@pytest.mark.vpn_required
 @pytest.mark.investigation_dataset_tests
 @pytest.mark.bcss_additional_tests
 @pytest.mark.colonoscopy_dataset_tests
