@@ -1248,6 +1248,73 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
     LogoutPage(page).log_out()
 
 
+@pytest.mark.regression
+@pytest.mark.vpn_required
+@pytest.mark.investigation_dataset_tests
+@pytest.mark.bcss_additional_tests
+@pytest.mark.colonoscopy_dataset_tests
+def test_check_behaviour_of_aspirant_endoscopist_fields_in_incomplete_dataset(
+    page: Page,
+) -> None:
+    """
+    Scenario: Check the behaviour of the Aspirant Endoscopist fields
+    This tests:
+    > Aspirant Endoscopist Not Present field is enabled until an Aspirant Endoscopist is selected
+    > If Aspirant Endoscopist Not Present is ticked, it is automatically unticked and disabled when an Aspirant Endoscopist is selected
+    > Aspirant Endoscopist Participation is only displayed if an Aspirant Endoscopist is selected
+    > Aspirant Endoscopist Participation is only displayed if an Aspirant Endoscopist defaults to Operator
+    """
+    nhs_no = get_subject_with_new_colonoscopy_investigation_dataset()
+
+    UserTools.user_login(page, "Screening Centre Manager at BCS001")
+
+    BasePage(page).go_to_screening_subject_search_page()
+    search_subject_episode_by_nhs_number(page, nhs_no)
+
+    SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_investigation_show_datasets()
+
+    InvestigationDatasetsPage(page).bowel_cancer_screening_page_title_contains_text(
+        "Investigation Datasets"
+    )
+
+    assert (
+        InvestigationDatasetsPage(page).are_fields_on_page(
+            "Investigation Dataset", None, ["Aspirant Endoscopist"]
+        )
+    ) is True, "Aspirant Endoscopist field is not visible when it should be"
+    logging.info("Aspirant Endoscopist field is visible")
+
+    assert (
+        InvestigationDatasetsPage(page).are_fields_on_page(
+            "Investigation Dataset",
+            None,
+            ["Aspirant Endoscopist Participation"],
+            visible=False,
+        )
+    ) is True, (
+        "Aspirant Endoscopist Participation field is visible when it should not be"
+    )
+    logging.info("Aspirant Endoscopist Participation field is not visible")
+
+    InvestigationDatasetsPage(page).check_aspirant_endoscopist_not_present()
+    DatasetFieldUtil(page).assert_checkbox_to_right_is_ticked_or_not(
+        "Aspirant Endoscopist lookup", "Ticked"
+    )
+    InvestigationDatasetsPage(page).select_aspirant_endoscopist_option_index(-1)
+    DatasetFieldUtil(page).assert_checkbox_to_right_is_enabled(
+        "Aspirant Endoscopist lookup", False
+    )
+
+    DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
+        "Aspirant Endoscopist Participation", "Operator"
+    )
+    DatasetFieldUtil(page).assert_select_to_right_has_values(
+        "Aspirant Endoscopist Participation", ["Operator", "Spectator"]
+    )
+    LogoutPage(page).log_out()
+
+
 def check_role_access_to_edit_investigation_dataset(
     page: Page,
     nhs_no: str,
