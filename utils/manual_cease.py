@@ -1,7 +1,6 @@
 import logging
 import pandas as pd
 from utils.oracle.oracle import OracleDB
-from pages.base_page import BasePage
 from datetime import datetime, date
 from enum import IntEnum
 from pages.manual_cease.manual_cease_page import ManualCeasePage
@@ -111,15 +110,15 @@ class ManualCeaseTools:
             )
 
             # Step 1: Click "Request Cease"
-            manual_cease_page.request_cease_button.click()
+            manual_cease_page.click_request_cease()
             logging.info("[STEP 1] Clicked 'Request Cease'")
 
             # Step 2: Select reason
-            manual_cease_page.cease_reason_dropdown.select_option(label=reason)
+            manual_cease_page.select_cease_reason(reason)
             logging.info(f"[STEP 2] Selected cease reason: {reason}")
 
             # Step 3: Save cease request
-            manual_cease_page.save_request_cease_button.click()
+            manual_cease_page.click_save_request_cease()
             logging.info("[STEP 3] Clicked 'Save Request Cease'")
 
         except TimeoutError:
@@ -128,26 +127,23 @@ class ManualCeaseTools:
             )
 
         # Step 4: Record Disclaimer Letter Sent
-        manual_cease_page.record_disclaimer_sent_button.click()
+        manual_cease_page.record_disclaimer_sent()
         logging.info("[STEP 4] Clicked 'Record Disclaimer Letter Sent'")
 
         # Step 5: Confirm manual sending of disclaimer letter
-        manual_cease_page.confirm_disclaimer_sent_button.click()
+        manual_cease_page.confirm_disclaimer_sent()
         logging.info("[STEP 5] Confirmed disclaimer letter sent")
 
         # Step 6: Record Return of Disclaimer letter
-        manual_cease_page.record_return_disclaimer_button.click()
+        manual_cease_page.record_return_of_disclaimer()
         logging.info("[STEP 6] Clicked 'Record Return of Disclaimer Letter'")
 
         # Step 7: Final confirmation (Record Informed Dissent screen)
-        manual_cease_page.notes_field.fill("AUTO TEST: notes")
-        today_str = datetime.today().strftime("%d/%m/%Y")
-        manual_cease_page.date_confirmed_field.fill(today_str)
-        logging.info(f"[STEP 7] Entered date: {today_str} and note")
+        manual_cease_page.fill_notes_and_date()
+        logging.info(f"[STEP 7] Entered note and today's date")
 
-        BasePage(manual_cease_page.page).safe_accept_dialog(
-            manual_cease_page.confirm_cease_button
-        )
+        # Step 8: Confirm cease
+        manual_cease_page.confirm_cease()
         logging.info("[STEP 8] Clicked 'Confirm Cease'")
 
     @staticmethod
@@ -168,36 +164,22 @@ class ManualCeaseTools:
         logging.info("[MANUAL CEASE] Starting full cease workflow")
 
         # Step 1: Click "Request Cease"
-        manual_cease_page.request_cease_button.click()
+        manual_cease_page.click_request_cease()
         logging.info("[STEP 1] Clicked 'Request Cease'")
 
         # Step 2: Select reason from dropdown
-        manual_cease_page.cease_reason_dropdown.select_option(label=reason)
+        manual_cease_page.select_cease_reason(reason)
         logging.info(f"[STEP 2] Selected cease reason: {reason}")
 
         # Step 3: Conditionally enter notes and today's date
         today_str = datetime.today().strftime("%d/%m/%Y")
-
-        if manual_cease_page.notes_textbox.is_visible():
-            manual_cease_page.notes_textbox.fill("AUTO TEST: notes")
-            logging.info("[STEP 3] Entered note")
-
-        if manual_cease_page.date_confirmed_field.is_visible():
-            manual_cease_page.date_confirmed_field.fill(today_str)
-            logging.info(f"[STEP 3] Entered date: {today_str}")
+        manual_cease_page.fill_notes_if_visible()
+        manual_cease_page.fill_date_if_visible(today_str)
+        logging.info("[STEP 3] Entered note and today's date: {date_str}")
 
         # Step 4: Confirm cease via available button
-        if manual_cease_page.confirm_cease_button.is_visible():
-            BasePage(manual_cease_page.page).safe_accept_dialog(
-                manual_cease_page.confirm_cease_button
-            )
-            logging.info("[STEP 4] Clicked 'Confirm Cease'")
-        elif manual_cease_page.save_request_cease_button.is_visible():
-            manual_cease_page.save_request_cease_button.click()
-            logging.info("[STEP 4] Clicked 'Save Request Cease'")
-        else:
-            logging.error("[STEP 4] No cease confirmation button found!")
-            raise RuntimeError("Cease button not found on the page")
+        manual_cease_page.confirm_or_save_cease()
+        logging.info("[STEP 4] Clicked 'Confirm Cease' or 'Save Request Cease'")
 
     @staticmethod
     def verify_manual_cease_db_fields_dynamic(
