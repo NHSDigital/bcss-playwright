@@ -65,7 +65,7 @@ class ManualCeasePage(BasePage):
 
     def confirm_cease(self) -> None:
         """Clicks the 'Confirm cease' button and accepts dialog."""
-        BasePage(self.page).safe_accept_dialog(self.confirm_cease_button)
+        self.safe_accept_dialog(self.confirm_cease_button)
 
     def fill_notes_if_visible(self, notes: str = "AUTO TEST: notes") -> None:
         """Fills in notes if the notes textbox is visible.
