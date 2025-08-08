@@ -52,7 +52,6 @@ def base_expected_db() -> dict[str, Any]:
 
 # These scenarios just check that manually ceasing a subject (either immediately or via a disclaimer letter) from different statuses correctly sets their screening status and status reason.
 # Screening due date reason is always set to "Ceased" during a manual cease, even if the SDD is not changing.
-@pytest.mark.wip
 @pytest.mark.vpn_required
 @pytest.mark.manual_cease_tests
 @pytest.mark.regression
@@ -147,7 +146,6 @@ def test_manual_cease_from_inactive_subject_for_informed_dissent(
     logging.info("[ASSERTIONS COMPLETE] Manual cease scenario validated successfully")
 
 
-@pytest.mark.wip
 @pytest.mark.vpn_required
 @pytest.mark.manual_cease_tests
 @pytest.mark.regression
@@ -258,7 +256,6 @@ def test_manual_cease_from_call_subject_for_informed_dissent_verbal_only(
     logging.info("[ASSERTIONS COMPLETE] Manual cease scenario validated successfully")
 
 
-@pytest.mark.wip
 @pytest.mark.vpn_required
 @pytest.mark.manual_cease_tests
 @pytest.mark.regression
@@ -367,7 +364,6 @@ def test_manual_cease_from_recall_subject_for_no_colon_subject_request(
     logging.info("[ASSERTIONS COMPLETE] Manual cease scenario validated successfully")
 
 
-@pytest.mark.wip
 @pytest.mark.vpn_required
 @pytest.mark.manual_cease_tests
 @pytest.mark.regression
@@ -471,7 +467,6 @@ def test_manual_cease_from_surveillance_subject_for_no_colon_programme_assessed(
     )
 
 
-@pytest.mark.wip
 @pytest.mark.vpn_required
 @pytest.mark.manual_cease_tests
 @pytest.mark.regression
@@ -577,7 +572,6 @@ def test_manual_cease_from_already_ceased_subject_for_informal_death(
     )
 
 
-@pytest.mark.wip
 @pytest.mark.vpn_required
 @pytest.mark.manual_cease_tests
 @pytest.mark.regression

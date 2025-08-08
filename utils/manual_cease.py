@@ -140,7 +140,7 @@ class ManualCeaseTools:
 
         # Step 7: Final confirmation (Record Informed Dissent screen)
         manual_cease_page.fill_notes_and_date()
-        logging.info(f"[STEP 7] Entered note and today's date")
+        logging.info("[STEP 7] Entered note and today's date")
 
         # Step 8: Confirm cease
         manual_cease_page.confirm_cease()
