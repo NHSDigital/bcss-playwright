@@ -1231,7 +1231,6 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
     LogoutPage(page).log_out()
 
 
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.vpn_required
 @pytest.mark.investigation_dataset_tests
