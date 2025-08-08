@@ -416,6 +416,26 @@ class InvestigationDatasetCompletion:
                 logging.info(f"Adding drug dose {index}")
                 input_locator = f"#UI_BOWEL_PREP_DRUG_DOSE{index}"
                 self.page.fill(input_locator, value)
+            elif key.startswith("antibiotic_drug_type"):
+                index = key[len("antibiotic_drug_type") :]
+                logging.info(f"Adding antibiotic drug type {index}")
+                select_locator = f"#UI_ANTIBIOTIC{index}"
+                self.page.select_option(select_locator, value)
+            elif key.startswith("antibiotic_drug_dose"):
+                index = key[len("antibiotic_drug_dose") :]
+                logging.info(f"Adding antibiotic drug dose {index}")
+                input_locator = f"#UI_ANTIBIOTIC_DOSE{index}"
+                self.page.fill(input_locator, value)
+            elif key.startswith("other_drug_type"):
+                index = key[len("other_drug_type") :]
+                logging.info(f"Adding other drug type {index}")
+                select_locator = f"#UI_DRUG{index}"
+                self.page.select_option(select_locator, value)
+            elif key.startswith("other_drug_dose"):
+                index = key[len("other_drug_dose") :]
+                logging.info(f"Adding other drug dose {index}")
+                input_locator = f"#UI_DOSE{index}"
+                self.page.fill(input_locator, value)
 
     def process_polyps(
         self,
