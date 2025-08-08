@@ -179,13 +179,10 @@ After running tests with tracing enabled, trace files are saved in the test-resu
 
 To view a trace:
 
-Open https://trace.playwright.dev/
-
-Drag and drop the .zip file from the test-results folder into the browser window
-
-Use the interactive viewer to explore browser actions, network activity, and DOM snapshots
-
-This is especially useful for debugging failed tests or understanding complex UI flows.
+- Open [Playwright Trace Viewer](https://trace.playwright.dev/)
+- Drag and drop the .zip file from the test-results folder into the browser window
+- Use the interactive viewer to explore browser actions, network activity, and DOM snapshots
+- This is especially useful for debugging failed tests or understanding complex UI flows.
 
 ### Test Structure and Conventions
 
@@ -206,7 +203,6 @@ Example: test_login_to_bcss.py
 
 Page Object Models: <page>_page.py
 Example: login_failure_screen_page.py
-
 
 #### 3. Test Function Anatomy
 
