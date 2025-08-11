@@ -972,6 +972,46 @@ class InvestigationDatasetsPage(BasePage):
             actual_text == expected_text
         ), f"Expected drug unit dose text '{expected_text}' but found '{actual_text}'"
 
+    def assert_drug_dosage_unit_text(
+        self, drug_type: str, drug_number: int, expected_text: str
+    ) -> None:
+        """
+        Asserts that the drug dosage unit contains the expected text.
+
+        Args:
+            drug_type (str): The drug type to check
+            drug_number (int): The number of the drug dosage unit cell to check.
+            expected_text (str): The expected text content of the cell.
+
+        Raises:
+            AssertionError: If the actual text does not match the expected text.
+        """
+        locator = self.get_drug_dosage_text_locator(drug_type, drug_number)
+        actual_text = locator.inner_text().strip()
+
+        logging.info(
+            f"Drug dosage unit text for drug {drug_number}: "
+            f"'{actual_text}' (expected: '{expected_text}')"
+        )
+
+        assert actual_text == expected_text, (
+            f"Expected drug dosage unit text '{expected_text}' "
+            f"but found '{actual_text}'"
+        )
+
+    def get_drug_dosage_text_locator(self, drug_type: str, drug_number: int) -> Locator:
+        """
+        Returns the drug dosage text locator for the matching drug type and number
+        Args:
+            drug_type (str): The drug type to check
+            drug_number (int): The number of the drug to check
+        """
+        if drug_type.lower() == "bowel preparation administered":
+            locator_prefix = "#HILITE_spanBowelPrepDrugDosageUnit"
+        elif drug_type.lower() == "antibiotics administered":
+            locator_prefix = "#HILITE_spanAntibioticDosageUnit"
+        return self.page.locator(f"{locator_prefix}{drug_number}")
+
 
 def normalize_label(text: str) -> str:
     """

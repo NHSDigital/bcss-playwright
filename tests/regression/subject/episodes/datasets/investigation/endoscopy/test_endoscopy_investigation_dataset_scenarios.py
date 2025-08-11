@@ -1549,6 +1549,11 @@ def test_check_behaviour_of_antibiotics_administered_fields_in_incomplete_datase
     InvestigationDatasetsPage(page).assert_all_drug_information(
         drug_information, "Antibiotics Administered"
     )
+    InvestigationDatasetsPage(page).assert_drug_dosage_unit_text(
+        "Antibiotics Administered",
+        9,
+        "Please record antibiotic details and dosage in episode notes.",
+    )
     LogoutPage(page).log_out()
 
 
