@@ -51,6 +51,10 @@ drug_information = get_default_drug_information()
 
 endoscopy_information = get_default_endoscopy_information()
 
+bowel_preparation_administered_string = "Bowel Preparation Administered"
+antibiotics_administered_string = "Antibiotics Administered"
+other_drugs_administered_string = "Other Drugs Administered"
+
 
 @pytest.mark.regression
 @pytest.mark.vpn_required
@@ -737,9 +741,9 @@ def test_check_dropdown_lists_and_default_values_for_drug_information(
     field_names = [
         "General Anaesthetic",
         "Entonox",
-        "Bowel Preparation Administered",
-        "Antibiotics Administered",
-        "Other Drugs Administered",
+        bowel_preparation_administered_string,
+        antibiotics_administered_string,
+        other_drugs_administered_string,
     ]
     InvestigationDatasetsPage(page).are_fields_on_page(
         "Investigation Dataset", None, field_names
@@ -755,15 +759,15 @@ def test_check_dropdown_lists_and_default_values_for_drug_information(
     DatasetFieldUtil(page).assert_select_to_right_has_values("Entonox", ["Yes", "No"])
 
     DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
-        "Bowel Preparation Administered", "Yes"
+        bowel_preparation_administered_string, "Yes"
     )
     DatasetFieldUtil(page).assert_select_to_right_has_values(
-        "Bowel Preparation Administered", ["Yes", "No"]
+        bowel_preparation_administered_string, ["Yes", "No"]
     )
 
     assert (
         InvestigationDatasetsPage(page).check_visibility_of_drug_type(
-            "Bowel Preparation Administered", 1, True
+            bowel_preparation_administered_string, 1, True
         )
     ) is True, (
         "The first Bowel Preparation Administered drug type input cell is not visible"
@@ -774,7 +778,7 @@ def test_check_dropdown_lists_and_default_values_for_drug_information(
 
     assert (
         InvestigationDatasetsPage(page).check_visibility_of_drug_dose(
-            "Bowel Preparation Administered", 1, True
+            bowel_preparation_administered_string, 1, True
         )
     ) is True, (
         "The first Bowel Preparation Administered drug dose input cell is not visible"
@@ -784,22 +788,22 @@ def test_check_dropdown_lists_and_default_values_for_drug_information(
     )
 
     InvestigationDatasetsPage(page).assert_drug_type_text(
-        "Bowel Preparation Administered", 1, ""
+        bowel_preparation_administered_string, 1, ""
     )
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Bowel Preparation Administered", 1, ""
+        bowel_preparation_administered_string, 1, ""
     )
 
     DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
-        "Antibiotics Administered", "No"
+        antibiotics_administered_string, "No"
     )
     DatasetFieldUtil(page).assert_select_to_right_has_values(
-        "Antibiotics Administered", ["Yes", "No"]
+        antibiotics_administered_string, ["Yes", "No"]
     )
 
     assert (
         InvestigationDatasetsPage(page).check_visibility_of_drug_type(
-            "Antibiotics Administered", 1, True
+            antibiotics_administered_string, 1, True
         )
     ) is False, "The first Antibiotics Administered drug type input cell is visible"
     logging.info(
@@ -808,7 +812,7 @@ def test_check_dropdown_lists_and_default_values_for_drug_information(
 
     assert (
         InvestigationDatasetsPage(page).check_visibility_of_drug_dose(
-            "Antibiotics Administered", 1, True
+            antibiotics_administered_string, 1, True
         )
     ) is False, "The first Antibiotics Administered drug dose input cell is visible"
     logging.info(
@@ -816,15 +820,15 @@ def test_check_dropdown_lists_and_default_values_for_drug_information(
     )
 
     DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
-        "Other Drugs Administered", "No"
+        other_drugs_administered_string, "No"
     )
     DatasetFieldUtil(page).assert_select_to_right_has_values(
-        "Other Drugs Administered", ["Yes", "No"]
+        other_drugs_administered_string, ["Yes", "No"]
     )
 
     assert (
         InvestigationDatasetsPage(page).check_visibility_of_drug_type(
-            "Other Drugs Administered", 1, True
+            other_drugs_administered_string, 1, True
         )
     ) is False, "The first Other Drugs Administered drug type input cell is visible"
     logging.info(
@@ -833,7 +837,7 @@ def test_check_dropdown_lists_and_default_values_for_drug_information(
 
     assert (
         InvestigationDatasetsPage(page).check_visibility_of_drug_dose(
-            "Other Drugs Administered", 1, True
+            other_drugs_administered_string, 1, True
         )
     ) is False, "The first Other Drugs Administered drug dose input cell is visible"
     logging.info(
@@ -887,15 +891,15 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
     InvestigationDatasetsPage(page).click_show_drug_information()
 
     DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
-        "Bowel Preparation Administered", "divDrugDetails", YesNoDrugOptions.NO
+        bowel_preparation_administered_string, "divDrugDetails", YesNoDrugOptions.NO
     )
     DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
-        "Bowel Preparation Administered", "No"
+        bowel_preparation_administered_string, "No"
     )
 
     assert (
         InvestigationDatasetsPage(page).check_visibility_of_drug_type(
-            "Bowel Preparation Administered", 1, False
+            bowel_preparation_administered_string, 1, False
         )
     ) is True, (
         "The first Bowel Preparation Administered drug type input cell is visible"
@@ -906,7 +910,7 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
 
     assert (
         InvestigationDatasetsPage(page).check_visibility_of_drug_dose(
-            "Bowel Preparation Administered", 1, False
+            bowel_preparation_administered_string, 1, False
         )
     ) is True, (
         "The first Bowel Preparation Administered drug dose input cell is visible"
@@ -931,12 +935,12 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
         "STEP: Bowel Preparation Administered Type and Dose fields are displayed if Bowel Preparation Administered = Yes.  Check default values and dropdown options."
     )
     DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
-        "Bowel Preparation Administered", "divDrugDetails", YesNoDrugOptions.YES
+        bowel_preparation_administered_string, "divDrugDetails", YesNoDrugOptions.YES
     )
 
     assert (
         InvestigationDatasetsPage(page).check_visibility_of_drug_type(
-            "Bowel Preparation Administered", 1, True
+            bowel_preparation_administered_string, 1, True
         )
     ) is True, (
         "The first Bowel Preparation Administered drug type input cell is not visible"
@@ -947,7 +951,7 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
 
     assert (
         InvestigationDatasetsPage(page).check_visibility_of_drug_dose(
-            "Bowel Preparation Administered", 1, True
+            bowel_preparation_administered_string, 1, True
         )
     ) is True, (
         "The first Bowel Preparation Administered drug dose input cell is not visible"
@@ -956,10 +960,10 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
         "The first Bowel Preparation Administered drug dose input cell is visible"
     )
     InvestigationDatasetsPage(page).assert_drug_type_text(
-        "Bowel Preparation Administered", 1, ""
+        bowel_preparation_administered_string, 1, ""
     )
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Bowel Preparation Administered", 1, ""
+        bowel_preparation_administered_string, 1, ""
     )
 
     list_of_options = [
@@ -981,7 +985,7 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
         "Other",
     ]
     InvestigationDatasetsPage(page).assert_drug_type_options(
-        "Bowel Preparation Administered", 1, list_of_options
+        bowel_preparation_administered_string, 1, list_of_options
     )
 
     logging.info(
@@ -994,20 +998,20 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
         "You cannot set Bowel Preparation Administered to this value as one or more Bowel Preparation Type is present"
     )
     DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
-        "Bowel Preparation Administered", "divDrugDetails", YesNoDrugOptions.NO
+        bowel_preparation_administered_string, "divDrugDetails", YesNoDrugOptions.NO
     )
     DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
-        "Bowel Preparation Administered", "Yes"
+        bowel_preparation_administered_string, "Yes"
     )
 
     InvestigationDatasetsPage(page).assert_dialog_text(
         "You cannot set Bowel Preparation Administered to this value as one or more Bowel Preparation Type is present"
     )
     DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
-        "Bowel Preparation Administered", "divDrugDetails", ""
+        bowel_preparation_administered_string, "divDrugDetails", ""
     )
     DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
-        "Bowel Preparation Administered", "Yes"
+        bowel_preparation_administered_string, "Yes"
     )
 
     logging.info(
@@ -1016,15 +1020,15 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
     InvestigationDatasetsPage(page).select_drug_type_option1("")
     InvestigationDatasetsPage(page).fill_drug_type_dose1("")
     DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
-        "Bowel Preparation Administered", "divDrugDetails", YesNoDrugOptions.NO
+        bowel_preparation_administered_string, "divDrugDetails", YesNoDrugOptions.NO
     )
     DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
-        "Bowel Preparation Administered", "No"
+        bowel_preparation_administered_string, "No"
     )
 
     assert (
         InvestigationDatasetsPage(page).check_visibility_of_drug_type(
-            "Bowel Preparation Administered", 1, False
+            bowel_preparation_administered_string, 1, False
         )
     ) is True, (
         "The first Bowel Preparation Administered drug type input cell is visible"
@@ -1035,7 +1039,7 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
 
     assert (
         InvestigationDatasetsPage(page).check_visibility_of_drug_dose(
-            "Bowel Preparation Administered", 1, False
+            bowel_preparation_administered_string, 1, False
         )
     ) is True, (
         "The first Bowel Preparation Administered drug dose input cell is visible"
@@ -1049,15 +1053,15 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
     )
 
     DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
-        "Bowel Preparation Administered", "divDrugDetails", YesNoDrugOptions.YES
+        bowel_preparation_administered_string, "divDrugDetails", YesNoDrugOptions.YES
     )
     DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
-        "Bowel Preparation Administered", "Yes"
+        bowel_preparation_administered_string, "Yes"
     )
 
     assert (
         InvestigationDatasetsPage(page).check_visibility_of_drug_type(
-            "Bowel Preparation Administered", 1, True
+            bowel_preparation_administered_string, 1, True
         )
     ) is True, (
         "The first Bowel Preparation Administered drug type input cell is not visible"
@@ -1068,7 +1072,7 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
 
     assert (
         InvestigationDatasetsPage(page).check_visibility_of_drug_dose(
-            "Bowel Preparation Administered", 1, True
+            bowel_preparation_administered_string, 1, True
         )
     ) is True, (
         "The first Bowel Preparation Administered drug dose input cell is not visible"
@@ -1078,10 +1082,10 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
     )
 
     InvestigationDatasetsPage(page).assert_drug_type_text(
-        "Bowel Preparation Administered", 1, ""
+        bowel_preparation_administered_string, 1, ""
     )
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Bowel Preparation Administered", 1, ""
+        bowel_preparation_administered_string, 1, ""
     )
 
     logging.info(
@@ -1095,12 +1099,12 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
     )
     InvestigationDatasetsPage(page).fill_drug_type_dose1("0.9")
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Bowel Preparation Administered", 1, "0.9"
+        bowel_preparation_administered_string, 1, "0.9"
     )
 
     InvestigationDatasetsPage(page).fill_drug_type_dose1("1")
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Bowel Preparation Administered", 1, "1"
+        bowel_preparation_administered_string, 1, "1"
     )
 
     InvestigationDatasetsPage(page).assert_dialog_text(
@@ -1108,7 +1112,7 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
     )
     InvestigationDatasetsPage(page).fill_drug_type_dose1("1.01")
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Bowel Preparation Administered", 1, "1.01"
+        bowel_preparation_administered_string, 1, "1.01"
     )
 
     InvestigationDatasetsPage(page).assert_dialog_text(
@@ -1116,12 +1120,12 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
     )
     InvestigationDatasetsPage(page).fill_drug_type_dose1("1000")
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Bowel Preparation Administered", 1, "1000"
+        bowel_preparation_administered_string, 1, "1000"
     )
 
     InvestigationDatasetsPage(page).fill_drug_type_dose1("999.9")
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Bowel Preparation Administered", 1, "999.9"
+        bowel_preparation_administered_string, 1, "999.9"
     )
 
     logging.info("STEP: Cannot save a dataset with a drug Type but no Dose")
@@ -1132,10 +1136,10 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
     )
     InvestigationDatasetsPage(page).click_save_dataset_button()
     InvestigationDatasetsPage(page).assert_drug_type_text(
-        "Bowel Preparation Administered", 1, DrugTypeOptions.KLEAN_PREP
+        bowel_preparation_administered_string, 1, DrugTypeOptions.KLEAN_PREP
     )
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Bowel Preparation Administered", 1, ""
+        bowel_preparation_administered_string, 1, ""
     )
 
     logging.info("STEP: Cannot save a dataset with a drug Dose but no Type")
@@ -1146,10 +1150,10 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
     )
     InvestigationDatasetsPage(page).click_save_dataset_button()
     InvestigationDatasetsPage(page).assert_drug_type_text(
-        "Bowel Preparation Administered", 1, ""
+        bowel_preparation_administered_string, 1, ""
     )
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Bowel Preparation Administered", 1, "1"
+        bowel_preparation_administered_string, 1, "1"
     )
 
     logging.info("STEP: The same drug cannot be entered more than once")
@@ -1165,16 +1169,16 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
     )
     InvestigationDatasetsPage(page).click_save_dataset_button()
     InvestigationDatasetsPage(page).assert_drug_type_text(
-        "Bowel Preparation Administered", 1, DrugTypeOptions.KLEAN_PREP
+        bowel_preparation_administered_string, 1, DrugTypeOptions.KLEAN_PREP
     )
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Bowel Preparation Administered", 1, "1"
+        bowel_preparation_administered_string, 1, "1"
     )
     InvestigationDatasetsPage(page).assert_drug_type_text(
-        "Bowel Preparation Administered", 2, DrugTypeOptions.KLEAN_PREP
+        bowel_preparation_administered_string, 2, DrugTypeOptions.KLEAN_PREP
     )
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Bowel Preparation Administered", 2, "2"
+        bowel_preparation_administered_string, 2, "2"
     )
 
     logging.info(
@@ -1223,7 +1227,7 @@ def test_check_behaviour_of_drug_information_fields_in_incomplete_dataset(
     }
     InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
     InvestigationDatasetsPage(page).assert_all_drug_information(
-        drug_information, "Bowel Preparation Administered"
+        drug_information, bowel_preparation_administered_string
     )
     InvestigationDatasetsPage(page).expect_text_to_be_visible(
         "Please record your bowel preparation regime in episode notes."
@@ -1270,31 +1274,31 @@ def test_check_behaviour_of_antibiotics_administered_fields_in_incomplete_datase
 
     InvestigationDatasetsPage(page).click_show_drug_information()
     DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
-        "Antibiotics Administered", "divDrugDetails", YesNoOptions.YES
+        antibiotics_administered_string, "divDrugDetails", YesNoOptions.YES
     )
     DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
-        "Antibiotics Administered", "Yes"
+        antibiotics_administered_string, "Yes"
     )
 
     assert (
         InvestigationDatasetsPage(page).check_visibility_of_drug_type(
-            "Antibiotics Administered", 1, True
+            antibiotics_administered_string, 1, True
         )
     ) is True, "The first Antibiotics Administered drug type input cell is not visible"
     logging.info("The first Antibiotics Administered drug type input cell is visible")
 
     assert (
         InvestigationDatasetsPage(page).check_visibility_of_drug_dose(
-            "Antibiotics Administered", 1, True
+            antibiotics_administered_string, 1, True
         )
     ) is True, "The first Antibiotics Administered drug dose input cell is not visible"
     logging.info("The first Antibiotics Administered drug dose input cell is visible")
 
     InvestigationDatasetsPage(page).assert_drug_type_text(
-        "Antibiotics Administered", 1, ""
+        antibiotics_administered_string, 1, ""
     )
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Antibiotics Administered", 1, ""
+        antibiotics_administered_string, 1, ""
     )
 
     list_of_options = [
@@ -1309,7 +1313,7 @@ def test_check_behaviour_of_antibiotics_administered_fields_in_incomplete_datase
         "Other antibiotic",
     ]
     InvestigationDatasetsPage(page).assert_drug_type_options(
-        "Antibiotics Administered", 1, list_of_options
+        antibiotics_administered_string, 1, list_of_options
     )
 
     logging.info(
@@ -1324,32 +1328,32 @@ def test_check_behaviour_of_antibiotics_administered_fields_in_incomplete_datase
     InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
 
     InvestigationDatasetsPage(page).assert_drug_type_text(
-        "Antibiotics Administered",
+        antibiotics_administered_string,
         1,
         AntibioticsAdministeredDrugTypeOptions.AMOXYCILLIN,
     )
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Antibiotics Administered", 1, "1"
+        antibiotics_administered_string, 1, "1"
     )
 
     InvestigationDatasetsPage(page).assert_dialog_text(
         "You cannot set Antibiotics Administered to this value as Antibiotics exist"
     )
     DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
-        "Antibiotics Administered", "divDrugDetails", YesNoOptions.NO
+        antibiotics_administered_string, "divDrugDetails", YesNoOptions.NO
     )
     DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
-        "Antibiotics Administered", "Yes"
+        antibiotics_administered_string, "Yes"
     )
 
     InvestigationDatasetsPage(page).assert_dialog_text(
         "You cannot set Antibiotics Administered to this value as Antibiotics exist"
     )
     DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
-        "Antibiotics Administered", "divDrugDetails", ""
+        antibiotics_administered_string, "divDrugDetails", ""
     )
     DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
-        "Antibiotics Administered", "Yes"
+        antibiotics_administered_string, "Yes"
     )
 
     logging.info(
@@ -1363,10 +1367,10 @@ def test_check_behaviour_of_antibiotics_administered_fields_in_incomplete_datase
 
     InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
     DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
-        "Antibiotics Administered", "divDrugDetails", YesNoOptions.NO
+        antibiotics_administered_string, "divDrugDetails", YesNoOptions.NO
     )
     DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
-        "Antibiotics Administered", "No"
+        antibiotics_administered_string, "No"
     )
 
     logging.info(
@@ -1374,10 +1378,10 @@ def test_check_behaviour_of_antibiotics_administered_fields_in_incomplete_datase
     )
 
     DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
-        "Antibiotics Administered", "divDrugDetails", YesNoOptions.YES
+        antibiotics_administered_string, "divDrugDetails", YesNoOptions.YES
     )
     DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
-        "Antibiotics Administered", "Yes"
+        antibiotics_administered_string, "Yes"
     )
 
     InvestigationDatasetsPage(page).assert_dialog_text("You cannot enter a value of 0")
@@ -1386,7 +1390,7 @@ def test_check_behaviour_of_antibiotics_administered_fields_in_incomplete_datase
     }
     InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Antibiotics Administered", 1, "0"
+        antibiotics_administered_string, 1, "0"
     )
 
     drug_information = {
@@ -1394,7 +1398,7 @@ def test_check_behaviour_of_antibiotics_administered_fields_in_incomplete_datase
     }
     InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Antibiotics Administered", 1, "0.01"
+        antibiotics_administered_string, 1, "0.01"
     )
 
     InvestigationDatasetsPage(page).assert_dialog_text(
@@ -1405,7 +1409,7 @@ def test_check_behaviour_of_antibiotics_administered_fields_in_incomplete_datase
     }
     InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Antibiotics Administered", 1, "1.123"
+        antibiotics_administered_string, 1, "1.123"
     )
 
     InvestigationDatasetsPage(page).assert_dialog_text(
@@ -1416,7 +1420,7 @@ def test_check_behaviour_of_antibiotics_administered_fields_in_incomplete_datase
     }
     InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Antibiotics Administered", 1, "10000000"
+        antibiotics_administered_string, 1, "10000000"
     )
 
     drug_information = {
@@ -1424,7 +1428,7 @@ def test_check_behaviour_of_antibiotics_administered_fields_in_incomplete_datase
     }
     InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Antibiotics Administered", 1, "9999999.99"
+        antibiotics_administered_string, 1, "9999999.99"
     )
 
     logging.info("STEP: Cannot save a dataset with a drug Type but no Dose")
@@ -1445,12 +1449,12 @@ def test_check_behaviour_of_antibiotics_administered_fields_in_incomplete_datase
     )
     InvestigationDatasetsPage(page).click_save_dataset_button()
     InvestigationDatasetsPage(page).assert_drug_type_text(
-        "Antibiotics Administered",
+        antibiotics_administered_string,
         1,
         AntibioticsAdministeredDrugTypeOptions.AMOXYCILLIN,
     )
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Antibiotics Administered", 1, ""
+        antibiotics_administered_string, 1, ""
     )
 
     logging.info("STEP: Cannot save a dataset with a drug Dose but no Type")
@@ -1470,10 +1474,10 @@ def test_check_behaviour_of_antibiotics_administered_fields_in_incomplete_datase
     )
     InvestigationDatasetsPage(page).click_save_dataset_button()
     InvestigationDatasetsPage(page).assert_drug_type_text(
-        "Antibiotics Administered", 1, ""
+        antibiotics_administered_string, 1, ""
     )
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Antibiotics Administered", 1, "1"
+        antibiotics_administered_string, 1, "1"
     )
 
     logging.info("STEP: The same drug cannot be entered more than once")
@@ -1496,20 +1500,20 @@ def test_check_behaviour_of_antibiotics_administered_fields_in_incomplete_datase
     )
     InvestigationDatasetsPage(page).click_save_dataset_button()
     InvestigationDatasetsPage(page).assert_drug_type_text(
-        "Antibiotics Administered",
+        antibiotics_administered_string,
         1,
         AntibioticsAdministeredDrugTypeOptions.AMOXYCILLIN,
     )
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Antibiotics Administered", 1, "1"
+        antibiotics_administered_string, 1, "1"
     )
     InvestigationDatasetsPage(page).assert_drug_type_text(
-        "Antibiotics Administered",
+        antibiotics_administered_string,
         2,
         AntibioticsAdministeredDrugTypeOptions.AMOXYCILLIN,
     )
     InvestigationDatasetsPage(page).assert_drug_dose_text(
-        "Antibiotics Administered", 2, "2"
+        antibiotics_administered_string, 2, "2"
     )
 
     logging.info(
@@ -1547,10 +1551,10 @@ def test_check_behaviour_of_antibiotics_administered_fields_in_incomplete_datase
     InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
 
     InvestigationDatasetsPage(page).assert_all_drug_information(
-        drug_information, "Antibiotics Administered"
+        drug_information, antibiotics_administered_string
     )
     InvestigationDatasetsPage(page).assert_drug_dosage_unit_text(
-        "Antibiotics Administered",
+        antibiotics_administered_string,
         9,
         "Please record antibiotic details and dosage in episode notes.",
     )

@@ -81,6 +81,11 @@ class InvestigationDatasetsPage(BasePage):
         self.visible_ui_results_string = 'select[id^="UI_RESULTS_"]:visible'
         self.sections = self.page.locator(".DatasetSection")
 
+        # Repeat strings:
+        self.bowel_preparation_administered_string = "Bowel Preparation Administered"
+        self.antibiotics_administered_string = "Antibiotics Administered"
+        self.other_drugs_administered_string = "Other Drugs Administered"
+
     def select_site_lookup_option(self, option: str) -> None:
         """
         This method is designed to select a site from the site lookup options.
@@ -787,11 +792,11 @@ class InvestigationDatasetsPage(BasePage):
             drug_type (str): The drug type to check
             drug_number (int): The number of the drug to check
         """
-        if drug_type == "Bowel Preparation Administered":
+        if drug_type == self.bowel_preparation_administered_string:
             locator_prefix = "#UI_BOWEL_PREP_DRUG"
-        elif drug_type == "Antibiotics Administered":
+        elif drug_type == self.antibiotics_administered_string:
             locator_prefix = "#UI_ANTIBIOTIC"
-        elif drug_type == "Other Drugs Administered":
+        elif drug_type == self.other_drugs_administered_string:
             locator_prefix = "#UI_DRUG"
         return self.page.locator(f"{locator_prefix}{drug_number}")
 
@@ -802,11 +807,11 @@ class InvestigationDatasetsPage(BasePage):
             drug_type (str): The drug type to check
             drug_number (int): The number of the drug to check
         """
-        if drug_type.lower() == "bowel preparation administered":
+        if drug_type == self.bowel_preparation_administered_string:
             locator_prefix = "#UI_BOWEL_PREP_DRUG_DOSE"
-        elif drug_type.lower() == "antibiotics administered":
+        elif drug_type == self.antibiotics_administered_string:
             locator_prefix = "#UI_ANTIBIOTIC_DOSE"
-        elif drug_type.lower() == "other drugs administered":
+        elif drug_type == self.other_drugs_administered_string:
             locator_prefix = "#UI_DOSE"
         return self.page.locator(f"{locator_prefix}{drug_number}")
 
@@ -943,11 +948,11 @@ class InvestigationDatasetsPage(BasePage):
             drug_type (str): The drug type to check
             drug_number (int): The number of the drug to check
         """
-        if drug_type.lower() == "bowel preparation administered":
+        if drug_type == self.bowel_preparation_administered_string:
             locator_prefix = "#spanBowelPrepDrugDosageUnit"
-        elif drug_type.lower() == "antibiotics administered":
+        elif drug_type == self.antibiotics_administered_string:
             locator_prefix = "#spanAntibioticDosageUnit"
-        elif drug_type.lower() == "other drugs administered":
+        elif drug_type == self.other_drugs_administered_string:
             locator_prefix = "#spanDosageUnit"
         return self.page.locator(f"{locator_prefix}{drug_number}")
 
@@ -1006,9 +1011,9 @@ class InvestigationDatasetsPage(BasePage):
             drug_type (str): The drug type to check
             drug_number (int): The number of the drug to check
         """
-        if drug_type.lower() == "bowel preparation administered":
+        if drug_type == self.bowel_preparation_administered_string:
             locator_prefix = "#HILITE_spanBowelPrepDrugDosageUnit"
-        elif drug_type.lower() == "antibiotics administered":
+        elif drug_type == self.antibiotics_administered_string:
             locator_prefix = "#HILITE_spanAntibioticDosageUnit"
         return self.page.locator(f"{locator_prefix}{drug_number}")
 
