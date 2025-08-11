@@ -1336,13 +1336,13 @@ def to_enum_name_or_value(val: Any) -> Union[str, Any]:
     Convert an Enum member or matching string value to its Enum name.
 
     If the input is:
-      - An Enum member → returns the `.name` (e.g., "KLEAN_PREP")
-      - A string matching any Enum value in ALL_ENUMS → returns that member's `.name`
-      - Anything else → returns the value unchanged
+    - An Enum member → returns the `.name` (e.g., "KLEAN_PREP")
+    - A string matching any Enum value in ALL_ENUMS → returns that member's `.name`
+    - Anything else → returns the value unchanged
 
     Args:
         val (Any): The value to convert. Can be an Enum member, a string,
-                   or any other type.
+                or any other type.
 
     Returns:
         Union[str, Any]: The Enum name (string) if matched, otherwise the original value.
