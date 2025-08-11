@@ -1,14 +1,14 @@
 import re
 from playwright.sync_api import Page, expect, Locator
 from pages.base_page import BasePage
-from enum import StrEnum
+from enum import Enum, StrEnum
 from utils.oracle.oracle_specific_functions import (
     get_investigation_dataset_polyp_category,
     get_investigation_dataset_polyp_algorithm_size,
 )
 from typing import Optional, Any, Union, List
 import logging
-from enum import Enum
+import sys
 
 
 class InvestigationDatasetsPage(BasePage):
@@ -1326,8 +1326,14 @@ class AntibioticsAdministeredDrugTypeOptions(StrEnum):
 
 # Registry of all known Enums to search when matching string values
 ALL_ENUMS: List[type[Enum]] = [
-    DrugTypeOptions,
-    AntibioticsAdministeredDrugTypeOptions,
+    obj
+    for obj in globals().values()
+    if (
+        isinstance(obj, type)
+        and issubclass(obj, Enum)
+        and obj is not Enum
+        and obj is not StrEnum  # Exclude only the base classes, not subclasses
+    )
 ]
 
 
