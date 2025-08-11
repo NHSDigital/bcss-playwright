@@ -6,8 +6,9 @@ from utils.oracle.oracle_specific_functions import (
     get_investigation_dataset_polyp_category,
     get_investigation_dataset_polyp_algorithm_size,
 )
-from typing import Optional
+from typing import Optional, Any, Union, List
 import logging
+from enum import Enum
 
 
 class InvestigationDatasetsPage(BasePage):
@@ -750,11 +751,13 @@ class InvestigationDatasetsPage(BasePage):
         locator = self.get_drug_type_locator(drug_type, drug_number)
         actual_text = locator.input_value().strip()
         logging.info(
-            f"Drug type text for drug {drug_number}: '{actual_text}' (expected: '{expected_text}')"
+            f"Drug type text for drug {drug_number}: "
+            f"'{to_enum_name_or_value(actual_text)}' "
+            f"(expected: '{to_enum_name_or_value(expected_text)}')"
         )
         assert (
             actual_text == expected_text
-        ), f"Expected drug type text '{expected_text}' but found '{actual_text}'"
+        ), f"Expected drug type text '{to_enum_name_or_value(expected_text)}' but found '{to_enum_name_or_value(actual_text)}'"
 
     def assert_drug_dose_text(
         self, drug_type: str, drug_number: int, expected_text: str
@@ -1319,3 +1322,42 @@ class AntibioticsAdministeredDrugTypeOptions(StrEnum):
     TEICOPLANIN = "17944~mg"
     VANCOMYCIN = "17943~g"
     OTHER_ANTIBIOTIC = "305493"
+
+
+# Registry of all known Enums to search when matching string values
+ALL_ENUMS: List[type[Enum]] = [
+    DrugTypeOptions,
+    AntibioticsAdministeredDrugTypeOptions,
+]
+
+
+def to_enum_name_or_value(val: Any) -> Union[str, Any]:
+    """
+    Convert an Enum member or matching string value to its Enum name.
+
+    If the input is:
+      - An Enum member → returns the `.name` (e.g., "KLEAN_PREP")
+      - A string matching any Enum value in ALL_ENUMS → returns that member's `.name`
+      - Anything else → returns the value unchanged
+
+    Args:
+        val (Any): The value to convert. Can be an Enum member, a string,
+                   or any other type.
+
+    Returns:
+        Union[str, Any]: The Enum name (string) if matched, otherwise the original value.
+    """
+    # Directly handle Enum instances
+    if isinstance(val, Enum):
+        return val.name
+
+    # Handle strings that match known Enum values
+    if isinstance(val, str):
+        for enum_cls in ALL_ENUMS:
+            try:
+                return enum_cls(val).name
+            except ValueError:
+                continue
+
+    # Fallback: return unchanged
+    return val
