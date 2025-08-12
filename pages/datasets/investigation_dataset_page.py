@@ -928,8 +928,23 @@ class InvestigationDatasetsPage(BasePage):
                         | AntibioticsAdministeredDrugTypeOptions.GENTAMICIN
                         | AntibioticsAdministeredDrugTypeOptions.METRONIDAZOLE
                         | AntibioticsAdministeredDrugTypeOptions.TEICOPLANIN
+                        | OtherDrugsAdministeredDrugTypeOptions.BUSCOPAN
+                        | OtherDrugsAdministeredDrugTypeOptions.DIAZEMULS
+                        | OtherDrugsAdministeredDrugTypeOptions.GLUCAGON
+                        | OtherDrugsAdministeredDrugTypeOptions.HYDROCORTISONE
+                        | OtherDrugsAdministeredDrugTypeOptions.MEPTAZINOL
+                        | OtherDrugsAdministeredDrugTypeOptions.MIDAZOLAM
+                        | OtherDrugsAdministeredDrugTypeOptions.PETHIDINE
+                        | OtherDrugsAdministeredDrugTypeOptions.PROPOFOL
                     ):
                         expected_unit = "mg"
+                    case (
+                        OtherDrugsAdministeredDrugTypeOptions.ALFENTANYL
+                        | OtherDrugsAdministeredDrugTypeOptions.FENTANYL
+                        | OtherDrugsAdministeredDrugTypeOptions.FLUMAZENIL
+                        | OtherDrugsAdministeredDrugTypeOptions.NALOXONE
+                    ):
+                        expected_unit = "mcg"
                     case _:
                         expected_unit = None
 
@@ -1367,6 +1382,23 @@ class AntibioticsAdministeredDrugTypeOptions(StrEnum):
     TEICOPLANIN = "17944~mg"
     VANCOMYCIN = "17943~g"
     OTHER_ANTIBIOTIC = "305493"
+
+
+class OtherDrugsAdministeredDrugTypeOptions(StrEnum):
+    """Enum for other drugs administered drug type options"""
+
+    ALFENTANYL = "200252~mcg"
+    BUSCOPAN = "17133~mg"
+    DIAZEMULS = "17959~mg"
+    FENTANYL = "17958~mcg"
+    FLUMAZENIL = "17134~mcg"
+    GLUCAGON = "17940~mg"
+    HYDROCORTISONE = "17527~mg"
+    MEPTAZINOL = "200251~mg"
+    MIDAZOLAM = "17135~mg"
+    NALOXONE = "17136~mcg~204333"
+    PETHIDINE = "17137~mg"
+    PROPOFOL = "17960~mg"
 
 
 # Registry of all known Enums to search when matching string values

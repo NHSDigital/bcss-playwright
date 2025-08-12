@@ -18,6 +18,7 @@ from pages.datasets.investigation_dataset_page import (
     DrugTypeOptions,
     YesNoDrugOptions,
     AntibioticsAdministeredDrugTypeOptions,
+    OtherDrugsAdministeredDrugTypeOptions,
 )
 from classes.user import User
 from classes.subject import Subject
@@ -1558,6 +1559,628 @@ def test_check_behaviour_of_antibiotics_administered_fields_in_incomplete_datase
         9,
         "Please record antibiotic details and dosage in episode notes.",
     )
+    LogoutPage(page).log_out()
+
+
+@pytest.mark.wip
+@pytest.mark.regression
+@pytest.mark.vpn_required
+@pytest.mark.investigation_dataset_tests
+@pytest.mark.bcss_additional_tests
+@pytest.mark.colonoscopy_dataset_tests
+def test_check_behaviour_of_other_drugs_administered_fields_in_incomplete_dataset(
+    page: Page,
+) -> None:
+    """
+    Scenario: Check the behaviour of the Other Drugs Administered fields in the Drug Information section in an incomplete endoscopy investigation dataset
+    This checks:
+    The contents of dropdown lists
+    The default values of fields
+    The visibility of drug type/dose fields
+    The dose units
+    A "drug administered" field cannot be set to "No" or null if associated drugs and doses are listed
+    The same drug type cannot be selected more than once
+    Validation of dose values - when entering a new drug line, and when updating an existing dose
+    """
+    nhs_no = get_subject_younger_than_70_with_new_colonsocopy_dataset()
+
+    logging.info(
+        "STEP: Other Drugs Administered Type and Dose fields are not displayed if Other Drugs Administered = No"
+    )
+
+    UserTools.user_login(page, "Screening Centre Manager at BCS001")
+
+    BasePage(page).go_to_screening_subject_search_page()
+    search_subject_episode_by_nhs_number(page, nhs_no)
+
+    SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_investigation_show_datasets()
+
+    InvestigationDatasetsPage(page).bowel_cancer_screening_page_title_contains_text(
+        "Investigation Datasets"
+    )
+
+    InvestigationDatasetsPage(page).click_show_drug_information()
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
+        other_drugs_administered_string, "divDrugDetails", YesNoOptions.NO
+    )
+    DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
+        other_drugs_administered_string, "No"
+    )
+
+    assert (
+        InvestigationDatasetsPage(page).check_visibility_of_drug_type(
+            other_drugs_administered_string, 1, False
+        )
+    ) is True, "The first other drugs administered drug type input cell is visible"
+    logging.info(
+        "The first other drugs administered drug type input cell is not visible"
+    )
+
+    assert (
+        InvestigationDatasetsPage(page).check_visibility_of_drug_dose(
+            other_drugs_administered_string, 1, False
+        )
+    ) is True, "The first other drugs administered drug dose input cell is visible"
+    logging.info(
+        "The first other drugs administered drug dose input cell is not visible"
+    )
+
+    logging.info(
+        "STEP: Other Drugs Administered Type and Dose fields are displayed if Other Drugs Administered = Yes.  Check default values and dropdown options."
+    )
+
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
+        other_drugs_administered_string, "divDrugDetails", YesNoOptions.YES
+    )
+    DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
+        other_drugs_administered_string, "Yes"
+    )
+
+    assert (
+        InvestigationDatasetsPage(page).check_visibility_of_drug_type(
+            other_drugs_administered_string, 1, True
+        )
+    ) is True, "The first other drugs administered drug type input cell is not visible"
+    logging.info("The first other drugs administered drug type input cell is visible")
+
+    assert (
+        InvestigationDatasetsPage(page).check_visibility_of_drug_dose(
+            other_drugs_administered_string, 1, True
+        )
+    ) is True, "The first other drugs administered drug dose input cell is not visible"
+    logging.info("The first other drugs administered drug dose input cell is visible")
+
+    InvestigationDatasetsPage(page).assert_drug_type_text(
+        other_drugs_administered_string, 1, ""
+    )
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, ""
+    )
+
+    list_of_options = [
+        "Alfentanyl",
+        "Buscopan",
+        "Diazemuls",
+        "Fentanyl",
+        "Flumazenil",
+        "Glucagon",
+        "Hydrocortisone",
+        "Meptazinol",
+        "Midazolam",
+        "Naloxone",
+        "Pethidine",
+        "Propofol",
+    ]
+    InvestigationDatasetsPage(page).assert_drug_type_options(
+        other_drugs_administered_string, 1, list_of_options
+    )
+
+    logging.info(
+        "STEP: Cannot change Other Drugs Administered to No or null if a Type and Dose have been recorded"
+    )
+
+    drug_information = {
+        "other_drug_type1": OtherDrugsAdministeredDrugTypeOptions.ALFENTANYL,
+        "other_drug_dose1": "1",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "You cannot set Drugs Administered to this value as Drugs exist"
+    )
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
+        other_drugs_administered_string, "divDrugDetails", YesNoOptions.NO
+    )
+    DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
+        other_drugs_administered_string, "Yes"
+    )
+
+    logging.info(
+        "STEP: Can change Other Drugs Administered to No if neither Types nor Doses have been recorded"
+    )
+
+    drug_information = {
+        "other_drug_type1": "",
+        "other_drug_dose1": "",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_type_text(
+        other_drugs_administered_string, 1, ""
+    )
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, ""
+    )
+
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
+        other_drugs_administered_string, "divDrugDetails", YesNoOptions.NO
+    )
+    DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
+        other_drugs_administered_string, "No"
+    )
+
+    logging.info(
+        "STEP: Dose must be within the allowed range of values, and have the right number of decimal places"
+    )
+
+    DatasetFieldUtil(page).populate_select_locator_for_field_inside_div(
+        other_drugs_administered_string, "divDrugDetails", YesNoOptions.YES
+    )
+
+    drug_information = {
+        "other_drug_type1": OtherDrugsAdministeredDrugTypeOptions.ALFENTANYL,
+        "other_drug_dose1": "0",
+    }
+
+    InvestigationDatasetsPage(page).assert_dialog_text("You cannot enter a value of 0")
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_type_text(
+        other_drugs_administered_string,
+        1,
+        OtherDrugsAdministeredDrugTypeOptions.ALFENTANYL,
+    )
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "0"
+    )
+
+    drug_information = {
+        "other_drug_dose1": "0.01",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "0.01"
+    )
+
+    drug_information = {
+        "other_drug_dose1": "1.123",
+    }
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "Number cannot have more than 2 decimal places"
+    )
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "1.123"
+    )
+
+    drug_information = {
+        "other_drug_dose1": "10000000",
+    }
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "Number cannot be greater than 9999999"
+    )
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "10000000"
+    )
+
+    drug_information = {
+        "other_drug_dose1": "9999999.99",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "9999999.99"
+    )
+
+    drug_information = {
+        "other_drug_dose1": "15",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    logging.info("STEP: Fentanyl has a specific Dose range")
+
+    drug_information = {
+        "other_drug_type1": OtherDrugsAdministeredDrugTypeOptions.FENTANYL,
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    drug_information = {
+        "other_drug_dose1": "11.99",
+    }
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "The recommended dose for Fentanyl is 12 - 100 mcg. Please check and re-enter as necessary.",
+        True,
+    )
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_type_text(
+        other_drugs_administered_string,
+        1,
+        OtherDrugsAdministeredDrugTypeOptions.FENTANYL,
+    )
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "11.99"
+    )
+
+    drug_information = {
+        "other_drug_dose1": "12",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "12"
+    )
+
+    drug_information = {
+        "other_drug_dose1": "100.01",
+    }
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "The recommended dose for Fentanyl is 12 - 100 mcg. Please check and re-enter as necessary.",
+        True,
+    )
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_type_text(
+        other_drugs_administered_string,
+        1,
+        OtherDrugsAdministeredDrugTypeOptions.FENTANYL,
+    )
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "100.01"
+    )
+
+    drug_information = {
+        "other_drug_dose1": "100",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "100"
+    )
+
+    logging.info("STEP: Pethidine has a specific Dose range")
+
+    drug_information = {
+        "other_drug_type1": "",
+        "other_drug_dose1": "",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    drug_information = {
+        "other_drug_type1": OtherDrugsAdministeredDrugTypeOptions.PETHIDINE,
+        "other_drug_dose1": "24.99",
+    }
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "The recommended dose for Pethidine is 25 - 100 mg. Please check and re-enter as necessary.",
+        True,
+    )
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_type_text(
+        other_drugs_administered_string,
+        1,
+        OtherDrugsAdministeredDrugTypeOptions.PETHIDINE,
+    )
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "24.99"
+    )
+
+    drug_information = {
+        "other_drug_dose1": "25",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "25"
+    )
+
+    drug_information = {
+        "other_drug_dose1": "100.01",
+    }
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "The recommended dose for Pethidine is 25 - 100 mg. Please check and re-enter as necessary.",
+        True,
+    )
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "100.01"
+    )
+
+    drug_information = {
+        "other_drug_dose1": "100",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "100"
+    )
+
+    logging.info("STEP: Buscopan has a specific Dose range")
+
+    drug_information = {
+        "other_drug_type1": "",
+        "other_drug_dose1": "",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    drug_information = {
+        "other_drug_type1": OtherDrugsAdministeredDrugTypeOptions.BUSCOPAN,
+        "other_drug_dose1": "9.99",
+    }
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "The recommended dose for Buscopan is 10 - 40 mg. Please check and re-enter as necessary.",
+        True,
+    )
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_type_text(
+        other_drugs_administered_string,
+        1,
+        OtherDrugsAdministeredDrugTypeOptions.BUSCOPAN,
+    )
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "9.99"
+    )
+
+    drug_information = {
+        "other_drug_dose1": "10",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "10"
+    )
+
+    drug_information = {
+        "other_drug_dose1": "40.01",
+    }
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "The recommended dose for Buscopan is 10 - 40 mg. Please check and re-enter as necessary.",
+        True,
+    )
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "40.01"
+    )
+
+    drug_information = {
+        "other_drug_dose1": "40",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "40"
+    )
+
+    logging.info("STEP: Midazolam has a specific Dose range for patients aged under 70")
+
+    drug_information = {
+        "other_drug_type1": "",
+        "other_drug_dose1": "",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    drug_information = {
+        "other_drug_type1": OtherDrugsAdministeredDrugTypeOptions.MIDAZOLAM,
+        "other_drug_dose1": "0.99",
+    }
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "The recommended dose for Midazolam is 1 - 5 mg for patients under 70 years old. Please check and re-enter as necessary.",
+        True,
+    )
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_type_text(
+        other_drugs_administered_string,
+        1,
+        OtherDrugsAdministeredDrugTypeOptions.MIDAZOLAM,
+    )
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "0.99"
+    )
+
+    drug_information = {
+        "other_drug_dose1": "1",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "1"
+    )
+
+    drug_information = {
+        "other_drug_dose1": "5.01",
+    }
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "The recommended dose for Midazolam is 1 - 5 mg for patients under 70 years old. Please check and re-enter as necessary.",
+        True,
+    )
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "5.01"
+    )
+
+    drug_information = {
+        "other_drug_dose1": "5",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "5"
+    )
+
+    logging.info("STEP: Cannot save a dataset with a drug Type but no Dose")
+
+    drug_information = {
+        "other_drug_type1": "",
+        "other_drug_dose1": "",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    drug_information = {
+        "other_drug_type1": OtherDrugsAdministeredDrugTypeOptions.ALFENTANYL,
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "Please enter a dose for this drug"
+    )
+    InvestigationDatasetsPage(page).click_save_dataset_button()
+    InvestigationDatasetsPage(page).assert_drug_type_text(
+        other_drugs_administered_string,
+        1,
+        OtherDrugsAdministeredDrugTypeOptions.ALFENTANYL,
+    )
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, ""
+    )
+
+    logging.info("STEP: Cannot save a dataset with a drug Dose but no Type ")
+
+    drug_information = {
+        "other_drug_type1": "",
+        "other_drug_dose1": "",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    drug_information = {
+        "other_drug_dose1": "1",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "To delete the drug you must also remove the drug dose"
+    )
+    InvestigationDatasetsPage(page).click_save_dataset_button()
+    InvestigationDatasetsPage(page).assert_drug_type_text(
+        other_drugs_administered_string, 1, ""
+    )
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "1"
+    )
+
+    logging.info("STEP: If Naxolone is selected, an alert is displayed")
+
+    drug_information = {
+        "other_drug_type1": "",
+        "other_drug_dose1": "",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    drug_information = {
+        "other_drug_type1": OtherDrugsAdministeredDrugTypeOptions.NALOXONE,
+    }
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "NALOXONE is a reversal agent, are you sure this is correct?  If so please raise an AVI.",
+        True,
+    )
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    InvestigationDatasetsPage(page).assert_drug_type_text(
+        other_drugs_administered_string,
+        1,
+        OtherDrugsAdministeredDrugTypeOptions.NALOXONE,
+    )
+
+    logging.info("STEP: The same drug cannot be entered more than once")
+
+    drug_information = {
+        "other_drug_type1": "",
+        "other_drug_dose1": "",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    drug_information = {
+        "other_drug_type1": OtherDrugsAdministeredDrugTypeOptions.ALFENTANYL,
+        "other_drug_dose1": "1",
+        "other_drug_type2": OtherDrugsAdministeredDrugTypeOptions.ALFENTANYL,
+        "other_drug_dose2": "2",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "You may not select the same Drug more than once."
+    )
+    InvestigationDatasetsPage(page).click_save_dataset_button()
+
+    InvestigationDatasetsPage(page).assert_drug_type_text(
+        other_drugs_administered_string,
+        1,
+        OtherDrugsAdministeredDrugTypeOptions.ALFENTANYL,
+    )
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 1, "1"
+    )
+    InvestigationDatasetsPage(page).assert_drug_type_text(
+        other_drugs_administered_string,
+        2,
+        OtherDrugsAdministeredDrugTypeOptions.ALFENTANYL,
+    )
+    InvestigationDatasetsPage(page).assert_drug_dose_text(
+        other_drugs_administered_string, 2, "2"
+    )
+
+    logging.info(
+        "STEP: Check that all drug Types can be entered, and the correct Dose units are displayed"
+    )
+
+    drug_information = {
+        "other_drug_type2": "",
+        "other_drug_dose2": "",
+        "other_drug_type1": "",
+        "other_drug_dose1": "",
+    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+
+    drug_information = {
+        "other_drug_type1": OtherDrugsAdministeredDrugTypeOptions.ALFENTANYL,
+        "other_drug_dose1": "1.01",
+        "other_drug_type2": OtherDrugsAdministeredDrugTypeOptions.BUSCOPAN,
+        "other_drug_dose2": "10.2",
+        "other_drug_type3": OtherDrugsAdministeredDrugTypeOptions.DIAZEMULS,
+        "other_drug_dose3": "3",
+        "other_drug_type4": OtherDrugsAdministeredDrugTypeOptions.FENTANYL,
+        "other_drug_dose4": "12",
+        "other_drug_type5": OtherDrugsAdministeredDrugTypeOptions.FLUMAZENIL,
+        "other_drug_dose5": "5.55",
+        "other_drug_type6": OtherDrugsAdministeredDrugTypeOptions.GLUCAGON,
+        "other_drug_dose6": "6",
+        "other_drug_type7": OtherDrugsAdministeredDrugTypeOptions.HYDROCORTISONE,
+        "other_drug_dose7": "7",
+        "other_drug_type8": OtherDrugsAdministeredDrugTypeOptions.MEPTAZINOL,
+        "other_drug_dose8": "8",
+        "other_drug_type9": OtherDrugsAdministeredDrugTypeOptions.MIDAZOLAM,
+        "other_drug_dose9": "5",
+        "other_drug_type10": OtherDrugsAdministeredDrugTypeOptions.PETHIDINE,
+        "other_drug_dose10": "25",
+        "other_drug_type11": OtherDrugsAdministeredDrugTypeOptions.PROPOFOL,
+        "other_drug_dose11": "9999999.99",
+        "other_drug_type12": OtherDrugsAdministeredDrugTypeOptions.NALOXONE,
+        "other_drug_dose12": "10",
+    }
+    InvestigationDatasetsPage(page).assert_dialog_text(
+        "NALOXONE is a reversal agent, are you sure this is correct?  If so please raise an AVI.",
+        True,
+    )
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+    InvestigationDatasetsPage(page).assert_all_drug_information(
+        drug_information, other_drugs_administered_string
+    )
+
     LogoutPage(page).log_out()
 
 
