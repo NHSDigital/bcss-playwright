@@ -1562,7 +1562,6 @@ def test_check_behaviour_of_antibiotics_administered_fields_in_incomplete_datase
     LogoutPage(page).log_out()
 
 
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.vpn_required
 @pytest.mark.investigation_dataset_tests
