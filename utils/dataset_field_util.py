@@ -195,31 +195,32 @@ class DatasetFieldUtil:
             expected_text (str): The expected value to check.
         Returns:
             bool: True if the expected value is found, False otherwise.
-        Raises:
-            AssertionError: If the actual value does not match the expected value.
         """
         input_el = right_cell.locator("input")
         if input_el.count() > 0:
             value = input_el.first.input_value().strip()
-            assert (
-                value == expected_text
-            ), f'Expected "{expected_text}" but found "{value}" in input to the right of "{text}".'
-            logging.info(f'Input to the right of "{text}" contains "{expected_text}"')
-            return True
+            if value == expected_text:
+                logging.info(
+                    f'Input to the right of "{text}" contains "{expected_text}"'
+                )
+                return True
+            return False
+
         select_el = right_cell.locator("select")
         if select_el.count() > 0:
             selected = select_el.locator("option:checked").inner_text().strip()
-            assert (
-                selected == expected_text
-            ), f'Expected "{expected_text}" but found "{selected}" in select to the right of "{text}".'
-            logging.info(f'Select to the right of "{text}" contains "{expected_text}"')
-            return True
+            if selected == expected_text:
+                logging.info(
+                    f'Select to the right of "{text}" contains "{expected_text}"'
+                )
+                return True
+            return False
+
         generic_text = right_cell.inner_text().strip()
-        assert (
-            generic_text == expected_text
-        ), f'Expected "{expected_text}" but found "{generic_text}" in cell to the right of "{text}".'
-        logging.info(f'Cell to the right of "{text}" contains "{expected_text}"')
-        return True
+        if generic_text == expected_text:
+            logging.info(f'Cell to the right of "{text}" contains "{expected_text}"')
+            return True
+        return False
 
     def _check_span_structure(
         self, scope: Locator | Page, text: str, expected_text: str
