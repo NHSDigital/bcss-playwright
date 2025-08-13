@@ -39,6 +39,7 @@ from pages.datasets.investigation_dataset_page import (
     PolypInterventionModalityOptions,
     PolypInterventionDeviceOptions,
     PolypInterventionExcisionTechniqueOptions,
+    to_enum_name_or_value,
 )
 from pages.screening_subject_search.advance_fobt_screening_episode_page import (
     AdvanceFOBTScreeningEpisodePage,
@@ -367,14 +368,8 @@ class InvestigationDatasetCompletion:
             )
 
         # Drug Information
-        self.investigation_datasets_pom.click_show_drug_information()
-        logging.info("Filling out drug information")
-        self.investigation_datasets_pom.select_drug_type_option1(
-            drug_information["drug_type1"]
-        )
-        self.investigation_datasets_pom.fill_drug_type_dose1(
-            drug_information["drug_dose1"]
-        )
+        InvestigationDatasetsPage(self.page).click_show_drug_information()
+        self.fill_out_drug_information(drug_information)
 
         logging.info("Filling out endoscopy information")
         self.fill_endoscopy_information(endoscopy_information)
@@ -403,6 +398,40 @@ class InvestigationDatasetCompletion:
         logging.info("Saving the investigation dataset")
         self.investigation_datasets_pom.check_dataset_complete_checkbox()
         self.investigation_datasets_pom.click_save_dataset_button()
+
+    def fill_out_drug_information(self, drug_information: dict) -> None:
+        """
+        This method completes the drug information section of the investigation dataset.
+        Args:
+            drug_information (dict): A dictionary containing the drug types and dosages.
+        """
+        logging.info("Filling out drug information")
+
+        # Define mapping for each drug type/dose prefix and their selectors
+        drug_map = {
+            "drug_type": ("#UI_BOWEL_PREP_DRUG{}", True),
+            "drug_dose": ("#UI_BOWEL_PREP_DRUG_DOSE{}", False),
+            "antibiotic_drug_type": ("#UI_ANTIBIOTIC{}", True),
+            "antibiotic_drug_dose": ("#UI_ANTIBIOTIC_DOSE{}", False),
+            "other_drug_type": ("#UI_DRUG{}", True),
+            "other_drug_dose": ("#UI_DOSE{}", False),
+        }
+
+        for key, value in drug_information.items():
+            for prefix, (selector_template, is_select) in drug_map.items():
+                if key.startswith(prefix):
+                    index = key[len(prefix) :]
+                    if is_select:
+                        logging.info(
+                            f"Adding {prefix.replace('_', ' ')} {index}: {to_enum_name_or_value(value)}"
+                        )
+                        self.page.select_option(selector_template.format(index), value)
+                    else:
+                        logging.info(
+                            f"Adding {prefix.replace('_', ' ')} {index}: {value}"
+                        )
+                        self.page.fill(selector_template.format(index), value)
+                    break
 
     def process_polyps(
         self,
@@ -452,7 +481,6 @@ class InvestigationDatasetCompletion:
     def fill_endoscopy_information(self, endoscopy_information: dict) -> None:
         """
         Fills out the endoscopy information section of the investigation dataset.
-
         Args:
             endoscopy_information (dict): A dictionary containing the endoscopy information to be filled in the form.
         """
@@ -538,7 +566,6 @@ class InvestigationDatasetCompletion:
     ) -> None:
         """
         Fills out the polyp information section of the investigation dataset for any polyp.
-
         Args:
             polyp_1_information (dict): A dictionary containing the polyp 1 information to be filled in the form.
         """
@@ -605,7 +632,6 @@ class InvestigationDatasetCompletion:
     ) -> None:
         """
         Fills out the polyp 1 intervention section of the investigation dataset.
-
         Args:
             polyp_1_intervention (dict): A dictionary containing the polyp 1 intervention to be filled in the form.
         """
@@ -674,7 +700,6 @@ class InvestigationDatasetCompletion:
     ) -> None:
         """
         Fills out multiple interventions for the given polyp.
-
         Args:
             interventions (list): A list of intervention dictionaries.
             polyp_number (int): The 1-based index of the polyp.
@@ -741,7 +766,6 @@ class InvestigationDatasetCompletion:
     def fill_polyp_x_histology(self, polyp_histology: dict, polyp_number: int) -> None:
         """
         Fills out the polyp histology section of the investigation dataset.
-
         Args:
             polyp_histology (dict): A dictionary containing the polyp 1 histology to be filled in the form.
         """
@@ -780,13 +804,13 @@ class InvestigationDatasetCompletion:
                         "Pathology Provider",
                         f"divPolypHistology{polyp_number}_1Details",
                     )
-                    self.investigation_datasets_pom.select_loopup_option_index(value)
+                    self.investigation_datasets_pom.select_lookup_option_index(value)
                 case "pathologist":
                     DatasetFieldUtil(self.page).click_lookup_link_inside_div(
                         "Pathologist",
                         f"divPolypHistology{polyp_number}_1Details",
                     )
-                    self.investigation_datasets_pom.select_loopup_option_index(value)
+                    self.investigation_datasets_pom.select_lookup_option_index(value)
                 case "polyp type":
                     DatasetFieldUtil(
                         self.page
@@ -848,7 +872,6 @@ class InvestigationDatasetCompletion:
         """
         This method checks if the relevant "Show details" link for a polyp histology is present.
         If it is then it clicks it.
-
         Args:
             polyp_number (int): The polyp number for the histology you want to check
         """
@@ -859,6 +882,88 @@ class InvestigationDatasetCompletion:
             text = locator.inner_text().strip()
             if text == "Show details":
                 locator.click()
+
+    def clear_drug_type_and_doses_inputs(self, drug_type: str, count: int = 1) -> None:
+        """
+        Clears all drug type and dose inputs on the page for the specified drug type.
+        Args:
+            drug_type (str): The drug type label (should be one of the class string constants).
+            count (int): The number of drug types and doses to clear. Default is 1.
+        """
+        if (
+            drug_type
+            == InvestigationDatasetsPage(
+                self.page
+            ).bowel_preparation_administered_string
+        ):
+            type_prefix = "drug_type"
+            dose_prefix = "drug_dose"
+        elif (
+            drug_type
+            == InvestigationDatasetsPage(self.page).antibiotics_administered_string
+        ):
+            type_prefix = "antibiotic_drug_type"
+            dose_prefix = "antibiotic_drug_dose"
+        elif (
+            drug_type
+            == InvestigationDatasetsPage(self.page).other_drugs_administered_string
+        ):
+            type_prefix = "other_drug_type"
+            dose_prefix = "other_drug_dose"
+        else:
+            raise ValueError(f"Unknown drug_type: {drug_type}")
+
+        drug_information = {}
+        for i in range(1, count + 1):
+            drug_information[f"{type_prefix}{i}"] = ""
+            drug_information[f"{dose_prefix}{i}"] = ""
+
+        self.fill_out_drug_information(drug_information)
+
+        for i in range(1, count + 1):
+            InvestigationDatasetsPage(self.page).assert_drug_type_text(drug_type, i, "")
+            InvestigationDatasetsPage(self.page).assert_drug_dose_text(drug_type, i, "")
+
+    def build_drug_information_dict(
+        self, drug_info_list: list[tuple], drug_type: str, skip_none: bool = True
+    ) -> dict:
+        """
+        Builds a drug information dictionary for use with InvestigationDatasetCompletion.fill_out_drug_information,
+        automatically selecting the correct key prefixes based on the drug_type.
+
+        Args:
+            drug_info_list (list[tuple[object, str]]):
+                A list of (drug_type_value, drug_dose_value) pairs.
+            drug_type (str):
+                The drug section label, e.g. "Bowel Preparation Administered",
+                "Antibiotics Administered", or "Other Drugs Administered".
+            skip_none (bool):
+                If True, skips adding keys with None or empty string values.
+
+        Returns:
+            dict[str, object]:
+                A dictionary with keys like "drug_type1", "drug_dose1", etc.,
+                suitable for passing to fill_out_drug_information.
+        """
+        prefix_map = {
+            "Bowel Preparation Administered": ("drug_type", "drug_dose"),
+            "Antibiotics Administered": (
+                "antibiotic_drug_type",
+                "antibiotic_drug_dose",
+            ),
+            "Other Drugs Administered": ("other_drug_type", "other_drug_dose"),
+        }
+        if drug_type not in prefix_map:
+            raise ValueError(f"Unknown drug_type: {drug_type}")
+
+        type_prefix, dose_prefix = prefix_map[drug_type]
+        drug_information = {}
+        for idx, (drug_type_val, drug_dose_val) in enumerate(drug_info_list, start=1):
+            if not skip_none or drug_type_val not in (None, ""):
+                drug_information[f"{type_prefix}{idx}"] = drug_type_val
+            if not skip_none or drug_dose_val not in (None, ""):
+                drug_information[f"{dose_prefix}{idx}"] = drug_dose_val
+        return drug_information
 
 
 class AfterInvestigationDatasetComplete:
