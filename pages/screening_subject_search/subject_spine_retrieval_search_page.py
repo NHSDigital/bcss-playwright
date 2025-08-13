@@ -4,12 +4,13 @@ from pages.base_page import BasePage
 from typing import Dict
 from utils.calendar_picker import CalendarPicker
 
-class SpineSearchPage:
+class SpineSearchPage(BasePage):
     """
     Page object for the Spine Search screen, enabling demographic searches
     and data retrieval from the Spine system.
     """
     def __init__(self, page: Page):
+        super().__init__(page)
         self.page = page
 
         # Define locators
@@ -60,18 +61,6 @@ class SpineSearchPage:
         Clicks the 'Search' button to initiate the Spine demographic search.
         """
         self.click(self.search_button)
-
-    def click(self, locator: Locator) -> None:
-        """
-        Clicks on the specified locator.
-
-        Args:
-            locator (Locator): The Playwright locator to click.
-        """
-        try:
-            locator.click()
-        except Exception as e:
-            print(f"Error clicking on locator: {e}")
 
     def get_spine_alert_message(self) -> str:
         """
