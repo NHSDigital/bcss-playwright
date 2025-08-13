@@ -2,8 +2,6 @@ from datetime import datetime
 from playwright.sync_api import Page, Locator
 from pages.base_page import BasePage
 from typing import Dict
-
-# Assume you have a CalendarPicker utility in your project
 from utils.calendar_picker import CalendarPicker
 
 class SpineSearchPage:
@@ -13,10 +11,8 @@ class SpineSearchPage:
     """
     def __init__(self, page: Page):
         self.page = page
-        self.spine_url = "https://bcss-bcss-18680-ddc-bcss.k8s-nonprod.texasplatform.uk/servlet/SpineSearchScreen"
 
         # Define locators
-        self.retrieve_data_link = self.page.get_by_role("link", name="Retrieve Data from Spine")
         self.demographics_radio = self.page.get_by_role("radio", name="Demographics")
         self.date_of_birth_field = self.page.locator("#dateOfBirth")
         self.surname_field = self.page.locator("#surname")
@@ -24,18 +20,10 @@ class SpineSearchPage:
         self.gender_dropdown = self.page.locator("#gender")
         self.postcode_field = self.page.locator("#postcode")
         self.search_button = self.page.get_by_role("button", name="Search")
-        self.alert_message = self.page.locator(".spine-alert")
+        self.alert_locator= self.page.locator(".spine-alert")
 
         # CalendarPicker utility instance
         self.calendar_picker = CalendarPicker(self.page)
-
-    def navigate_to_spine_search(self) -> None:
-        """
-        Navigates to the Spine Search screen by clicking the appropriate link
-        and loading the target URL.
-        """
-        self.retrieve_data_link.click()
-        self.page.goto(self.spine_url)
 
     def select_demographic_search(self) -> None:
         """
@@ -44,7 +32,7 @@ class SpineSearchPage:
         self.demographics_radio.check()
 
     def enter_search_criteria(
-    self, dob: str, surname: str, forename: str, gender: str, postcode: str
+self, dob: str, surname: str, forename: str, gender: str, postcode: str
 ) -> None:
         """
         Fills in the demographic search fields with the provided values.
@@ -59,7 +47,7 @@ class SpineSearchPage:
 
         # Convert dob string to datetime object
         dob_dt = datetime.strptime(dob, "%d %b %Y")  # Adjust format if needed
-        self.date_of_birth_field.click()
+        self.click(self.date_of_birth_field)
         self.calendar_picker.v2_calendar_picker(dob_dt)  # dob should be in a supported format, e.g. "YYYY-MM-DD"
         self.surname_field.fill(surname)
         self.forename_field.fill(forename)
@@ -71,10 +59,33 @@ class SpineSearchPage:
         """
         Clicks the 'Search' button to initiate the Spine demographic search.
         """
-        self.search_button.click()
+        self.click(self.search_button)
+
+    def click(self, locator: Locator) -> None:
+        """
+        Clicks on the specified locator.
+
+        Args:
+        locator (Locator): The Playwright locator to click.
+        """
+        try:
+            locator.click()
+        except Exception as e:
+            print(f"Error clicking on locator: {e}")
 
     def get_spine_alert_message(self) -> str:
-        alert_locator = self.page.locator(".spine-alert")  # Update selector if needed
+        """
+        Retrieves the text content of a visible spine alert message from the page.
+
+        This method waits for the alert element with the CSS class `.spine-alert` to become visible
+        within a 5-second timeout. If the alert appears, its inner text is returned after stripping
+        leading and trailing whitespace. If the alert does not appear within the timeout or an unexpected
+        error occurs, an empty string is returned and the error is logged to the console.
+
+        Returns:
+        str: The stripped text of the alert message if visible, otherwise an empty string.
+        """
+        alert_locator = self.page.locator(".spine-alert")
         try:
             alert_locator.wait_for(state="visible", timeout=5000)
             return alert_locator.inner_text().strip()
