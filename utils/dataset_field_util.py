@@ -129,7 +129,7 @@ class DatasetFieldUtil:
     ) -> None:
         """
         Asserts that the first visible field to the right of the cell containing `text` has the expected value,
-        ensuring it is in the same row (not just visually to the right).
+        supporting both table row and span structures.
         Args:
             text (str): The text in the left-hand cell.
             expected_text (str): The expected value in the adjacent right-hand cell.
@@ -143,53 +143,73 @@ class DatasetFieldUtil:
         if div:
             scope = self.page.locator(f"div#{div}")
 
-        # Locate the parent row containing the label text
+        # Try table row structure first
         row = scope.locator(f'.noTableRow:has-text("{text}")').first
+        if row.count() > 0 and row.is_visible():
+            cells = row.locator("xpath=./*").all()
+            for idx, cell in enumerate(cells):
+                cell_text = cell.inner_text().strip()
+                if text.strip() in cell_text:
+                    if idx + 1 >= len(cells):
+                        raise AssertionError(f'No cell found to the right of "{text}".')
+                    right_cell = cells[idx + 1]
 
-        # Defensive check
-        if not row.is_visible():
-            raise AssertionError(f'Could not find a visible row with text "{text}".')
+                    # Check <input>
+                    input_el = right_cell.locator("input")
+                    if input_el.count() > 0:
+                        value = input_el.first.input_value().strip()
+                        assert (
+                            value == expected_text
+                        ), f'Expected "{expected_text}" but found "{value}" in input.'
+                        logging.info(
+                            f"The cell next to {text} contains {expected_text}"
+                        )
+                        return
 
-        # Find all children inside this row
-        cells = row.locator("xpath=./*").all()
+                    # Check <select>
+                    select_el = right_cell.locator("select")
+                    if select_el.count() > 0:
+                        selected = (
+                            select_el.locator("option:checked").inner_text().strip()
+                        )
+                        assert (
+                            selected == expected_text
+                        ), f'Expected "{expected_text}" but found "{selected}" in select.'
+                        logging.info(
+                            f"The cell next to {text} contains {expected_text}"
+                        )
+                        return
 
-        # Loop through children to find the one with the label text, then check the next one
-        for idx, cell in enumerate(cells):
-            cell_text = cell.inner_text().strip()
-            if text.strip() in cell_text:
-                if idx + 1 >= len(cells):
-                    raise AssertionError(f'No cell found to the right of "{text}".')
-                right_cell = cells[idx + 1]
-
-                # Check <input>
-                input_el = right_cell.locator("input")
-                if input_el.count() > 0:
-                    value = input_el.first.input_value().strip()
+                    # Check <p>, <span>, etc.
+                    generic_text = right_cell.inner_text().strip()
                     assert (
-                        value == expected_text
-                    ), f'Expected "{expected_text}" but found "{value}" in input.'
+                        generic_text == expected_text
+                    ), f'Expected "{expected_text}" but found "{generic_text}".'
                     logging.info(f"The cell next to {text} contains {expected_text}")
                     return
 
-                # Check <select>
-                select_el = right_cell.locator("select")
-                if select_el.count() > 0:
-                    selected = select_el.locator("option:checked").inner_text().strip()
-                    assert (
-                        selected == expected_text
-                    ), f'Expected "{expected_text}" but found "{selected}" in select.'
-                    logging.info(f"The cell next to {text} contains {expected_text}")
-                    return
+            raise AssertionError(f'Could not locate label "{text}" in any cell.')
 
-                # Check <p>, <span>, etc.
-                generic_text = right_cell.inner_text().strip()
-                assert (
-                    generic_text == expected_text
-                ), f'Expected "{expected_text}" but found "{generic_text}".'
-                logging.info(f"The cell next to {text} contains {expected_text}")
-                return
+        label_span = scope.locator(f'span.label:has-text("{text}")').first
+        user_input_span = label_span.locator(
+            'xpath=following-sibling::span[contains(@class,"userInput")]'
+        ).first
+        if (
+            label_span.count() > 0
+            and label_span.is_visible()
+            and user_input_span.count() > 0
+            and user_input_span.is_visible()
+        ):
+            actual_text = user_input_span.inner_text().strip()
+            assert (
+                actual_text == expected_text
+            ), f'Expected "{expected_text}" but found "{actual_text}" in userInput span next to "{text}".'
+            logging.info(f"The span next to '{text}' contains '{expected_text}'")
+            return
 
-        raise AssertionError(f'Could not locate label "{text}" in any cell.')
+        raise AssertionError(
+            f'Could not find a visible row or span with text "{text}".'
+        )
 
     def assert_select_to_right_has_values(
         self, text: str, expected_values: List[str], div: Optional[str] = None
@@ -286,10 +306,13 @@ class DatasetFieldUtil:
     ) -> None:
         """
         Asserts that the selected radio button to the right of a label with the given text matches the expected value.
+        Handles both wrapped <label> patterns and label-for patterns.
+
         Args:
             text (str): The label or text on the left-hand side.
             expected_value (str): The expected label/text of the selected radio button.
             div (Optional[str]): Optional ID of a container DIV.
+
         Raises:
             AssertionError: If no radio button is selected, or the selected one doesn't match expected.
         """
@@ -300,28 +323,42 @@ class DatasetFieldUtil:
         if div:
             scope = self.page.locator(f"div#{div}")
 
-        # Find all radio buttons to the right of the label
+        # Find all radio buttons to the right of the label text
         radio_buttons = scope.locator(f'input[type="radio"]:right-of(:text("{text}"))')
 
-        if radio_buttons.count() == 0:
+        count = radio_buttons.count()
+        if count == 0:
             raise AssertionError(f'No radio buttons found to the right of "{text}".')
 
         found_match = False
-        for radio_button_index in range(radio_buttons.count()):
-            radio = radio_buttons.nth(radio_button_index)
+
+        for i in range(count):
+            radio = radio_buttons.nth(i)
             if radio.is_checked():
-                # Try to find the label next to the radio
-                label = radio.evaluate_handle(
+                # Try both wrapped label and label-for approaches
+                label_text = radio.evaluate(
                     """
                     (radio) => {
-                        const label = radio.closest('label');
-                        return label ? label.innerText : radio.nextSibling?.textContent?.trim() || "";
+                        // Case 1: Wrapped inside label
+                        let label = radio.closest('label');
+                        if (label) {
+                            return label.innerText.trim();
+                        }
+                        // Case 2: label-for pattern
+                        const id = radio.id;
+                        if (id) {
+                            label = document.querySelector(`label[for="${id}"]`);
+                            if (label) {
+                                return label.innerText.trim();
+                            }
+                        }
+                        // Fallback: Try immediate text sibling
+                        return radio.nextSibling?.textContent?.trim() || "";
                     }
                 """
                 )
-                label_text = label.json_value()
                 found_match = True
-                assert label_text.strip() == expected_value, (
+                assert label_text == expected_value, (
                     f'Expected selected radio to be "{expected_value}" to the right of "{text}", '
                     f'but found "{label_text}".'
                 )
@@ -331,6 +368,7 @@ class DatasetFieldUtil:
             raise AssertionError(
                 f'No radio button is selected to the right of "{text}".'
             )
+
         logging.info(f"The radio selected next to {text} was {expected_value}")
 
     def assert_checkbox_to_right_is_enabled(
