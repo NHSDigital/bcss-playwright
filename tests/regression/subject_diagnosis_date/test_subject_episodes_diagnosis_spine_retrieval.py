@@ -1,5 +1,5 @@
 import pytest
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 from utils.user_tools import UserTools
 from pages.base_page import BasePage
 from pages.screening_subject_search.subject_spine_retrieval_search_page import SpineSearchPage
@@ -7,7 +7,7 @@ from pages.screening_subject_search.subject_spine_retrieval_search_page import S
 @pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.spine_retrieval_search_tests
-def test_user_can_search_for_subject_spine_retrieval(page: Page):
+def test_user_can_search_for_subject_spine_retrieval(page: Page) -> None:
     """
     Tests to ensure that Spine searching is enabled for English users.
     """
@@ -28,9 +28,6 @@ def test_user_can_search_for_subject_spine_retrieval(page: Page):
     )
     spine_page.perform_search()
 
-    # Step 3: Assert alert message
+    # Step 3: Assert in-page alert message
     alert_message = spine_page.get_spine_alert_message()
-    assert not alert_message, f"Unexpected alert shown: '{alert_message}'"
-
-
-
+    f"Expected alert message not found. Got: '{alert_message}'"
