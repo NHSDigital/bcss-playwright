@@ -32,8 +32,8 @@ class SpineSearchPage:
         self.demographics_radio.check()
 
     def enter_search_criteria(
-self, dob: str, surname: str, forename: str, gender: str, postcode: str
-) -> None:
+        self, dob: str, surname: str, forename: str, gender: str, postcode: str
+    ) -> None:
         """
         Fills in the demographic search fields with the provided values.
 
