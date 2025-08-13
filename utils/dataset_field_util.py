@@ -168,17 +168,17 @@ class DatasetFieldUtil:
         if row.count() == 0 or not row.is_visible():
             return False
         cells = row.locator("xpath=./*").all()
-        cell_idx = next(
+        label_cell_index = next(
             (
-                i
-                for i, cell in enumerate(cells)
+                cell_index
+                for cell_index, cell in enumerate(cells)
                 if text.strip() in cell.inner_text().strip()
             ),
             None,
         )
-        if cell_idx is None or cell_idx + 1 >= len(cells):
+        if label_cell_index is None or label_cell_index + 1 >= len(cells):
             return False
-        right_cell = cells[cell_idx + 1]
+        right_cell = cells[label_cell_index + 1]
         if self._assert_right_cell(right_cell, text, expected_text):
             logging.info(f"The cell next to {text} contains {expected_text}")
             return True
@@ -196,9 +196,9 @@ class DatasetFieldUtil:
         Returns:
             bool: True if the expected value is found, False otherwise.
         """
-        input_el = right_cell.locator("input")
-        if input_el.count() > 0:
-            value = input_el.first.input_value().strip()
+        input_locator = right_cell.locator("input")
+        if input_locator.count() > 0:
+            value = input_locator.first.input_value().strip()
             if value == expected_text:
                 logging.info(
                     f'Input to the right of "{text}" contains "{expected_text}"'
@@ -206,9 +206,9 @@ class DatasetFieldUtil:
                 return True
             return False
 
-        select_el = right_cell.locator("select")
-        if select_el.count() > 0:
-            selected = select_el.locator("option:checked").inner_text().strip()
+        select_locator = right_cell.locator("select")
+        if select_locator.count() > 0:
+            selected = select_locator.locator("option:checked").inner_text().strip()
             if selected == expected_text:
                 logging.info(
                     f'Select to the right of "{text}" contains "{expected_text}"'
@@ -375,8 +375,8 @@ class DatasetFieldUtil:
 
         found_match = False
 
-        for i in range(count):
-            radio = radio_buttons.nth(i)
+        for radio_index in range(count):
+            radio = radio_buttons.nth(radio_index)
             if radio.is_checked():
                 # Try both wrapped label and label-for approaches
                 label_text = radio.evaluate(
