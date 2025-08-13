@@ -138,58 +138,103 @@ class DatasetFieldUtil:
             AssertionError: If the expected text is not found.
         """
         logging.info(f"Checking that the cell next to {text} contains {expected_text}")
+        scope = self.page.locator(f"div#{div}") if div else self.page
 
-        scope = self.page
-        if div:
-            scope = self.page.locator(f"div#{div}")
+        if self._check_table_row(scope, text, expected_text):
+            return
+        if self._check_span_structure(scope, text, expected_text):
+            return
 
-        # Try table row structure first
+        raise AssertionError(
+            f'Could not find a visible row or span with text "{text}".'
+        )
+
+    def _check_table_row(
+        self, scope: Locator | Page, text: str, expected_text: str
+    ) -> bool:
+        """
+        Checks if the expected text is present in the cell to the right of the cell containing `text`
+        within a table row structure.
+        Args:
+            scope (Locator): The Playwright locator to scope the search.
+            text (str): The label text to search for.
+            expected_text (str): The expected value in the adjacent right-hand cell.
+        Returns:
+            bool: True if the expected text is found and matches, False otherwise.
+        Raises:
+            AssertionError: If the actual value does not match the expected value.
+        """
         row = scope.locator(f'.noTableRow:has-text("{text}")').first
-        if row.count() > 0 and row.is_visible():
-            cells = row.locator("xpath=./*").all()
-            for idx, cell in enumerate(cells):
-                cell_text = cell.inner_text().strip()
-                if text.strip() in cell_text:
-                    if idx + 1 >= len(cells):
-                        raise AssertionError(f'No cell found to the right of "{text}".')
-                    right_cell = cells[idx + 1]
+        if row.count() == 0 or not row.is_visible():
+            return False
+        cells = row.locator("xpath=./*").all()
+        cell_idx = next(
+            (
+                i
+                for i, cell in enumerate(cells)
+                if text.strip() in cell.inner_text().strip()
+            ),
+            None,
+        )
+        if cell_idx is None or cell_idx + 1 >= len(cells):
+            return False
+        right_cell = cells[cell_idx + 1]
+        if self._assert_right_cell(right_cell, text, expected_text):
+            logging.info(f"The cell next to {text} contains {expected_text}")
+            return True
+        return False
 
-                    # Check <input>
-                    input_el = right_cell.locator("input")
-                    if input_el.count() > 0:
-                        value = input_el.first.input_value().strip()
-                        assert (
-                            value == expected_text
-                        ), f'Expected "{expected_text}" but found "{value}" in input.'
-                        logging.info(
-                            f"The cell next to {text} contains {expected_text}"
-                        )
-                        return
+    def _assert_right_cell(
+        self, right_cell: Locator, text: str, expected_text: str
+    ) -> bool:
+        """
+        Asserts that the right cell contains the expected value, checking input, select, or generic text.
+        Args:
+            right_cell (Locator): The Playwright locator for the cell to the right.
+            text (str): The label text for logging and error messages.
+            expected_text (str): The expected value to check.
+        Returns:
+            bool: True if the expected value is found, False otherwise.
+        Raises:
+            AssertionError: If the actual value does not match the expected value.
+        """
+        input_el = right_cell.locator("input")
+        if input_el.count() > 0:
+            value = input_el.first.input_value().strip()
+            assert (
+                value == expected_text
+            ), f'Expected "{expected_text}" but found "{value}" in input to the right of "{text}".'
+            logging.info(f'Input to the right of "{text}" contains "{expected_text}"')
+            return True
+        select_el = right_cell.locator("select")
+        if select_el.count() > 0:
+            selected = select_el.locator("option:checked").inner_text().strip()
+            assert (
+                selected == expected_text
+            ), f'Expected "{expected_text}" but found "{selected}" in select to the right of "{text}".'
+            logging.info(f'Select to the right of "{text}" contains "{expected_text}"')
+            return True
+        generic_text = right_cell.inner_text().strip()
+        assert (
+            generic_text == expected_text
+        ), f'Expected "{expected_text}" but found "{generic_text}" in cell to the right of "{text}".'
+        logging.info(f'Cell to the right of "{text}" contains "{expected_text}"')
+        return True
 
-                    # Check <select>
-                    select_el = right_cell.locator("select")
-                    if select_el.count() > 0:
-                        selected = (
-                            select_el.locator("option:checked").inner_text().strip()
-                        )
-                        assert (
-                            selected == expected_text
-                        ), f'Expected "{expected_text}" but found "{selected}" in select.'
-                        logging.info(
-                            f"The cell next to {text} contains {expected_text}"
-                        )
-                        return
-
-                    # Check <p>, <span>, etc.
-                    generic_text = right_cell.inner_text().strip()
-                    assert (
-                        generic_text == expected_text
-                    ), f'Expected "{expected_text}" but found "{generic_text}".'
-                    logging.info(f"The cell next to {text} contains {expected_text}")
-                    return
-
-            raise AssertionError(f'Could not locate label "{text}" in any cell.')
-
+    def _check_span_structure(
+        self, scope: Locator | Page, text: str, expected_text: str
+    ) -> bool:
+        """
+        Checks if the expected text is present in a span structure (label and userInput spans).
+        Args:
+            scope (Locator): The Playwright locator to scope the search.
+            text (str): The label text to search for.
+            expected_text (str): The expected value in the adjacent userInput span.
+        Returns:
+            bool: True if the expected text is found and matches, False otherwise.
+        Raises:
+            AssertionError: If the actual value does not match the expected value.
+        """
         label_span = scope.locator(f'span.label:has-text("{text}")').first
         user_input_span = label_span.locator(
             'xpath=following-sibling::span[contains(@class,"userInput")]'
@@ -205,11 +250,8 @@ class DatasetFieldUtil:
                 actual_text == expected_text
             ), f'Expected "{expected_text}" but found "{actual_text}" in userInput span next to "{text}".'
             logging.info(f"The span next to '{text}' contains '{expected_text}'")
-            return
-
-        raise AssertionError(
-            f'Could not find a visible row or span with text "{text}".'
-        )
+            return True
+        return False
 
     def assert_select_to_right_has_values(
         self, text: str, expected_values: List[str], div: Optional[str] = None
