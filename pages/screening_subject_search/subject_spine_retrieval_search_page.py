@@ -38,11 +38,11 @@ class SpineSearchPage:
         Fills in the demographic search fields with the provided values.
 
         Args:
-        dob (str): Date of birth in string format (e.g., "06 May 1940").
-        surname (str): Subject's surname.
-        forename (str): Subject's forename.
-        gender (str): Gender value ("Male" or "Female").
-        postcode (str): Subject's postcode.
+            dob (str): Date of birth in string format (e.g., "06 May 1940").
+            surname (str): Subject's surname.
+            forename (str): Subject's forename.
+            gender (str): Gender value ("Male" or "Female").
+            postcode (str): Subject's postcode.
         """
 
         # Convert dob string to datetime object
@@ -66,7 +66,7 @@ class SpineSearchPage:
         Clicks on the specified locator.
 
         Args:
-        locator (Locator): The Playwright locator to click.
+            locator (Locator): The Playwright locator to click.
         """
         try:
             locator.click()
@@ -83,7 +83,7 @@ class SpineSearchPage:
         error occurs, an empty string is returned and the error is logged to the console.
 
         Returns:
-        str: The stripped text of the alert message if visible, otherwise an empty string.
+            str: The stripped text of the alert message if visible, otherwise an empty string.
         """
         alert_locator = self.page.locator(".spine-alert")
         try:
