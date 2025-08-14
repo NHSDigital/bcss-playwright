@@ -576,7 +576,7 @@ class InvestigationDatasetsPage(BasePage):
         return section_found
 
     def is_dataset_section_on_page(
-        self, dataset_section: Union[str, List[str]], should_be_present: bool = True
+        self, dataset_section: str | List[str], should_be_present: bool = True
     ) -> None:
         """
         Asserts whether the specified dataset section(s) are present or not on the page.
