@@ -140,6 +140,7 @@ class SubjectSelectionQueryBuilder:
         self.sql_from = []
         self.sql_where = []
         self.sql_from_episode = []
+        self.sql_from_diagnostic_test = []
         self.sql_from_genetic_condition_diagnosis = []
         self.sql_from_cancer_audit_datasets = []
         self.bind_vars = {}
@@ -162,6 +163,7 @@ class SubjectSelectionQueryBuilder:
                 self.sql_select
                 + self.sql_from
                 + self.sql_from_episode
+                + self.sql_from_diagnostic_test
                 + self.sql_from_genetic_condition_diagnosis
                 + self.sql_from_cancer_audit_datasets
                 + self.sql_where
@@ -1737,7 +1739,7 @@ class SubjectSelectionQueryBuilder:
 
     def _handle_latest_test_in_latest_episode(self, which, xt, _):
         """Helper method for diagnostic test filtering"""
-        self.sql_from.append(
+        self.sql_from_diagnostic_test.append(
             f"""AND {xt}.ext_test_id = (
         SELECT MAX(xtx.ext_test_id) FROM external_tests_t xtx
         WHERE xtx.screening_subject_id = ss.screening_subject_id
@@ -1791,7 +1793,16 @@ class SubjectSelectionQueryBuilder:
                 self.sql_where.append(self._SQL_IS_NOT_NULL)
             else:
                 comparator = self.criteria_comparator
-                type_id = DiagnosticTestType.get_valid_value_id(self.criteria_value)
+                diagnostic_test_type = (
+                    DiagnosticTestType.by_description_case_insensitive(
+                        self.criteria_value
+                    )
+                )
+                if diagnostic_test_type is None:
+                    raise SelectionBuilderException(
+                        self.criteria_key_name, self.criteria_value
+                    )
+                type_id = diagnostic_test_type.get_valid_value_id()
                 self.sql_where.append(f"{comparator} {type_id}")
 
         except Exception:
@@ -1873,7 +1884,9 @@ class SubjectSelectionQueryBuilder:
         try:
             idx = getattr(self, "criteria_index", 0)
             xt = f"xt{idx}"
-            extent = IntendedExtentType.from_description(self.criteria_value)
+            extent = IntendedExtentType.by_description_case_insensitive(
+                self.criteria_value
+            )
 
             self.sql_where.append(f"AND {xt}.intended_extent_id ")
 
@@ -1882,9 +1895,11 @@ class SubjectSelectionQueryBuilder:
                     f"IS {IntendedExtentType.get_description(extent)}"
                 )
             else:
-                self.sql_where.append(
-                    f"{self.criteria_comparator} {IntendedExtentType.get_id(self.criteria_value)}"
-                )
+                if extent is None:
+                    raise SelectionBuilderException(
+                        self.criteria_key_name, self.criteria_value
+                    )
+                self.sql_where.append(f" {self.criteria_comparator} {extent.get_id()} ")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
@@ -2036,12 +2051,19 @@ class SubjectSelectionQueryBuilder:
         """
         try:
             self._add_join_to_latest_episode()
-            extent_id = IntendedExtentType.get_id(self.criteria_value)
+            extent = IntendedExtentType.by_description_case_insensitive(
+                self.criteria_value
+            )
+            if extent is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+            extent_id = extent.get_id()
 
             self.sql_where.append(
-                "AND EXISTS (SELECT 'dsc' FROM v_ds_colonoscopy dsc "
-                "WHERE dsc.episode_id = ep.subject_epis_id "
-                f"AND dsc.intended_extent_id = {extent_id})"
+                " AND EXISTS (SELECT 'dsc' FROM v_ds_colonoscopy dsc "
+                " WHERE dsc.episode_id = ep.subject_epis_id "
+                f" AND dsc.intended_extent_id = {extent_id}) "
             )
 
         except Exception:

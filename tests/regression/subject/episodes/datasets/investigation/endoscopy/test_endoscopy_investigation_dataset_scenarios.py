@@ -3081,6 +3081,62 @@ def test_cross_field_validation_between_general_anaesthetic_other_drugs_and_seda
     LogoutPage(page).log_out()
 
 
+@pytest.mark.wip
+@pytest.mark.regression
+@pytest.mark.vpn_required
+@pytest.mark.investigation_dataset_tests
+@pytest.mark.bcss_additional_tests
+@pytest.mark.colonoscopy_dataset_tests
+def test_validation_of_endoscopist_defined_extent_in_limited_colonoscopy_investigation_dataset(
+    page: Page,
+) -> None:
+    """
+    Scenario: Check validation related to the Endoscopist Defined Extent in a Limited Colonoscopy investigation dataset
+
+    At the time a Limited Colonoscopy is booked, an Intended Extent of Examination is recorded, which is any location from Anus to Ascending Colon.
+    Intended Extent of Examination is only displayed if the endoscope was inserted.
+    The Endoscopist Defined Extent dropdown list still offers all locations from Anus to Appendix.
+    Even if the Endoscopist Defined Extent is set to Ascending Colon (the furthest possible point in a Limited Colonoscopy) the Completion Proof Information section is not displayed.
+    If the Endoscopist Defined Extent is set to a value "beyond" Ascending Colon, a warning message is displayed, and if the user confirms this value is correct, the Actual Type of Test is changed to a full Colonoscopy.
+
+    The affect of the Endoscopist Defined Extent value on the display of the Failure Reasons dropdown list, in a Limited Colonoscopy, is covered in a separate scenario.
+    """
+    criteria = {
+        "which diagnostic test": "latest_not_void_test_in_latest_episode",
+        "diagnostic test confirmed type": "Limited Colonoscopy",
+        "diagnostic test intended extent": "Ascending Colon",
+        "latest episode status": "open",
+        "latest episode latest investigation dataset": "limited_colonoscopy_new",
+    }
+    # Currently 0 subjects. The test data is created by scenario 11 in SurveillanceRegressionTests.feature but this also lacks test data
+
+    user = User()
+    subject = Subject()
+
+    builder = SubjectSelectionQueryBuilder()
+
+    query, bind_vars = builder.build_subject_selection_query(
+        criteria=criteria,
+        user=user,
+        subject=subject,
+        subjects_to_retrieve=1,
+    )
+
+    df = OracleDB().execute_query(query, bind_vars)
+    nhs_no = df.iloc[0]["subject_nhs_number"]
+    logging.info(f"NHS Number: {nhs_no}")
+
+    UserTools.user_login(page, "Screening Centre Manager at BCS001")
+    BasePage(page).go_to_screening_subject_search_page()
+    search_subject_episode_by_nhs_number(page, nhs_no)
+    SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_investigation_show_datasets()
+
+    InvestigationDatasetsPage(page).bowel_cancer_screening_page_title_contains_text(
+        "Investigation Datasets"
+    )
+
+
 # Helper Functions
 
 
