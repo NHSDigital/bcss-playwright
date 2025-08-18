@@ -272,9 +272,7 @@ class TableUtils:
             raise ValueError(f"Column '{column_name}' not found in table")
 
         # Locate all <td> elements in the specified row and column
-        cell_locator = (
-            f"{self.table_id} tbody tr:nth-child({row_index}) td:nth-child({column_index})"
-        )
+        cell_locator = f"{self.table_id} tbody tr:nth-child({row_index}) td:nth-child({column_index})"
 
         cell = self.page.locator(cell_locator).first
 
@@ -360,3 +358,79 @@ class TableUtils:
             ):
                 return self.pick_row(i)
         return None
+
+    def click_surname_if_bcss_user_and_has_code(self):
+        """
+        Clicks on the surname link of the first row where:
+        - 'BCSS User?' column is 'Yes'
+        - 'User Code' is not '-'
+        """
+        surname_col = self.get_column_index("Surname")
+        user_code_col = self.get_column_index("User Code")
+        bcss_col = self.get_column_index("BCSS User?")
+
+        if -1 in (surname_col, user_code_col, bcss_col):
+            raise ValueError("One or more required columns not found")
+
+        rows = self.table.locator("tbody tr")
+
+        for i in range(rows.count()):
+            row = rows.nth(i)
+
+            # Skip rows with no <td> cells
+            cell_count = row.locator("td").count()
+            if cell_count == 0:
+                continue
+
+            # Skip rows that don’t have enough columns
+            if cell_count < max(user_code_col, bcss_col, surname_col):
+                continue
+
+            user_code = (
+                row.locator(f"td:nth-child({user_code_col})").inner_text().strip()
+            )
+            bcss_value = row.locator(f"td:nth-child({bcss_col})").inner_text().strip()
+
+            if bcss_value.lower() == "yes" and user_code != "-":
+                surname_link = row.locator(f"td:nth-child({surname_col}) a")
+                if surname_link.count() > 0:
+                    surname_link.click()
+                    return
+                else:
+                    logging.error(f"No clickable surname link found in row {i+1}")
+                    return
+
+        logging.warning(
+            "No matching row found where BCSS User? == 'Yes' and User Code != '-'"
+        )
+
+    def verify_value_for_label(self, label_text: str, expected_text: str) -> None:
+        """
+        Verifies that the value cell (2nd <td>) in the row where the first <td>
+        matches the given label contains the expected text.
+
+        Args:
+            label_text (str): The label text to look for in the first cell of a row.
+            expected_text (str): The text expected inside the adjacent cell.
+
+        Raises:
+            AssertionError: If the label is not found or the expected text is not present.
+        """
+        # Find the row with the matching label in its first cell
+        row = self.table.locator(f"tr:has(td:nth-child(1):has-text('{label_text}'))")
+
+        if row.count() == 0:
+            raise AssertionError(f"Label '{label_text}' not found in table")
+
+        # Select the value cell (2nd column in the same row)
+        value_cell = row.locator("td").nth(1)
+        actual_text = value_cell.inner_text().strip()
+
+        assert expected_text in actual_text, (
+            f"Expected '{expected_text}' for label '{label_text}', "
+            f"but got '{actual_text}'"
+        )
+
+        logging.info(
+            f"Verified: label '{label_text}' has expected text '{expected_text}'"
+        )
