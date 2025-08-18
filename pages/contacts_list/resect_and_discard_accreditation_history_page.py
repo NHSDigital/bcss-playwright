@@ -12,7 +12,9 @@ class ResectAndDiscardAccreditationHistoryPage(BasePage):
         self.page = page
         # Resect And Discard Accreditation History - page locators, methods
         self.heading = self.page.get_by_role("heading", name="Resect and Discard")
-        self.add_accreditation_button = self.page.get_by_role("button", name="+ Add Accreditation")
+        self.add_accreditation_button = self.page.get_by_role(
+            "button", name="+ Add Accreditation"
+        )
         self.save_button = self.page.get_by_role("button", name="Save")
         self.changes_saved_text = self.page.get_by_text("×Saved Changes")
 
@@ -27,7 +29,7 @@ class ResectAndDiscardAccreditationHistoryPage(BasePage):
     def click_add_accreditation_button(self) -> None:
         """Clicks the 'Add Accreditation' button"""
         self.click(self.add_accreditation_button)
-    
+
     def click_save_button(self) -> None:
         """Clicks the 'Save' button"""
         self.click(self.save_button)
@@ -36,7 +38,9 @@ class ResectAndDiscardAccreditationHistoryPage(BasePage):
         """Verifies the new period added has been saved"""
         expect(self.changes_saved_text).to_be_visible()
 
-    def add_new_period_of_resect_and_discard_accerditation(self, date: datetime) -> None:
+    def add_new_period_of_resect_and_discard_accerditation(
+        self, date: datetime
+    ) -> None:
         """
         Adds a new period of resect and discard accreditation
         Args:
