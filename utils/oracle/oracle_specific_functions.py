@@ -806,6 +806,10 @@ def build_accredited_screening_colonoscopist_query(query_type: str) -> pd.DataFr
 
 
 def get_accredited_screening_colonoscopist_in_bcs001() -> pd.DataFrame:
+    """
+    Retrieves a list of accredited screening colonoscopists in the BCS001 organization.
+    The query filters based on the role ID, accreditation type, and organization code.
+    """
     query = """
         SELECT
             prs.prs_id,
