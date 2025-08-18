@@ -365,51 +365,6 @@ class TableUtils:
                 return self.pick_row(i)
         return None
 
-    def click_surname_if_bcss_user_and_has_code(self):
-        """
-        Clicks on the surname link of the first row where:
-        - 'BCSS User?' column is 'Yes'
-        - 'User Code' is not '-'
-        """
-        surname_col = self.get_column_index("Surname")
-        user_code_col = self.get_column_index("User Code")
-        bcss_col = self.get_column_index("BCSS User?")
-
-        if -1 in (surname_col, user_code_col, bcss_col):
-            raise ValueError("One or more required columns not found")
-
-        rows = self.table.locator(self.tbody_tr_string)
-
-        for i in range(rows.count()):
-            row = rows.nth(i)
-
-            # Skip rows with no <td> cells
-            cell_count = row.locator("td").count()
-            if cell_count == 0:
-                continue
-
-            # Skip rows that don’t have enough columns
-            if cell_count < max(user_code_col, bcss_col, surname_col):
-                continue
-
-            user_code = (
-                row.locator(f"td:nth-child({user_code_col})").inner_text().strip()
-            )
-            bcss_value = row.locator(f"td:nth-child({bcss_col})").inner_text().strip()
-
-            if bcss_value.lower() == "yes" and user_code != "-":
-                surname_link = row.locator(f"td:nth-child({surname_col}) a")
-                if surname_link.count() > 0:
-                    surname_link.click()
-                    return
-                else:
-                    logging.error(f"No clickable surname link found in row {i+1}")
-                    return
-
-        logging.warning(
-            "No matching row found where BCSS User? == 'Yes' and User Code != '-'"
-        )
-
     def verify_value_for_label(self, label_text: str, expected_text: str) -> None:
         """
         Verifies that the value cell (2nd <td>) in the row where the first <td>

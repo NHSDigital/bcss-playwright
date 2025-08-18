@@ -50,13 +50,13 @@ class MaintainContactsPage(BasePage):
         """Click the search button to perform a search"""
         self.click(self.search_button)
 
-    def click_person_link_from_suranme(self, surname: str) -> None:
+    def click_person_link_from_surname(self, surname: str) -> None:
         """
         Clicks on the link containing the person's surname to go to the edit contact page
         Args:
             surname (str): The surname of the subject
         """
-        self.click(self.page.get_by_role("link", name=surname))
+        self.click(self.page.get_by_role("link", name=surname).last)
 
     def click_person_link_from_forename(self, forename: str) -> None:
         """
@@ -64,8 +64,4 @@ class MaintainContactsPage(BasePage):
         Args:
             forename (str): The forename of the subject
         """
-        self.click(self.page.get_by_role("link", name=forename))
-
-    def click_first_correct_link(self) -> None:
-        """Clicks on the first link in the search results that is a BCSS user and has a code"""
-        self.search_table.click_surname_if_bcss_user_and_has_code()
+        self.click(self.page.get_by_role("link", name=forename).last)

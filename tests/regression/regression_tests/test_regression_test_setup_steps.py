@@ -15,9 +15,9 @@ from utils.user_tools import UserTools
 from utils.oracle.oracle_specific_functions import (
     set_org_parameter_value,
     check_parameter,
+    build_accredited_screening_colonoscopist_query,
+    get_accredited_screening_colonoscopist_in_bcs001,
 )
-
-from utils.oracle.oracle import OracleDB
 
 
 def test_allow_10_minute_colonsocopy_assessment_appointments(page: Page) -> None:
@@ -50,36 +50,31 @@ def test_ensure_the_is_accredited_screening_colonoscopist_with_current_resect_an
     Scenario: 2: Ensure there is an Accredited Screening Colonoscopist with current Resect & Discard accreditation
     """
     UserTools.user_login(page, "BCSS Bureau Staff at X26")
+
+    current_df = build_accredited_screening_colonoscopist_query("Current")
+    if current_df.empty:
+        pytest.skip(
+            "No Accredited Screening Colonoscopist with current Resect & Discard accreditation found."
+        )
+    expired_df = build_accredited_screening_colonoscopist_query("Expiring soon")
+    if expired_df.empty:
+        pytest.skip(
+            "No Accredited Screening Colonoscopist with expiring Resect & Discard accreditation found."
+        )
+    person_df = get_accredited_screening_colonoscopist_in_bcs001()
+    if person_df.empty:
+        pytest.fail("No Accredited Screening Colonoscopist found in the database.")
+
     BasePage(page).go_to_contacts_list_page()
     ContactsListPage(page).go_to_maintain_contacts_page()
-    query = """
-    SELECT
-        prs.prs_id,
-        prs.person_family_name,
-        prs.person_given_name,
-        prs.gmc_code,
-        pio.pio_id,
-        pio.role_id,
-        org.org_code,
-        org.org_name
-    FROM person prs
-    INNER JOIN person_in_org pio ON prs.prs_id = pio.prs_id
-    INNER JOIN org ON org.org_id = pio.org_id
-    WHERE 1=1
-    AND pio.role_id = (SELECT valid_value_id FROM valid_values WHERE description = 'Accredited Screening Colonoscopist')
-    AND org.org_code = 'BCS001'
-    AND TRUNC(SYSDATE) BETWEEN TRUNC(pio.start_date) AND NVL(pio.end_date, SYSDATE)
-    AND pio.is_bcss_user = 1
-    ORDER BY prs.prs_id
-    FETCH FIRST 1 ROWS ONLY
-    """
-    person_df = OracleDB().execute_query(query)
+
     surname = person_df.iloc[0]["person_family_name"]
     forename = person_df.iloc[0]["person_given_name"]
     MaintainContactsPage(page).fill_surname_input_field(surname)
     MaintainContactsPage(page).fill_forenames_input_field(forename)
     MaintainContactsPage(page).click_search_button()
-    MaintainContactsPage(page).click_first_correct_link()
+    MaintainContactsPage(page).click_person_link_from_surname(surname)
+
     EditContactPage(page).click_view_resect_and_discard_link()
     ResectAndDiscardAccreditationHistoryPage(page).verify_heading_is_correct()
     ResectAndDiscardAccreditationHistoryPage(
@@ -89,6 +84,7 @@ def test_ensure_the_is_accredited_screening_colonoscopist_with_current_resect_an
     ResectAndDiscardAccreditationHistoryPage(
         page
     ).add_new_period_of_resect_and_discard_accerditation(date=yesterday)
+
     BasePage(page).click_back_button()
     end_date = yesterday + relativedelta(years=2)
     EditContactPage(page).assert_value_for_label_in_edit_contact_table(
