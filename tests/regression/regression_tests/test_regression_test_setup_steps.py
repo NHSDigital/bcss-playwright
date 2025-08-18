@@ -16,12 +16,11 @@ from utils.oracle.oracle_specific_functions import (
     set_org_parameter_value,
     check_parameter,
 )
-from utils.dataset_field_util import DatasetFieldUtil
 
 from utils.oracle.oracle import OracleDB
 
 
-def test_allow_10_minute_colonsocopy_assessment_Appointments(page: Page) -> None:
+def test_allow_10_minute_colonsocopy_assessment_appointments(page: Page) -> None:
     """
     Scenario: 1: Allow 10 minute colonoscopy assessment appointments between 7am and 8pm at BCS001
 

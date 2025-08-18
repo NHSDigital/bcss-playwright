@@ -25,6 +25,8 @@ class TableUtils:
             table_locator
         )  # Create a locator object for the table
 
+        self.tbody_tr_string = "tbody tr"
+
     def get_column_index(self, column_name: str) -> int:
         """
         Finds the column index dynamically based on column name.
@@ -41,7 +43,9 @@ class TableUtils:
         if not header_row.locator("th").count():
             # Fallback: look for header in <tbody> if <thead> is missing or empty
             header_row = (
-                self.table.locator("tbody tr").filter(has=self.page.locator("th")).first
+                self.table.locator(self.tbody_tr_string)
+                .filter(has=self.page.locator("th"))
+                .first
             )
 
         headers = header_row.locator("th")
@@ -163,7 +167,9 @@ class TableUtils:
 
         # Strategy 3: Last resort — try to find header from tbody row (some old tables use <tbody> only)
         fallback_row = (
-            self.table.locator("tbody tr").filter(has=self.page.locator("th")).first
+            self.table.locator(self.tbody_tr_string)
+            .filter(has=self.page.locator("th"))
+            .first
         )
         if fallback_row.locator("th").count():
             try:
@@ -372,7 +378,7 @@ class TableUtils:
         if -1 in (surname_col, user_code_col, bcss_col):
             raise ValueError("One or more required columns not found")
 
-        rows = self.table.locator("tbody tr")
+        rows = self.table.locator(self.tbody_tr_string)
 
         for i in range(rows.count()):
             row = rows.nth(i)
