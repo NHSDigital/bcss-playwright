@@ -20,7 +20,9 @@ from utils.oracle.oracle_specific_functions import (
 )
 
 
-def test_allow_10_minute_colonsocopy_assessment_appointments(page: Page) -> None:
+def test_allow_10_minute_colonsocopy_assessment_appointments(
+    page: Page, general_properties: dict
+) -> None:
     """
     Scenario: 1: Allow 10 minute colonoscopy assessment appointments between 7am and 8pm at BCS001
 
@@ -30,20 +32,21 @@ def test_allow_10_minute_colonsocopy_assessment_appointments(page: Page) -> None
         And I set the value of parameter 29 to "20:00" for my organisation with immediate effect
     """
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    param_12_set_correctly = check_parameter(12, "23162", "10")
-    param_28_set_correctly = check_parameter(28, "23162", "07:00")
-    param_29_set_correctly = check_parameter(29, "23162", "20:00")
+    org_id = general_properties["eng_screening_centre_id"]
+    param_12_set_correctly = check_parameter(12, org_id, "10")
+    param_28_set_correctly = check_parameter(28, org_id, "07:00")
+    param_29_set_correctly = check_parameter(29, org_id, "20:00")
     if not param_12_set_correctly:
-        set_org_parameter_value(12, "10", "23162")
+        set_org_parameter_value(12, "10", org_id)
     if not param_28_set_correctly:
-        set_org_parameter_value(28, "07:00", "23162")
+        set_org_parameter_value(28, "07:00", org_id)
     if not param_29_set_correctly:
-        set_org_parameter_value(29, "20:00", "23162")
+        set_org_parameter_value(29, "20:00", org_id)
 
     LogoutPage(page).log_out()
 
 
-def test_ensure_the_is_accredited_screening_colonoscopist_with_current_resect_and_discard_accreditation(
+def test_asc_with_current_resect_and_discard_accreditation(
     page: Page,
 ) -> None:
     """
