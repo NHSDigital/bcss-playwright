@@ -116,29 +116,34 @@ def subjects_to_run_for(request: FixtureRequest) -> int:
 
 
 @pytest.fixture(scope="function")
-def setup_org_and_appointments(page: Page, request: FixtureRequest) -> None:
+def setup_org_and_appointments(
+    page: Page, request: FixtureRequest, general_properties: dict
+) -> None:
     """
     Ensures required org parameters and appointments are set up.
     Only runs once per day per environment, regardless of which test calls it.
 
     This fixture is designed to be used in tests that require a specific setup of the organisation and appointments.
-    Example usage:
-        @pytest.mark.usefixtures("setup_org_and_appointments")
-        def test_my_function(page: Page):
-            # Your test code here
 
-        def test_my_function(page: Page, setup_org_and_appointments):
-            # Your test code here
+    Example usage:
+
+    @pytest.mark.usefixtures("setup_org_and_appointments")
+    def test_my_function(page: Page):
+        # Your test code here
+
+    def test_my_function(page: Page, setup_org_and_appointments):
+        # Your test code here
     """
-    param_12_set_correctly = check_parameter(12, "23162", "10")
-    param_28_set_correctly = check_parameter(28, "23162", "07:00")
-    param_29_set_correctly = check_parameter(29, "23162", "20:00")
+    org_id = general_properties["eng_screening_centre_id"]
+    param_12_set_correctly = check_parameter(12, org_id, "10")
+    param_28_set_correctly = check_parameter(28, org_id, "07:00")
+    param_29_set_correctly = check_parameter(29, org_id, "20:00")
     if not param_12_set_correctly:
-        set_org_parameter_value(12, "10", "23162")
+        set_org_parameter_value(12, "10", org_id)
     if not param_28_set_correctly:
-        set_org_parameter_value(28, "07:00", "23162")
+        set_org_parameter_value(28, "07:00", org_id)
     if not param_29_set_correctly:
-        set_org_parameter_value(29, "20:00", "23162")
+        set_org_parameter_value(29, "20:00", org_id)
 
     base_url = request.config.getoption("--base-url")
     fixture_name = "setup_org_and_appointments"

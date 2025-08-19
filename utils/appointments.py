@@ -29,12 +29,7 @@ def setup_appointments(page: Page, no_of_practitioners: int, max: bool = False) 
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
 
     if max:
-        BasePage(page).go_to_screening_practitioner_appointments_page()
-        ScreeningPractitionerAppointmentsPage(page).go_to_set_availability_page()
-        SetAvailabilityPage(page).go_to_practitioner_availability_page()
-        PractitionerAvailabilityPage(page).select_site_dropdown_option(
-            "THE ROYAL HOSPITAL (WOLVERHAMPTON)"
-        )
+        go_to_appointments_page_and_select_site(page)
         total_practitioners = (
             PractitionerAvailabilityPage(page)
             .screening_practitioner_dropdown.locator("option")
@@ -46,12 +41,7 @@ def setup_appointments(page: Page, no_of_practitioners: int, max: bool = False) 
     logging.info(f"Setting up appointments for {no_of_practitioners} practitioners")
     for index in range(no_of_practitioners):
         logging.info(f"Setting up appointments for practitioner {index + 1}")
-        BasePage(page).go_to_screening_practitioner_appointments_page()
-        ScreeningPractitionerAppointmentsPage(page).go_to_set_availability_page()
-        SetAvailabilityPage(page).go_to_practitioner_availability_page()
-        PractitionerAvailabilityPage(page).select_site_dropdown_option(
-            "THE ROYAL HOSPITAL (WOLVERHAMPTON)"
-        )
+        go_to_appointments_page_and_select_site(page)
         PractitionerAvailabilityPage(
             page
         ).select_practitioner_dropdown_option_from_index(index + 1)
@@ -66,3 +56,18 @@ def setup_appointments(page: Page, no_of_practitioners: int, max: bool = False) 
         logging.info(f"Appointments set for practitioner {index + 1} at BCS001")
         BasePage(page).click_main_menu_link()
     LogoutPage(page).log_out()
+
+
+def go_to_appointments_page_and_select_site(page: Page) -> None:
+    """
+    Navigate to the Screening Practitioner Appointments page.
+
+    Args:
+        page (Page): The Playwright page object.
+    """
+    BasePage(page).go_to_screening_practitioner_appointments_page()
+    ScreeningPractitionerAppointmentsPage(page).go_to_set_availability_page()
+    SetAvailabilityPage(page).go_to_practitioner_availability_page()
+    PractitionerAvailabilityPage(page).select_site_dropdown_option(
+        "THE ROYAL HOSPITAL (WOLVERHAMPTON)"
+    )
