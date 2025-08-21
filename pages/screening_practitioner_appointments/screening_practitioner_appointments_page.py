@@ -10,6 +10,9 @@ class ScreeningPractitionerAppointmentsPage(BasePage):
         self.page = page
         # ScreeningPractitionerAppointments Page
         self.log_in_page = self.page.get_by_role("button", name="Log in")
+        self.appointments_link = self.page.get_by_text("Screening Practitioner Appointments")
+        self.appointments_header = self.page.get_by_text("Screening Practitioner Appointments")
+
         self.view_appointments_page = self.page.get_by_role(
             "link", name="View appointments"
         )
@@ -43,3 +46,6 @@ class ScreeningPractitionerAppointmentsPage(BasePage):
     def go_to_set_availability_page(self) -> None:
         """Click on the Set Availability link to navigate to the set availability page."""
         self.click(self.set_availability_link)
+
+    def open_appointments_report(self):
+        self.appointments_link.click()
