@@ -8,6 +8,13 @@ class OrganisationsPage(BasePage):
     def __init__(self, page: Page):
         super().__init__(page)
         self.page = page
+        self.org_and_site_details_link = self.page.get_by_role("link", name="Organisation and Site Details")
+        self.list_all_orgs_link = self.page.get_by_role("link", name="List All Organisations")
+        self.back_link = self.page.get_by_role("link", name="Back", exact=True)
+        self.list_all_sites_link = self.page.get_by_role("link", name="List All Sites")
+        self.surveillance_link = self.page.get_by_role("link", name="Surveillance", exact=True)
+        self.manage_surveillance_review_link = self.page.get_by_role("link", name="Manage Surveillance Review")
+        self.surveillance_review_summary_header = self.page.get_by_text("Surveillance Review Summary")
 
         # Organisations page links
         self.screening_centre_parameters_page = self.page.get_by_role(
@@ -50,6 +57,17 @@ class OrganisationsPage(BasePage):
     def go_to_bureau_page(self) -> None:
         """Clicks the 'Bureau' link."""
         self.click(self.bureau_page)
+
+    def navigate_to_surveillance_review_summary(self):
+        self.org_and_site_details_link.click()
+        self.list_all_orgs_link.click()
+        self.back_link.click()
+        self.list_all_sites_link.click()
+        for _ in range(3):
+            self.back_link.click()
+        self.surveillance_link.click()
+        self.manage_surveillance_review_link.click()
+        self.page.goto("https://bcss-bcss-18680-ddc-bcss.k8s-nonprod.texasplatform.uk/surveillance/review/summary")
 
 class OrganisationSwitchPage:
     """Page Object Model for interacting with the Organisation Switch page."""
