@@ -2,10 +2,15 @@ import pytest
 from playwright.sync_api import Page, expect
 from utils.user_tools import UserTools
 from pages.base_page import BasePage
+from pages.alerts.alerts_page import AlertsPage
+from pages.gfobt_test_kits.gfobt_test_kits_page import GFOBTTestKitsPage
 from utils.screening_subject_page_searcher import search_subject_by_forename, search_subject_by_surname
-
+from pages.screening_practitioner_appointments.screening_practitioner_appointments_page import ScreeningPractitionerAppointmentsPage
+from pages.screening_subject_search.subject_search_page import SubjectSearchPage
+from pages.organisations.organisations_page import OrganisationsPage
 
 # Scenario 1
+@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.hub_user_tests
 def test_hub_user_alerts_populated(page: Page) -> None:
@@ -18,10 +23,12 @@ def test_hub_user_alerts_populated(page: Page) -> None:
     BasePage(page).click_refresh_alerts_link()
 
     # Step 2: Assert the refresh alerts button is visible
-    page.get_by_role("link", name="Refresh alerts").click()
-    expect(page.get_by_role("link", name="Refresh alerts")).to_be_visible(timeout=5000)
+    alerts_page = AlertsPage(page)
+    alerts_page.click_refresh_alerts()
+    expect(alerts_page.refresh_alerts_link).to_be_visible(timeout=5000)
 
 # Scenario 2
+@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.hub_user_tests
 def test_hub_user_kits_logged_not_read_report(page: Page) -> None:
@@ -34,10 +41,12 @@ def test_hub_user_kits_logged_not_read_report(page: Page) -> None:
     BasePage(page).go_to_gfobt_test_kits_page()
 
     # Step 2: Assert the Kits Logged Not Read report loads as expected
-    page.get_by_text("gFOBT Test Kits").click()
-    expect(page.get_by_text("gFOBT Test Kits")).to_be_visible(timeout=5000)
+    test_kits_page = GFOBTTestKitsPage(page)
+    test_kits_page.open_test_kits_report()
+    expect(test_kits_page.test_kits_header).to_be_visible(timeout=5000)
 
 # Scenario 3
+@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.hub_user_tests
 def test_hub_user_people_requiring_colonoscopy_assessment_report(page: Page) -> None:
@@ -50,10 +59,12 @@ def test_hub_user_people_requiring_colonoscopy_assessment_report(page: Page) -> 
     BasePage(page).go_to_screening_practitioner_appointments_page()
 
     # Step 2: Assert the People Requiring Colonoscopy Assessment report loads as expected
-    page.get_by_text("Screening Practitioner Appointments").click()
-    expect(page.get_by_text("Screening Practitioner Appointments")).to_be_visible(timeout=5000)
+    appointments_page = ScreeningPractitionerAppointmentsPage(page)
+    appointments_page.open_appointments_report()
+    expect(appointments_page.appointments_header).to_be_visible(timeout=5000)
 
 # Scenario 4
+@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.hub_user_tests
 def test_screening_centre_user_subject_search_and_summary(page: Page) -> None:
@@ -65,21 +76,13 @@ def test_screening_centre_user_subject_search_and_summary(page: Page) -> None:
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
     BasePage(page).go_to_screening_subject_search_page()
 
-    # Step 2: Add value "A*" to the "Surname" & "Forename" with ScreeningStatus as "Recall" and EpisodeStatus as "Closed"
-    # Click search button on the subject search criteria page
-    search_subject_by_surname(page, "A*")
-    page.get_by_role("link", name="Back", exact=True).click()
-    search_subject_by_forename(page, "A*")
-    page.get_by_role("link", name="Back", exact=True).click()
-    page.locator("#A_C_ScreeningStatus").select_option("4004")
-    page.locator("#A_C_ScreeningStatus").click()
-    page.get_by_role("button", name="Search").click()
-    page.get_by_role("link", name="Back", exact=True).click()
-    page.locator("#A_C_EpisodeStatus").select_option("2")
-    page.get_by_role("button", name="Search").click()
-    page.get_by_role("link", name="Back", exact=True).click()
+    # Step 2: Use POM for subject search
+    search_page = SubjectSearchPage(page)
+    """screening_status=4004 value represents 'Recall' & episode_status=2 value represents 'Closed'"""
+    search_page.search_subject(surname="A*", forename="A*", screening_status="4004", episode_status="2")
 
 # Scenario 5
+@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.hub_user_tests
 def test_screening_centre_user_subject_search_and_surveillance(page: Page) -> None:
@@ -91,14 +94,7 @@ def test_screening_centre_user_subject_search_and_surveillance(page: Page) -> No
     UserTools.user_login(page, "Screening Centre Manager at BCS001")
     BasePage(page).go_to_organisations_page()
 
-    page.get_by_role("link", name="Organisation and Site Details").click()
-    page.get_by_role("link", name="List All Organisations").click()
-    page.get_by_role("link", name="Back", exact=True).click()
-    page.get_by_role("link", name="List All Sites").click()
-    [page.get_by_role("link", name="Back", exact=True).click() for _ in range(3)]
-    page.get_by_role("link", name="Surveillance", exact=True).click()
-    page.get_by_role("link", name="Manage Surveillance Review").click()
-
-    # Step 2: Assert the Surveillance Review Summary report loads as expected
-    page.goto("https://bcss-bcss-18680-ddc-bcss.k8s-nonprod.texasplatform.uk/surveillance/review/summary")
-    expect(page.get_by_text("Surveillance Review Summary")).to_be_visible(timeout=5000)
+    # Step 2: Use POM for navigation and assertion
+    org_page = OrganisationsPage(page)
+    org_page.navigate_to_surveillance_review_summary()
+    expect(org_page.surveillance_review_summary_header).to_be_visible(timeout=5000)
