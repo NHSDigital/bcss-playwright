@@ -23,7 +23,6 @@ Note: This project is actively maintained and evolving.
       - [2. Set up a virtual environment (recommended)](#2-set-up-a-virtual-environment-recommended)
         - [First Create the virtual environment](#first-create-the-virtual-environment)
         - [Next Activate the virtual environment](#next-activate-the-virtual-environment)
-      - [3. Install Playwright browser binaries](#3-install-playwright-browser-binaries)
     - [Installation \& Configuration](#installation--configuration)
       - [1. Install Dependencies](#1-install-dependencies)
       - [2. Environment Variables](#2-environment-variables)
@@ -48,6 +47,7 @@ Note: This project is actively maintained and evolving.
       - [2. Example: Wait Utility](#2-example-wait-utility)
       - [3. Best Practices](#3-best-practices)
       - [4. Blueprint Utilities](#4-blueprint-utilities)
+      - [5. BCSS Project Specific Utilities](#5-bcss-project-specific-utilities)
     - [Contributing](#contributing)
     - [Contacts](#contacts)
     - [Licence](#licence)
@@ -90,25 +90,17 @@ This step tells your terminal to use the Python version and packages inside .ven
 
 On Windows (Command Prompt):
 
-`.venv\Scripts\activate`
+`.venv/Scripts/activate`
 
 On Windows (PowerShell):
 
-`.venv\Scripts\Activate.ps1`
+`.venv/Scripts/Activate.ps1`
 
 On macOS/Linux:
 
 `source .venv/bin/activate`
 
 Once activated, your terminal will show the virtual environment name (e.g. (.venv)), indicating you're working inside it.
-
-#### 3. Install Playwright browser binaries
-
-Playwright uses real browsers to run tests. You’ll need to install these browser binaries once by running:
-
-`playwright install`
-
-This downloads the necessary versions of Chromium, Firefox, and WebKit so tests can run across different browser types.
 
 ### Installation & Configuration
 
@@ -127,7 +119,7 @@ Note: If you're using a virtual environment (recommended), activate it before ru
 
 #### 2. Environment Variables
 
-Create a `.env` file in the project root to store sensitive configuration values like credentials, URLs, or feature flags. Example:
+Create a `local.env` file in the project root, by running `setup_env_file.py`, to store sensitive configuration values like credentials, URLs, or feature flags. Example:
 
 ```Bash
 BASE_URL=https://bcss.example.com
@@ -136,8 +128,8 @@ PASSWORD=secure_password123
 ```
 
 These variables are loaded automatically by the framework using `python-dotenv`, keeping secrets out of the codebase.
-The actual values required for the `.env` file can be obtained from one of the testers already using this framework.
-Important Note: Ensure that `.env` is added to your `.gitignore` to avoid accidentally committing secrets.
+The actual values required for the `local.env` file can be obtained from one of the testers already using this framework.
+Important Note: Ensure that `local.env` is added to your `.gitignore` to avoid accidentally committing secrets.
 
 #### 3. Test Configuration
 
@@ -210,10 +202,10 @@ Each test typically follows this structure:
 
 ```Python
 def test_user_can_login(page):
-    login_page = LoginPage(page)
-    login_page.navigate()
-    login_page.login("user@example.com", "securepassword")
-    assert login_page.is_logged_in()
+    UserTools.user_login(page, "Hub Manager State Registered at BCS01") # Users are defined in users.json
+    expect(page.locator("#ntshAppTitle")).to_contain_text(
+        "Bowel Cancer Screening System"
+    )
 ```
 
 - Use Page Object Model (POM) for UI interactions
@@ -334,7 +326,7 @@ def wait_for_element(page, selector, timeout=5000):
 
 #### 4. Blueprint Utilities
 
-This blueprint provides the following utility classes, that can be used to aid in testing:
+This project was built on the existing NHS England Playwright Python Blueprint. The blueprint provides the following utility classes, that can be used to aid in testing:
 
 | Utility                                                       | Description                                  |
 | ------------------------------------------------------------- | -------------------------------------------- |
@@ -342,6 +334,32 @@ This blueprint provides the following utility classes, that can be used to aid i
 | [Date Time Utility](./docs/utility-guides/DateTimeUtility.md) | Basic functionality for managing date/times. |
 | [NHSNumberTools](./docs/utility-guides/NHSNumberTools.md)     | Basic tools for working with NHS numbers.    |
 | [User Tools](./docs/utility-guides/UserTools.md)              | Basic user management tool.                  |
+
+#### 5. BCSS Project Specific Utilities
+
+These utilities have been created specifically for the bcss playwright project:
+
+| Utility                                                                                 | Description                                                                                                                                    |
+| --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Appointments Utility](.docs/utility-guides/Appointments.md)                            | Automates appointment slot setup for multiple practitioners at a screening centre, including calendar navigation and slot configuration.       |
+| [Batch Processing Utility](.docs/utility-guides/BatchProcessing.md)                     | Provides a one-stop function to process batches end-to-end, including preparation, printing, subject verification, and archive confirmation.   |
+| [Calendar Picker](.docs/utility-guides/CalendarPicker.md)                               | Provides methods to interact with BCSS’s three distinct calendar types                                                                         |
+| [Dataset Field Utility](.docs/utility-guides/DatasetField.md)                           | Dynamically locates and populates input/select fields based on label text, supporting both flat and nested dataset structures.                 |
+| [Fit Kit Utility](.docs/utility-guides/FitKit.md)                                       | Provides methods to generate FIT device IDs, split test kits into normal/abnormal groups, and simulate compartment 3 workflows.                |
+| [Investigation Dataset Utility](.docs/utility-guides/InvestigationDataset.md)           | Automates the completion and progression of investigation datasets based on subject age and result type, with support for custom field values. |
+| [Last Test Run](.docs/utility-guides/LastTestRun.md)                                    | Tracks when specific tests were last executed to avoid redundant setups and enable “run once per day” logic.                                   |
+| [Load Properties](.docs/utility-guides/LoadProperties.md)                               | Loads key-value pairs from `.properties` files to centralize configuration and avoid hard-coded values in tests.                               |
+| [Manual Cease Workflow](.docs/utility-guides/ManualCease.md)                            | Automates subject creation, UI interaction, and DB verification for manual cease flows, including disclaimer handling.                         |
+| [NHS Number Tools](.docs/utility-guides/NHSNumberTools.md)                              | Validates NHS numbers and formats them for display or input, ensuring compliance with NHS standards.                                           |
+| [Notify Criteria Parser](.docs/utility-guides/NotifyCriteriaParser.md)                  | Parses compact Notify filter strings (e.g. "S1 (S1w) - sending") into structured components for use in selection builders and SQL queries.     |
+| [Oracle Utility](.docs/utility-guides/Oracle.md)                                        | Provides direct access to Oracle DB for querying, executing stored procedures, and generating synthetic test subjects.                         |
+| [PDF Reader](.docs/utility-guides/PDFReader.md)                                         | Extracts NHS numbers from PDF documents by scanning for "NHS No:" markers, returning results as a pandas DataFrame.                            |
+| [Screening Subject Page Searcher](.docs/utility-guides/ScreeningSubjectPageSearcher.md) | Provides methods to search for subjects by NHS number, name, DOB, postcode, and status, and verify event status directly from the UI.          |
+| [Subject Demographics](.docs/utility-guides/SubjectDemographics.md)                     | Updates subject demographic data such as DOB and postcode, with support for randomized age ranges and direct field manipulation.               |
+| [Subject Notes](.docs/utility-guides/SubjectNotes.md)                                   | Verifies note content against database and UI, and confirms proper archiving of removed notes as obsolete.                                     |
+| [Subject Selection Query Builder](.docs/utility-guides/SubjectSelectionQueryBuilder.md) | Dynamically builds SQL queries to retrieve subjects based on screening status, demographics, Notify messages, and more.                        |
+| [Table Utility](.docs/utility-guides/TableUtil.md)                                      | Provides helper methods for interacting with HTML tables, including row selection, column indexing, and data extraction.                       |
+| [User Tools](.docs/utility-guides/UserTools.md)                                         | Manages test user credentials via `users.json`, supports login automation, and retrieves user metadata for role-based testing.                 |
 
 ### Contributing
 
