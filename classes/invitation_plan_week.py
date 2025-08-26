@@ -136,8 +136,8 @@ class InvitationPlanWeek:
         Maps the first row of a database cursor to an InvitationPlanWeek instance.
         Expects cursor rows in the order:
             (plan_id, week_number, week_start_date, invite_days, subjects_due,
-             invitations_target, cumulative_subjects, cumulative_invites,
-             resulting_position_subjects, resulting_position_weeks, calculated_target)
+            invitations_target, cumulative_subjects, cumulative_invites,
+            resulting_position_subjects, resulting_position_weeks, calculated_target)
         """
         if not rows:
             return cls()

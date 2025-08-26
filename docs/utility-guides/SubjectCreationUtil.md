@@ -1,6 +1,6 @@
 # Utility Guide: Subject Creation Utility
 
-This guide explains the purpose and usage of the `CreateSubjectSteps` utility found in [`utils/oracle/subject_creation_util.py`](../../utils/oracle/subject_creation_util.py).  
+This guide explains the purpose and usage of the `CreateSubjectSteps` utility found in [`utils/oracle/subject_creation_util.py`](../../utils/oracle/subject_creation_util.py).
 It is designed to automate the creation of custom subjects for test scenarios, supporting a variety of criteria such as age, GP practice, and more.
 
 ---
@@ -21,8 +21,7 @@ It is designed to automate the creation of custom subjects for test scenarios, s
 
 ## Overview
 
-The `CreateSubjectSteps` class provides methods to create, log, and verify subjects in the BCSS Playwright test suite.  
-It interacts with the Oracle database to insert subjects with specific attributes, making it easy to set up test data for automated scenarios.
+The `CreateSubjectSteps` class provides methods to create, log, and verify subjects in the BCSS Playwright test suite. It interacts with the Oracle database to insert subjects with specific attributes, making it easy to set up test data for automated scenarios.
 
 ---
 
@@ -30,8 +29,8 @@ It interacts with the Oracle database to insert subjects with specific attribute
 
 Each function in this utility requires specific arguments:
 
-- `subject_requirements` (dict):  
-  A dictionary mapping human-readable field labels to desired values.  
+- `subject_requirements` (dict):
+  A dictionary mapping human-readable field labels to desired values.
   Example: `{"age": "30"}` or `{"gp practice": "C81014"}`
 
 ---

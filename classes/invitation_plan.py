@@ -170,7 +170,7 @@ class InvitationPlan:
         Maps the first row of a database cursor to an InvitationPlan instance.
         Expects cursor rows in the order:
             (plan_id, created_date, start_date, end_date, invitations_due,
-             invitations_per_week, invitations_per_day, plan_status, fip_note, date_stamp)
+            invitations_per_week, invitations_per_day, plan_status, fip_note, date_stamp)
         """
         if not rows:
             return cls()
