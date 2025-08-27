@@ -135,11 +135,11 @@ class SubjectRepository:
             Optional[str]: GP practice org code.
         """
         query = """
-        SELECT gp.org_code AS gp_code 
-        FROM org gp 
-        INNER JOIN gp_practice_current_links gpl ON gpl.gp_practice_id = gp.org_id 
-        INNER JOIN org hub ON hub.org_id = gpl.hub_id 
-        INNER JOIN org sc ON sc.org_id = gpl.sc_id 
+        SELECT gp.org_code AS gp_code
+        FROM org gp
+        INNER JOIN gp_practice_current_links gpl ON gpl.gp_practice_id = gp.org_id
+        INNER JOIN org hub ON hub.org_id = gpl.hub_id
+        INNER JOIN org sc ON sc.org_id = gpl.sc_id
         WHERE hub.org_code = :hub_code AND sc.org_code = :sc_code
         """
         df = self.oracle_db.execute_query(
@@ -157,10 +157,10 @@ class SubjectRepository:
             Optional[str]: GP practice org code.
         """
         query = """
-        SELECT gp.org_code AS gp_code 
-        FROM org gp 
-        LEFT OUTER JOIN gp_practice_current_links gpl ON gpl.gp_practice_id = gp.org_id 
-        WHERE gp.org_type_id = 1009 AND gpl.gp_practice_id IS NULL 
+        SELECT gp.org_code AS gp_code
+        FROM org gp
+        LEFT OUTER JOIN gp_practice_current_links gpl ON gpl.gp_practice_id = gp.org_id
+        WHERE gp.org_type_id = 1009 AND gpl.gp_practice_id IS NULL
         """
         df = self.oracle_db.execute_query(query)
         if df.empty:
@@ -178,13 +178,13 @@ class SubjectRepository:
             Optional[str]: GP practice org code.
         """
         query = """
-        SELECT gp.org_code AS gp_code 
-        FROM sd_contact_t c 
-        INNER JOIN subject_in_org sio ON sio.contact_id = c.contact_id 
-        INNER JOIN org gp ON gp.org_id = sio.org_id 
-        WHERE c.nhs_number = :nhs_number 
-        AND sio.org_type_id = 1009 
-        AND sio.sio_id = (SELECT MAX(siox.sio_id) FROM subject_in_org siox WHERE siox.contact_id = c.contact_id AND siox.org_type_id = 1009) 
+        SELECT gp.org_code AS gp_code
+        FROM sd_contact_t c
+        INNER JOIN subject_in_org sio ON sio.contact_id = c.contact_id
+        INNER JOIN org gp ON gp.org_id = sio.org_id
+        WHERE c.nhs_number = :nhs_number
+        AND sio.org_type_id = 1009
+        AND sio.sio_id = (SELECT MAX(siox.sio_id) FROM subject_in_org siox WHERE siox.contact_id = c.contact_id AND siox.org_type_id = 1009)
         """
         df = self.oracle_db.execute_query(query, {"nhs_number": nhs_number})
         if df.empty:
