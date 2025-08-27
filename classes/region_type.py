@@ -34,6 +34,8 @@ class RegionType:
     def get_region(cls, region: str) -> "RegionType":
         """
         Factory method to get a RegionType instance by region string.
+        Returns:
+            RegionType: The corresponding RegionType instance. By default returns UNDEFINED.
         """
         mapping = {
             "England": cls(*cls.ENGLAND),

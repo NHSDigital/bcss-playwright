@@ -1,38 +1,39 @@
+from dataclasses import dataclass, field
 from typing import Optional
 from datetime import date
 
 
+@dataclass
 class PISubject:
     """
     Represents a PI Subject with all relevant demographic and administrative fields.
     """
 
-    def __init__(self) -> None:
-        self.screening_subject_id: Optional[int] = None
-        self.nhs_number: Optional[str] = None
-        self.family_name: Optional[str] = None
-        self.first_given_names: Optional[str] = None
-        self.other_given_names: Optional[str] = None
-        self.previous_family_name: Optional[str] = None
-        self.name_prefix: Optional[str] = None
-        self.birth_date: Optional[date] = None
-        self.death_date: Optional[date] = None
-        self.gender_code: Optional[int] = None
-        self.address_line_1: Optional[str] = None
-        self.address_line_2: Optional[str] = None
-        self.address_line_3: Optional[str] = None
-        self.address_line_4: Optional[str] = None
-        self.address_line_5: Optional[str] = None
-        self.postcode: Optional[str] = None
-        self.gnc_code: Optional[str] = None
-        self.gp_practice_code: Optional[str] = None
-        self.nhais_deduction_reason: Optional[str] = None
-        self.nhais_deduction_date: Optional[date] = None
-        self.exeter_system: Optional[str] = None
-        self.removed_to: Optional[str] = None
-        self.pi_reference: Optional[str] = None
-        self.superseded_by_nhs_number: Optional[str] = None
-        self.replaced_nhs_number: Optional[str] = None
+    screening_subject_id: Optional[int] = None
+    nhs_number: Optional[str] = None
+    family_name: Optional[str] = None
+    first_given_names: Optional[str] = None
+    other_given_names: Optional[str] = None
+    previous_family_name: Optional[str] = None
+    name_prefix: Optional[str] = None
+    birth_date: Optional[date] = None
+    death_date: Optional[date] = None
+    gender_code: Optional[int] = None
+    address_line_1: Optional[str] = None
+    address_line_2: Optional[str] = None
+    address_line_3: Optional[str] = None
+    address_line_4: Optional[str] = None
+    address_line_5: Optional[str] = None
+    postcode: Optional[str] = None
+    gnc_code: Optional[str] = None
+    gp_practice_code: Optional[str] = None
+    nhais_deduction_reason: Optional[str] = None
+    nhais_deduction_date: Optional[date] = None
+    exeter_system: Optional[str] = None
+    removed_to: Optional[str] = None
+    pi_reference: Optional[str] = None
+    superseded_by_nhs_number: Optional[str] = None
+    replaced_nhs_number: Optional[str] = None
 
     def get_screening_subject_id(self) -> Optional[int]:
         """Returns the screening subject ID."""

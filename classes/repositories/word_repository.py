@@ -15,6 +15,9 @@ class WordRepository:
         db_util: An object that provides the execute_query method as described.
         """
         self.db_util = OracleDB()
+        self.forename_weighting = [80, 95, 100]
+        self.surname_weighting = [90, 97, 100]
+        self.names_max_length = 35
 
     def get_random_words_by_weighting(
         self, weightings: List[int], max_length: int
@@ -114,10 +117,18 @@ class WordRepository:
         logging.info("START: get_random_subject_details")
         details = {}
         # Weighted values
-        details["forename"] = self.get_random_words_by_weighting([80, 95, 100], 35)
-        details["forename2"] = self.get_random_words_by_weighting([80, 95, 100], 35)
-        details["surname"] = self.get_random_words_by_weighting([90, 97, 100], 35)
-        details["surname2"] = self.get_random_words_by_weighting([90, 97, 100], 35)
+        details["forename"] = self.get_random_words_by_weighting(
+            self.forename_weighting, self.names_max_length
+        )
+        details["forename2"] = self.get_random_words_by_weighting(
+            self.forename_weighting, self.names_max_length
+        )
+        details["surname"] = self.get_random_words_by_weighting(
+            self.surname_weighting, self.names_max_length
+        )
+        details["surname2"] = self.get_random_words_by_weighting(
+            self.surname_weighting, self.names_max_length
+        )
         # Unweighted values
         details["county"] = self.get_random_word()
         details["locality"] = self.get_random_word()

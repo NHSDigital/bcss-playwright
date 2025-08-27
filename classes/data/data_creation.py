@@ -8,6 +8,7 @@ from classes.address import Address
 from classes.person import Person
 from classes.region_type import RegionType
 from classes.pi_subject import PISubject
+from utils.nhs_number_tools import NHSNumberTools
 
 
 class DataCreation:
@@ -110,7 +111,7 @@ class DataCreation:
             f"generateRandomSubject: {random_words_list}, {pi_reference}, {region}"
         )
         pi_subject = PISubject()
-        pi_subject.set_nhs_number(self.generate_random_nhs_number())
+        pi_subject.set_nhs_number(NHSNumberTools.generate_random_nhs_number())
         person = self.generate_random_person(random_words_list, GenderType.NOT_KNOWN)
         pi_subject.set_family_name(person.get_surname())
         pi_subject.set_first_given_names(person.get_forename())
@@ -147,47 +148,6 @@ class DataCreation:
         logging.info("generateRandomSubject: end")
         return pi_subject
 
-    def generate_random_nhs_number(self) -> str:
-        """
-        Generates a random NHS number
-        Returns:
-            str: The generated NHS number
-        """
-        logging.info("generateRandomNHSNumber: start")
-        nhs_number_base = 900000000
-        nhs_number_range = 100000000
-        while True:
-            nhs_number = str(
-                nhs_number_base + self.rand.randint(0, nhs_number_range - 1)
-            )
-            if self.is_valid_nhs_number(nhs_number):
-                break
-        nhs_number += str(self.calculate_nhs_number_checksum(nhs_number))
-        logging.info("generateRandomNHSNumber: end")
-        return nhs_number
-
-    def is_valid_nhs_number(self, nhs_number: str) -> bool:
-        """
-        Checks if the NHS number is valid
-        Retuns:
-            bool: True if it is valid, False if it is not
-        """
-        return len(nhs_number) == 9 and nhs_number.isdigit()
-
-    def calculate_nhs_number_checksum(self, nhs_number: str) -> int:
-        """
-        Calculates the NHS number checksum
-        Returns:
-            int: the checksum of the NHS number
-        """
-        digits = [int(d) for d in nhs_number]
-        total = sum((10 - i) * digits[i] for i in range(9))
-        remainder = total % 11
-        checksum = 11 - remainder
-        if checksum == 11:
-            checksum = 0
-        return checksum
-
     def generate_random_registration_code(self) -> str:
         """
         Generates a random registraction code
@@ -205,7 +165,7 @@ class DataCreation:
         Args:
             region (RegionType): The region type (e.g., England)
         Returns:
-            Organisation: The generated gp surgery
+            Organisation: The generated gp surgery or None if the region type cannot be found
         """
         logging.info(f"generateRandomGPSurgery: {region}")
         if region == RegionType.ENGLAND:

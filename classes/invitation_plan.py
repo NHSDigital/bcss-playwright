@@ -1,5 +1,6 @@
 from typing import Optional
 from datetime import date, datetime
+from classes.invitation_plan_status_type import InvitationPlanStatusType
 
 
 class InvitationPlan:
@@ -16,12 +17,24 @@ class InvitationPlan:
         invitations_due: Optional[int] = None,
         invitations_per_week: Optional[int] = None,
         invitations_per_day: Optional[int] = None,
-        plan_status: Optional[
-            str
-        ] = None,  # Replace with InvitationPlanStatusType if available
+        plan_status: Optional[InvitationPlanStatusType] = None,
         fip_note: Optional[str] = None,
         date_stamp: Optional[datetime] = None,
     ) -> None:
+        """
+        Initializes an InvitationPlan instance.
+        Args:
+            plan_id (Optional[int]): The plan ID.
+            created_date (Optional[date]): The date the plan was created.
+            start_date (Optional[date]): The start date of the plan.
+            end_date (Optional[date]): The end date of the plan.
+            invitations_due (Optional[int]): The total number of invitations due.
+            invitations_per_week (Optional[int]): The number of invitations per week.
+            invitations_per_day (Optional[int]): The number of invitations per day.
+            plan_status (Optional[InvitationPlanStatusType]): The status of the plan.
+            fip_note (Optional[str]): Any notes associated with the plan.
+            date_stamp (Optional[datetime]): The timestamp of the last update.
+        """
         self.plan_id: Optional[int] = plan_id
         self.created_date: Optional[date] = created_date
         self.start_date: Optional[date] = start_date
@@ -29,7 +42,7 @@ class InvitationPlan:
         self.invitations_due: Optional[int] = invitations_due
         self.invitations_per_week: Optional[int] = invitations_per_week
         self.invitations_per_day: Optional[int] = invitations_per_day
-        self.plan_status: Optional[str] = plan_status
+        self.plan_status: Optional[InvitationPlanStatusType] = plan_status
         self.fip_note: Optional[str] = fip_note
         self.date_stamp: Optional[datetime] = date_stamp
 
@@ -140,13 +153,13 @@ class InvitationPlan:
         """
         self.invitations_per_day = invitations_per_day
 
-    def get_plan_status(self) -> Optional[str]:
+    def get_plan_status(self) -> Optional[InvitationPlanStatusType]:
         """
         Returns the plan status.
         """
         return self.plan_status
 
-    def set_plan_status(self, plan_status: str) -> None:
+    def set_plan_status(self, plan_status: InvitationPlanStatusType) -> None:
         """
         Sets the plan status.
         """

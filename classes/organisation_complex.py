@@ -1,6 +1,6 @@
 class Organisation:
     """
-    Class representing an organisation with an organisation with id, name, and code.
+    Class representing an organisation with id, name, and code.
     """
 
     def __init__(self, new_id: int, new_name: str, new_code: str):
@@ -12,7 +12,7 @@ class Organisation:
         """Returns the organisation name"""
         return self.name
 
-    def set_name(self, name: str):
+    def set_name(self, name: str) -> None:
         """Sets the organisation name"""
         self.name = name
 
@@ -20,7 +20,7 @@ class Organisation:
         """Returns the organisation id"""
         return self.id
 
-    def set_id(self, id_: int):
+    def set_id(self, id_: int) -> None:
         """Sets the organisation id"""
         self.id = id_
 
@@ -28,6 +28,6 @@ class Organisation:
         """Returns the organisation code"""
         return self.code
 
-    def set_code(self, code: str):
+    def set_code(self, code: str) -> None:
         """Sets the organisation code"""
         self.code = code

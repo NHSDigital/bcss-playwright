@@ -28,7 +28,7 @@ class SubjectRepository:
             return None
         return True
 
-    def create_pi_subject(self, pio_id: int, pi_subject: "PISubject") -> Optional[int]:
+    def create_pi_subject(self, pio_id: int, pi_subject: PISubject) -> Optional[int]:
         """
         Creates a new screening subject, returning the contact id.
 
@@ -54,7 +54,7 @@ class SubjectRepository:
 
         return self.process_pi_subject(pio_id, pi_subject)
 
-    def process_pi_subject(self, pio_id: int, pi_subject: "PISubject") -> Optional[int]:
+    def process_pi_subject(self, pio_id: int, pi_subject: PISubject) -> Optional[int]:
         """
         Processes a PI subject using the PKG_SSPI.p_process_pi_subject stored procedure.
 
@@ -98,7 +98,7 @@ class SubjectRepository:
 
         return new_contact_id
 
-    def update_pi_subject(self, pi_subject: "PISubject") -> None:
+    def update_pi_subject(self, pi_subject: PISubject) -> None:
         """
         Updates an existing screening subject.
 
@@ -134,14 +134,14 @@ class SubjectRepository:
         Returns:
             Optional[str]: GP practice org code.
         """
-        query = (
-            "SELECT gp.org_code AS gp_code "
-            "FROM org gp "
-            "INNER JOIN gp_practice_current_links gpl ON gpl.gp_practice_id = gp.org_id "
-            "INNER JOIN org hub ON hub.org_id = gpl.hub_id "
-            "INNER JOIN org sc ON sc.org_id = gpl.sc_id "
-            "WHERE hub.org_code = :hub_code AND sc.org_code = :sc_code"
-        )
+        query = """
+        SELECT gp.org_code AS gp_code 
+        FROM org gp 
+        INNER JOIN gp_practice_current_links gpl ON gpl.gp_practice_id = gp.org_id 
+        INNER JOIN org hub ON hub.org_id = gpl.hub_id 
+        INNER JOIN org sc ON sc.org_id = gpl.sc_id 
+        WHERE hub.org_code = :hub_code AND sc.org_code = :sc_code
+        """
         df = self.oracle_db.execute_query(
             query, {"hub_code": hub_code, "sc_code": screening_centre_code}
         )
@@ -156,12 +156,12 @@ class SubjectRepository:
         Returns:
             Optional[str]: GP practice org code.
         """
-        query = (
-            "SELECT gp.org_code AS gp_code "
-            "FROM org gp "
-            "LEFT OUTER JOIN gp_practice_current_links gpl ON gpl.gp_practice_id = gp.org_id "
-            "WHERE gp.org_type_id = 1009 AND gpl.gp_practice_id IS NULL"
-        )
+        query = """
+        SELECT gp.org_code AS gp_code 
+        FROM org gp 
+        LEFT OUTER JOIN gp_practice_current_links gpl ON gpl.gp_practice_id = gp.org_id 
+        WHERE gp.org_type_id = 1009 AND gpl.gp_practice_id IS NULL 
+        """
         df = self.oracle_db.execute_query(query)
         if df.empty:
             return None
@@ -177,15 +177,15 @@ class SubjectRepository:
         Returns:
             Optional[str]: GP practice org code.
         """
-        query = (
-            "SELECT gp.org_code AS gp_code "
-            "FROM sd_contact_t c "
-            "INNER JOIN subject_in_org sio ON sio.contact_id = c.contact_id "
-            "INNER JOIN org gp ON gp.org_id = sio.org_id "
-            "WHERE c.nhs_number = :nhs_number "
-            "AND sio.org_type_id = 1009 "
-            "AND sio.sio_id = (SELECT MAX(siox.sio_id) FROM subject_in_org siox WHERE siox.contact_id = c.contact_id AND siox.org_type_id = 1009)"
-        )
+        query = """
+        SELECT gp.org_code AS gp_code 
+        FROM sd_contact_t c 
+        INNER JOIN subject_in_org sio ON sio.contact_id = c.contact_id 
+        INNER JOIN org gp ON gp.org_id = sio.org_id 
+        WHERE c.nhs_number = :nhs_number 
+        AND sio.org_type_id = 1009 
+        AND sio.sio_id = (SELECT MAX(siox.sio_id) FROM subject_in_org siox WHERE siox.contact_id = c.contact_id AND siox.org_type_id = 1009) 
+        """
         df = self.oracle_db.execute_query(query, {"nhs_number": nhs_number})
         if df.empty:
             return None

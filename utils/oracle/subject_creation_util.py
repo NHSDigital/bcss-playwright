@@ -3,6 +3,7 @@ from datetime import date, timedelta
 from typing import Optional
 import random
 from utils.oracle.oracle import OracleDB
+from utils.nhs_number_tools import NHSNumberTools
 from classes.region_type import RegionType
 from classes.repositories.investigation_repository import InvitationRepository
 from classes.data.data_creation import DataCreation
@@ -41,13 +42,6 @@ class CreateSubjectSteps:
             hub_org_id,
             sc_org_id,
         )
-
-        if active_plan is None:
-            raise RuntimeError(
-                f"No active invitation plan for screening centre {sc_org_id}, hub id {hub_org_id}"
-            )
-
-        active_plan = InvitationRepository().get_active_plan(hub_org_id, sc_org_id)
 
         if active_plan is None:
             raise RuntimeError(
@@ -128,7 +122,7 @@ class CreateSubjectSteps:
                     and self.subject_exists(new_subject.nhs_number)
                     and attempts <= max_attempts
                 ):
-                    new_subject.nhs_number = DataCreation().generate_random_nhs_number()
+                    new_subject.nhs_number = NHSNumberTools.generate_random_nhs_number()
                     attempts += 1
 
                 if attempts > max_attempts:
