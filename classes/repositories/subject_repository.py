@@ -40,14 +40,14 @@ class SubjectRepository:
             int: The new contact id.
         """
         logging.info(f"Creating PI subject: {pi_subject}")
-        nhs_number = pi_subject.get_nhs_number()
+        nhs_number = pi_subject.nhs_number
         if nhs_number is None:
             raise ValueError("NHS Number must be specified when creating a new subject")
         if self.find_by_nhs_number(nhs_number) is not None:
             raise ValueError(
                 f"Cannot create new subject with NHS Number {nhs_number} because it is already in use"
             )
-        if pi_subject.get_pi_reference is None:
+        if pi_subject.pi_reference is None:
             raise ValueError(
                 "A PI Reference must be specified when creating a new subject, for example 'SELF REFERRAL' or 'AUTOMATED TEST'"
             )
@@ -106,7 +106,7 @@ class SubjectRepository:
             pi_subject (PISubject): The subject to update.
         """
         logging.info(f"Updating PI subject: {pi_subject}")
-        nhs_number = pi_subject.get_nhs_number()
+        nhs_number = pi_subject.nhs_number
         if nhs_number is None:
             raise ValueError("NHS Number must be specified when creating a new subject")
         if self.find_by_nhs_number(nhs_number) is None:

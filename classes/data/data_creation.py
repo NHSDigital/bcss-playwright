@@ -111,40 +111,41 @@ class DataCreation:
             f"generateRandomSubject: {random_words_list}, {pi_reference}, {region}"
         )
         pi_subject = PISubject()
-        pi_subject.set_nhs_number(NHSNumberTools.generate_random_nhs_number())
+        pi_subject.nhs_number = NHSNumberTools.generate_random_nhs_number()
         person = self.generate_random_person(random_words_list, GenderType.NOT_KNOWN)
-        pi_subject.set_family_name(person.get_surname())
-        pi_subject.set_first_given_names(person.get_forename())
-        pi_subject.set_other_given_names(person.get_other_forenames())
-        pi_subject.set_previous_family_name(person.get_previous_surname())
-        pi_subject.set_name_prefix(person.get_title())
-        pi_subject.set_birth_date(
-            datetime.date.today() - datetime.timedelta(days=60 * 365)
+        pi_subject.family_name = person.get_surname()
+        pi_subject.first_given_names = person.get_forename()
+        pi_subject.other_given_names = person.get_other_forenames()
+        pi_subject.previous_family_name = person.get_previous_surname()
+        pi_subject.name_prefix = person.get_title()
+        pi_subject.birth_date = datetime.date.today() - datetime.timedelta(
+            days=60 * 365
         )
-        pi_subject.set_death_date(None)
+
+        pi_subject.death_date = None
         gender = person.get_gender()
         if gender is not None:
-            pi_subject.set_gender_code(gender.redefined_value)
+            pi_subject.gender_code = gender.redefined_value
         else:
-            pi_subject.set_gender_code(GenderType.NOT_KNOWN.redefined_value)
+            pi_subject.gender_code = GenderType.NOT_KNOWN.redefined_value
         address = self.generate_random_address(random_words_list)
-        pi_subject.set_address_line1(address.get_address_line1())
-        pi_subject.set_address_line2(address.get_address_line2())
-        pi_subject.set_address_line3(address.get_address_line3())
-        pi_subject.set_address_line4(address.get_address_line4())
-        pi_subject.set_address_line5(address.get_address_line5())
-        pi_subject.set_post_code(address.get_post_code())
-        pi_subject.set_registration_code(self.generate_random_registration_code())
+        pi_subject.address_line_1 = address.get_address_line1()
+        pi_subject.address_line_2 = address.get_address_line2()
+        pi_subject.address_line_3 = address.get_address_line3()
+        pi_subject.address_line_4 = address.get_address_line4()
+        pi_subject.address_line_5 = address.get_address_line5()
+        pi_subject.postcode = address.get_post_code()
+        pi_subject.gnc_code = self.generate_random_registration_code()
         gp_surgery = self.generate_random_gp_surgery(region)
         if gp_surgery is not None:
-            pi_subject.set_gp_practice_code(gp_surgery.get_code())
-        pi_subject.set_nhais_deduction_reason(None)
-        pi_subject.set_nhais_deduction_date(None)
-        pi_subject.set_exeter_system("ATO")
-        pi_subject.set_removed_to(None)
-        pi_subject.set_pi_reference(pi_reference)
-        pi_subject.set_superseded_by_nhs_number(None)
-        pi_subject.set_replaced_by_nhs_number(None)
+            pi_subject.gp_practice_code = gp_surgery.get_code()
+        pi_subject.nhais_deduction_reason = None
+        pi_subject.nhais_deduction_date = None
+        pi_subject.exeter_system = "ATO"
+        pi_subject.removed_to = None
+        pi_subject.pi_reference = pi_reference
+        pi_subject.superseded_by_nhs_number = None
+        pi_subject.replaced_nhs_number = None
         logging.info("generateRandomSubject: end")
         return pi_subject
 

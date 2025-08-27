@@ -283,9 +283,9 @@ class CreateSubjectSteps:
             str: Formatted details.
         """
         return "{} {} {} (DoB = {}, NHS number = {})".format(
-            self.safe_string(subject.get_name_prefix()),
-            self.safe_string(subject.get_first_given_names()),
-            self.safe_string(subject.get_family_name()),
-            self.safe_date(subject.get_birth_date()),
-            self.safe_string(subject.get_nhs_number()),
+            self.safe_string(subject.name_prefix),
+            self.safe_string(subject.first_given_names),
+            self.safe_string(subject.family_name),
+            self.safe_date(subject.birth_date),
+            self.safe_string(subject.nhs_number),
         )
