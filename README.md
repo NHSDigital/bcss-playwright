@@ -21,8 +21,8 @@ Note: This project is actively maintained and evolving.
     - [Prerequisites](#prerequisites)
       - [1. Install Python 3.11 or higher](#1-install-python-311-or-higher)
       - [2. Set up a virtual environment (recommended)](#2-set-up-a-virtual-environment-recommended)
-        - [First Create the virtual environment](#first-create-the-virtual-environment)
-        - [Next Activate the virtual environment](#next-activate-the-virtual-environment)
+        - [First - Create the virtual environment](#first---create-the-virtual-environment)
+        - [Next - Activate the virtual environment](#next---activate-the-virtual-environment)
     - [Installation \& Configuration](#installation--configuration)
       - [1. Install Dependencies](#1-install-dependencies)
       - [2. Environment Variables](#2-environment-variables)
@@ -72,7 +72,7 @@ A virtual environment is like a sandbox—it keeps your project’s Python packa
 
 Note: If you are using an IDE such as Visual Studio Code or PyCharm, you will normally be prompted to do this automatically.
 
-##### First Create the virtual environment
+##### First - Create the virtual environment
 
 To create and activate a virtual environment, open your terminal or command prompt in the root folder of the project (where requirements.txt lives), then run:
 
@@ -84,7 +84,7 @@ If you get an error like 'Python not found', try using Python3 instead:
 
 `python3 -m venv .venv`
 
-##### Next Activate the virtual environment
+##### Next - Activate the virtual environment
 
 This step tells your terminal to use the Python version and packages inside .venv.
 
@@ -202,6 +202,13 @@ Each test typically follows this structure:
 
 ```Python
 def test_user_can_login(page):
+    """
+      Verifies that a predefined user can successfully log in and reach the BCSS home page.
+
+      Steps:
+          - Logs in using the 'Hub Manager State Registered at BCS01' user defined in users.json.
+          - Asserts that the application title is visible and contains the expected text.
+    """
     UserTools.user_login(page, "Hub Manager State Registered at BCS01") # Users are defined in users.json
     expect(page.locator("#ntshAppTitle")).to_contain_text(
         "Bowel Cancer Screening System"
@@ -214,7 +221,7 @@ def test_user_can_login(page):
 
 #### 4. Markers and Tags
 
-Use @pytest.mark.<tag> to run a subset or tests as required:
+Use @pytest.mark.<tag> to run a subset of tests as required:
 
 ```Python
 @pytest.mark.smoke
@@ -314,6 +321,17 @@ Utility modules help you abstract common functionality that doesn’t belong in 
 from playwright.sync_api import expect
 
 def wait_for_element(page, selector, timeout=5000):
+    """
+    Waits for a specific element to become visible on the page within a given timeout.
+
+    Args:
+        page (Page): The Playwright page instance to operate on.
+        selector (str): The CSS selector of the element to wait for.
+        timeout (int, optional): Maximum time to wait for visibility in milliseconds. Defaults to 5000.
+
+    Returns:
+        None
+    """
     expect(page.locator(selector)).to_be_visible(timeout=timeout)
 ```
 
