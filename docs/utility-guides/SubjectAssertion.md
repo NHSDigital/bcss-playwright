@@ -22,7 +22,7 @@ It is designed to assert that a subject with a given NHS number matches specifie
 ## Overview
 
 The `subject_assertion` function is used to verify that a subject in the database matches a set of criteria.
-If the subject does not match all criteria, the function will iteratively remove criteria (except NHS number) and retry, logging any criteria that caused the assertion to fail.
+If the subject does not match all criteria, the function will iteratively loop through each criteria (except NHS number), logging any criteria that caused the assertion to fail.
 
 ---
 
@@ -36,8 +36,8 @@ If the subject does not match all criteria, the function will iteratively remove
 ## How It Works
 
 1. The function first checks if the subject with the given NHS number matches all provided criteria.
-2. If not, it removes one criterion at a time (except NHS number) and retries the assertion.
-3. This process continues until either a match is found or all criteria (except NHS number) have been removed.
+2. If not, it removes checks one criterion at a time and retries the assertion.
+3. This process continues until all criteria have been checked.
 4. If a match is found only after removing criteria, the failed criteria are logged.
 5. The function returns `True` only if all criteria match on the first attempt; otherwise, it returns `False`.
 

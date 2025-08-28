@@ -1251,93 +1251,105 @@ class Subject:
         Only fields present in the SQL query are populated.
         """
 
-        def parse_date(
-            val: Optional[Union[pd.Timestamp, str, datetime, date]],
-        ) -> Optional[date]:
-            """
-            Converts a value to a Python date object if possible.
-
-            Args:
-                val: The value to convert (can be pandas.Timestamp, string, datetime, date, or None).
-
-            Returns:
-                Optional[date]: The converted date object, or None if conversion fails.
-            """
-            if pd.isnull(val):
-                return None
-            if isinstance(val, pd.Timestamp):
-                return val.to_pydatetime().date()
-            if isinstance(val, str):
-                try:
-                    return datetime.strptime(val[:10], "%Y-%m-%d").date()
-                except Exception:
-                    return None
-            if isinstance(val, datetime):
-                return val.date()
-            if isinstance(val, date):
-                return val
-            return None
-
-        def parse_datetime(
-            val: Optional[Union[pd.Timestamp, str, datetime, date]],
-        ) -> Optional[datetime]:
-            """
-            Converts a value to a Python datetime object if possible.
-
-            Args:
-                val: The value to convert (can be pandas.Timestamp, string, datetime, or None).
-
-            Returns:
-                Optional[datetime]: The converted datetime object, or None if conversion fails.
-            """
-            if pd.isnull(val):
-                return None
-            if isinstance(val, pd.Timestamp):
-                return val.to_pydatetime()
-            if isinstance(val, str):
-                for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S"):
-                    try:
-                        return datetime.strptime(val[:19], fmt)
-                    except Exception:
-                        continue
-                return None
-            if isinstance(val, datetime):
-                return val
-            return None
-
         field_map = {
             "screening_subject_id": row.get("screening_subject_id"),
             "nhs_number": row.get("subject_nhs_number"),
             "surname": row.get("person_family_name"),
             "forename": row.get("person_given_name"),
-            "datestamp": parse_datetime(row.get("datestamp")),
+            "datestamp": Subject.parse_datetime(row.get("datestamp")),
             "screening_status_id": row.get("screening_status_id"),
             "screening_status_change_reason_id": row.get("ss_reason_for_change_id"),
-            "screening_status_change_date": parse_date(
+            "screening_status_change_date": Subject.parse_date(
                 row.get("screening_status_change_date")
             ),
-            "screening_due_date": parse_date(row.get("screening_due_date")),
+            "screening_due_date": Subject.parse_date(row.get("screening_due_date")),
             "screening_due_date_change_reason_id": row.get("sdd_reason_for_change_id"),
-            "screening_due_date_change_date": parse_date(row.get("sdd_change_date")),
-            "calculated_screening_due_date": parse_date(row.get("calculated_sdd")),
-            "surveillance_screening_due_date": parse_date(
+            "screening_due_date_change_date": Subject.parse_date(
+                row.get("sdd_change_date")
+            ),
+            "calculated_screening_due_date": Subject.parse_date(
+                row.get("calculated_sdd")
+            ),
+            "surveillance_screening_due_date": Subject.parse_date(
                 row.get("surveillance_screen_due_date")
             ),
-            "calculated_surveillance_due_date": parse_date(row.get("calculated_ssdd")),
+            "calculated_surveillance_due_date": Subject.parse_date(
+                row.get("calculated_ssdd")
+            ),
             "surveillance_due_date_change_reason_id": row.get(
                 "surveillance_sdd_rsn_change_id"
             ),
-            "surveillance_due_date_change_date": parse_date(
+            "surveillance_due_date_change_date": Subject.parse_date(
                 row.get("surveillance_sdd_change_date")
             ),
-            "lynch_due_date": parse_date(row.get("lynch_screening_due_date")),
+            "lynch_due_date": Subject.parse_date(row.get("lynch_screening_due_date")),
             "lynch_due_date_change_reason_id": row.get(
                 "lynch_sdd_reason_for_change_id"
             ),
-            "lynch_due_date_change_date": parse_date(row.get("lynch_sdd_change_date")),
-            "calculated_lynch_due_date": parse_date(row.get("lynch_calculated_sdd")),
-            "date_of_birth": parse_date(row.get("date_of_birth")),
-            "date_of_death": parse_date(row.get("date_of_death")),
+            "lynch_due_date_change_date": Subject.parse_date(
+                row.get("lynch_sdd_change_date")
+            ),
+            "calculated_lynch_due_date": Subject.parse_date(
+                row.get("lynch_calculated_sdd")
+            ),
+            "date_of_birth": Subject.parse_date(row.get("date_of_birth")),
+            "date_of_death": Subject.parse_date(row.get("date_of_death")),
         }
 
         return Subject(**field_map)
+
+    @staticmethod
+    def parse_date(
+        val: Optional[Union[pd.Timestamp, str, datetime, date]],
+    ) -> Optional[date]:
+        """
+        Converts a value to a Python date object if possible.
+
+        Args:
+            val: The value to convert (can be pandas.Timestamp, string, datetime, date, or None).
+
+        Returns:
+            Optional[date]: The converted date object, or None if conversion fails.
+        """
+        if pd.isnull(val):
+            return None
+        if isinstance(val, pd.Timestamp):
+            return val.to_pydatetime().date()
+        if isinstance(val, str):
+            try:
+                return datetime.strptime(val[:10], "%Y-%m-%d").date()
+            except Exception:
+                return None
+        if isinstance(val, datetime):
+            return val.date()
+        if isinstance(val, date):
+            return val
+        return None
+
+    @staticmethod
+    def parse_datetime(
+        val: Optional[Union[pd.Timestamp, str, datetime, date]],
+    ) -> Optional[datetime]:
+        """
+        Converts a value to a Python datetime object if possible.
+
+        Args:
+            val: The value to convert (can be pandas.Timestamp, string, datetime, or None).
+
+        Returns:
+            Optional[datetime]: The converted datetime object, or None if conversion fails.
+        """
+        if pd.isnull(val):
+            return None
+        if isinstance(val, pd.Timestamp):
+            return val.to_pydatetime()
+        if isinstance(val, str):
+            for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S"):
+                try:
+                    return datetime.strptime(val[:19], fmt)
+                except Exception:
+                    continue
+            return None
+        if isinstance(val, datetime):
+            return val
+        return None

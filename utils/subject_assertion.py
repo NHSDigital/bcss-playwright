@@ -14,7 +14,9 @@ def subject_assertion(nhs_number: str, criteria: dict) -> bool:
     Returns:
         bool: True if the subject matches the provided criteria, False if it does not.
     """
-    nhs_no_criteria = {"nhs number": nhs_number}
+    nhs_number_string = "nhs number"
+    subject_nhs_number_string = "subject_nhs_number"
+    nhs_no_criteria = {nhs_number_string: nhs_number}
     subject = Subject()
     user = User()
     builder = SubjectSelectionQueryBuilder()
@@ -29,40 +31,45 @@ def subject_assertion(nhs_number: str, criteria: dict) -> bool:
     subject_df = OracleDB().execute_query(query, bind_vars)
     subject = Subject.from_dataframe_row(subject_df.iloc[0])
 
-    criteria["nhs number"] = nhs_number
+    criteria[nhs_number_string] = nhs_number
+
+    # Check all criteria together first
     query, bind_vars = builder.build_subject_selection_query(
         criteria=criteria,
         user=user,
         subject=subject,
         subjects_to_retrieve=1,
     )
-
     df = OracleDB().execute_query(query, bind_vars)
-
-    if nhs_number in df["subject_nhs_number"].values:
+    if nhs_number in df[subject_nhs_number_string].values:
         return True
 
-    # Try removing criteria one by one (except nhs number)
+    # Check each criterion independently
     failed_criteria = []
-    criteria_keys = [key for key in criteria if key != "nhs number"]
+    criteria_keys = [key for key in criteria if key != nhs_number_string]
     for key in criteria_keys:
-        reduced_criteria = {key: value for key, value in criteria.items() if key != key}
+        single_criteria = {nhs_number_string: nhs_number, key: criteria[key]}
         query, bind_vars = builder.build_subject_selection_query(
-            criteria=reduced_criteria,
+            criteria=single_criteria,
             user=user,
             subject=subject,
             subjects_to_retrieve=1,
         )
         df = OracleDB().execute_query(query, bind_vars)
-        if nhs_number in df["subject_nhs_number"].values:
-            failed_criteria.append((key, criteria[key]))
-            break
-        else:
+        if (
+            subject_nhs_number_string not in df.columns
+            or nhs_number not in df[subject_nhs_number_string].values
+        ):
             failed_criteria.append((key, criteria[key]))
 
     if failed_criteria:
         log_message = "Subject Assertion Failed\nFailed criteria:\n" + "\n".join(
-            [f"Key: '{key}' - Value: '{value}'" for key, value in failed_criteria]
+            [f"{key}, {value}" for key, value in failed_criteria]
         )
         logging.error(log_message)
+    else:
+        logging.error(
+            "Subject Assertion Failed: Criteria combination is invalid or conflicting."
+        )
+
     return False
