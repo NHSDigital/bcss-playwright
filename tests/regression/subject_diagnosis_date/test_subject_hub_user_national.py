@@ -6,7 +6,7 @@ from pages.alerts.alerts_page import AlertsPage
 from pages.gfobt_test_kits.gfobt_test_kits_page import GFOBTTestKitsPage
 from pages.screening_practitioner_appointments.screening_practitioner_appointments_page import ScreeningPractitionerAppointmentsPage
 from pages.screening_subject_search.subject_screening_search_page import SubjectScreeningPage
-from pages.organisations.organisations_page import OrganisationsPage
+from pages.surveillance.surveillance_summary_review_page import SurveillanceSummaryPage
 
 # Scenario 1
 @pytest.mark.regression
@@ -89,7 +89,15 @@ def test_screening_centre_user_subject_search_and_surveillance(page: Page) -> No
     BasePage(page).go_to_organisations_page()
 
     # Step 2: Use POM for navigation and assertion
-    org_page = OrganisationsPage(page)
-    org_page.navigate_to_surveillance_review_summary()
-    expect(org_page.surveillance_review_summary_header).to_be_visible(timeout=5000)
+    sur_page = SurveillanceSummaryPage(
+    page,
+    org_and_site_details_link_text="Organisation and Site Details",
+    list_all_orgs_link_text="List All Organisations",
+    list_all_sites_link_text="List All Sites",
+    surveillance_link_text="Surveillance",
+    manage_surveillance_review_link_text="Manage Surveillance Review",
+    surveillance_review_summary_header_text="Surveillance Review Summary"
+)
+    sur_page.navigate_to_surveillance_review_summary()
+    expect(sur_page.surveillance_review_summary_header).to_be_visible(timeout=5000)
 
