@@ -4,9 +4,8 @@ from utils.user_tools import UserTools
 from pages.base_page import BasePage
 from pages.alerts.alerts_page import AlertsPage
 from pages.gfobt_test_kits.gfobt_test_kits_page import GFOBTTestKitsPage
-from utils.screening_subject_page_searcher import search_subject_by_forename, search_subject_by_surname
 from pages.screening_practitioner_appointments.screening_practitioner_appointments_page import ScreeningPractitionerAppointmentsPage
-from pages.screening_subject_search.subject_search_page import SubjectSearchPage
+from pages.screening_subject_search.subject_screening_search_page import SubjectScreeningPage
 from pages.organisations.organisations_page import OrganisationsPage
 
 # Scenario 1
@@ -73,7 +72,7 @@ def test_screening_centre_user_subject_search_and_summary(page: Page) -> None:
     BasePage(page).go_to_screening_subject_search_page()
 
     # Step 2: Use POM for subject search
-    search_page = SubjectSearchPage(page)
+    search_page = SubjectScreeningPage(page)
     """screening_status=4004 value represents 'Recall' & episode_status=2 value represents 'Closed'"""
     search_page.search_subject(surname="A*", forename="A*", screening_status="4004", episode_status="2")
 
