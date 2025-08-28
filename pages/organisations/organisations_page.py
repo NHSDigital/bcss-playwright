@@ -10,7 +10,6 @@ class OrganisationsPage(BasePage):
         self.page = page
         self.org_and_site_details_link = self.page.get_by_role("link", name="Organisation and Site Details")
         self.list_all_orgs_link = self.page.get_by_role("link", name="List All Organisations")
-        self.back_link = self.page.get_by_role("link", name="Back", exact=True)
         self.list_all_sites_link = self.page.get_by_role("link", name="List All Sites")
         self.surveillance_link = self.page.get_by_role("link", name="Surveillance", exact=True)
         self.manage_surveillance_review_link = self.page.get_by_role("link", name="Manage Surveillance Review")
@@ -58,10 +57,13 @@ class OrganisationsPage(BasePage):
         """Clicks the 'Bureau' link."""
         self.click(self.bureau_page)
 
+    def go_back(self):
+        self.click_back_button()
+
     def navigate_to_surveillance_review_summary(self):
         self.org_and_site_details_link.click()
         self.list_all_orgs_link.click()
-        self.back_link.click()
+        self.back_button.click()
         self.list_all_sites_link.click()
         for _ in range(3):
             self.back_button.click()
