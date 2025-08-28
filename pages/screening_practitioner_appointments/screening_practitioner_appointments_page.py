@@ -47,6 +47,7 @@ class ScreeningPractitionerAppointmentsPage(BasePage):
         self.click(self.set_availability_link)
 
     def open_appointments_report(self):
+        """Clicks the 'Appointments' header to open the related report section."""
         self.click(self.appointments_header)
 
 
