@@ -21,7 +21,7 @@ It is designed to assert that a subject with a given NHS number matches specifie
 
 ## Overview
 
-The `subject_assertion` function is used to verify that a subject in the database matches a set of criteria.  
+The `subject_assertion` function is used to verify that a subject in the database matches a set of criteria.
 If the subject does not match all criteria, the function will iteratively remove criteria (except NHS number) and retry, logging any criteria that caused the assertion to fail.
 
 ---
