@@ -36,7 +36,7 @@ If the subject does not match all criteria, the function will iteratively loop t
 ## How It Works
 
 1. The function first checks if the subject with the given NHS number matches all provided criteria.
-2. If not, it removes checks one criterion at a time and retries the assertion.
+2. If not, it checks one criterion at a time and retries the assertion.
 3. This process continues until all criteria have been checked.
 4. If a match is found only after removing criteria, the failed criteria are logged.
 5. The function returns `True` only if all criteria match on the first attempt; otherwise, it returns `False`.
