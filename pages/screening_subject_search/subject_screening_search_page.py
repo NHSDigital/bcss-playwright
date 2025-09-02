@@ -213,7 +213,8 @@ class SubjectScreeningPage(BasePage):
 
         logging.info("[KIT REQUEST] 'Send a kit' form submitted successfully")
 
-    def search_subject(self, surname: str, forename: str, screening_status: str, episode_status: str):
+    def search_subject_with_args(self, surname: str, forename: str, screening_status: str, episode_status: str) -> None:
+        """Searches for a subject using the provided criteria."""
         self.surname_field.fill(surname)
         self.forename_field.fill(forename)
         self.screening_status_dropdown.select_option(screening_status)
