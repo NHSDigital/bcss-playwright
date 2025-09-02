@@ -57,16 +57,13 @@ class OrganisationsPage(BasePage):
         """Clicks the 'Bureau' link."""
         self.click(self.bureau_page)
 
-    def go_back(self):
-        self.click_back_button()
-
     def navigate_to_surveillance_review_summary(self):
         self.org_and_site_details_link.click()
         self.list_all_orgs_link.click()
-        self.back_button.click()
+        self.click_back_button()
         self.list_all_sites_link.click()
         for _ in range(3):
-            self.back_button.click()
+            self.click_back_button()
         self.surveillance_link.click()
         self.manage_surveillance_review_link.click()
         self.page.goto("https://bcss-bcss-18680-ddc-bcss.k8s-nonprod.texasplatform.uk/surveillance/review/summary")
