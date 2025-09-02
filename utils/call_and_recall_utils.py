@@ -5,6 +5,8 @@ from classes.repositories.general_repository import GeneralRepository
 from classes.repositories.database_transition_parameters import (
     DatabaseTransitionParameters,
 )
+from classes.user_role_type import UserRoleType
+from classes.repositories.user_repository import UserRepository
 
 
 class CallAndRecallUtils:
@@ -54,7 +56,9 @@ class CallAndRecallUtils:
         conn.close()
         logging.info(f"END: failsafe stored proc executed for {nhs_no}")
 
-    def invite_subject_for_fobt_screening(self, nhs_no: str) -> None:
+    def invite_subject_for_fobt_screening(
+        self, nhs_no: str, user_role: UserRoleType
+    ) -> None:
         """
         Runs the database transition to 'invite' the subject for FOBT screening and create an FOBT episode.
         Uses OracleDB to execute the stored procedure.
@@ -65,16 +69,18 @@ class CallAndRecallUtils:
 
         try:
             # Prepare parameters for the stored procedure
+            user_repository = UserRepository()
             general_repository = GeneralRepository()
+            pio_id = user_repository.get_pio_id_for_role(user_role)
             database_transition_parameters = DatabaseTransitionParameters(
                 transition_id=58,
                 subject_id=int(self.oracledb.get_subject_id_from_nhs_number(nhs_no)),
-                user_id=2,
+                user_id=pio_id,
                 rollback_on_failure="Y",
             )
             general_repository.run_database_transition(database_transition_parameters)
         except Exception as e:
-            raise Exception(
+            raise oracledb.DatabaseError(
                 f"Error in invite_subject_for_fobt_screening for NHS No {nhs_no}: {e}"
-            ) from e
+            )
         logging.info(f"END: invite_subject_for_fobt_screening for NHS No: {nhs_no}")

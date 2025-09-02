@@ -82,7 +82,10 @@ class SubjectRepository:
         out_params = [int, int, str]  # contact_id, error_id, error_text
 
         result = self.oracle_db.execute_stored_procedure(
-            procedure, in_params=in_params, out_params=out_params, conn=conn
+            procedure,
+            in_params=in_params,
+            out_params=out_params,
+            conn=conn,
         )
 
         new_contact_id = result.get(3)
