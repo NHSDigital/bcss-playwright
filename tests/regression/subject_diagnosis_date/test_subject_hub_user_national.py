@@ -74,7 +74,7 @@ def test_screening_centre_user_subject_search_and_summary(page: Page) -> None:
     # Step 2: Use POM for subject search
     search_page = SubjectScreeningPage(page)
     """screening_status=4004 value represents 'Recall' & episode_status=2 value represents 'Closed'"""
-    search_page.search_subject(surname="A*", forename="A*", screening_status="4004", episode_status="2")
+    search_page.search_subject_with_args(surname="A*", forename="A*", screening_status="4004", episode_status="2")
 
 # Scenario 5
 @pytest.mark.regression
