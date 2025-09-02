@@ -7,6 +7,7 @@ from utils.user_tools import UserTools
 from utils.subject_assertion import subject_assertion
 from pages.base_page import BasePage
 
+@pytest.mark.wip
 @pytest.mark.fobt_regression_tests
 def test_scenario_2(page: Page) -> None:
     """
@@ -30,6 +31,7 @@ def test_scenario_2(page: Page) -> None:
     > Process S158 letter batch > S159 (1.3) > C203 (1.13)
     > Check recall [SSCL4a]
     """
+    logging.info("[TEST START] Regression - fobt normal kit reading")
 
     # Given I log in to BCSS "England" as user role "Hub Manager"
     UserTools.user_login(page, "Hub Manager State Registered at BCS01")
@@ -65,6 +67,8 @@ def test_scenario_2(page: Page) -> None:
             "screening status": "Inactive",
         },
     )
+    logging.info("Updated subject details checked in the DB")
+
 
     # When I run the FOBT failsafe trawl for my subject
 
@@ -92,7 +96,7 @@ def test_scenario_2(page: Page) -> None:
     )
 
     # When I invite my subject for FOBT screening
-    
+
     # Then my subject has been updated as follows:
     # Latest event status     	S1 Selected for Screening
     # Latest episode kit class	FIT
