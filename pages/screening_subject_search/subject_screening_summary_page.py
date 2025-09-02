@@ -1,3 +1,4 @@
+import re
 from playwright.sync_api import Page, expect, Locator
 from pages.base_page import BasePage
 from enum import Enum
@@ -32,7 +33,9 @@ class SubjectScreeningSummaryPage(BasePage):
         self.individual_letters = self.page.get_by_role(
             "link", name="Individual Letters"
         )
-        self.retrieve_data_link = self.page.get_by_role("link", name="Retrieve Data from Spine")
+        self.retrieve_data_link = self.page.get_by_role(
+            "link", name="Retrieve Data from Spine"
+        )
         self.patient_contacts = self.page.get_by_role("link", name="Patient Contacts")
         self.more = self.page.get_by_role("link", name="more")
         self.change_screening_status = self.page.get_by_label("Change Screening Status")
@@ -69,6 +72,16 @@ class SubjectScreeningSummaryPage(BasePage):
         self.book_practitioner_clinic_button = self.page.get_by_role(
             "button", name="Book Practitioner Clinic"
         )
+        self.subject_age_cell = self.page.locator(
+            "table#subjectSummaryTable tr:nth-of-type(1) td:nth-of-type(2)"
+        )
+
+        self.screening_status_cell = self.page.locator(
+            "td.epihdr_label:text('Screening Status') + td.epihdr_data"
+        )
+        self.latest_event_status_cell = self.page.locator(
+            "table#subjectSummaryTable tr:has(td:text('Latest Event Status')) td.epihdr_data"
+        ).nth(0)
 
     def wait_for_page_title(self) -> None:
         """Waits for the page to be the Subject Screening Summary"""
@@ -321,6 +334,58 @@ class SubjectScreeningSummaryPage(BasePage):
         #self.retrieve_data_link.click()
         self.click(self.retrieve_data_link)
         self.page.goto(self.spine_url)
+
+    def assert_subject_age(self, expected_age: int) -> None:
+        """
+        Asserts that the subject's age displayed in the demographics cell matches the expected value.
+
+        Args:
+            expected_age (int): The age to verify against the UI.
+
+        Raises:
+            AssertionError: If the age in the UI does not match the expected value.
+        """
+        age_text = self.subject_age_cell.inner_text().strip()
+        match = re.search(r"\(age\s+(\d+)\)", age_text)
+        if not match:
+            raise AssertionError(
+                f"[AGE PARSE ERROR] Could not find age in text: '{age_text}'"
+            )
+
+        actual_age = int(match.group(1))
+        assert (
+            actual_age == expected_age
+        ), f"[AGE MISMATCH] Expected age {expected_age}, but found {actual_age} in UI."
+
+    def assert_screening_status(self, expected_status: str) -> None:
+        """
+        Asserts that the screening status displayed in the summary matches the expected value.
+
+        Args:
+            expected_status (str): The expected screening status (e.g., 'Inactive').
+
+        Raises:
+            AssertionError: If the status in the UI does not match the expected value.
+        """
+        actual_status = self.screening_status_cell.inner_text().strip()
+        assert (
+            actual_status.lower() == expected_status.lower()
+        ), f"[SCREENING STATUS MISMATCH] Expected '{expected_status}', but found '{actual_status}' in UI."
+
+    def assert_latest_event_status(self, expected_status: str) -> None:
+        """
+        Asserts that the latest event status displayed in the summary table matches the expected value.
+
+        Args:
+            expected_status (str): The expected event status (e.g., 'S9 Pre-invitation Sent').
+
+        Raises:
+            AssertionError: If the status in the UI does not match the expected value.
+        """
+        actual_status = self.latest_event_status_cell.inner_text().strip()
+        assert actual_status == expected_status, (
+            f"[LATEST EVENT STATUS MISMATCH] Expected '{expected_status}', but found '{actual_status}' in UI."
+        )
 
 class ChangeScreeningStatusOptions(Enum):
     """Enum for Change Screening Status options."""
