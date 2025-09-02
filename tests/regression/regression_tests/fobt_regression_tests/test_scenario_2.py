@@ -13,6 +13,19 @@ from pages.screening_subject_search.subject_screening_summary_page import (
 )
 
 
+# Helper function to navigate to subject profile
+def navigate_to_subject_profile(page, nhs_no: str) -> None:
+    """
+    Navigates to the subject profile in the UI using the NHS number.
+
+    Args:
+        page (Page): The Playwright page object.
+        nhs_no (str): The NHS number of the subject to search.
+    """
+    screening_subject_page_searcher.search_subject_by_nhs_number(page, nhs_no)
+    logging.info("[SUBJECT VIEW] Subject loaded in UI")
+
+
 @pytest.mark.wip
 @pytest.mark.fobt_regression_tests
 def test_scenario_2(page: Page) -> None:
@@ -49,8 +62,6 @@ def test_scenario_2(page: Page) -> None:
     base_page.go_to_screening_subject_search_page()
 
     # And I create a subject that meets the following criteria:
-    # Age (y/d)                   	66/130
-    # Active GP practice in hub/SC	BCS01/BCS001
     requirements = {
         "age (y/d)": "66/130",
         "active gp practice in hub/sc": "BCS01/BCS001",
@@ -63,9 +74,6 @@ def test_scenario_2(page: Page) -> None:
     logging.info(f"[SUBJECT CREATED] Created subject's NHS number: {nhs_no}")
 
     # And my subject has been updated as follows:
-    # Subject age         	66
-    # Subject has episodes	No
-    # Screening status     	Inactive
     subject_assertion(
         nhs_no,
         {
@@ -77,8 +85,7 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[DB ASSERTIONS COMPLETE]Updated subject details checked in the DB")
 
     # Navigate to subject profile in UI
-    screening_subject_page_searcher.search_subject_by_nhs_number(page, nhs_no)
-    logging.info("[SUBJECT VIEW] Subject loaded in UI")
+    navigate_to_subject_profile(page, nhs_no)
 
     # Assert subject details in the UI
     summary_page.assert_subject_age(66)
@@ -90,13 +97,6 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[FAILSAFE TRAWL RUN]FOBT failsafe trawl run for subject")
 
     # Then my subject has been updated as follows:
-    # Subject has episodes             	No
-    # Screening due date               	Last birthday
-    # Screening due date date of change	Today
-    # Screening due date reason         	Failsafe Trawl
-    # Screening status                 	Call
-    # Screening status date of change   	Today
-    # Screening status reason           	Failsafe Trawl
     today = datetime.datetime.now().strftime("%d/%m/%Y")
 
     subject_assertion(
@@ -114,8 +114,7 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[DB ASSERTIONS COMPLETE]Updated subject details checked in the DB")
 
     # Navigate to subject profile in UI
-    screening_subject_page_searcher.search_subject_by_nhs_number(page, nhs_no)
-    logging.info("[SUBJECT VIEW] Subject loaded in UI")
+    navigate_to_subject_profile(page, nhs_no)
 
     # Assert subject details in the UI
     summary_page.assert_screening_status("Call")
@@ -124,9 +123,6 @@ def test_scenario_2(page: Page) -> None:
     # When I invite my subject for FOBT screening
 
     # Then my subject has been updated as follows:
-    # Latest event status     	S1 Selected for Screening
-    # Latest episode kit class	FIT
-    # Latest episode type     	FOBT
     subject_assertion(
         nhs_no,
         {
@@ -143,7 +139,6 @@ def test_scenario_2(page: Page) -> None:
     # When I process the open "S1" letter batch for my subject
 
     # Then my subject has been updated as follows:
-    # Latest event status	S9 Pre-invitation Sent
     subject_assertion(
         nhs_no,
         {
@@ -153,8 +148,7 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[ASSERTIONS COMPLETE]Updated subject status checked in the DB")
 
     # Navigate to subject profile in UI
-    screening_subject_page_searcher.search_subject_by_nhs_number(page, nhs_no)
-    logging.info("[SUBJECT VIEW] Subject loaded in UI")
+    navigate_to_subject_profile(page, nhs_no)
 
     # Assert subject details in the UI
     summary_page.assert_latest_event_status("S9 Pre-invitation Sent")
@@ -166,7 +160,6 @@ def test_scenario_2(page: Page) -> None:
     # When I process the open "S9" letter batch for my subject
 
     # Then my subject has been updated as follows:
-    # Latest event status	S10 Invitation & Test Kit Sent
     subject_assertion(
         nhs_no,
         {
@@ -176,7 +169,6 @@ def test_scenario_2(page: Page) -> None:
     # When I log my subject's latest unlogged FIT kit
 
     # Then my subject has been updated as follows:
-    # Latest event status	S43 Kit Returned and Logged (Initial Test)
     subject_assertion(
         nhs_no,
         {
@@ -184,8 +176,7 @@ def test_scenario_2(page: Page) -> None:
         },
     )
     # Navigate to subject profile in UI
-    screening_subject_page_searcher.search_subject_by_nhs_number(page, nhs_no)
-    logging.info("[SUBJECT VIEW] Subject loaded in UI")
+    navigate_to_subject_profile(page, nhs_no)
 
     # Assert subject details in the UI
     summary_page.assert_latest_event_status(
@@ -196,7 +187,6 @@ def test_scenario_2(page: Page) -> None:
     # When I read my subject's latest logged FIT kit as "NORMAL"
 
     # Then my subject has been updated as follows:
-    # Latest event status	S2 Normal
     subject_assertion(
         nhs_no,
         {
@@ -206,8 +196,7 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[DB ASSERTIONS COMPLETE]Updated subject details checked in the DB")
 
     # Navigate to subject profile in UI
-    screening_subject_page_searcher.search_subject_by_nhs_number(page, nhs_no)
-    logging.info("[SUBJECT VIEW] Subject loaded in UI")
+    navigate_to_subject_profile(page, nhs_no)
 
     # Assert subject details in the UI
     summary_page.assert_latest_event_status("S2 Normal")
@@ -227,8 +216,7 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[DB ASSERTIONS COMPLETE]Updated subject details checked in the DB")
 
     # Navigate to subject profile in UI
-    screening_subject_page_searcher.search_subject_by_nhs_number(page, nhs_no)
-    logging.info("[SUBJECT VIEW] Subject loaded in UI")
+    navigate_to_subject_profile(page, nhs_no)
 
     # Assert subject details in the UI
     summary_page.assert_latest_event_status("S158 Subject Discharge Sent (Normal)")
@@ -238,33 +226,6 @@ def test_scenario_2(page: Page) -> None:
     # When I process the open "S158" letter batch for my subject
 
     # Then my subject has been updated as follows:
-    # Calculated screening due date           	2 years from latest S158 event
-    # Calculated Lynch due date               	Null
-    # Calculated Surveillance due date         	Null
-    # Ceased confirmation date                 	Null
-    # Ceased confirmation details             	Null
-    # Ceased confirmation user ID             	Null
-    # Clinical reason for cease               	Null
-    # Latest episode accumulated result       	Definitive normal FOBt outcome
-    # Latest episode recall calculation method	Date of last patient letter
-    # Latest episode recall episode type       	FOBT screening
-    # Latest episode recall surveillance type 	Null
-    # Latest episode status                   	Closed
-    # Latest episode status reason             	Episode Complete
-    # Latest event status                     	S159 GP Discharge Sent (Normal)
-    # Lynch due date                           	Null
-    # Lynch due date date of change           	Null
-    # Lynch due date reason                   	Null
-    # Screening status                         	Recall
-    # Screening status date of change
-    # Not checking as status may or may not have changed
-    # Screening status reason                 	Recall
-    # Screening due date                       	Calculated screening due date
-    # Screening due date date of change       	Today
-    # Screening due date reason               	Recall
-    # Surveillance due date                   	Null
-    # Surveillance due date date of change     	Unchanged
-    # Surveillance due date reason             	Unchanged
     subject_assertion(
         nhs_no,
         {
@@ -286,7 +247,7 @@ def test_scenario_2(page: Page) -> None:
             "lynch due date date of change": None,
             "lynch due date reason": None,
             "screening status": "Recall",
-            # Screening status date of change intentionally omitted
+            # 'Screening status date of change' intentionally omitted as status may or may not have changed
             "screening status reason": "Recall",
             "screening due date": "Calculated screening due date",
             "screening due date date of change": "Today",
@@ -299,8 +260,7 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[DB ASSERTIONS COMPLETE]Updated subject details checked in the DB")
 
     # Navigate to subject profile in UI
-    screening_subject_page_searcher.search_subject_by_nhs_number(page, nhs_no)
-    logging.info("[SUBJECT VIEW] Subject loaded in UI")
+    navigate_to_subject_profile(page, nhs_no)
 
     # Assert subject details in the UI
     summary_page.assert_latest_event_status("S159 GP Discharge Sent (Normal)")
