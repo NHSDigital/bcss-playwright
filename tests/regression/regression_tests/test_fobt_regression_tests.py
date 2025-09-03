@@ -8,7 +8,6 @@ import logging
 from utils.batch_processing import batch_processing
 
 
-@pytest.mark.wip
 @pytest.mark.fobt_regression_tests
 def test_scenario_1(page: Page) -> None:
     """
@@ -155,7 +154,6 @@ def test_scenario_1(page: Page) -> None:
     ), "Subject does not meet the expected criteria"
 
 
-@pytest.mark.wip2
 def test_test():
     nhs_no = "9426174885"
     criteria = {

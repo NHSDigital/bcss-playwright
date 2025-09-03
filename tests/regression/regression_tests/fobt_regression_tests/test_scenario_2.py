@@ -7,6 +7,7 @@ from utils.user_tools import UserTools
 from utils.subject_assertion import subject_assertion
 from utils.call_and_recall_utils import CallAndRecallUtils
 from utils import screening_subject_page_searcher
+from utils.batch_processing import batch_processing
 from pages.base_page import BasePage
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
@@ -22,6 +23,8 @@ def navigate_to_subject_profile(page, nhs_no: str) -> None:
         page (Page): The Playwright page object.
         nhs_no (str): The NHS number of the subject to search.
     """
+    BasePage(page).click_main_menu_link()
+    BasePage(page).go_to_screening_subject_search_page()
     screening_subject_page_searcher.search_subject_by_nhs_number(page, nhs_no)
     logging.info("[SUBJECT VIEW] Subject loaded in UI")
 
@@ -54,7 +57,11 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[TEST START] Regression - fobt normal kit reading")
 
     # Given I log in to BCSS "England" as user role "Hub Manager"
-    UserTools.user_login(page, "Hub Manager State Registered at BCS01")
+    user_role = UserTools.user_login(
+        page, "Hub Manager State Registered at BCS01", return_role_type=True
+    )
+    if user_role is None:
+        raise ValueError("User cannot be assigned to a UserRoleType")
 
     # Go to screening subject search page
     base_page = BasePage(page)
@@ -77,12 +84,12 @@ def test_scenario_2(page: Page) -> None:
     subject_assertion(
         nhs_no,
         {
-            "age (y/d)": "66/130",
+            "subject age": "66",
             "subject has episodes": "No",
             "screening status": "Inactive",
         },
     )
-    logging.info("[DB ASSERTIONS COMPLETE]Updated subject details checked in the DB")
+    logging.info("[DB ASSERTIONS COMPLETE]Created subject's details checked in the DB")
 
     # Navigate to subject profile in UI
     navigate_to_subject_profile(page, nhs_no)
@@ -121,6 +128,7 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[UI ASSERTIONS COMPLETE]Updated subject details checked in the UI")
 
     # When I invite my subject for FOBT screening
+    CallAndRecallUtils().invite_subject_for_fobt_screening(nhs_no, user_role)
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -131,21 +139,21 @@ def test_scenario_2(page: Page) -> None:
             "latest episode type": "FOBT",
         },
     )
-    # Then there is a "S1" letter batch for my subject with the exact title "Pre-invitation (FIT)"
     logging.info(
-        "[DB ASSERTIONS COMPLETE]Updated subject details checked in the DB & letter batch exists"
+        "[DB ASSERTIONS COMPLETE]Updated subject details checked in the DB"
+    )
+    # Then there is a "S1" letter batch for my subject with the exact title "Pre-invitation (FIT)"
+    LetterBatchUtils().assert_letter_batch_exists(nhs_no, "S1", "Pre-invitation (FIT)")
+    logging.info(
+        "[ASSERTIONS COMPLETE]S1 Letter batch exists"
     )
 
     # When I process the open "S1" letter batch for my subject
-
     # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "S9 Pre-invitation Sent",
-        },
+    batch_processing(
+        page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent", True
     )
-    logging.info("[ASSERTIONS COMPLETE]Updated subject status checked in the DB")
+    logging.info("[DB ASSERTIONS COMPLETE]Updated subject status checked in the DB")
 
     # Navigate to subject profile in UI
     navigate_to_subject_profile(page, nhs_no)
@@ -158,14 +166,16 @@ def test_scenario_2(page: Page) -> None:
     # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
 
     # When I process the open "S9" letter batch for my subject
-
     # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "S10 Invitation & Test Kit Sent",
-        },
+    batch_processing(
+        page,
+        "S9",
+        "Invitation & Test Kit (FIT)",
+        "S10 - Invitation & Test Kit Sent",
+        True,
     )
+    logging.info("[DB ASSERTIONS COMPLETE]Updated subject status checked in the DB")
+
     # When I log my subject's latest unlogged FIT kit
 
     # Then my subject has been updated as follows:
@@ -230,29 +240,29 @@ def test_scenario_2(page: Page) -> None:
         nhs_no,
         {
             "calculated screening due date": "2 years from latest S158 event",
-            "calculated lynch due date": None,
-            "calculated surveillance due date": None,
-            "ceased confirmation date": None,
-            "ceased confirmation details": None,
-            "ceased confirmation user ID": None,
-            "clinical reason for cease": None,
+            "calculated lynch due date": "Null",
+            "calculated surveillance due date": "Null",
+            "ceased confirmation date": "Null",
+            "ceased confirmation details": "Null",
+            "ceased confirmation user ID": "Null",
+            "clinical reason for cease": "Null",
             "latest episode accumulated result": "Definitive normal FOBt outcome",
             "latest episode recall calculation method": "Date of last patient letter",
             "latest episode recall episode type": "FOBT screening",
-            "latest episode recall surveillance type": None,
+            "latest episode recall surveillance type": "Null",
             "latest episode status": "Closed",
             "latest episode status reason": "Episode Complete",
             "latest event status": "S159 GP Discharge Sent (Normal)",
-            "lynch due date": None,
-            "lynch due date date of change": None,
-            "lynch due date reason": None,
+            "lynch due date": "Null",
+            "lynch due date date of change": "Null",
+            "lynch due date reason": "Null",
             "screening status": "Recall",
             # 'Screening status date of change' intentionally omitted as status may or may not have changed
             "screening status reason": "Recall",
             "screening due date": "Calculated screening due date",
             "screening due date date of change": "Today",
             "screening due date reason": "Recall",
-            "surveillance due date": None,
+            "surveillance due date": "Null",
             "surveillance due date date of change": "Unchanged",
             "surveillance due date reason": "Unchanged",
         },
