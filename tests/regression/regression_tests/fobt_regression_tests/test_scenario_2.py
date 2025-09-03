@@ -21,34 +21,7 @@ from pages.communication_production.communications_production_page import (
 )
 from pages.fit_test_kits.log_devices_page import LogDevicesPage
 from pages.fit_test_kits.fit_test_kits_page import FITTestKitsPage
-
-
-# Helper function to navigate to subject profile
-def navigate_to_subject_summary_page(page, nhs_no: str) -> None:
-    """
-    Navigates to the subject profile in the UI using the NHS number.
-
-    Args:
-        page (Page): The Playwright page object.
-        nhs_no (str): The NHS number of the subject to search.
-    """
-    BasePage(page).click_main_menu_link()
-    BasePage(page).go_to_screening_subject_search_page()
-    screening_subject_page_searcher.search_subject_by_nhs_number(page, nhs_no)
-    logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
-
-
-# Helper function to navigate to active batch list
-def navigate_to_active_batch_list(page: Page) -> None:
-    """
-    Navigates to the active batch list page in the UI.
-
-    Args:
-        page (Page): The Playwright page object.
-    """
-    BasePage(page).click_main_menu_link()
-    BasePage(page).go_to_communications_production_page()
-    CommunicationsProductionPage(page).go_to_active_batch_list_page()
+from pages.communication_production.batch_list_page import BatchListPage
 
 
 # Helper function to log FIT kit
@@ -128,7 +101,7 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[DB ASSERTIONS COMPLETE] Created subject's details checked in the DB")
 
     # Navigate to subject summary page in UI
-    navigate_to_subject_summary_page(page, nhs_no)
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
@@ -158,7 +131,7 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[DB ASSERTIONS COMPLETE]Updated subject details checked in the DB")
 
     # Navigate to subject summary page in UI
-    navigate_to_subject_summary_page(page, nhs_no)
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
@@ -181,7 +154,7 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[DB ASSERTIONS COMPLETE] Updated subject details checked in the DB")
 
     # Then there is a "S1" letter batch for my subject with the exact title "Pre-invitation (FIT)"
-    navigate_to_active_batch_list(page)
+    BatchListPage(page).navigate_to_active_batch_list_page()
     ActiveBatchListPage(page).is_batch_present("S1 - Pre-invitation (FIT)")
     logging.info("[UI ASSERTIONS COMPLETE] S1 Letter batch exists")
 
@@ -191,6 +164,7 @@ def test_scenario_2(page: Page) -> None:
         page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent", True
     )
     logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
+    logging.info("[UI ASSERTIONS COMPLETE] Updated subject details checked in the UI")
 
     # Navigate to subject summary page in UI
     # navigate_to_subject_summary_page(page, nhs_no)
@@ -198,8 +172,6 @@ def test_scenario_2(page: Page) -> None:
 
     # Assert subject details in the UI
     # summary_page.assert_latest_event_status("S9 - Pre-invitation Sent")
-    # logging.info("[UI ASSERTIONS COMPLETE] Updated subject details checked in the UI")
-    # logging.info("[DEBUG TEST PASSED]")
 
     # When I run Timed Events for my subject
     # nhs_df = pd.DataFrame(
@@ -248,7 +220,7 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
 
     # Navigate to subject summary page in UI
-    navigate_to_subject_summary_page(page, nhs_no)
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
@@ -270,7 +242,7 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
 
     # Navigate to subject summary page in UI
-    navigate_to_subject_summary_page(page, nhs_no)
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
@@ -278,7 +250,7 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[UI ASSERTIONS COMPLETE] Updated subject details checked in the UI")
 
     # And there is a "S2" letter batch for my subject with the exact title "Subject Result (Normal)"
-    navigate_to_active_batch_list(page)
+    BatchListPage(page).navigate_to_active_batch_list_page()
     ActiveBatchListPage(page).is_batch_present("S2 - Subject Result (Normal)")
     logging.info("[UI ASSERTIONS COMPLETE] S2 Letter batch exists")
 
@@ -302,7 +274,7 @@ def test_scenario_2(page: Page) -> None:
     # logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
 
     # Navigate to subject summary page in UI
-    navigate_to_subject_summary_page(page, nhs_no)
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
@@ -310,7 +282,7 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[UI ASSERTIONS COMPLETE] Updated subject details checked in the UI")
 
     # And there is a "S158" letter batch for my subject with the exact title "GP Result (Normal)"
-    navigate_to_active_batch_list(page)
+    BatchListPage(page).navigate_to_active_batch_list_page()
     ActiveBatchListPage(page).is_batch_present("S158 - GP Result (Normal)")
     logging.info("[UI ASSERTIONS COMPLETE] S158 Letter batch exists")
 
@@ -357,7 +329,7 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[DB ASSERTIONS COMPLETE] Updated subject details checked in the DB")
 
     # Navigate to subject summary page in UI
-    navigate_to_subject_summary_page(page, nhs_no)
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI

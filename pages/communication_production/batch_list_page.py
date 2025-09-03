@@ -1,6 +1,7 @@
 from playwright.sync_api import Page, expect, Locator
 from pages.base_page import BasePage
 from datetime import datetime
+from pages.communication_production.communications_production_page import CommunicationsProductionPage
 from utils.calendar_picker import CalendarPicker
 from utils.table_util import TableUtils
 import logging
@@ -203,6 +204,17 @@ class BatchListPage(BasePage):
             first_link.count() > 0
         ), f"No batch links found in table '{table_selector}'"
         first_link.click()
+
+    def navigate_to_active_batch_list_page(self) -> None:
+        """
+        Navigates to the active batch list page from anywhere in bcss (providing the main menu link is displayed).
+
+        Args:
+            page (Page): The Playwright page object.
+        """
+        BasePage(self.page).click_main_menu_link()
+        BasePage(self.page).go_to_communications_production_page()
+        CommunicationsProductionPage(self.page).go_to_active_batch_list_page()
 
 
 class ActiveBatchListPage(BatchListPage):
