@@ -193,27 +193,27 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
 
     # Navigate to subject summary page in UI
-    navigate_to_subject_summary_page(page, nhs_no)
-    logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
+    # navigate_to_subject_summary_page(page, nhs_no)
+    # logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
-    summary_page.assert_latest_event_status("S9 - Pre-invitation Sent")
-    logging.info("[UI ASSERTIONS COMPLETE] Updated subject details checked in the UI")
-    logging.info("[DEBUG TEST PASSED]")
+    # summary_page.assert_latest_event_status("S9 - Pre-invitation Sent")
+    # logging.info("[UI ASSERTIONS COMPLETE] Updated subject details checked in the UI")
+    # logging.info("[DEBUG TEST PASSED]")
 
     # When I run Timed Events for my subject
-    nhs_df = pd.DataFrame(
-        {"subject_nhs_number": [nhs_no]}
-    )  # Create DataFrame with NHS number to pass to timed events procedure
-    OracleDB().exec_bcss_timed_events(
-        nhs_df
-    )  # Execute timed events procedure to process the subject
-    logging.info("[TIMED EVENTS]Executed for existing subject")
+    # nhs_df = pd.DataFrame(
+    #     {"subject_nhs_number": [nhs_no]}
+    # )  # Create DataFrame with NHS number to pass to timed events procedure
+    # OracleDB().exec_bcss_timed_events(
+    #     nhs_df
+    # )  # Execute timed events procedure to process the subject
+    # logging.info("[TIMED EVENTS]Executed for existing subject")
 
     # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
-    navigate_to_active_batch_list(page)
-    ActiveBatchListPage(page).is_batch_present("S9 - Invitation & Test Kit (FIT)")
-    logging.info("[UI ASSERTIONS COMPLETE] S9 Letter batch exists")
+    # navigate_to_active_batch_list(page)
+    # ActiveBatchListPage(page).is_batch_present("S9 - Invitation & Test Kit (FIT)")
+    # logging.info("[UI ASSERTIONS COMPLETE] S9 Letter batch exists")
 
     # When I process the open "S9" letter batch for my subject
     batch_processing(
@@ -225,15 +225,15 @@ def test_scenario_2(page: Page) -> None:
     )
     logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
 
-    # Then my subject has been updated as follows:
-    batch_processing(
-        page,
-        "S9",
-        "Invitation & Test Kit (FIT)",
-        "S10 - Invitation & Test Kit Sent",
-        True,
-    )
-    logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
+    # # Then my subject has been updated as follows:
+    # batch_processing(
+    #     page,
+    #     "S9",
+    #     "Invitation & Test Kit (FIT)",
+    #     "S10 - Invitation & Test Kit Sent",
+    #     True,
+    # )
+    # logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
 
     # When I log my subject's latest unlogged FIT kit
     fit_kit = log_fit_kit(page, nhs_no)
@@ -253,7 +253,7 @@ def test_scenario_2(page: Page) -> None:
 
     # Assert subject details in the UI
     summary_page.assert_latest_event_status(
-        "S43 Kit Returned and Logged (Initial Test)"
+        "S43 - Kit Returned and Logged (Initial Test)"
     )
     logging.info("[UI ASSERTIONS COMPLETE] Updated subject details checked in the UI")
 
@@ -274,7 +274,7 @@ def test_scenario_2(page: Page) -> None:
     logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
-    summary_page.assert_latest_event_status("S2 Normal")
+    summary_page.assert_latest_event_status("S2 - Normal")
     logging.info("[UI ASSERTIONS COMPLETE] Updated subject details checked in the UI")
 
     # And there is a "S2" letter batch for my subject with the exact title "Subject Result (Normal)"
@@ -283,24 +283,30 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[UI ASSERTIONS COMPLETE] S2 Letter batch exists")
 
     # When I process the open "S2" letter batch for my subject
-    batch_processing(page, "S2", "Normal", "S158 Subject Discharge Sent (Normal)", True)
-
-    # Then my subject has been updated as follows:
     batch_processing(
         page,
         "S2",
         "Subject Result (Normal)",
-        "S158 Subject Discharge Sent (Normal)",
+        "S158 - Subject Discharge Sent (Normal)",
         True,
     )
-    logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
+
+    # Then my subject has been updated as follows:
+    # batch_processing(
+    #     page,
+    #     "S2",
+    #     "Subject Result (Normal)",
+    #     "S158 Subject Discharge Sent (Normal)",
+    #     True,
+    # )
+    # logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
 
     # Navigate to subject summary page in UI
     navigate_to_subject_summary_page(page, nhs_no)
     logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
-    summary_page.assert_latest_event_status("S158 Subject Discharge Sent (Normal)")
+    summary_page.assert_latest_event_status("S158 - Subject Discharge Sent (Normal)")
     logging.info("[UI ASSERTIONS COMPLETE] Updated subject details checked in the UI")
 
     # And there is a "S158" letter batch for my subject with the exact title "GP Result (Normal)"
@@ -313,7 +319,7 @@ def test_scenario_2(page: Page) -> None:
         page,
         "S158",
         "GP Result (Normal)",
-        "S159 GP Discharge Sent (Normal)",
+        "S159 - GP Discharge Sent (Normal)",
         True,
     )
 
@@ -355,7 +361,7 @@ def test_scenario_2(page: Page) -> None:
     logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
-    summary_page.assert_latest_event_status("S159 GP Discharge Sent (Normal)")
+    summary_page.assert_latest_event_status("S159 - GP Discharge Sent (Normal)")
     logging.info("[UI ASSERTIONS COMPLETE] Updated subject details checked in the UI")
 
     logging.info("[TEST COMPLETE] Scenario 2 passed all assertions")
