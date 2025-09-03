@@ -24,10 +24,10 @@ class UserRepository:
             INNER JOIN person prs ON prs.prs_id = pio.prs_id
             INNER JOIN org ON org.org_id = pio.org_id
             WHERE prs.oe_user_code = :user_code
-              AND org.org_code = :org_code
-              AND pio.role_id = :role_id
-              AND pio.is_bcss_user = 1
-              AND TRUNC(SYSDATE) BETWEEN TRUNC(pio.start_date) AND NVL(pio.end_date, SYSDATE)
+            AND org.org_code = :org_code
+            AND pio.role_id = :role_id
+            AND pio.is_bcss_user = 1
+            AND TRUNC(SYSDATE) BETWEEN TRUNC(pio.start_date) AND NVL(pio.end_date, SYSDATE)
         """
         params = {
             "user_code": role.user_code,

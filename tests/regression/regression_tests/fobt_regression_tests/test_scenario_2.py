@@ -254,7 +254,11 @@ def test_scenario_2(page: Page) -> None:
     # Assert subject details in the UI
     summary_page.assert_latest_event_status("S158 Subject Discharge Sent (Normal)")
     logging.info("[UI ASSERTIONS COMPLETE]Updated subject details checked in the UI")
-    # TODO: And there is a "S158" letter batch for my subject with the exact title "GP Result (Normal)"
+    
+    # And there is a "S158" letter batch for my subject with the exact title "GP Result (Normal)"
+    navigate_to_active_batch_list(page)
+    ActiveBatchListPage(page).is_batch_present("S158 - GP Result (Normal)")
+    logging.info("[ASSERTIONS COMPLETE]S158 Letter batch exists")
 
     # When I process the open "S158" letter batch for my subject
     batch_processing(
