@@ -1,6 +1,7 @@
 import pytest
 import logging
 import datetime
+import pandas as pd
 from playwright.sync_api import Page
 from pages.communication_production.batch_list_page import ActiveBatchListPage
 from utils.oracle.subject_creation_util import CreateSubjectSteps
@@ -16,6 +17,7 @@ from pages.screening_subject_search.subject_screening_summary_page import (
 from pages.communication_production.communications_production_page import (
     CommunicationsProductionPage,
 )
+from utils.oracle.oracle import OracleDB
 
 
 # Helper function to navigate to subject profile
@@ -33,6 +35,7 @@ def navigate_to_subject_profile(page, nhs_no: str) -> None:
     logging.info("[SUBJECT VIEW] Subject loaded in UI")
 
 
+# Helper function to navigate to active batch list
 def navigate_to_active_batch_list(page: Page) -> None:
     """
     Navigates to the active batch list page in the UI.
@@ -175,14 +178,29 @@ def test_scenario_2(page: Page) -> None:
     summary_page.assert_latest_event_status("S9 Pre-invitation Sent")
     logging.info("[UI ASSERTIONS COMPLETE]Updated subject details checked in the UI")
 
-    # TODO: When I run Timed Events for my subject
+    # When I run Timed Events for my subject
+    nhs_df = pd.DataFrame(
+        {"subject_nhs_number": [nhs_no]}
+    )  # Create DataFrame with NHS number to pass to timed events procedure
+    OracleDB().exec_bcss_timed_events(
+        nhs_df
+    )  # Execute timed events procedure to process the subject
+    logging.info("[TIMED EVENTS] Executed for existing subject")
 
     # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
     navigate_to_active_batch_list(page)
     ActiveBatchListPage(page).is_batch_present("S9 - Invitation & Test Kit (FIT)")
     logging.info("[ASSERTIONS COMPLETE]S9 Letter batch exists")
 
-    # TODO: When I process the open "S9" letter batch for my subject
+    # When I process the open "S9" letter batch for my subject
+    batch_processing(
+        page,
+        "S9",
+        "Invitation & Test Kit (FIT)",
+        "S10 - Invitation & Test Kit Sent",
+        True,
+    )
+    logging.info("[DB ASSERTIONS COMPLETE]Updated subject status checked in the DB")
 
     # Then my subject has been updated as follows:
     batch_processing(
@@ -237,7 +255,9 @@ def test_scenario_2(page: Page) -> None:
     ActiveBatchListPage(page).is_batch_present("S2 - Subject Result (Normal)")
     logging.info("[ASSERTIONS COMPLETE]S2 Letter batch exists")
 
-    # TODO: When I process the open "S2" letter batch for my subject
+    # When I process the open "S2" letter batch for my subject
+    batch_processing(page, "S2", "Normal", "S158 Subject Discharge Sent (Normal)", True)
+
     # Then my subject has been updated as follows:
     batch_processing(
         page,
@@ -254,7 +274,7 @@ def test_scenario_2(page: Page) -> None:
     # Assert subject details in the UI
     summary_page.assert_latest_event_status("S158 Subject Discharge Sent (Normal)")
     logging.info("[UI ASSERTIONS COMPLETE]Updated subject details checked in the UI")
-    
+
     # And there is a "S158" letter batch for my subject with the exact title "GP Result (Normal)"
     navigate_to_active_batch_list(page)
     ActiveBatchListPage(page).is_batch_present("S158 - GP Result (Normal)")
