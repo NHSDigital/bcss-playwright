@@ -10,6 +10,8 @@ from utils.subject_assertion import subject_assertion
 from utils.call_and_recall_utils import CallAndRecallUtils
 from utils import screening_subject_page_searcher
 from utils.batch_processing import batch_processing
+from utils.fit_kit import FitKitGeneration, FitKitLogged
+from utils.oracle.oracle import OracleDB
 from pages.base_page import BasePage
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
@@ -17,11 +19,12 @@ from pages.screening_subject_search.subject_screening_summary_page import (
 from pages.communication_production.communications_production_page import (
     CommunicationsProductionPage,
 )
-from utils.oracle.oracle import OracleDB
+from pages.fit_test_kits.log_devices_page import LogDevicesPage
+from pages.fit_test_kits.fit_test_kits_page import FITTestKitsPage
 
 
 # Helper function to navigate to subject profile
-def navigate_to_subject_profile(page, nhs_no: str) -> None:
+def navigate_to_subject_summary_page(page, nhs_no: str) -> None:
     """
     Navigates to the subject profile in the UI using the NHS number.
 
@@ -32,7 +35,7 @@ def navigate_to_subject_profile(page, nhs_no: str) -> None:
     BasePage(page).click_main_menu_link()
     BasePage(page).go_to_screening_subject_search_page()
     screening_subject_page_searcher.search_subject_by_nhs_number(page, nhs_no)
-    logging.info("[SUBJECT VIEW] Subject loaded in UI")
+    logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
 
 # Helper function to navigate to active batch list
@@ -46,6 +49,26 @@ def navigate_to_active_batch_list(page: Page) -> None:
     BasePage(page).click_main_menu_link()
     BasePage(page).go_to_communications_production_page()
     CommunicationsProductionPage(page).go_to_active_batch_list_page()
+
+
+# Helper function to log FIT kit
+def log_fit_kit(page: Page, nhs_no: str) -> str:
+    BasePage(page).click_main_menu_link()
+    fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
+    BasePage(page).go_to_fit_test_kits_page()
+    FITTestKitsPage(page).go_to_log_devices_page()
+    logging.info(f"Logging FIT Device ID: {fit_kit}")
+    LogDevicesPage(page).fill_fit_device_id_field(fit_kit)
+    sample_date = datetime.datetime.now()
+    logging.info(f"Setting sample date to {sample_date}")
+    LogDevicesPage(page).fill_sample_date_field(sample_date)
+    LogDevicesPage(page).log_devices_title.get_by_text("Scan Device").wait_for()
+    try:
+        LogDevicesPage(page).verify_successfully_logged_device_text()
+        logging.info(f"{fit_kit} Successfully logged")
+    except Exception as e:
+        pytest.fail(f"{fit_kit} unsuccessfully logged: {str(e)}")
+    return fit_kit
 
 
 @pytest.mark.wip
@@ -109,8 +132,9 @@ def test_scenario_2(page: Page) -> None:
     )
     logging.info("[DB ASSERTIONS COMPLETE]Created subject's details checked in the DB")
 
-    # Navigate to subject profile in UI
-    navigate_to_subject_profile(page, nhs_no)
+    # Navigate to subject summary page in UI
+    navigate_to_subject_summary_page(page, nhs_no)
+    logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
     summary_page.assert_subject_age(66)
@@ -138,8 +162,9 @@ def test_scenario_2(page: Page) -> None:
     )
     logging.info("[DB ASSERTIONS COMPLETE]Updated subject details checked in the DB")
 
-    # Navigate to subject profile in UI
-    navigate_to_subject_profile(page, nhs_no)
+    # Navigate to subject summary page in UI
+    navigate_to_subject_summary_page(page, nhs_no)
+    logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
     summary_page.assert_screening_status("Call")
@@ -171,8 +196,9 @@ def test_scenario_2(page: Page) -> None:
     )
     logging.info("[DB ASSERTIONS COMPLETE]Updated subject status checked in the DB")
 
-    # Navigate to subject profile in UI
-    navigate_to_subject_profile(page, nhs_no)
+    # Navigate to subject summary page in UI
+    navigate_to_subject_summary_page(page, nhs_no)
+    logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
     summary_page.assert_latest_event_status("S9 Pre-invitation Sent")
@@ -212,7 +238,8 @@ def test_scenario_2(page: Page) -> None:
     )
     logging.info("[DB ASSERTIONS COMPLETE]Updated subject status checked in the DB")
 
-    # TODO: When I log my subject's latest unlogged FIT kit
+    # When I log my subject's latest unlogged FIT kit
+    fit_kit = log_fit_kit(page, nhs_no)
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -223,8 +250,9 @@ def test_scenario_2(page: Page) -> None:
     )
     logging.info("[DB ASSERTIONS COMPLETE]Updated subject status checked in the DB")
 
-    # Navigate to subject profile in UI
-    navigate_to_subject_profile(page, nhs_no)
+    # Navigate to subject summary page in UI
+    navigate_to_subject_summary_page(page, nhs_no)
+    logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
     summary_page.assert_latest_event_status(
@@ -232,7 +260,8 @@ def test_scenario_2(page: Page) -> None:
     )
     logging.info("[UI ASSERTIONS COMPLETE]Updated subject details checked in the UI")
 
-    # TODO: When I read my subject's latest logged FIT kit as "NORMAL"
+    # When I read my subject's latest logged FIT kit as "NORMAL"
+    FitKitLogged().read_latest_logged_kit(user_role, 2, fit_kit, "NORMAL")
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -243,8 +272,9 @@ def test_scenario_2(page: Page) -> None:
     )
     logging.info("[DB ASSERTIONS COMPLETE]Updated subject status checked in the DB")
 
-    # Navigate to subject profile in UI
-    navigate_to_subject_profile(page, nhs_no)
+    # Navigate to subject summary page in UI
+    navigate_to_subject_summary_page(page, nhs_no)
+    logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
     summary_page.assert_latest_event_status("S2 Normal")
@@ -268,8 +298,9 @@ def test_scenario_2(page: Page) -> None:
     )
     logging.info("[DB ASSERTIONS COMPLETE]Updated subject status checked in the DB")
 
-    # Navigate to subject profile in UI
-    navigate_to_subject_profile(page, nhs_no)
+    # Navigate to subject summary page in UI
+    navigate_to_subject_summary_page(page, nhs_no)
+    logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
     summary_page.assert_latest_event_status("S158 Subject Discharge Sent (Normal)")
@@ -322,8 +353,9 @@ def test_scenario_2(page: Page) -> None:
     )
     logging.info("[DB ASSERTIONS COMPLETE]Updated subject details checked in the DB")
 
-    # Navigate to subject profile in UI
-    navigate_to_subject_profile(page, nhs_no)
+    # Navigate to subject summary page in UI
+    navigate_to_subject_summary_page(page, nhs_no)
+    logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
     summary_page.assert_latest_event_status("S159 GP Discharge Sent (Normal)")
