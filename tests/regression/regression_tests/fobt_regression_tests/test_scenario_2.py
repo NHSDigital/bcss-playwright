@@ -2,6 +2,7 @@ import pytest
 import logging
 import datetime
 from playwright.sync_api import Page
+from pages.communication_production.batch_list_page import ActiveBatchListPage
 from utils.oracle.subject_creation_util import CreateSubjectSteps
 from utils.user_tools import UserTools
 from utils.subject_assertion import subject_assertion
@@ -11,6 +12,9 @@ from utils.batch_processing import batch_processing
 from pages.base_page import BasePage
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
+)
+from pages.communication_production.communications_production_page import (
+    CommunicationsProductionPage,
 )
 
 
@@ -29,6 +33,18 @@ def navigate_to_subject_profile(page, nhs_no: str) -> None:
     logging.info("[SUBJECT VIEW] Subject loaded in UI")
 
 
+def navigate_to_active_batch_list(page: Page) -> None:
+    """
+    Navigates to the active batch list page in the UI.
+
+    Args:
+        page (Page): The Playwright page object.
+    """
+    BasePage(page).click_main_menu_link()
+    BasePage(page).go_to_communications_production_page()
+    CommunicationsProductionPage(page).go_to_active_batch_list_page()
+
+
 @pytest.mark.wip
 @pytest.mark.fobt_regression_tests
 def test_scenario_2(page: Page) -> None:
@@ -40,7 +56,6 @@ def test_scenario_2(page: Page) -> None:
     This scenario tests the basic scenario where a subject returns their initial test kit which gives a normal result.
 
     Scenario summary:
-
     > Create a new subject in the FOBT age range > Inactive
     > Run the FOBT failsafe trawl > Call
     > Run the database transition to invite them for FOBT screening > S1(1.1)
@@ -101,7 +116,7 @@ def test_scenario_2(page: Page) -> None:
 
     # When I run the FOBT failsafe trawl for my subject
     CallAndRecallUtils().run_failsafe(nhs_no)
-    logging.info("[FAILSAFE TRAWL RUN]FOBT failsafe trawl run for subject")
+    logging.info(f"[FAILSAFE TRAWL RUN]FOBT failsafe trawl run for subject {nhs_no}")
 
     # Then my subject has been updated as follows:
     today = datetime.datetime.now().strftime("%d/%m/%Y")
@@ -139,14 +154,12 @@ def test_scenario_2(page: Page) -> None:
             "latest episode type": "FOBT",
         },
     )
-    logging.info(
-        "[DB ASSERTIONS COMPLETE]Updated subject details checked in the DB"
-    )
+    logging.info("[DB ASSERTIONS COMPLETE]Updated subject details checked in the DB")
+
     # Then there is a "S1" letter batch for my subject with the exact title "Pre-invitation (FIT)"
-    LetterBatchUtils().assert_letter_batch_exists(nhs_no, "S1", "Pre-invitation (FIT)")
-    logging.info(
-        "[ASSERTIONS COMPLETE]S1 Letter batch exists"
-    )
+    navigate_to_active_batch_list(page)
+    ActiveBatchListPage(page).is_batch_present("S1 - Pre-invitation (FIT)")
+    logging.info("[ASSERTIONS COMPLETE]S1 Letter batch exists")
 
     # When I process the open "S1" letter batch for my subject
     # Then my subject has been updated as follows:
@@ -162,10 +175,15 @@ def test_scenario_2(page: Page) -> None:
     summary_page.assert_latest_event_status("S9 Pre-invitation Sent")
     logging.info("[UI ASSERTIONS COMPLETE]Updated subject details checked in the UI")
 
-    # When I run Timed Events for my subject
-    # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
+    # TODO: When I run Timed Events for my subject
 
-    # When I process the open "S9" letter batch for my subject
+    # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
+    navigate_to_active_batch_list(page)
+    ActiveBatchListPage(page).is_batch_present("S9 - Invitation & Test Kit (FIT)")
+    logging.info("[ASSERTIONS COMPLETE]S9 Letter batch exists")
+
+    # TODO: When I process the open "S9" letter batch for my subject
+
     # Then my subject has been updated as follows:
     batch_processing(
         page,
@@ -176,7 +194,7 @@ def test_scenario_2(page: Page) -> None:
     )
     logging.info("[DB ASSERTIONS COMPLETE]Updated subject status checked in the DB")
 
-    # When I log my subject's latest unlogged FIT kit
+    # TODO: When I log my subject's latest unlogged FIT kit
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -185,6 +203,8 @@ def test_scenario_2(page: Page) -> None:
             "latest event status": "S43 Kit Returned and Logged (Initial Test)",
         },
     )
+    logging.info("[DB ASSERTIONS COMPLETE]Updated subject status checked in the DB")
+
     # Navigate to subject profile in UI
     navigate_to_subject_profile(page, nhs_no)
 
@@ -194,7 +214,7 @@ def test_scenario_2(page: Page) -> None:
     )
     logging.info("[UI ASSERTIONS COMPLETE]Updated subject details checked in the UI")
 
-    # When I read my subject's latest logged FIT kit as "NORMAL"
+    # TODO: When I read my subject's latest logged FIT kit as "NORMAL"
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -203,7 +223,7 @@ def test_scenario_2(page: Page) -> None:
             "latest event status": "S2 Normal",
         },
     )
-    logging.info("[DB ASSERTIONS COMPLETE]Updated subject details checked in the DB")
+    logging.info("[DB ASSERTIONS COMPLETE]Updated subject status checked in the DB")
 
     # Navigate to subject profile in UI
     navigate_to_subject_profile(page, nhs_no)
@@ -211,19 +231,22 @@ def test_scenario_2(page: Page) -> None:
     # Assert subject details in the UI
     summary_page.assert_latest_event_status("S2 Normal")
     logging.info("[UI ASSERTIONS COMPLETE]Updated subject details checked in the UI")
+
     # And there is a "S2" letter batch for my subject with the exact title "Subject Result (Normal)"
+    navigate_to_active_batch_list(page)
+    ActiveBatchListPage(page).is_batch_present("S2 - Subject Result (Normal)")
+    logging.info("[ASSERTIONS COMPLETE]S2 Letter batch exists")
 
-    # When I process the open "S2" letter batch for my subject
-
+    # TODO: When I process the open "S2" letter batch for my subject
     # Then my subject has been updated as follows:
-    # Latest event status	S158 Subject Discharge Sent (Normal)
-    subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "S158 Subject Discharge Sent (Normal)",
-        },
+    batch_processing(
+        page,
+        "S2",
+        "Subject Result (Normal)",
+        "S158 Subject Discharge Sent (Normal)",
+        True,
     )
-    logging.info("[DB ASSERTIONS COMPLETE]Updated subject details checked in the DB")
+    logging.info("[DB ASSERTIONS COMPLETE]Updated subject status checked in the DB")
 
     # Navigate to subject profile in UI
     navigate_to_subject_profile(page, nhs_no)
@@ -231,9 +254,16 @@ def test_scenario_2(page: Page) -> None:
     # Assert subject details in the UI
     summary_page.assert_latest_event_status("S158 Subject Discharge Sent (Normal)")
     logging.info("[UI ASSERTIONS COMPLETE]Updated subject details checked in the UI")
-    # And there is a "S158" letter batch for my subject with the exact title "GP Result (Normal)"
+    # TODO: And there is a "S158" letter batch for my subject with the exact title "GP Result (Normal)"
 
     # When I process the open "S158" letter batch for my subject
+    batch_processing(
+        page,
+        "S158",
+        "GP Result (Normal)",
+        "S159 GP Discharge Sent (Normal)",
+        True,
+    )
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -252,7 +282,6 @@ def test_scenario_2(page: Page) -> None:
             "latest episode recall surveillance type": "Null",
             "latest episode status": "Closed",
             "latest episode status reason": "Episode Complete",
-            "latest event status": "S159 GP Discharge Sent (Normal)",
             "lynch due date": "Null",
             "lynch due date date of change": "Null",
             "lynch due date reason": "Null",
