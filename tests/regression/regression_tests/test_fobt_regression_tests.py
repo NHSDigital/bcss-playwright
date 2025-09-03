@@ -183,16 +183,21 @@ def test_scenario_1(page: Page) -> None:
         subject_assertion(nhs_no, criteria) is True
     ), "Subject does not meet the expected criteria"
 
-    batch_processing(page, "S3", "Test Spoilt", "S11 - Retest Kit Sent (Spoilt)", True)
+    batch_processing(
+        page, "S3", "Retest (Spoilt) (FIT)", "S11 - Retest Kit Sent (Spoilt)", True
+    )
     batch_processing(
         page,
         "S11",
-        "Retest Kit Sent (Spoilt)",
+        "Reminder of Retest (Spoilt)",
         "S20 - Reminder of Retest Kit Sent (Spoilt)",
         True,
     )
     batch_processing(
-        page, "S20", "Reminder of Retest Kit Sent (Spoilt)", "S13 - Test Spoilt Logged"
+        page,
+        "S20",
+        "GP Discharge Non Response (Spoilt)",
+        "S47 - GP Discharge for Non-response Sent (Spoilt Retest Kit)",
     )
 
     criteria = {

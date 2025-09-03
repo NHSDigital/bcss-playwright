@@ -18,6 +18,7 @@ from classes.repositories.kit_service_management_repository import (
 )
 from classes.kit_service_management_record import KitServiceManagementRecord
 from classes.kit_status import KitStatus
+from oracle.oracle_specific_functions import execute_fit_kit_stored_procedures
 
 
 class FitKitGeneration:
@@ -286,10 +287,11 @@ class FitKitLogged:
             kit_queue_record.authoriser_user_code = "AUTOTEST"
             kit_queue_record.test_result = result_reading
             kit_queue_record.error_code = result_code
+            logging.debug(f"kit queue record: {kit_queue_record.__str__()}")
             kit_queue_repo.update_kit_service_management_record(kit_queue_record)
 
             # Immediately process the kit queue (don't wait for the scheduled DB job to kick in)
-            kit_queue_repo.process_kit_queue()
+            execute_fit_kit_stored_procedures()
 
         except Exception as e:
             raise RuntimeError(f"Error occurred while reading latest logged kit: {e}")

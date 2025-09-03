@@ -89,4 +89,4 @@ class AnalyserRepository:
             raise ValueError(
                 f"No result code found for analyser type id: {analyser_type_id} and code type id {result_code_type}"
             )
-        return int(result_code_df["tk_analyser_type_id"].iloc[0])
+        return int(result_code_df["error_code"].iloc[0])

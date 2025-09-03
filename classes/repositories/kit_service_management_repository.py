@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional, Any
+from typing import Optional
 from utils.oracle.oracle import OracleDB
 from classes.kit_service_management_record import KitServiceManagementRecord
 from classes.entities.kit_service_management_entity import KitServiceManagementEntity
@@ -216,14 +216,3 @@ class KitServiceManagementRepository:
             self.oracle_db.update_or_insert_data_to_table(sql_query, params)
         except Exception as ex:
             raise RuntimeError(f"Error updating KIT_QUEUE record: {ex}")
-
-    def process_kit_queue(self) -> None:
-        """
-        Processes the kit queue by executing the following stored procedures:
-            - PKG_TEST_KIT_QUEUE.p_validate_kit_queue
-            - PKG_TEST_KIT_QUEUE.p_calculate_result
-        """
-        self.oracle_db.execute_stored_procedure(
-            "PKG_TEST_KIT_QUEUE.p_validate_kit_queue"
-        )
-        self.oracle_db.execute_stored_procedure("PKG_TEST_KIT_QUEUE.p_calculate_result")
