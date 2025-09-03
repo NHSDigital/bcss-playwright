@@ -7,7 +7,6 @@ from utils.call_and_recall_utils import CallAndRecallUtils
 import logging
 from utils.batch_processing import batch_processing
 
-
 @pytest.mark.fobt_regression_tests
 def test_scenario_1(page: Page) -> None:
     """
@@ -153,13 +152,45 @@ def test_scenario_1(page: Page) -> None:
         subject_assertion(nhs_no, criteria) is True
     ), "Subject does not meet the expected criteria"
 
+    BasePage(page).click_main_menu_link()
+    fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
+    BasePage(page).go_to_fit_test_kits_page()
+    FITTestKitsPage(page).go_to_log_devices_page()
+    logging.info(f"Logging FIT Device ID: {fit_kit}")
+    LogDevicesPage(page).fill_fit_device_id_field(fit_kit)
+    sample_date = datetime.now()
+    logging.info(f"Setting sample date to {sample_date}")
+    LogDevicesPage(page).fill_sample_date_field(sample_date)
+    LogDevicesPage(page).log_devices_title.get_by_text("Scan Device").wait_for()
+    try:
+        LogDevicesPage(page).verify_successfully_logged_device_text()
+        logging.info(f"{fit_kit} Successfully logged")
+    except Exception as e:
+        pytest.fail(f"{fit_kit} unsuccessfully logged: {str(e)}")
 
-def test_test():
-    nhs_no = "9426174885"
+    FitKitLogged().read_latest_logged_kit(user_role, 2, fit_kit, "SPOILT")
+
+    criteria = {"latest event status": "S3 Test Spoilt"}
+    assert (
+        subject_assertion(nhs_no, criteria) is True
+    ), "Subject does not meet the expected criteria"
+
+    batch_processing(page, "S3", "Test Spoilt", "S11 - Retest Kit Sent (Spoilt)", True)
+    batch_processing(
+        page,
+        "S11",
+        "Retest Kit Sent (Spoilt)",
+        "S20 - Reminder of Retest Kit Sent (Spoilt)",
+        True,
+    )
+    batch_processing(
+        page, "S20", "Reminder of Retest Kit Sent (Spoilt)", "S13 - Test Spoilt Logged"
+    )
+
     criteria = {
         "calculated fobt due date": "2 years from earliest S10 event",
         "calculated lynch due date": "Null",
-        "calculated surveillance due date": "Unchanged",
+        "calculated surveillance due date": "Null",
         "ceased confirmation date": "Null",
         "ceased confirmation details": "Null",
         "ceased confirmation user id": "Null",
@@ -170,7 +201,7 @@ def test_test():
         "latest episode recall surveillance type": "Null",
         "latest episode status": "Closed",
         "latest episode status reason": "Non Response",
-        "latest event status": "S44 GP Discharge for Non-response Sent (Initial Test)",
+        "latest event status": "S47 GP Discharge for Non-response Sent (Spoilt Retest Kit)",
         "lynch due date": "Null",
         "lynch due date date of change": "Null",
         "lynch due date reason": "Null",
@@ -183,7 +214,8 @@ def test_test():
         "surveillance due date date of change": "Unchanged",
         "surveillance due date reason": "Unchanged",
     }
-
     assert (
         subject_assertion(nhs_no, criteria) is True
     ), "Subject does not meet the expected criteria"
+
+    LogoutPage(page).log_out()
