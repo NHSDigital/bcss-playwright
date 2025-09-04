@@ -25,7 +25,7 @@ from oracle.oracle_specific_functions import execute_fit_kit_stored_procedures
 class FitKitGeneration:
     """
     This class is responsible for generating FIT Device IDs from test kit data.
-    It is also used to retreive a kit belonging to a subject
+    It is also used to retrieve a kit belonging to a subject
     """
 
     def create_fit_id_df(
@@ -113,7 +113,7 @@ class FitKitGeneration:
         """
         Constructs SQL for requesting the kit ID of the latest FIT kit for a subject.
         This then gets the subject's subject id from the DB and runs the query to return their FIT kit
-        It then calculates the checkdigit and extra info to append at the end of the FIT Kit
+        It then calculates the check digit and extra info to append at the end of the FIT Kit
 
         Args:
             nhs_no (str): The subject's NHS number.
