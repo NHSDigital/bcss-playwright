@@ -13,6 +13,86 @@ class KitServiceManagementRepository:
     def __init__(self):
         self.oracle_db = OracleDB()
 
+    def _device_filter(self, device_id: Optional[str]) -> list[str]:
+        """
+        Adds a filter on device ID for the 'get_service_management_sql' method
+        Args:
+            device_id (str): The device ID of the subject
+        Returns:
+            list[str]: A filter for device_id if it is provided, otherwise it returns an empty string
+        """
+        return ["AND kq.device_id = :device_id"] if device_id else []
+
+    def _archived_filter(self, archived: Optional[bool]) -> list[str]:
+        """
+        Adds a filter on date_time_error_archived for the 'get_service_management_sql' method
+        Args:
+            archived (bool): Whether to include archived records
+        Returns:
+            list[str]: A filter for date_time_error_archived
+        """
+        if archived is None:
+            return []
+        return [f"AND kq.date_time_error_archived IS {'NOT ' if archived else ''}NULL"]
+
+    def _hub_filter(self, issuing_hub_id: int, logged_hub_id: int) -> list[str]:
+        """
+        Adds a filter on hubs for the 'get_service_management_sql' method
+        Args:
+            issuing_hub_id (int): The ID of the issuing hub
+            logged_hub_id (int): The ID of the logged hub
+        Returns:
+            list[str]: A filter for the hubs
+        """
+        hub_conditions = []
+        if logged_hub_id > -1:
+            hub_conditions.append("lo.org_id = :logged_hub_id")
+        if issuing_hub_id > -1:
+            hub_conditions.append("ep.start_hub_id = :issuing_hub_id")
+        return [f"AND ({' OR '.join(hub_conditions)})"] if hub_conditions else []
+
+    def _status_filter(
+        self, status: Optional[str], if_error_has_id: Optional[bool]
+    ) -> list[str]:
+        """
+        Adds a filter on statuses for the 'get_service_management_sql' method
+        Args:
+            status (str): The status of the test kit
+            if_error_has_id (bool): Whether to include records with an error ID
+        Returns:
+            list[str]: A filter for the statuses
+        """
+        if not status:
+            error_status = [
+                "AND (kq.test_kit_status = 'COMPLETE' OR (kq.test_kit_status = 'ERROR'"
+            ]
+            if if_error_has_id is not None:
+                error_status.append(
+                    f"AND kq.bcss_error_id IS {'NOT ' if if_error_has_id else ''}NULL"
+                )
+            error_status.append("))")
+            return [" ".join(error_status)]
+        status_upper = status.upper()
+        if status_upper == "ERROR":
+            filters = ["AND kq.test_kit_status = 'ERROR'"]
+            if if_error_has_id is not None:
+                filters.append(
+                    f"AND kq.bcss_error_id IS {'NOT ' if if_error_has_id else ''}NULL"
+                )
+            return filters
+        return [f"AND kq.test_kit_status = '{status_upper}'"]
+
+    def _order_by(self, device_id: Optional[str], order_by_column: str) -> list[str]:
+        """
+        Returns an order by for the column specified
+        Args:
+            device_id (str): The device ID of the subject
+            order_by_column (str): The column to order by
+        Returns:
+            list[str]: An order by clause for the specified column
+        """
+        return [f"ORDER BY {order_by_column} DESC NULLS LAST"] if not device_id else []
+
     def get_service_management_sql(
         self,
         device_id: Optional[str],
@@ -25,9 +105,18 @@ class KitServiceManagementRepository:
     ) -> str:
         """
         Constructs the SQL query for kit service management records.
+        Args:
+            device_id (str): The device ID of the subject
+            archived (bool): Whether to include archived records
+            issuing_hub_id (int): The ID of the issuing hub
+            logged_hub_id (int): The ID of the logged hub
+            status (str): The status of the test kit
+            if_error_has_id (bool): Whether to include records with an error ID
+            order_by_column (str): The column to order by
+        Returns:
+            str: The SQL query for kit service management records
         """
-        sql_query = [
-            """
+        base_sql = """
         SELECT kq.device_id, kq.test_kit_name, kq.test_kit_type, kq.test_kit_status,
             CASE WHEN tki.logged_in_flag = 'Y' THEN kq.logged_by_hub END as logged_by_hub,
             CASE WHEN tki.logged_in_flag = 'Y' THEN kq.date_time_logged END as date_time_logged,
@@ -48,49 +137,16 @@ class KitServiceManagementRepository:
         LEFT OUTER JOIN ORG lo ON lo.org_code = kq.logged_by_hub
         WHERE kq.test_kit_type = 'FIT'
         """
-        ]
 
-        if device_id:
-            sql_query.append("AND kq.device_id = :device_id")
-        else:
-            # Archived filter
-            if archived is not None:
-                if archived:
-                    sql_query.append("AND kq.date_time_error_archived IS NOT NULL")
-                else:
-                    sql_query.append("AND kq.date_time_error_archived IS NULL")
-            # Hub filters
-            if issuing_hub_id > -1 and logged_hub_id > -1:
-                sql_query.append(
-                    "AND (lo.org_id = :logged_hub_id OR ep.start_hub_id = :issuing_hub_id)"
-                )
-            elif issuing_hub_id > -1:
-                sql_query.append("AND ep.start_hub_id = :issuing_hub_id")
-            elif logged_hub_id > -1:
-                sql_query.append("AND lo.org_id = :logged_hub_id")
-            # Status/error filters
-            if status:
-                if status.upper() == "ERROR":
-                    sql_query.append("AND kq.test_kit_status = 'ERROR'")
-                    if if_error_has_id is not None:
-                        if if_error_has_id:
-                            sql_query.append("AND kq.bcss_error_id IS NOT NULL")
-                        else:
-                            sql_query.append("AND kq.bcss_error_id IS NULL")
-                else:
-                    sql_query.append(f"AND kq.test_kit_status = '{status.upper()}'")
-            else:
-                sql_query.append(
-                    "AND (kq.test_kit_status = 'COMPLETE' OR (kq.test_kit_status = 'ERROR'"
-                )
-                if if_error_has_id is not None:
-                    if if_error_has_id:
-                        sql_query.append("AND kq.bcss_error_id IS NOT NULL))")
-                    else:
-                        sql_query.append("AND kq.bcss_error_id IS NULL))")
+        filters = []
+        filters += self._device_filter(device_id)
         if not device_id:
-            sql_query.append(f"ORDER BY {order_by_column} DESC NULLS LAST")
-        return "\n".join(sql_query)
+            filters += self._archived_filter(archived)
+            filters += self._hub_filter(issuing_hub_id, logged_hub_id)
+            filters += self._status_filter(status, if_error_has_id)
+            filters += self._order_by(device_id, order_by_column)
+
+        return base_sql + "\n" + "\n".join(filters)
 
     def get_service_management(
         self,
@@ -104,8 +160,18 @@ class KitServiceManagementRepository:
     ) -> KitServiceManagementRecord:
         """
         Gets kit service management records based on the provided filters.
+        Args:
+            device_id (str): The device ID of the subject
+            issuing_hub_id (int): The ID of the issuing hub
+            logged_hub_id (int): The ID of the logged hub
+            status (str): The status of the test kit
+            archived (bool): Whether to include archived records
+            if_error_has_id (bool): Whether to include records with an error ID
+            order_by_column (str): The column to order by
+        Returns:
+            KitServiceManagementRecord: The populated kit service management record object
         """
-        logging.info("begin KitServiceManagementRepository.get_service_management")
+        logging.debug("begin KitServiceManagementRepository.get_service_management")
         sql = self.get_service_management_sql(
             device_id,
             archived,
@@ -131,8 +197,12 @@ class KitServiceManagementRepository:
     ) -> KitServiceManagementRecord:
         """
         Gets the kit service management record for the specified device ID.
+        Args:
+            device_id (str): The device ID of the subject
+        Returns:
+            KitServiceManagementRecord: The populated kit service management record object
         """
-        logging.info(
+        logging.debug(
             "start: KitServiceManagementRepository.get_service_management_by_device_id"
         )
         kit_queue_record = self.get_service_management(
@@ -144,7 +214,7 @@ class KitServiceManagementRepository:
             if_error_has_id=None,
             order_by_column="date_time_logged",
         )
-        logging.info(
+        logging.debug(
             "exit: KitServiceManagementRepository.get_service_management_by_device_id"
         )
         return kit_queue_record
@@ -154,7 +224,6 @@ class KitServiceManagementRepository:
     ) -> None:
         """
         Updates a kit service management record in the database.
-
         Args:
             record (KitServiceManagementRecord): The record to update.
         """
@@ -166,6 +235,8 @@ class KitServiceManagementRepository:
     ) -> None:
         """
         Updates a kit service management entity in the database.
+        Args:
+            entity (KitServiceManagementEntity): The entity to update.
         """
 
         try:

@@ -35,10 +35,10 @@ class UserRepository:
             INNER JOIN person prs ON prs.prs_id = pio.prs_id
             INNER JOIN org ON org.org_id = pio.org_id
             WHERE prs.oe_user_code = :user_code
-              AND org.org_code = :org_code
-              AND pio.role_id = :role_id
-              AND pio.is_bcss_user = 1
-              AND TRUNC(SYSDATE) BETWEEN TRUNC(pio.start_date) AND NVL(pio.end_date, SYSDATE)
+            AND org.org_code = :org_code
+            AND pio.role_id = :role_id
+            AND pio.is_bcss_user = 1
+            AND TRUNC(SYSDATE) BETWEEN TRUNC(pio.start_date) AND NVL(pio.end_date, SYSDATE)
         """
         params = {
             "user_code": role.user_code,
@@ -60,7 +60,7 @@ class UserRepository:
         Returns:
             int: The pio_id of the user
         """
-        logging.info(f"Getting PIO ID for role: {role.user_code}")
+        logging.debug(f"Getting PIO ID for role: {role.user_code}")
 
         df = self.general_query(role)
         return int(df["pio_id"].iloc[0])
@@ -75,7 +75,7 @@ class UserRepository:
         Returns:
             int: The org_id of the user
         """
-        logging.info(f"Getting ORG ID for role: {role.user_code}")
+        logging.debug(f"Getting ORG ID for role: {role.user_code}")
 
         df = self.general_query(role)
         return int(df["org_id"].iloc[0])
@@ -90,7 +90,7 @@ class UserRepository:
         Returns:
             int: The role_id of the user
         """
-        logging.info(f"Getting ROLE ID for role: {role.user_code}")
+        logging.debug(f"Getting ROLE ID for role: {role.user_code}")
 
         df = self.general_query(role)
         return int(df["role_id"].iloc[0])
@@ -105,7 +105,7 @@ class UserRepository:
         Returns:
             int: The org_code of the user
         """
-        logging.info(f"Getting ORG CODE for role: {role.user_code}")
+        logging.debug(f"Getting ORG CODE for role: {role.user_code}")
 
         df = self.general_query(role)
         return int(df["org_code"].iloc[0])

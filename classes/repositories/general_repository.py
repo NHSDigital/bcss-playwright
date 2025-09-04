@@ -20,7 +20,7 @@ class GeneralRepository:
         """
         Executes the PKG_EPISODE.p_set_episode_next_status stored procedure with the provided parameters.
         """
-        logging.info(
+        logging.debug(
             f"Running database transition with transition_id = {database_transition_parameters.transition_id}"
         )
         conn = self.oracle_db.connect_to_db()
@@ -45,7 +45,7 @@ class GeneralRepository:
             assert success, f"Error when executing database transition: {error_rows}"
 
             conn.commit()
-            logging.info("Database transition executed successfully.")
+            logging.debug("Database transition executed successfully.")
         except Exception as e:
             raise oracledb.DatabaseError(f"Error executing database transition: {e}")
         finally:

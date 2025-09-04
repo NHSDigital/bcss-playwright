@@ -63,9 +63,7 @@ def test_scenario_1(page: Page) -> None:
         "subject has episodes": "no",
         "screening status": "Inactive",
     }
-    assert (
-        subject_assertion(nhs_no, criteria) is True
-    ), "Subject does not meet the expected criteria"
+    subject_assertion(nhs_no, criteria)
 
     CallAndRecallUtils().run_failsafe(nhs_no)
 
@@ -88,9 +86,7 @@ def test_scenario_1(page: Page) -> None:
         "screening status date of change": "Today",
         "screening status reason": "Failsafe Trawl",
     }
-    assert (
-        subject_assertion(nhs_no, criteria) is True
-    ), "Subject does not meet the expected criteria"
+    subject_assertion(nhs_no, criteria)
     """
 
     CallAndRecallUtils().invite_subject_for_fobt_screening(nhs_no, user_role)
@@ -101,9 +97,7 @@ def test_scenario_1(page: Page) -> None:
         "latest episode type": "FOBT",
     }
 
-    assert (
-        subject_assertion(nhs_no, criteria) is True
-    ), "Subject does not meet the expected criteria"
+    subject_assertion(nhs_no, criteria)
 
     batch_processing(
         page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent", True
@@ -156,9 +150,7 @@ def test_scenario_1(page: Page) -> None:
         "surveillance due date reason": "Unchanged",
     }
 
-    assert (
-        subject_assertion(nhs_no, criteria) is True
-    ), "Subject does not meet the expected criteria"
+    subject_assertion(nhs_no, criteria)
 
     BasePage(page).click_main_menu_link()
     fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
@@ -179,9 +171,7 @@ def test_scenario_1(page: Page) -> None:
     FitKitLogged().read_latest_logged_kit(user_role, 2, fit_kit, "SPOILT")
 
     criteria = {"latest event status": "S3 Test Spoilt"}
-    assert (
-        subject_assertion(nhs_no, criteria) is True
-    ), "Subject does not meet the expected criteria"
+    subject_assertion(nhs_no, criteria)
 
     batch_processing(
         page, "S3", "Retest (Spoilt) (FIT)", "S11 - Retest Kit Sent (Spoilt)", True
@@ -227,8 +217,6 @@ def test_scenario_1(page: Page) -> None:
         "surveillance due date date of change": "Unchanged",
         "surveillance due date reason": "Unchanged",
     }
-    assert (
-        subject_assertion(nhs_no, criteria) is True
-    ), "Subject does not meet the expected criteria"
+    subject_assertion(nhs_no, criteria)
 
     LogoutPage(page).log_out()

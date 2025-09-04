@@ -34,7 +34,7 @@ class CreateSubjectSteps:
             sc_org_id (int): Screening center ID.
             hub_org_id (int): Hub ID.
         """
-        logging.info(
+        logging.debug(
             f"Checking if fewer than {num_subjects} subjects to invite per day for screening center {sc_org_id}, hub {hub_org_id}"
         )
 
@@ -48,9 +48,9 @@ class CreateSubjectSteps:
                 f"No active invitation plan for screening centre {sc_org_id}, hub id {hub_org_id}"
             )
 
-        logging.info(f"Current active plan = {active_plan}")
+        logging.debug(f"Current active plan = {active_plan}")
         invitations_per_day = active_plan["invitations_per_day"]
-        logging.info(
+        logging.debug(
             f"Need to add more subjects? {num_subjects > invitations_per_day} (numRequired={num_subjects}, numAvailable={invitations_per_day})"
         )
 
@@ -66,7 +66,7 @@ class CreateSubjectSteps:
             hub_org_id (int): Hub ID.
             region (str): Region name.
         """
-        logging.info(
+        logging.debug(
             f"Creating additional subjects for {num_subjects} per day, screening center {sc_org_id}, hub {hub_org_id}, region {region_str}"
         )
 
@@ -78,14 +78,14 @@ class CreateSubjectSteps:
                 f"No active invitation plan for screening centre {sc_org_id}, hub id {hub_org_id}"
             )
 
-        logging.info(f"Current active plan = {active_plan}")
+        logging.debug(f"Current active plan = {active_plan}")
 
         if num_subjects <= active_plan["invitations_per_day"]:
-            logging.info(
+            logging.debug(
                 f"Don't need to add more subjects (numRequired={num_subjects}, numAvailable={active_plan['invitations_per_day']})"
             )
         else:
-            logging.info(
+            logging.debug(
                 f"Need to add more subjects (numRequired={num_subjects}, numAvailable={active_plan['invitations_per_day']})"
             )
 
@@ -97,7 +97,7 @@ class CreateSubjectSteps:
             ).days
             pio_id = self.get_pio_id_for_region(region)
 
-            logging.info(f"adding {total_number_of_new_subjects} more subjects")
+            logging.debug(f"adding {total_number_of_new_subjects} more subjects")
             for _ in range(total_number_of_new_subjects):
                 # Generate a random subject
                 new_subject = DataCreation().generate_random_subject(
@@ -130,7 +130,7 @@ class CreateSubjectSteps:
                         f"Failed to create random NHS number for subject: {self.get_subject_details(new_subject)}"
                     )
                 else:
-                    logging.info(
+                    logging.debug(
                         f"Creating new Subject {self.get_subject_details(new_subject)}"
                     )
                     SubjectRepository().create_pi_subject(pio_id, new_subject)
@@ -201,7 +201,7 @@ class CreateSubjectSteps:
         Raises:
             ValueError: If an invalid criteria is provided.
         """
-        logging.info("Starting custom subject creation")
+        logging.debug("Starting custom subject creation")
 
         word_repo = WordRepository()
         data_creation = DataCreation()
@@ -217,35 +217,35 @@ class CreateSubjectSteps:
             key_lower = key.lower()
             if key_lower == "nhs number":
                 subject.nhs_number = value
-                logging.info(f"nhs number updated = {subject.nhs_number}")
+                logging.debug(f"nhs number updated = {subject.nhs_number}")
             elif key_lower == "age":
                 birth_date = date.today() - timedelta(days=int(value) * 365)
                 subject.birth_date = birth_date
-                logging.info(f"date of birth updated = {subject.birth_date}")
+                logging.debug(f"date of birth updated = {subject.birth_date}")
             elif key_lower == "age (y/d)":
                 years, days = map(int, value.split("/"))
                 birth_date = date.today() - timedelta(days=years * 365 + days)
                 subject.birth_date = birth_date
-                logging.info(f"date of birth updated = {subject.birth_date}")
+                logging.debug(f"date of birth updated = {subject.birth_date}")
             elif key_lower == "gp practice":
                 subject.gp_practice_code = value
-                logging.info(f"gp practice updated = {subject.gp_practice_code}")
+                logging.debug(f"gp practice updated = {subject.gp_practice_code}")
             elif key_lower == "active gp practice in hub/sc":
                 orgs = value.split("/")
                 gp_code = subject_repo.get_active_gp_practice_in_hub_and_sc(
                     orgs[0], orgs[1]
                 )
                 subject.gp_practice_code = gp_code
-                logging.info(f"gp practice set = {subject.gp_practice_code}")
+                logging.debug(f"gp practice set = {subject.gp_practice_code}")
             elif key_lower == "inactive gp practice":
                 gp_code = subject_repo.get_inactive_gp_practice()
                 subject.gp_practice_code = gp_code
-                logging.info(f"gp practice set = {subject.gp_practice_code}")
+                logging.debug(f"gp practice set = {subject.gp_practice_code}")
             else:
                 raise ValueError(f"The criteria provided ({key}) is not valid")
 
         subject_repo.create_pi_subject(2, subject)
-        logging.info(f"subject added = {subject.to_string()}")
+        logging.debug(f"subject added = {subject.to_string()}")
         return subject.nhs_number
 
     def safe_string(self, value: Optional[str]) -> str:

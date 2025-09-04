@@ -7,6 +7,7 @@ from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
 from playwright.sync_api import Page, expect
+import logging
 
 
 def verify_subject_event_status_by_nhs_no(
@@ -22,6 +23,12 @@ def verify_subject_event_status_by_nhs_no(
         nhs_no (str): The screening subject's nhs number
         latest_event_status (str | list): the screening subjects's latest event status
     """
+    if isinstance(latest_event_status, list):
+        status_str = f" one of : {', '.join(map(str, latest_event_status))}"
+    else:
+        status_str = f": {str(latest_event_status)}"
+
+    logging.info(f"[UI ASSERTIONS] Asserting subject's event status is{status_str}")
     BasePage(page).click_main_menu_link()
     BasePage(page).go_to_screening_subject_search_page()
     SubjectScreeningPage(page).click_nhs_number_filter()
