@@ -70,11 +70,10 @@ def test_scenario_2(page: Page) -> None:
             "screening status": "Inactive",
         },
     )
-    logging.info("[DB ASSERTIONS COMPLETE] Created subject's details checked in the DB")
+    logging.info("[DB ASSERTIONS COMPLETE] Created subject details checked in the DB")
 
     # Navigate to subject summary page in UI
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-    logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
     summary_page.assert_subject_age(66)
@@ -100,11 +99,10 @@ def test_scenario_2(page: Page) -> None:
             "Screening Status Reason": "Failsafe Trawl",
         },
     )
-    logging.info("[DB ASSERTIONS COMPLETE]Updated subject details checked in the DB")
+    logging.info("[DB ASSERTIONS COMPLETE] Updated subject details checked in the DB")
 
     # Navigate to subject summary page in UI
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-    logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
     summary_page.assert_screening_status("Inactive")
@@ -180,7 +178,6 @@ def test_scenario_2(page: Page) -> None:
 
     # Navigate to subject summary page in UI
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-    logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
     summary_page.assert_latest_event_status(
@@ -202,7 +199,6 @@ def test_scenario_2(page: Page) -> None:
 
     # Navigate to subject summary page in UI
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-    logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
     summary_page.assert_latest_event_status("S2 - Normal")

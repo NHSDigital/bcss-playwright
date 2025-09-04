@@ -331,7 +331,7 @@ class SubjectScreeningSummaryPage(BasePage):
         Navigates to the Spine Search screen by clicking the appropriate link
         and loading the target URL.
         """
-        #self.retrieve_data_link.click()
+        # self.retrieve_data_link.click()
         self.click(self.retrieve_data_link)
         self.page.goto(self.spine_url)
 
@@ -377,15 +377,17 @@ class SubjectScreeningSummaryPage(BasePage):
         Asserts that the latest event status displayed in the summary table matches the expected value.
 
         Args:
-            expected_status (str): The expected event status (e.g., 'S9 Pre-invitation Sent').
+            expected_status (str): The expected event status (e.g., 'S9 - Pre-invitation Sent').
 
         Raises:
             AssertionError: If the status in the UI does not match the expected value.
         """
-        actual_status = self.latest_event_status_cell.inner_text().strip()
-        assert actual_status == expected_status, (
-            f"[LATEST EVENT STATUS MISMATCH] Expected '{expected_status}', but found '{actual_status}' in UI."
-        )
+        cell = self.get_latest_event_status_cell(expected_status)
+        actual_status = cell.inner_text().strip()
+        assert (
+            actual_status == expected_status
+        ), f"[LATEST EVENT STATUS MISMATCH] Expected '{expected_status}', but found '{actual_status}' in UI."
+
 
 class ChangeScreeningStatusOptions(Enum):
     """Enum for Change Screening Status options."""

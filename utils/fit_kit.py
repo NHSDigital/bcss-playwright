@@ -240,6 +240,11 @@ class FitKitLogged:
     ) -> None:
         """
         Reads the subject's latest logged FIT kit and updates its status/result.
+        Args:
+            user (UserRoleType): The user performing the action.
+            kit_type (int): The type of the kit.
+            kit (str): The FIT kit ID to be read.
+            kit_result (str): The result of the kit reading. Valid values are "NORMAL", "ABNORMAL", "SPOILT", "TECHNICAL_FAILURE".
         """
         logging.info("start: read_latest_logged_kit")
 
@@ -300,7 +305,13 @@ class FitKitLogged:
         logging.info("exit: read_latest_logged_kit")
 
     def log_fit_kit(self, page: Page, nhs_no: str) -> str:
-        """Logs the FIT kit for a given subject."""
+        """Logs the FIT kit for a given subject.
+        Args:
+            page (Page): The Playwright page object.
+            nhs_no (str): The NHS number of the subject.
+        Returns:
+            str: The FIT kit ID that was successfully logged.
+        """
         BasePage(page).click_main_menu_link()
         fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
         BasePage(page).go_to_fit_test_kits_page()

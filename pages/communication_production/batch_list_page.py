@@ -1,7 +1,9 @@
 from playwright.sync_api import Page, expect, Locator
 from pages.base_page import BasePage
 from datetime import datetime
-from pages.communication_production.communications_production_page import CommunicationsProductionPage
+from pages.communication_production.communications_production_page import (
+    CommunicationsProductionPage,
+)
 from utils.calendar_picker import CalendarPicker
 from utils.table_util import TableUtils
 import logging
@@ -228,7 +230,10 @@ class ActiveBatchListPage(BatchListPage):
         self.select_first_batch_row(self.table_selector, timeout_ms=10000)
 
     def is_batch_present(self, batch_type: str) -> bool:
-        """Checks if a batch of the given type exists in the active batch list."""
+        """Checks if a batch of the given type exists in the active batch list.
+        Args:
+            batch_type (str): The type of the batch to check for e.g. "S1 - Pre-invitation (FIT)"
+        """
         locator = self.page.locator(
             f"{self.table_selector} tbody tr td", has_text=batch_type
         )
