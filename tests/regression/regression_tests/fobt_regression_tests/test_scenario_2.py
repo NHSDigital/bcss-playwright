@@ -1,6 +1,6 @@
 import pytest
 import logging
-import datetime
+from datetime import datetime
 from playwright.sync_api import Page
 from pages.communication_production.batch_list_page import ActiveBatchListPage
 from utils.oracle.subject_creation_util import CreateSubjectSteps
@@ -9,7 +9,7 @@ from utils.subject_assertion import subject_assertion
 from utils.call_and_recall_utils import CallAndRecallUtils
 from utils import screening_subject_page_searcher
 from utils.batch_processing import batch_processing
-from utils.fit_kit import FitKitLogged
+from utils.fit_kit import FitKitLogged, FitKitGeneration
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
@@ -85,7 +85,7 @@ def test_scenario_2(page: Page) -> None:
     logging.info(f"[FAILSAFE TRAWL RUN] FOBT failsafe trawl run for subject {nhs_no}")
 
     # Then my subject has been updated as follows:
-    today = datetime.datetime.now().strftime("%d/%m/%Y")
+    today = datetime.now().strftime("%d/%m/%Y")
 
     subject_assertion(
         nhs_no,
@@ -164,8 +164,10 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
 
     # When I log my subject's latest unlogged FIT kit
-    fit_kit = FitKitLogged().log_fit_kit(page, nhs_no)
-
+    fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
+    sample_date = datetime.now()
+    FitKitLogged().log_fit_kits(page, fit_kit, sample_date)
+    
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
