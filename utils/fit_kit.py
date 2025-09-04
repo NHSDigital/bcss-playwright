@@ -18,7 +18,6 @@ from classes.repositories.user_repository import UserRepository
 from classes.repositories.kit_service_management_repository import (
     KitServiceManagementRepository,
 )
-from classes.kit_service_management_record import KitServiceManagementRecord
 from classes.kit_status import KitStatus
 from oracle.oracle_specific_functions import execute_fit_kit_stored_procedures
 
@@ -26,7 +25,7 @@ from oracle.oracle_specific_functions import execute_fit_kit_stored_procedures
 class FitKitGeneration:
     """
     This class is responsible for generating FIT Device IDs from test kit data.
-    It is also used to retreive a kit belonging to a subject
+    It is also used to retrieve a kit belonging to a subject
     """
 
     def create_fit_id_df(
@@ -114,7 +113,7 @@ class FitKitGeneration:
         """
         Constructs SQL for requesting the kit ID of the latest FIT kit for a subject.
         This then gets the subject's subject id from the DB and runs the query to return their FIT kit
-        It then calculates the checkdigit and extra info to append at the end of the FIT Kit
+        It then calculates the check digit and extra info to append at the end of the FIT Kit
 
         Args:
             nhs_no (str): The subject's NHS number.
@@ -302,7 +301,7 @@ class FitKitLogged:
 
     def log_fit_kits(self, page, fit_kit: str, sample_date: datetime) -> None:
         """
-        Navigates to the log devicves page and logs FIT kits
+        Navigates to the log devices page and logs FIT kits
         Args:
             fit_kit (str): The device id of the FIT kit
             sample_date (datetime): The date you want to select for the sameple date field

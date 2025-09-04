@@ -95,7 +95,7 @@ class UserRepository:
         df = self.general_query(role)
         return int(df["role_id"].iloc[0])
 
-    def get_org_codefor_role(self, role: "UserRoleType") -> int:
+    def get_org_code_for_role(self, role: "UserRoleType") -> int:
         """
         Get the ORG CODE for the role.
 
