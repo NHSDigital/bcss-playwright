@@ -18,6 +18,9 @@ from classes.repositories.kit_service_management_repository import (
 )
 from classes.kit_service_management_record import KitServiceManagementRecord
 from classes.kit_status import KitStatus
+from pages.fit_test_kits.fit_test_kits_page import FITTestKitsPage
+from pages.fit_test_kits.log_devices_page import LogDevicesPage
+from playwright.sync_api import Page
 
 
 class FitKitGeneration:
@@ -295,3 +298,22 @@ class FitKitLogged:
             raise RuntimeError(f"Error occurred while reading latest logged kit: {e}")
 
         logging.info("exit: read_latest_logged_kit")
+
+    def log_fit_kit(self, page: Page, nhs_no: str) -> str:
+        """Logs the FIT kit for a given subject."""
+        BasePage(page).click_main_menu_link()
+        fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
+        BasePage(page).go_to_fit_test_kits_page()
+        FITTestKitsPage(page).go_to_log_devices_page()
+        logging.info(f"Logging FIT Device ID: {fit_kit}")
+        LogDevicesPage(page).fill_fit_device_id_field(fit_kit)
+        sample_date = datetime.now()
+        logging.info(f"Setting sample date to {sample_date}")
+        LogDevicesPage(page).fill_sample_date_field(sample_date)
+        LogDevicesPage(page).log_devices_title.get_by_text("Scan Device").wait_for()
+        try:
+            LogDevicesPage(page).verify_successfully_logged_device_text()
+            logging.info(f"{fit_kit} Successfully logged")
+        except Exception as e:
+            pytest.fail(f"{fit_kit} unsuccessfully logged: {str(e)}")
+        return fit_kit

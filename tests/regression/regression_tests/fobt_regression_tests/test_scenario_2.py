@@ -1,7 +1,6 @@
 import pytest
 import logging
 import datetime
-import pandas as pd
 from playwright.sync_api import Page
 from pages.communication_production.batch_list_page import ActiveBatchListPage
 from utils.oracle.subject_creation_util import CreateSubjectSteps
@@ -10,38 +9,11 @@ from utils.subject_assertion import subject_assertion
 from utils.call_and_recall_utils import CallAndRecallUtils
 from utils import screening_subject_page_searcher
 from utils.batch_processing import batch_processing
-from utils.fit_kit import FitKitGeneration, FitKitLogged
-from utils.oracle.oracle import OracleDB
-from pages.base_page import BasePage
+from utils.fit_kit import FitKitLogged
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
-from pages.communication_production.communications_production_page import (
-    CommunicationsProductionPage,
-)
-from pages.fit_test_kits.log_devices_page import LogDevicesPage
-from pages.fit_test_kits.fit_test_kits_page import FITTestKitsPage
 from pages.communication_production.batch_list_page import BatchListPage
-
-
-# Helper function to log FIT kit
-def log_fit_kit(page: Page, nhs_no: str) -> str:
-    BasePage(page).click_main_menu_link()
-    fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
-    BasePage(page).go_to_fit_test_kits_page()
-    FITTestKitsPage(page).go_to_log_devices_page()
-    logging.info(f"Logging FIT Device ID: {fit_kit}")
-    LogDevicesPage(page).fill_fit_device_id_field(fit_kit)
-    sample_date = datetime.datetime.now()
-    logging.info(f"Setting sample date to {sample_date}")
-    LogDevicesPage(page).fill_sample_date_field(sample_date)
-    LogDevicesPage(page).log_devices_title.get_by_text("Scan Device").wait_for()
-    try:
-        LogDevicesPage(page).verify_successfully_logged_device_text()
-        logging.info(f"{fit_kit} Successfully logged")
-    except Exception as e:
-        pytest.fail(f"{fit_kit} unsuccessfully logged: {str(e)}")
-    return fit_kit
 
 
 @pytest.mark.wip
@@ -135,8 +107,8 @@ def test_scenario_2(page: Page) -> None:
     logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
 
     # Assert subject details in the UI
-    # TODO: summary_page.assert_screening_status("Call")
     summary_page.assert_screening_status("Inactive")
+    # summary_page.assert_screening_status("Call") #TODO:
     logging.info("[UI ASSERTIONS COMPLETE] Updated subject details checked in the UI")
 
     # When I invite my subject for FOBT screening
@@ -159,33 +131,21 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[UI ASSERTIONS COMPLETE] S1 Letter batch exists")
 
     # When I process the open "S1" letter batch for my subject
-    # Then my subject has been updated as follows:
+    # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
     batch_processing(
         page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent", True
     )
-    logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
     logging.info("[UI ASSERTIONS COMPLETE] Updated subject details checked in the UI")
+    logging.info("[UI ASSERTIONS COMPLETE] S9 Letter batch exists")
 
-    # Navigate to subject summary page in UI
-    # navigate_to_subject_summary_page(page, nhs_no)
-    # logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
-
-    # Assert subject details in the UI
-    # summary_page.assert_latest_event_status("S9 - Pre-invitation Sent")
-
-    # When I run Timed Events for my subject
-    # nhs_df = pd.DataFrame(
-    #     {"subject_nhs_number": [nhs_no]}
-    # )  # Create DataFrame with NHS number to pass to timed events procedure
-    # OracleDB().exec_bcss_timed_events(
-    #     nhs_df
-    # )  # Execute timed events procedure to process the subject
-    # logging.info("[TIMED EVENTS]Executed for existing subject")
-
-    # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
-    # navigate_to_active_batch_list(page)
-    # ActiveBatchListPage(page).is_batch_present("S9 - Invitation & Test Kit (FIT)")
-    # logging.info("[UI ASSERTIONS COMPLETE] S9 Letter batch exists")
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S9 - Pre-invitation Sent",
+        },
+    )
+    logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
 
     # When I process the open "S9" letter batch for my subject
     batch_processing(
@@ -195,20 +155,19 @@ def test_scenario_2(page: Page) -> None:
         "S10 - Invitation & Test Kit Sent",
         True,
     )
+    logging.info("[UI ASSERTIONS COMPLETE] Updated subject status checked in the UI")
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S10 - Invitation & Test Kit Sent",
+        },
+    )
     logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
 
-    # # Then my subject has been updated as follows:
-    # batch_processing(
-    #     page,
-    #     "S9",
-    #     "Invitation & Test Kit (FIT)",
-    #     "S10 - Invitation & Test Kit Sent",
-    #     True,
-    # )
-    # logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
-
     # When I log my subject's latest unlogged FIT kit
-    fit_kit = log_fit_kit(page, nhs_no)
+    fit_kit = FitKitLogged().log_fit_kit(page, nhs_no)
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -262,24 +221,16 @@ def test_scenario_2(page: Page) -> None:
         "S158 - Subject Discharge Sent (Normal)",
         True,
     )
+    logging.info("[UI ASSERTIONS COMPLETE] Updated subject status checked in the UI")
 
     # Then my subject has been updated as follows:
-    # batch_processing(
-    #     page,
-    #     "S2",
-    #     "Subject Result (Normal)",
-    #     "S158 Subject Discharge Sent (Normal)",
-    #     True,
-    # )
-    # logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
-
-    # Navigate to subject summary page in UI
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-    logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
-
-    # Assert subject details in the UI
-    summary_page.assert_latest_event_status("S158 - Subject Discharge Sent (Normal)")
-    logging.info("[UI ASSERTIONS COMPLETE] Updated subject details checked in the UI")
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S158 Subject Discharge Sent (Normal)",
+        },
+    )
+    logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
 
     # And there is a "S158" letter batch for my subject with the exact title "GP Result (Normal)"
     BatchListPage(page).navigate_to_active_batch_list_page()
@@ -294,6 +245,7 @@ def test_scenario_2(page: Page) -> None:
         "S159 - GP Discharge Sent (Normal)",
         True,
     )
+    logging.info("[UI ASSERTIONS COMPLETE] Updated subject status checked in the UI")
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -327,13 +279,5 @@ def test_scenario_2(page: Page) -> None:
         },
     )
     logging.info("[DB ASSERTIONS COMPLETE] Updated subject details checked in the DB")
-
-    # Navigate to subject summary page in UI
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-    logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")
-
-    # Assert subject details in the UI
-    summary_page.assert_latest_event_status("S159 - GP Discharge Sent (Normal)")
-    logging.info("[UI ASSERTIONS COMPLETE] Updated subject details checked in the UI")
 
     logging.info("[TEST COMPLETE] Scenario 2 passed all assertions")
