@@ -7,14 +7,12 @@ from utils.call_and_recall_utils import CallAndRecallUtils
 import logging
 from utils.batch_processing import batch_processing
 from utils.fit_kit import FitKitGeneration, FitKitLogged
-from pages.base_page import BasePage
-from pages.fit_test_kits.log_devices_page import LogDevicesPage
-from pages.fit_test_kits.fit_test_kits_page import FITTestKitsPage
 from pages.logout.log_out_page import LogoutPage
 from datetime import datetime
 
 
-@pytest.mark.wip
+@pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.fobt_regression_tests
 def test_scenario_1(page: Page) -> None:
     """
@@ -53,7 +51,7 @@ def test_scenario_1(page: Page) -> None:
         "age (y/d)": "65/25",
         "active gp practice in hub/sc": "BCS01/BCS001",
     }
-    nhs_no = CreateSubjectSteps().create_custom_subject(requirements)
+    nhs_no = CreateSubjectSteps().create_custom_subject(requirements, user_role)
     if nhs_no is None:
         raise ValueError("NHS No is 'None'")
     logging.info(f"Created subject's NHS number: {nhs_no}")
@@ -69,14 +67,6 @@ def test_scenario_1(page: Page) -> None:
 
     page.wait_for_timeout(2000)  # Wait for 2 seconds to allow DB to update
 
-    # The following code does not work for
-    # screening due date, Last birthday
-    # screening due date date of change, Today
-    # screening due date reason, Failsafe Trawl
-    # screening status, Call
-    # screening status reason, Failsafe Trawl
-
-    """
     criteria = {
         "subject has episodes": "No",
         "screening due date": "Last birthday",
@@ -87,7 +77,6 @@ def test_scenario_1(page: Page) -> None:
         "screening status reason": "Failsafe Trawl",
     }
     subject_assertion(nhs_no, criteria)
-    """
 
     CallAndRecallUtils().invite_subject_for_fobt_screening(nhs_no, user_role)
 
@@ -152,21 +141,9 @@ def test_scenario_1(page: Page) -> None:
 
     subject_assertion(nhs_no, criteria)
 
-    BasePage(page).click_main_menu_link()
     fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
-    BasePage(page).go_to_fit_test_kits_page()
-    FITTestKitsPage(page).go_to_log_devices_page()
-    logging.info(f"Logging FIT Device ID: {fit_kit}")
-    LogDevicesPage(page).fill_fit_device_id_field(fit_kit)
     sample_date = datetime.now()
-    logging.info(f"Setting sample date to {sample_date}")
-    LogDevicesPage(page).fill_sample_date_field(sample_date)
-    LogDevicesPage(page).log_devices_title.get_by_text("Scan Device").wait_for()
-    try:
-        LogDevicesPage(page).verify_successfully_logged_device_text()
-        logging.info(f"{fit_kit} Successfully logged")
-    except Exception as e:
-        pytest.fail(f"{fit_kit} unsuccessfully logged: {str(e)}")
+    FitKitLogged().log_fit_kits(page, fit_kit, sample_date)
 
     FitKitLogged().read_latest_logged_kit(user_role, 2, fit_kit, "SPOILT")
 

@@ -46,6 +46,7 @@ class CallAndRecallUtils:
 
         result_cursor = out_cursor.getvalue()
         row = result_cursor.fetchone()
+        conn.commit()
         assert (
             "The action was performed successfully" in row
         ), f"Error when executing failsafe for {nhs_no}: {row}"
@@ -63,7 +64,8 @@ class CallAndRecallUtils:
         Runs the database transition to 'invite' the subject for FOBT screening and create an FOBT episode.
         Uses OracleDB to execute the stored procedure.
         Args:
-            nhs_no: The NHS number of the subject
+            nhs_no (str): The NHS number of the subject
+            user_role (UserRoleType): UseroleType onject for the user you are logged in as
         """
         logging.info(f"START: invite_subject_for_fobt_screening for NHS No: {nhs_no}")
 

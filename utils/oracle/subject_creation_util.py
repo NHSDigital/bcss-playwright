@@ -10,6 +10,8 @@ from classes.data.data_creation import DataCreation
 from classes.repositories.word_repository import WordRepository
 from classes.pi_subject import PISubject
 from classes.repositories.subject_repository import SubjectRepository
+from classes.repositories.user_repository import UserRepository
+from classes.user_role_type import UserRoleType
 
 
 class CreateSubjectSteps:
@@ -188,12 +190,15 @@ class CreateSubjectSteps:
         else:
             raise ValueError("The incomplete NHS number provided is not 9 digits.")
 
-    def create_custom_subject(self, subject_requirements: dict) -> Optional[str]:
+    def create_custom_subject(
+        self, subject_requirements: dict, user_role: UserRoleType
+    ) -> Optional[str]:
         """
         Creates a custom PI subject based on the provided requirements.
 
         Args:
             subject_requirements (dict): Dictionary of subject criteria.
+            user_role (UserRoleType): UseroleType onject for the user you are logged in as
 
         Returns:
             str: The subject's nhs number.
@@ -244,7 +249,9 @@ class CreateSubjectSteps:
             else:
                 raise ValueError(f"The criteria provided ({key}) is not valid")
 
-        subject_repo.create_pi_subject(2, subject)
+        user_repository = UserRepository()
+        pio_id = user_repository.get_pio_id_for_role(user_role)
+        subject_repo.create_pi_subject(pio_id, subject)
         logging.debug(f"subject added = {subject.to_string()}")
         return subject.nhs_number
 

@@ -37,6 +37,9 @@ def subject_assertion(nhs_number: str, criteria: dict) -> None:
     criteria[nhs_number_string] = nhs_number
 
     # Check all criteria together first
+    logging.info(
+        "[SUBJECT ASSERTIONS] Running query to check subject matches criteria:"
+    )
     query, bind_vars = builder.build_subject_selection_query(
         criteria=criteria,
         user=user,
@@ -58,6 +61,7 @@ def subject_assertion(nhs_number: str, criteria: dict) -> None:
             user=user,
             subject=subject,
             subjects_to_retrieve=1,
+            enable_logging=False,
         )
         df = OracleDB().execute_query(query, bind_vars)
         if (

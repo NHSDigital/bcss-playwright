@@ -3,6 +3,8 @@ from utils.oracle.oracle_specific_functions import (
     get_kit_id_logged_from_db,
 )
 from pages.base_page import BasePage
+from pages.fit_test_kits.log_devices_page import LogDevicesPage
+from pages.fit_test_kits.fit_test_kits_page import FITTestKitsPage
 from datetime import datetime
 import logging
 import pandas as pd
@@ -126,16 +128,16 @@ class FitKitGeneration:
         sql_query = []
         sql_query.append(
             """
-                         SELECT kitid
-        FROM tk_items_t
-        WHERE tk_type_id > 1
-        AND kitid = (
-            SELECT MAX(tkx.kitid)
-            FROM tk_items_t tkx
-            LEFT OUTER JOIN kit_queue kq ON kq.device_id = tkx.device_id
-            WHERE tkx.tk_type_id > 1
-            AND tkx.screening_subject_id = :subject_id 
-                         """
+            SELECT kitid
+            FROM tk_items_t
+            WHERE tk_type_id > 1
+            AND kitid = (
+                SELECT MAX(tkx.kitid)
+                FROM tk_items_t tkx
+                LEFT OUTER JOIN kit_queue kq ON kq.device_id = tkx.device_id
+                WHERE tkx.tk_type_id > 1
+                AND tkx.screening_subject_id = :subject_id
+            """
         )
         if logged:
             sql_query.append("    AND tkx.logged_in_flag = 'Y' ")
@@ -297,3 +299,25 @@ class FitKitLogged:
             raise RuntimeError(f"Error occurred while reading latest logged kit: {e}")
 
         logging.info("exit: read_latest_logged_kit")
+
+    def log_fit_kits(self, page, fit_kit: str, sample_date: datetime) -> None:
+        """
+        Navigates to the log devicves page and logs FIT kits
+        Args:
+            fit_kit (str): The device id of the FIT kit
+            sample_date (datetime): The date you want to select for the sameple date field
+        """
+        BasePage(page).click_main_menu_link()
+        BasePage(page).go_to_fit_test_kits_page()
+        FITTestKitsPage(page).go_to_log_devices_page()
+        logging.info(f"[FIT KITS] Logging FIT Device ID: {fit_kit}")
+        LogDevicesPage(page).fill_fit_device_id_field(fit_kit)
+        LogDevicesPage(page).fill_sample_date_field(sample_date)
+        LogDevicesPage(page).log_devices_title.get_by_text("Scan Device").wait_for()
+        try:
+            LogDevicesPage(page).verify_successfully_logged_device_text()
+            logging.info(f"[UI ASSERTIONS COMPLETE] {fit_kit} Successfully logged")
+        except Exception as e:
+            pytest.fail(
+                f"[UI ASSERTIONS FAILED] {fit_kit} unsuccessfully logged: {str(e)}"
+            )
