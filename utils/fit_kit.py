@@ -11,7 +11,6 @@ import pandas as pd
 import pytest
 from utils.oracle.oracle import OracleDB
 from decimal import Decimal
-from datetime import datetime
 from classes.user_role_type import UserRoleType
 from classes.repositories.analyser_repository import AnalyserRepository
 from classes.repositories.user_repository import UserRepository
@@ -239,6 +238,13 @@ class FitKitLogged:
     ) -> None:
         """
         Reads the subject's latest logged FIT kit and updates its status/result.
+        Args:
+            user (UserRoleType): The user role type of the user making the request
+            kit_type (int): The type of the kit being processed
+            kit (str): The ID of the kit being processed
+            kit_result (str): The result of the kit processing
+        Raises:
+            RuntimeError: If there is an error while reading the latest logged kit
         """
         logging.info("start: read_latest_logged_kit")
 
@@ -278,6 +284,7 @@ class FitKitLogged:
                         analyser.analyser_type_id
                     )
                 case _:
+                    logging.error("Error reading latest logged kit", exc_info=True)
                     raise RuntimeError(f"Invalid kit result value '{kit_result}'")
 
             kit_queue_repo = KitServiceManagementRepository()

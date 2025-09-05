@@ -34,6 +34,9 @@ class UserTools:
 
         Returns:
             Optional[UserRoleType]: The user's UserRoleType if requested, otherwise None.
+
+        Raises:
+            ValueError: If the 'BCSS_PASS' environment variable is not set
         """
         logging.info(f"Logging in as {username}")
         # Go to base url

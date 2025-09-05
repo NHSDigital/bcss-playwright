@@ -69,7 +69,14 @@ class AnalyserRepository:
     def get_result_code(
         self, analyser_type_id: int, result_code_type: "AnalyserResultCodeType"
     ) -> int:
-        """ """
+        """
+        Gets the result code for the specified analyser type and result code type from the database.
+        Args:
+            analyser_type_id (int): The ID of the analyser type.
+            result_code_type (AnalyserResultCodeType): The type of result code.
+        Returns:
+            int: The result code for the specified analyser type and result code type
+        """
         query = """
         SELECT
             tkte.tk_analyser_type_id,
@@ -89,4 +96,4 @@ class AnalyserRepository:
             raise ValueError(
                 f"No result code found for analyser type id: {analyser_type_id} and code type id {result_code_type}"
             )
-        return int(result_code_df["tk_analyser_type_id"].iloc[0])
+        return int(result_code_df["error_code"].iloc[0])

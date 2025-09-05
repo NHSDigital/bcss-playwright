@@ -43,17 +43,17 @@ class KitServiceManagementRecord:
 
     def __str__(self) -> str:
         return (
-            f"KitServiceManagementRecord [device_id={self.device_id}, test_kit_type={self.test_kit_type}, "
-            f"test_kit_name={self.test_kit_name}, test_kit_status={self.test_kit_status}, "
-            f"logged_by_hub={self.logged_by_hub}, date_time_logged={self.date_time_logged}, "
-            f"test_result={self.test_result}, calculated_result={self.calculated_result}, "
-            f"error_code={self.error_code}, analyser_code={self.analyser_code}, "
-            f"date_time_authorised={self.date_time_authorised}, authoriser_user_code={self.authoriser_user_code}, "
-            f"datestamp={self.datestamp}, bcss_error_id={self.bcss_error_id}, post_response={self.post_response}, "
-            f"post_attempts={self.post_attempts}, put_response={self.put_response}, put_attempts={self.put_attempts}, "
-            f"date_time_error_archived={self.date_time_error_archived}, error_archived_user_code={self.error_archived_user_code}, "
-            f"date_time_issued={self.date_time_issued}, issued_by_hub={self.issued_by_hub}, nhs_number={self.nhs_number}, "
-            f"analyser_error_description={self.analyser_error_description}, error_type={self.error_type}, "
+            f"KitServiceManagementRecord [device_id={self.device_id}, test_kit_type={self.test_kit_type}, \n"
+            f"test_kit_name={self.test_kit_name}, test_kit_status={self.test_kit_status}, \n"
+            f"logged_by_hub={self.logged_by_hub}, date_time_logged={self.date_time_logged}, \n"
+            f"test_result={self.test_result}, calculated_result={self.calculated_result}, \n"
+            f"error_code={self.error_code}, analyser_code={self.analyser_code}, \n"
+            f"date_time_authorised={self.date_time_authorised}, authoriser_user_code={self.authoriser_user_code}, \n"
+            f"datestamp={self.datestamp}, bcss_error_id={self.bcss_error_id}, post_response={self.post_response}, \n"
+            f"post_attempts={self.post_attempts}, put_response={self.put_response}, put_attempts={self.put_attempts}, \n"
+            f"date_time_error_archived={self.date_time_error_archived}, error_archived_user_code={self.error_archived_user_code}, \n"
+            f"date_time_issued={self.date_time_issued}, issued_by_hub={self.issued_by_hub}, nhs_number={self.nhs_number}, \n"
+            f"analyser_error_description={self.analyser_error_description}, error_type={self.error_type}, \n"
             f"screening_test_result={self.screening_test_result}]"
         )
 
@@ -66,16 +66,8 @@ class KitServiceManagementRecord:
             row (pd.Series): A row from a pandas DataFrame with columns matching the query.
 
         Returns:
-            KitServiceManagementRecord: The constructed object.
+            KitServiceManagementRecord:  A populated KitServiceManagementRecord object from the given DataFrame row.
         """
-
-        def parse_enum(enum_cls, value):
-            if value is None:
-                return None
-            try:
-                return enum_cls(value)
-            except ValueError:
-                return None
 
         def parse_decimal(value):
             if value is None or value == "":

@@ -130,6 +130,7 @@ class SubjectSelectionQueryBuilder:
         user: "User",
         subject: "Subject",
         subjects_to_retrieve: Optional[int] = None,
+        enable_logging: bool = True,
     ) -> tuple[str, dict]:
         """
         This method builds a SQL query string based on the provided selection criteria.
@@ -167,7 +168,8 @@ class SubjectSelectionQueryBuilder:
                 + self.sql_where
             )
         )
-        logging.info("Final query: %s", query)
+        if enable_logging:
+            logging.info(f"[SUBJECT SELECTION QUERY BUILDER] Final query: {query}")
         return query, self.bind_vars
 
     def _build_select_clause(self) -> None:
@@ -2199,7 +2201,7 @@ class SubjectSelectionQueryBuilder:
                 )
             else:
                 self.sql_where.append(
-                    f" {self.criteria_comparator} {episode_result_type.get_id()} "
+                    f" {self.criteria_comparator} {episode_result_type.id} "
                 )
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

@@ -18,12 +18,12 @@ class UserRepository:
     def general_query(self, role: "UserRoleType") -> pd.DataFrame:
         """
         Gets the pio_id, org_id, role_id and org_code of a user
-
         Args:
             role (UserRoleType): A UserRoleType object containing the necessary information to run the query
-
         Returns:
             pd.DataFrame: A dataframe containing the pio_id, org_id, role_id and org_code of a user
+        Raises:
+            ValueError: If no user data is returned from the query / the dataframe is empty
         """
         sql = """
             SELECT
@@ -60,7 +60,7 @@ class UserRepository:
         Returns:
             int: The pio_id of the user
         """
-        logging.info(f"Getting PIO ID for role: {role.user_code}")
+        logging.debug(f"Getting PIO ID for role: {role.user_code}")
 
         df = self.general_query(role)
         return int(df["pio_id"].iloc[0])
@@ -75,7 +75,7 @@ class UserRepository:
         Returns:
             int: The org_id of the user
         """
-        logging.info(f"Getting ORG ID for role: {role.user_code}")
+        logging.debug(f"Getting ORG ID for role: {role.user_code}")
 
         df = self.general_query(role)
         return int(df["org_id"].iloc[0])
@@ -90,12 +90,12 @@ class UserRepository:
         Returns:
             int: The role_id of the user
         """
-        logging.info(f"Getting ROLE ID for role: {role.user_code}")
+        logging.debug(f"Getting ROLE ID for role: {role.user_code}")
 
         df = self.general_query(role)
         return int(df["role_id"].iloc[0])
 
-    def get_org_codefor_role(self, role: "UserRoleType") -> int:
+    def get_org_code_for_role(self, role: "UserRoleType") -> int:
         """
         Get the ORG CODE for the role.
 
@@ -105,7 +105,7 @@ class UserRepository:
         Returns:
             int: The org_code of the user
         """
-        logging.info(f"Getting ORG CODE for role: {role.user_code}")
+        logging.debug(f"Getting ORG CODE for role: {role.user_code}")
 
         df = self.general_query(role)
         return int(df["org_code"].iloc[0])

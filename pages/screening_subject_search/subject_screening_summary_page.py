@@ -4,6 +4,7 @@ from pages.base_page import BasePage
 from enum import Enum
 import logging
 import pytest
+from typing import List
 
 
 class SubjectScreeningSummaryPage(BasePage):
@@ -113,21 +114,27 @@ class SubjectScreeningSummaryPage(BasePage):
         """Verify that the latest event status header is visible."""
         expect(self.latest_event_status).to_be_visible()
 
-    def verify_latest_event_status_value(self, latest_event_status: str | list) -> None:
+    def verify_latest_event_status_value(
+        self, latest_event_status: str | List[str]
+    ) -> None:
         """Verify that the latest event status value is visible."""
         self.wait_for_page_title()
         latest_event_status_locator = self.get_visible_status_from_list(
             latest_event_status
         )
         status = latest_event_status_locator.inner_text()
-        logging.info(f"Verifying subject has the status: {status}")
+        logging.info(f"[UI ASSERTIONS] Verifying subject has the status: {status}")
         try:
             expect(latest_event_status_locator).to_be_visible()
-            logging.info(f"Subject has the status: {status}")
+            logging.info(f"[UI ASSERTIONS COMPLETE] Subject has the status: {status}")
         except Exception:
-            pytest.fail(f"Subject does not have the status: {status}")
+            pytest.fail(
+                f"[UI ASSERTIONS FAILED] Subject does not have the status: {status}"
+            )
 
-    def get_visible_status_from_list(self, latest_event_status) -> Locator:
+    def get_visible_status_from_list(
+        self, latest_event_status: str | List[str]
+    ) -> Locator:
         """
         Get the first visible status from the latest event status string or list.
 
@@ -331,7 +338,6 @@ class SubjectScreeningSummaryPage(BasePage):
         Navigates to the Spine Search screen by clicking the appropriate link
         and loading the target URL.
         """
-        # self.retrieve_data_link.click()
         self.click(self.retrieve_data_link)
         self.page.goto(self.spine_url)
 
@@ -377,13 +383,12 @@ class SubjectScreeningSummaryPage(BasePage):
         Asserts that the latest event status displayed in the summary table matches the expected value.
 
         Args:
-            expected_status (str): The expected event status (e.g., 'S9 - Pre-invitation Sent').
+            expected_status (str): The expected event status (e.g., 'S9 Pre-invitation Sent').
 
         Raises:
             AssertionError: If the status in the UI does not match the expected value.
         """
-        cell = self.get_latest_event_status_cell(expected_status)
-        actual_status = cell.inner_text().strip()
+        actual_status = self.latest_event_status_cell.inner_text().strip()
         assert (
             actual_status == expected_status
         ), f"[LATEST EVENT STATUS MISMATCH] Expected '{expected_status}', but found '{actual_status}' in UI."
