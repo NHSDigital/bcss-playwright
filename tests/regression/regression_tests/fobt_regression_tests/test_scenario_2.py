@@ -16,7 +16,6 @@ from pages.screening_subject_search.subject_screening_summary_page import (
 from pages.communication_production.batch_list_page import BatchListPage
 
 
-@pytest.mark.wip
 @pytest.mark.fobt_regression_tests
 def test_scenario_2(page: Page) -> None:
     """
@@ -54,7 +53,7 @@ def test_scenario_2(page: Page) -> None:
         "age (y/d)": "66/130",
         "active gp practice in hub/sc": "BCS01/BCS001",
     }
-    nhs_no = CreateSubjectSteps().create_custom_subject(requirements)
+    nhs_no = CreateSubjectSteps().create_custom_subject(requirements, user_role)
     if nhs_no is None:
         pytest.fail("Failed to create subject: NHS number not returned.")
 
@@ -167,7 +166,7 @@ def test_scenario_2(page: Page) -> None:
     fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
     sample_date = datetime.now()
     FitKitLogged().log_fit_kits(page, fit_kit, sample_date)
-    
+
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
