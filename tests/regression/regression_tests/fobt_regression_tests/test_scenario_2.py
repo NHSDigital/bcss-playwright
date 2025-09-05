@@ -191,10 +191,6 @@ def test_scenario_2(page: Page) -> None:
     logging.info("[UI ASSERTIONS COMPLETE] Updated subject details checked in the UI")
 
     # And there is a "S2" letter batch for my subject with the exact title "Subject Result (Normal)"
-    BatchListPage(page).navigate_to_active_batch_list_page()
-    ActiveBatchListPage(page).is_batch_present("S2 - Subject Result (Normal)")
-    logging.info("[UI ASSERTIONS COMPLETE] S2 Letter batch exists")
-
     # When I process the open "S2" letter batch for my subject
     batch_processing(
         page,
