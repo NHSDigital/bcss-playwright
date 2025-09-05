@@ -210,12 +210,9 @@ class BatchListPage(BasePage):
     def navigate_to_active_batch_list_page(self) -> None:
         """
         Navigates to the active batch list page from anywhere in bcss (providing the main menu link is displayed).
-
-        Args:
-            page (Page): The Playwright page object.
         """
-        BasePage(self.page).click_main_menu_link()
-        BasePage(self.page).go_to_communications_production_page()
+        self.click_main_menu_link()
+        self.go_to_communications_production_page()
         CommunicationsProductionPage(self.page).go_to_active_batch_list_page()
 
 

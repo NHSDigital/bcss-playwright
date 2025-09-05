@@ -14,8 +14,11 @@ from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
 from pages.communication_production.batch_list_page import BatchListPage
+from pages.logout.log_out_page import LogoutPage
 
 
+@pytest.mark.vpn_required
+@pytest.mark.regression
 @pytest.mark.fobt_regression_tests
 def test_scenario_2(page: Page) -> None:
     """
@@ -69,7 +72,6 @@ def test_scenario_2(page: Page) -> None:
             "screening status": "Inactive",
         },
     )
-    logging.info("[DB ASSERTIONS COMPLETE] Created subject details checked in the DB")
 
     # Navigate to subject summary page in UI
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -81,24 +83,20 @@ def test_scenario_2(page: Page) -> None:
 
     # When I run the FOBT failsafe trawl for my subject
     CallAndRecallUtils().run_failsafe(nhs_no)
-    logging.info(f"[FAILSAFE TRAWL RUN] FOBT failsafe trawl run for subject {nhs_no}")
 
     # Then my subject has been updated as follows:
-    today = datetime.now().strftime("%d/%m/%Y")
-
     subject_assertion(
         nhs_no,
         {
             "subject has episodes": "No",
             "Screening Due Date": "Last Birthday",
-            "Screening due date date of change": today,
+            "Screening due date date of change": "Today",
             "Screening Due Date Reason": "Failsafe Trawl",
             "screening status": "Call",
-            "Screening Status Date of Change": today,
+            "Screening Status Date of Change": "Today",
             "Screening Status Reason": "Failsafe Trawl",
         },
     )
-    logging.info("[DB ASSERTIONS COMPLETE] Updated subject details checked in the DB")
 
     # Navigate to subject summary page in UI
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -119,20 +117,13 @@ def test_scenario_2(page: Page) -> None:
             "latest episode type": "FOBT",
         },
     )
-    logging.info("[DB ASSERTIONS COMPLETE] Updated subject details checked in the DB")
 
     # Then there is a "S1" letter batch for my subject with the exact title "Pre-invitation (FIT)"
-    BatchListPage(page).navigate_to_active_batch_list_page()
-    ActiveBatchListPage(page).is_batch_present("S1 - Pre-invitation (FIT)")
-    logging.info("[UI ASSERTIONS COMPLETE] S1 Letter batch exists")
-
     # When I process the open "S1" letter batch for my subject
     # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
     batch_processing(
         page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent", True
     )
-    logging.info("[UI ASSERTIONS COMPLETE] Updated subject details checked in the UI")
-    logging.info("[UI ASSERTIONS COMPLETE] S9 Letter batch exists")
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -141,7 +132,6 @@ def test_scenario_2(page: Page) -> None:
             "latest event status": "S9 - Pre-invitation Sent",
         },
     )
-    logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
 
     # When I process the open "S9" letter batch for my subject
     batch_processing(
@@ -151,7 +141,6 @@ def test_scenario_2(page: Page) -> None:
         "S10 - Invitation & Test Kit Sent",
         True,
     )
-    logging.info("[UI ASSERTIONS COMPLETE] Updated subject status checked in the UI")
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -160,7 +149,6 @@ def test_scenario_2(page: Page) -> None:
             "latest event status": "S10 - Invitation & Test Kit Sent",
         },
     )
-    logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
 
     # When I log my subject's latest unlogged FIT kit
     fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
@@ -174,7 +162,6 @@ def test_scenario_2(page: Page) -> None:
             "latest event status": "S43 Kit Returned and Logged (Initial Test)",
         },
     )
-    logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
 
     # Navigate to subject summary page in UI
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -195,7 +182,6 @@ def test_scenario_2(page: Page) -> None:
             "latest event status": "S2 Normal",
         },
     )
-    logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
 
     # Navigate to subject summary page in UI
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -217,7 +203,6 @@ def test_scenario_2(page: Page) -> None:
         "S158 - Subject Discharge Sent (Normal)",
         True,
     )
-    logging.info("[UI ASSERTIONS COMPLETE] Updated subject status checked in the UI")
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -226,13 +211,8 @@ def test_scenario_2(page: Page) -> None:
             "latest event status": "S158 Subject Discharge Sent (Normal)",
         },
     )
-    logging.info("[DB ASSERTIONS COMPLETE] Updated subject status checked in the DB")
 
     # And there is a "S158" letter batch for my subject with the exact title "GP Result (Normal)"
-    BatchListPage(page).navigate_to_active_batch_list_page()
-    ActiveBatchListPage(page).is_batch_present("S158 - GP Result (Normal)")
-    logging.info("[UI ASSERTIONS COMPLETE] S158 Letter batch exists")
-
     # When I process the open "S158" letter batch for my subject
     batch_processing(
         page,
@@ -241,7 +221,6 @@ def test_scenario_2(page: Page) -> None:
         "S159 - GP Discharge Sent (Normal)",
         True,
     )
-    logging.info("[UI ASSERTIONS COMPLETE] Updated subject status checked in the UI")
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -274,6 +253,6 @@ def test_scenario_2(page: Page) -> None:
             "surveillance due date reason": "Unchanged",
         },
     )
-    logging.info("[DB ASSERTIONS COMPLETE] Updated subject details checked in the DB")
 
     logging.info("[TEST COMPLETE] Scenario 2 passed all assertions")
+    LogoutPage(page).log_out()
