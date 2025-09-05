@@ -69,7 +69,14 @@ class AnalyserRepository:
     def get_result_code(
         self, analyser_type_id: int, result_code_type: "AnalyserResultCodeType"
     ) -> int:
-        """ """
+        """
+        Gets the result code for the specified analyser type and result code type from the database.
+        Args:
+            analyser_type_id (int): The ID of the analyser type.
+            result_code_type (AnalyserResultCodeType): The type of result code.
+        Returns:
+            int: The result code for the specified analyser type and result code type
+        """
         query = """
         SELECT
             tkte.tk_analyser_type_id,

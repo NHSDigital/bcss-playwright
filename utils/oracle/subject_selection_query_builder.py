@@ -2201,7 +2201,7 @@ class SubjectSelectionQueryBuilder:
                 )
             else:
                 self.sql_where.append(
-                    f" {self.criteria_comparator} {episode_result_type.get_id()} "
+                    f" {self.criteria_comparator} {episode_result_type.id} "
                 )
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)

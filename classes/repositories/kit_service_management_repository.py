@@ -19,7 +19,7 @@ class KitServiceManagementRepository:
         Args:
             device_id (str): The device ID of the subject
         Returns:
-            list[str]: A filter for device_id if it is provided, otherwise it returns an empty string
+            list[str]: A filter for device_id if it is provided, otherwise it returns an empty list
         """
         return ["AND kq.device_id = :device_id"] if device_id else []
 
@@ -29,7 +29,7 @@ class KitServiceManagementRepository:
         Args:
             archived (bool): Whether to include archived records
         Returns:
-            list[str]: A filter for date_time_error_archived
+            list[str]: An SQL filter clause to include or exclude archived records based on the archived flag.
         """
         if archived is None:
             return []
@@ -42,7 +42,7 @@ class KitServiceManagementRepository:
             issuing_hub_id (int): The ID of the issuing hub
             logged_hub_id (int): The ID of the logged hub
         Returns:
-            list[str]: A filter for the hubs
+            list[str]: An SQL filter clause for the hubs
         """
         hub_conditions = []
         if logged_hub_id > -1:
@@ -60,7 +60,7 @@ class KitServiceManagementRepository:
             status (str): The status of the test kit
             if_error_has_id (bool): Whether to include records with an error ID
         Returns:
-            list[str]: A filter for the statuses
+            list[str]: An SQL filter clause for the statuses
         """
         if not status:
             error_status = [

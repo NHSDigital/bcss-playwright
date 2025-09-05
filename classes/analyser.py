@@ -6,7 +6,17 @@ import pandas as pd
 @dataclass
 class Analyser:
     """
-    Data class representing an analyser.
+    This data class is used to store information about a specific analyser device.
+    The attributes correspond to the columns in the analyser query results.
+    Attributes:
+        analyser_id (Optional[int]): The ID of the analyser.
+        analyser_code (Optional[str]): The code of the analyser.
+        hub_id (Optional[int]): The ID of the hub the analyser is connected to.
+        analyser_type_id (Optional[int]): The type ID of the analyser.
+        spoil_result_code (Optional[int]): The result code for spoilage.
+        tech_fail_result_code (Optional[int]): The result code for technical failure.
+        below_range_result_code (Optional[int]): The result code for below range.
+        above_range_result_code (Optional[int]): The result code for above range.
     """
 
     analyser_id: Optional[int] = None
@@ -38,6 +48,7 @@ class Analyser:
                 - analyser_code
                 - hub_id
                 - tk_analyser_type_id
+            The other columns are obtained from the SQL query as so are not present in this method.
 
         Returns:
             Analyser: The constructed Analyser object.

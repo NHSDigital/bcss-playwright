@@ -65,7 +65,9 @@ class CallAndRecallUtils:
         Uses OracleDB to execute the stored procedure.
         Args:
             nhs_no (str): The NHS number of the subject
-            user_role (UserRoleType): UseroleType onject for the user you are logged in as
+            user_role (UserRoleType): UserRoleType object for the user you are logged in as
+        Raises:
+            oracledb.DatabaseError: If there is an error in the execution of the stored procedure
         """
         logging.info(f"START: invite_subject_for_fobt_screening for NHS No: {nhs_no}")
 
@@ -82,6 +84,7 @@ class CallAndRecallUtils:
             )
             general_repository.run_database_transition(database_transition_parameters)
         except Exception as e:
+            logging.error("Failsafe execution failed", exc_info=True)
             raise oracledb.DatabaseError(
                 f"Error in invite_subject_for_fobt_screening for NHS No {nhs_no}: {e}"
             )

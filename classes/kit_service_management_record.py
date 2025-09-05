@@ -66,7 +66,7 @@ class KitServiceManagementRecord:
             row (pd.Series): A row from a pandas DataFrame with columns matching the query.
 
         Returns:
-            KitServiceManagementRecord: The constructed object.
+            KitServiceManagementRecord:  A populated KitServiceManagementRecord object from the given DataFrame row.
         """
 
         def parse_decimal(value):

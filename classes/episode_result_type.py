@@ -1,7 +1,8 @@
-from typing import Optional, Dict
+from enum import Enum
+from typing import Optional
 
 
-class EpisodeResultType:
+class EpisodeResultType(Enum):
     NO_RESULT = (20311, "No Result")
     NORMAL = (20312, "Normal (No Abnormalities Found)")
     LOW_RISK_ADENOMA = (20314, "Low-risk Adenoma")
@@ -37,80 +38,38 @@ class EpisodeResultType:
     NULL = (0, "Null")
     NOT_NULL = (0, "Not Null")
 
-    _all_types = [
-        NO_RESULT,
-        NORMAL,
-        LOW_RISK_ADENOMA,
-        INTERMEDIATE_RISK_ADENOMA,
-        HIGH_RISK_ADENOMA,
-        CANCER_DETECTED,
-        ABNORMAL,
-        CANCER_NOT_CONFIRMED,
-        HIGH_RISK_FINDINGS,
-        LNPCP,
-        BOWEL_SCOPE_NON_PARTICIPATION,
-        FOBT_INADEQUATE_PARTICIPATION,
-        DEFINITIVE_NORMAL_FOBT_OUTCOME,
-        DEFINITIVE_ABNORMAL_FOBT_OUTCOME,
-        HIGH_RISK_FINDINGS_SURVEILLANCE_NON_PARTICIPATION,
-        LNPCP_SURVEILLANCE_NON_PARTICIPATION,
-        HIGH_RISK_SURVEILLANCE_NON_PARTICIPATION,
-        INTERMEDIATE_RISK_SURVEILLANCE_NON_PARTICIPATION,
-        LYNCH_NON_PARTICIPATION,
-        ANY_SURVEILLANCE_NON_PARTICIPATION,
-        NULL,
-        NOT_NULL,
-    ]
-
-    _descriptions: Dict[str, "EpisodeResultType"] = {}
-    _lowercase_descriptions: Dict[str, "EpisodeResultType"] = {}
-    _valid_value_ids: Dict[int, "EpisodeResultType"] = {}
-
     def __init__(self, valid_value_id: int, description: str):
-        self.valid_value_id = valid_value_id
-        self.description = description
+        self._id = valid_value_id
+        self._description = description
+
+    @property
+    def id(self) -> int:
+        """Return the valid value ID."""
+        return self._id
+
+    @property
+    def description(self) -> str:
+        """Return the description."""
+        return self._description
 
     @classmethod
-    def _init_types(cls):
-        if not cls._descriptions:
-            for valid_value_id, description in cls._all_types:
-                instance = cls(valid_value_id, description)
-                cls._descriptions[description] = instance
-                cls._lowercase_descriptions[description.lower()] = instance
-                # Only map the first occurrence of each valid_value_id
-                if valid_value_id not in cls._valid_value_ids:
-                    cls._valid_value_ids[valid_value_id] = instance
+    def by_id(cls, valid_value_id: int) -> Optional["EpisodeResultType"]:
+        """Find an EpisodeResultType by its ID (returns first match if duplicates)."""
+        return next((m for m in cls if m.id == valid_value_id), None)
 
     @classmethod
     def by_description(cls, description: str) -> Optional["EpisodeResultType"]:
-        cls._init_types()
-        return cls._descriptions.get(description)
+        """Find an EpisodeResultType by its description (case-sensitive)."""
+        return next((m for m in cls if m.description == description), None)
 
     @classmethod
     def by_description_case_insensitive(
         cls, description: str
     ) -> Optional["EpisodeResultType"]:
-        cls._init_types()
-        return cls._lowercase_descriptions.get(description.lower())
+        """Find an EpisodeResultType by its description (case-insensitive)."""
+        description = description.lower()
+        return next((m for m in cls if m.description.lower() == description), None)
 
-    @classmethod
-    def by_valid_value_id(cls, valid_value_id: int) -> Optional["EpisodeResultType"]:
-        cls._init_types()
-        return cls._valid_value_ids.get(valid_value_id)
-
-    def get_id(self) -> int:
-        return self.valid_value_id
-
-    def get_description(self) -> str:
-        return self.description
-
-    def __eq__(self, other):
-        if isinstance(other, EpisodeResultType):
-            return (
-                self.valid_value_id == other.valid_value_id
-                and self.description == other.description
-            )
-        return False
-
-    def __repr__(self):
-        return f"EpisodeResultType({self.valid_value_id}, '{self.description}')"
+    def __str__(self) -> str:
+        """Return a string representation of the EpisodeResultType."""
+        return f"{self.name} ({self.id}: {self.description})"

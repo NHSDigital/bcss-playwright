@@ -147,8 +147,6 @@ class User:
         Returns:
             User: The constructed User object.
         """
-        from classes.organisation_complex import Organisation
-
         organisation = (
             Organisation(new_id=row["org_id"], new_code=row["org_code"])
             if "org_id" in row and "org_code" in row

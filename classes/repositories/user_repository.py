@@ -18,12 +18,12 @@ class UserRepository:
     def general_query(self, role: "UserRoleType") -> pd.DataFrame:
         """
         Gets the pio_id, org_id, role_id and org_code of a user
-
         Args:
             role (UserRoleType): A UserRoleType object containing the necessary information to run the query
-
         Returns:
             pd.DataFrame: A dataframe containing the pio_id, org_id, role_id and org_code of a user
+        Raises:
+            ValueError: If no user data is returned from the query / the dataframe is empty
         """
         sql = """
             SELECT

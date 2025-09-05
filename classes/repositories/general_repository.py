@@ -19,6 +19,10 @@ class GeneralRepository:
     ) -> None:
         """
         Executes the PKG_EPISODE.p_set_episode_next_status stored procedure with the provided parameters.
+        Args:
+            database_transition_parameters (DatabaseTransitionParameters): The parameters for the database transition.
+        Raises:
+            oracledb.DatabaseError: If there is an error executing the database transition.
         """
         logging.debug(
             f"Running database transition with transition_id = {database_transition_parameters.transition_id}"
@@ -47,6 +51,7 @@ class GeneralRepository:
             conn.commit()
             logging.debug("Database transition executed successfully.")
         except Exception as e:
+            logging.error("Database transition failed", exc_info=True)
             raise oracledb.DatabaseError(f"Error executing database transition: {e}")
         finally:
             self.oracle_db.disconnect_from_db(conn)

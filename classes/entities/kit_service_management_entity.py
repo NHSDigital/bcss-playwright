@@ -55,7 +55,7 @@ class KitServiceManagementEntity:
             device_id=record.device_id,
             test_kit_type=(
                 str(record.test_kit_type) if record.test_kit_type is not None else None
-            ),
+            ),  # test_kit_type is converted to a string as this is what is required in the database
             test_kit_name=record.test_kit_name,
             test_kit_status=record.test_kit_status,
             logged_by_hub=record.logged_by_hub,

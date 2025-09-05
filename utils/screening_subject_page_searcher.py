@@ -21,7 +21,7 @@ def verify_subject_event_status_by_nhs_no(
     Args:
         page (Page): This is the playwright page object
         nhs_no (str): The screening subject's nhs number
-        latest_event_status (str | list): the screening subjects's latest event status
+        latest_event_status (str | list): the screening subject's latest event status
     """
     if isinstance(latest_event_status, list):
         status_str = f" one of : {', '.join(map(str, latest_event_status))}"
