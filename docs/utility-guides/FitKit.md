@@ -39,8 +39,8 @@ from utils.fit_kit import FitKitGeneration
 
 ### Required Arguments
 
-- `create_fit_id_df`: Requires `tk_type_id` (int), `hub_id` (int), and `no_of_kits_to_retrieve` (int).
-- `get_fit_kit_for_subject`: Requireds `nhs_no` (str), `logged` (boolean), `read` (boolean).
+- `create_fit_id_df`: Requires `tk_type_id` (`int`), `hub_id` (`int`), and `no_of_kits_to_retrieve` (`int`).
+- `get_fit_kit_for_subject`: Requireds `nhs_no` (`str`), `logged` (`bool`), `read` (`bool`).
 
 ### Key Methods
 
@@ -57,9 +57,9 @@ from utils.fit_kit import FitKitGeneration
 4. **`get_fit_kit_for_subject_sql(self, nhs_no: str, logged: bool, read: bool) -> str:`**
    - Retrieves the FIT kit information for a specific subject based on their NHS number.
    - **Arguments:**
-     - **nhs_no (str):** The subject's NHS number
-     - **logged (bool):** Whether to look for logged kits.
-     - **read (bool):** Whether to look for read kits.
+     - **nhs_no (`str`):** The subject's NHS number
+     - **logged (`bool`):** Whether to look for logged kits.
+     - **read (`bool`):** Whether to look for read kits.
    - **Returns:** A string containing the fit device id of the subject matching the provided criteria.
 
 > **Tip:**
