@@ -11,6 +11,7 @@ These utilities interact directly with the **OracleDB** backend to run failsafe 
   - [Main Methods](#main-methods)
     - [`run_failsafe`](#run_failsafe)
     - [`invite_subject_for_fobt_screening`](#invite_subject_for_fobt_screening)
+  - [Prerequisites](#prerequisites)
   - [Supporting Classes](#supporting-classes)
   - [Example Usage](#example-usage)
 
@@ -78,6 +79,18 @@ Transitions the subject into an **invited state** for FOBT screening.
 
 ---
 
+## Prerequisites
+
+Before using the Call and Recall utility, ensure that the following prerequisites are met:
+
+1. **Database Access**: The utility requires access to the OracleDB instance where the relevant stored procedures are defined.
+
+2. **NHS Number**: A valid NHS number must be provided for the subject being processed.
+
+3. **Environment Variables**: As this utility relies on the `UserTools` utility you must ensure that you have correctly created and populated a `local.env` file. For more information on this [See the README](../../README.md)
+
+---
+
 ## Supporting Classes
 
 These classes are required by the utility:
@@ -93,8 +106,8 @@ These classes are required by the utility:
 ## Example Usage
 
 ```python
+from utils.user_tools import UserTools
 from utils.call_and_recall_utils import CallAndRecallUtils
-from classes.user_role_type import UserRoleType
 
 # Log in with a user and populate the user_role variable
 user_role = UserTools.user_login(
