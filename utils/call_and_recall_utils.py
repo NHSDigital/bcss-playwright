@@ -69,7 +69,7 @@ class CallAndRecallUtils:
         Raises:
             oracledb.DatabaseError: If there is an error in the execution of the stored procedure
         """
-        logging.info(f"START: invite_subject_for_fobt_screening for NHS No: {nhs_no}")
+        logging.debug(f"START: invite_subject_for_fobt_screening for NHS No: {nhs_no}")
 
         try:
             # Prepare parameters for the stored procedure
@@ -88,4 +88,4 @@ class CallAndRecallUtils:
             raise oracledb.DatabaseError(
                 f"Error in invite_subject_for_fobt_screening for NHS No {nhs_no}: {e}"
             )
-        logging.info(f"END: invite_subject_for_fobt_screening for NHS No: {nhs_no}")
+        logging.debug(f"END: invite_subject_for_fobt_screening for NHS No: {nhs_no}")
