@@ -57,7 +57,8 @@ class OrganisationsPage(BasePage):
         """Clicks the 'Bureau' link."""
         self.click(self.bureau_page)
 
-    def navigate_to_surveillance_review_summary(self):
+    def navigate_to_surveillance_review_summary(self) -> None:
+        """Navigates through the organisation pages to the Surveillance Review Summary."""
         self.org_and_site_details_link.click()
         self.list_all_orgs_link.click()
         self.click_back_button()
