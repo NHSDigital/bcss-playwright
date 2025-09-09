@@ -298,49 +298,7 @@ def test_scenario_3(page: Page) -> None:
         "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
     )
 
-    # When I view the subject
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-
-    # And I view the event history for the subject's latest episode
-    SubjectScreeningSummaryPage(page).expand_episodes_list()
-    SubjectScreeningSummaryPage(page).click_first_fobt_episode_link()
-
-    # And I view the latest practitioner appointment in the subject's episode
-    EpisodeEventsAndNotesPage(page).click_view_appointment_link()
-
-    # And The subject cancels the practitioner appointment with reason "Patient Cancelled to Consider"
-    AppointmentDetailPage(page).check_cancel_radio()
-    AppointmentDetailPage(page).select_reason_for_cancellation_option(
-        ReasonForCancellationOptions.PATIENT_CANCELLED_TO_CONSIDER
-    )
-
-    # And I press OK on my confirmation prompt
-    AppointmentDetailPage(page).click_save_button(accept_dialog=True)
-
-    # Then my subject has been updated as follows:
-    criteria = {
-        "latest event status": "J4 Appointment Cancellation (Patient to Consider)"
-    }
-    subject_assertion(nhs_no, criteria)
-
-    # And there is a "J4" letter batch for my subject with the exact title "Practitioner Clinic 1st Appt Cancelled (Patient To Consider)"
-    # When I process the open "J4" letter batch for my subject
-    batch_processing(
-        page,
-        "J4",
-        "Practitioner Clinic 1st Appt Cancelled (Patient To Consider)",
-        "J22 - Appointment Cancellation letter sent (Patient to Consider)",
-        True,
-    )
-
-    # Then there is a "J22" letter batch for my subject with the exact title "Subject Discharge (Refused Appointment)"
-    # When I process the open "J22" letter batch for my subject
-    batch_processing(
-        page,
-        "J22",
-        "Subject Discharge (Refused Appointment)",
-        "J8 - Patient discharge sent (refused colonoscopy assessment appointment)",
-    )
+    cancel_appointment_and_processes_batches(page, nhs_no)
 
     # When I switch users to BCSS "England" as user role "Hub Manager"
     LogoutPage(page).log_out(close_page=False)
@@ -458,49 +416,7 @@ def test_scenario_3(page: Page) -> None:
         "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
     )
 
-    # When I view the subject
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-
-    # And I view the event history for the subject's latest episode
-    SubjectScreeningSummaryPage(page).expand_episodes_list()
-    SubjectScreeningSummaryPage(page).click_first_fobt_episode_link()
-
-    # And I view the latest practitioner appointment in the subject's episode
-    EpisodeEventsAndNotesPage(page).click_view_appointment_link()
-
-    # And The subject cancels the practitioner appointment with reason "Patient Cancelled to Consider"
-    AppointmentDetailPage(page).check_cancel_radio()
-    AppointmentDetailPage(page).select_reason_for_cancellation_option(
-        ReasonForCancellationOptions.PATIENT_CANCELLED_TO_CONSIDER
-    )
-
-    # And I press OK on my confirmation prompt
-    AppointmentDetailPage(page).click_save_button(accept_dialog=True)
-
-    # Then my subject has been updated as follows:
-    criteria = {
-        "latest event status": "J4 Appointment Cancellation (Patient to Consider)"
-    }
-    subject_assertion(nhs_no, criteria)
-
-    # And there is a "J4" letter batch for my subject with the exact title "Practitioner Clinic 1st Appt Cancelled (Patient To Consider)"
-    # When I process the open "J4" letter batch for my subject
-    batch_processing(
-        page,
-        "J4",
-        "Practitioner Clinic 1st Appt Cancelled (Patient To Consider)",
-        "J22 - Appointment Cancellation letter sent (Patient to Consider)",
-        True,
-    )
-
-    # Then there is a "J22" letter batch for my subject with the exact title "Subject Discharge (Refused Appointment)"
-    # When I process the open "J22" letter batch for my subject
-    batch_processing(
-        page,
-        "J22",
-        "Subject Discharge (Refused Appointment)",
-        "J8 - Patient discharge sent (refused colonoscopy assessment appointment)",
-    )
+    cancel_appointment_and_processes_batches(page, nhs_no)
 
     # When I switch users to BCSS "England" as user role "Hub Manager"
     LogoutPage(page).log_out(close_page=False)
@@ -550,3 +466,54 @@ def test_scenario_3(page: Page) -> None:
     subject_assertion(nhs_no, criteria, user_role)
 
     LogoutPage(page).log_out()
+
+
+def cancel_appointment_and_processes_batches(page: Page, nhs_no: str) -> None:
+    """
+    This function is used to reduce duplicate code in the test.
+    It navigates to the subject summary page and cancels an appointment for the subject.
+    Once the appointment is cancelled it processes the relevant batches
+    """
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # And I view the event history for the subject's latest episode
+    SubjectScreeningSummaryPage(page).expand_episodes_list()
+    SubjectScreeningSummaryPage(page).click_first_fobt_episode_link()
+
+    # And I view the latest practitioner appointment in the subject's episode
+    EpisodeEventsAndNotesPage(page).click_view_appointment_link()
+
+    # And The subject cancels the practitioner appointment with reason "Patient Cancelled to Consider"
+    AppointmentDetailPage(page).check_cancel_radio()
+    AppointmentDetailPage(page).select_reason_for_cancellation_option(
+        ReasonForCancellationOptions.PATIENT_CANCELLED_TO_CONSIDER
+    )
+
+    # And I press OK on my confirmation prompt
+    AppointmentDetailPage(page).click_save_button(accept_dialog=True)
+
+    # Then my subject has been updated as follows:
+    criteria = {
+        "latest event status": "J4 Appointment Cancellation (Patient to Consider)"
+    }
+    subject_assertion(nhs_no, criteria)
+
+    # And there is a "J4" letter batch for my subject with the exact title "Practitioner Clinic 1st Appt Cancelled (Patient To Consider)"
+    # When I process the open "J4" letter batch for my subject
+    batch_processing(
+        page,
+        "J4",
+        "Practitioner Clinic 1st Appt Cancelled (Patient To Consider)",
+        "J22 - Appointment Cancellation letter sent (Patient to Consider)",
+        True,
+    )
+
+    # Then there is a "J22" letter batch for my subject with the exact title "Subject Discharge (Refused Appointment)"
+    # When I process the open "J22" letter batch for my subject
+    batch_processing(
+        page,
+        "J22",
+        "Subject Discharge (Refused Appointment)",
+        "J8 - Patient discharge sent (refused colonoscopy assessment appointment)",
+    )
