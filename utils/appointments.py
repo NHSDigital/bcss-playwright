@@ -11,6 +11,9 @@ from pages.screening_practitioner_appointments.screening_practitioner_appointmen
 from pages.screening_practitioner_appointments.set_availability_page import (
     SetAvailabilityPage,
 )
+from pages.screening_practitioner_appointments.book_appointment_page import (
+    BookAppointmentPage,
+)
 from utils.calendar_picker import CalendarPicker
 from utils.user_tools import UserTools
 from datetime import datetime
@@ -55,7 +58,7 @@ def setup_appointments(page: Page, no_of_practitioners: int, max: bool = False) 
         PractitionerAvailabilityPage(page).click_save_button()
         logging.info(f"Appointments set for practitioner {index + 1} at BCS001")
         BasePage(page).click_main_menu_link()
-    LogoutPage(page).log_out()
+    LogoutPage(page).log_out(close_page=False)
 
 
 def go_to_appointments_page_and_select_site(page: Page) -> None:
@@ -71,3 +74,47 @@ def go_to_appointments_page_and_select_site(page: Page) -> None:
     PractitionerAvailabilityPage(page).select_site_dropdown_option(
         "THE ROYAL HOSPITAL (WOLVERHAMPTON)"
     )
+    page.wait_for_timeout(1000)  # Wait for the practitioners to load
+
+
+def book_appointments(page: Page, screening_centre: str, site: str) -> None:
+    """
+    Book appointments for the selected practitioner.
+
+    Args:
+        page (Page): The Playwright page object.
+        screening_centre (str): The name of the screening centre.
+        site (str): The name of the site.
+    """
+    BookAppointmentPage(page).select_screening_centre_dropdown_option(screening_centre)
+    BookAppointmentPage(page).select_site_dropdown_option(
+        [
+            f"{site} (? km)",
+            f"{site} (? km) (attended)",
+        ]
+    )
+
+    # And I book the "earliest" available practitioner appointment on this date
+    current_month_displayed = BookAppointmentPage(page).get_current_month_displayed()
+    CalendarPicker(page).book_first_eligible_appointment(
+        current_month_displayed,
+        BookAppointmentPage(page).appointment_cell_locators,
+        [
+            BookAppointmentPage(page).available_background_colour,
+            BookAppointmentPage(page).some_available_background_colour,
+        ],
+    )
+    page.wait_for_timeout(500)  # Wait for the appointments to load
+    BookAppointmentPage(page).appointments_table.click_first_input_in_column(
+        "Appt/Slot Time"
+    )
+    BasePage(page).safe_accept_dialog(BookAppointmentPage(page).save_button)
+    try:
+        BookAppointmentPage(page).appointment_booked_confirmation_is_displayed(
+            "Appointment booked"
+        )
+        logging.info("[BOOK APPOINTMENTS] Appointment successfully booked")
+    except Exception as e:
+        raise RuntimeError(
+            f"[BOOK APPOINTMENTS] Appointment not booked successfully: {e}"
+        )

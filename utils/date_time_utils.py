@@ -209,3 +209,19 @@ class DateTimeUtils:
         if isinstance(val, datetime):
             return val
         return None
+
+    @staticmethod
+    def calculate_birth_date_for_age(age: int) -> date:
+        """
+        Calculates the birth date for a given age.
+        Args:
+            age (int): The age to calculate the birth date for.
+        Returns:
+            date: The calculated birth date.
+        """
+        today = date.today()
+        try:
+            return today.replace(year=today.year - age)
+        except ValueError:
+            # Handles February 29 for non-leap years
+            return today.replace(month=2, day=28, year=today.year - age)
