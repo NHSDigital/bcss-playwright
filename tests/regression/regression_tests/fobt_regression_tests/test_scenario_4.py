@@ -73,7 +73,7 @@ def test_scenario_4(page: Page) -> None:
         "age (y/d)": "62/45",
         "active gp practice in hub/sc": "BCS01/BCS001",
     }
-    nhs_no = CreateSubjectSteps().create_custom_subject(requirements, user_role)
+    nhs_no = CreateSubjectSteps().create_custom_subject(requirements)
     if nhs_no is None:
         pytest.fail("Failed to create subject: NHS number not returned.")
 
