@@ -85,9 +85,12 @@ def book_appointments(page: Page, screening_centre: str, site: str) -> None:
         page (Page): The Playwright page object.
         screening_centre (str): The name of the screening centre.
         site (str): The name of the site.
+    Raises:
+        RuntimeError: If the appointment booking confirmation is not displayed.
     """
-    BookAppointmentPage(page).select_screening_centre_dropdown_option(screening_centre)
-    BookAppointmentPage(page).select_site_dropdown_option(
+    book_appointments_page = BookAppointmentPage(page)
+    book_appointments_page.select_screening_centre_dropdown_option(screening_centre)
+    book_appointments_page.select_site_dropdown_option(
         [
             f"{site} (? km)",
             f"{site} (? km) (attended)",
@@ -95,22 +98,22 @@ def book_appointments(page: Page, screening_centre: str, site: str) -> None:
     )
 
     # And I book the "earliest" available practitioner appointment on this date
-    current_month_displayed = BookAppointmentPage(page).get_current_month_displayed()
+    current_month_displayed = book_appointments_page.get_current_month_displayed()
     CalendarPicker(page).book_first_eligible_appointment(
         current_month_displayed,
-        BookAppointmentPage(page).appointment_cell_locators,
+        book_appointments_page.appointment_cell_locators,
         [
-            BookAppointmentPage(page).available_background_colour,
-            BookAppointmentPage(page).some_available_background_colour,
+            book_appointments_page.available_background_colour,
+            book_appointments_page.some_available_background_colour,
         ],
     )
     page.wait_for_timeout(500)  # Wait for the appointments to load
-    BookAppointmentPage(page).appointments_table.click_first_input_in_column(
+    book_appointments_page.appointments_table.click_first_input_in_column(
         "Appt/Slot Time"
     )
-    BasePage(page).safe_accept_dialog(BookAppointmentPage(page).save_button)
+    BasePage(page).safe_accept_dialog(book_appointments_page.save_button)
     try:
-        BookAppointmentPage(page).appointment_booked_confirmation_is_displayed(
+        book_appointments_page.appointment_booked_confirmation_is_displayed(
             "Appointment booked"
         )
         logging.info("[BOOK APPOINTMENTS] Appointment successfully booked")

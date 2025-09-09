@@ -87,7 +87,7 @@ class PISubject:
         if gender is not None:
             gender_code = gender.redefined_value
         else:
-            gender_code = 0  # If None setting to "Not known gender"
+            gender_code = 0  # If None, set to "Not known gender"
         return PISubject(
             screening_subject_id=subject.screening_subject_id,
             nhs_number=subject.nhs_number,

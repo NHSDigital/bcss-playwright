@@ -1307,6 +1307,13 @@ class Subject:
         return Subject(**field_map)
 
     def populate_subject_object_from_nhs_no(self, nhs_no: str) -> "Subject":
+        """
+        Populates a Subject object from the NHS number.
+        Args:
+            nhs_no (str): The NHS number to populate the subject from.
+        Returns:
+            Subject: A populated Subject object from the database
+        """
         from utils.oracle.subject_selection_query_builder import (
             SubjectSelectionQueryBuilder,
         )

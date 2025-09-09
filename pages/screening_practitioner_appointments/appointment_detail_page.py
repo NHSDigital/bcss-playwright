@@ -82,6 +82,7 @@ class AppointmentDetailPage(BasePage):
         Selects the reason for cancellation from the dropdown.
         Args:
             option: The reason for cancellation to select.
+            The options are in the ReasonForCancellationOptions class
         """
         self.reason_for_cancellation_dropwdown.select_option(value=option)
 

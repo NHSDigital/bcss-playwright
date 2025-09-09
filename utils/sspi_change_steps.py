@@ -31,7 +31,7 @@ class SSPIChangeSteps:
 
         logging.debug("exit: sspi_update_to_change_dob_received()")
 
-    def handle_update(self, subject, birth_date: Optional[date]) -> None:
+    def handle_update(self, subject: Subject, birth_date: Optional[date]) -> None:
         """
         Performs the SSPI update to make the changes in the database.
         Args:

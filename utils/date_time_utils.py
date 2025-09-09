@@ -213,7 +213,11 @@ class DateTimeUtils:
     @staticmethod
     def calculate_birth_date_for_age(age: int) -> date:
         """
-        Calculates the birth date for a given age.
+        Calculates a birth date corresponding to a given age as of today's date.
+
+        This method subtracts the specified age from the current year to estimate the birth date.
+        If the resulting date would fall on February 29 in a non-leap year, it adjusts to February 28
+        to ensure a valid date.
         Args:
             age (int): The age to calculate the birth date for.
         Returns:
