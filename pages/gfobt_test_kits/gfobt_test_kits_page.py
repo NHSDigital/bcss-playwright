@@ -36,7 +36,7 @@ class GFOBTTestKitsPage(BasePage):
         """Navigate to the Create QC Kit page."""
         self.click(self.create_qc_kit_page)
 
-    def open_test_kits_report(self):
+    def open_test_kits_report(self) -> None:
         """Clicks the 'Test Kits' header to open the corresponding report section."""
         self.click(self.test_kits_header)
 
