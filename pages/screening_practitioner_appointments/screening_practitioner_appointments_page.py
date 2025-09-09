@@ -46,7 +46,7 @@ class ScreeningPractitionerAppointmentsPage(BasePage):
         """Click on the Set Availability link to navigate to the set availability page."""
         self.click(self.set_availability_link)
 
-    def open_appointments_report(self):
+    def open_appointments_report(self) -> None:
         """Clicks the 'Appointments' header to open the related report section."""
         self.click(self.appointments_header)
 
