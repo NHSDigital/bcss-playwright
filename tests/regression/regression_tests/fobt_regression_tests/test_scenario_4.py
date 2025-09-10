@@ -2,7 +2,6 @@ import pytest
 import logging
 from datetime import datetime
 from playwright.sync_api import Page
-from pages.communication_production.batch_list_page import ActiveBatchListPage
 from utils.oracle.subject_creation_util import CreateSubjectSteps
 from utils.sspi_change_steps import SSPIChangeSteps
 from utils.user_tools import UserTools
@@ -14,10 +13,18 @@ from utils.fit_kit import FitKitLogged, FitKitGeneration
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
-from pages.communication_production.batch_list_page import BatchListPage
-from pages.logout.log_out_page import LogoutPage
 from pages.screening_subject_search.close_fobt_screening_episode_page import (
     CloseFobtScreeningEpisodePage,
+)
+from utils.appointments import book_appointments
+from pages.logout.log_out_page import LogoutPage
+from pages.base_page import BasePage
+from pages.screening_subject_search.episode_events_and_notes_page import (
+    EpisodeEventsAndNotesPage,
+)
+from pages.screening_practitioner_appointments.appointment_detail_page import (
+    AppointmentDetailPage,
+    ReasonForCancellationOptions,
 )
 
 
@@ -266,314 +273,268 @@ def test_scenario_4(page: Page) -> None:
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
+    # And I choose to book a practitioner clinic for my subject
+    SubjectScreeningSummaryPage(page).click_book_practitioner_clinic_button()
 
-# # And I choose to book a practitioner clinic for my subject
-# # And I select "BCS001" as the screening centre where the practitioner appointment will be held
-# # And I set the practitioner appointment date to "tomorrow"
-# # And I book the "earliest" available practitioner appointment on this date
-# CallAndRecallUtils().book_practitioner_clinic(
-#     nhs_no,
-#     screening_centre="BCS001",
-#     appointment_date=datetime.now().date() + timedelta(days=1),
-#     slot_preference="earliest",
-# )
+    # And I select "BCS001" as the screening centre where the practitioner appointment will be held
+    # And I set the practitioner appointment date to "tomorrow"
+    # And I book the "earliest" available practitioner appointment on this date
+    book_appointments(
+        page,
+        "BCS001 - Wolverhampton Bowel Cancer Screening Centre",
+        "The Royal Hospital (Wolverhampton)",
+    )
 
-# # Then my subject has been updated as follows:
-# subject_assertion(
-#     nhs_no,
-#     {
-#         "latest event status": "A183 1st Colonoscopy Assessment Appointment Requested",
-#     },
-# )
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A183 1st Colonoscopy Assessment Appointment Requested",
+        },
+    )
 
-# # And there is a "A183" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment"
-# batch_processing(
-#     page,
-#     "A183",
-#     "Practitioner Clinic 1st Appointment",
-#     "A183 1st Colonoscopy Assessment Appointment Requested",
-#     True,
-# )
+    # And there is a "A183" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment"
+    batch_processing(
+        page,
+        "A183",
+        "Practitioner Clinic 1st Appointment",
+        "A183 1st Colonoscopy Assessment Appointment Requested",
+        True,
+    )
 
-# # And there is a "A183" letter batch for my subject with the exact title "GP Result (Abnormal)"
-# batch_processing(
-#     page,
-#     "A183",
-#     "GP Result (Abnormal)",
-#     "A183 1st Colonoscopy Assessment Appointment Requested",
-#     True,
-# )
+    # And there is a "A183" letter batch for my subject with the exact title "GP Result (Abnormal)"
+    batch_processing(
+        page,
+        "A183",
+        "GP Result (Abnormal)",
+        "A183 1st Colonoscopy Assessment Appointment Requested",
+        True,
+    )
 
-# # When I process the open "A183 - Practitioner Clinic 1st Appointment" letter batch for my subject
-# batch_processing(
-#     page,
-#     "A183",
-#     "Practitioner Clinic 1st Appointment",
-#     "A25 1st Colonoscopy Assessment Appointment Booked, letter sent",
-#     False,
-# )
+    # When I process the open "A183 - Practitioner Clinic 1st Appointment" letter batch for my subject
+    # Then my subject has been updated as follows:
+    batch_processing(
+        page,
+        "A183",
+        "Practitioner Clinic 1st Appointment",
+        "A25 1st Colonoscopy Assessment Appointment Booked, letter sent",
+        False,
+    )
 
-# # Then my subject has been updated as follows:
-# subject_assertion(
-#     nhs_no,
-#     {
-#         "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked, letter sent",
-#     },
-# )
+    # When I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
+    # Then my subject has been updated as follows:
+    batch_processing(
+        page,
+        "A183",
+        "GP Result (Abnormal)",
+        "A167 GP Abnormal FOBT Result Sent",
+        False,
+    )
 
-# # When I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
-# batch_processing(
-#     page,
-#     "A183",
-#     "GP Result (Abnormal)",
-#     "A167 GP Abnormal FOBT Result Sent",
-#     False,
-# )
+    # When I switch users to BCSS "England" as user role "Screening Centre Manager"
+    LogoutPage(page).log_out(close_page=False)
+    BasePage(page).go_to_log_in_page()
+    UserTools.user_login(page, "Screening Centre Manager at BCS001")
 
-# # Then my subject has been updated as follows:
-# subject_assertion(
-#     nhs_no,
-#     {
-#         "latest episode includes event status": "A167 GP Abnormal FOBT Result Sent",
-#         "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked, letter sent",
-#     },
-# )
+    # And I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-# # When I switch users to BCSS "England" as user role "Screening Centre Manager"
-# user_role = UserTools.user_login(
-#     page, "Screening Centre Manager at BCS001", return_role_type=True
-# )
-# if user_role is None:
-#     raise ValueError("User cannot be assigned to a UserRoleType")
+    # And I view the event history for the subject's latest episode
+    SubjectScreeningSummaryPage(page).expand_episodes_list()
+    SubjectScreeningSummaryPage(page).click_first_fobt_episode_link()
 
-# # And I view the subject
-# screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # And I view the latest practitioner appointment in the subject's episode
+    EpisodeEventsAndNotesPage(page).click_view_appointment_link()
 
-# # And I view the event history for the subject's latest episode
-# summary_page.view_event_history()
+    # And the subject cancels the practitioner appointment with reason "Patient Cancelled to Consider"
+    AppointmentDetailPage(page).check_cancel_radio()
+    AppointmentDetailPage(page).select_reason_for_cancellation_option(
+        ReasonForCancellationOptions.PATIENT_CANCELLED_TO_CONSIDER
+    )
 
-# # And I view the latest practitioner appointment in the subject's episode
-# summary_page.view_latest_practitioner_appointment()
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "J4 Appointment Cancellation (Patient to Consider)",
+        },
+    )
 
-# # And the subject cancels the practitioner appointment with reason "Patient Cancelled to Consider"
-# CallAndRecallUtils().cancel_practitioner_appointment(
-#     nhs_no, reason="Patient Cancelled to Consider", confirm=True
-# )
+    # When I process the open "J4" letter batch for my subject
+    # # Then my subject has been updated as follows:
+    batch_processing(
+        page,
+        "J4",
+        "Appointment Cancellation (Patient to Consider)",
+        "J22 Appointment Cancellation letter sent (Patient to Consider)",
+        False,
+    )
 
-# # Then my subject has been updated as follows:
-# subject_assertion(
-#     nhs_no,
-#     {
-#         "latest event status": "J4 Appointment Cancellation (Patient to Consider)",
-#     },
-# )
+    # # TODO: But there is no "J22" letter batch for my subject with the exact title "Subject Discharge (Refused Appointment)"
+    # batch_processing.assert_batch_absence(
+    #     nhs_no, "J22", "Subject Discharge (Refused Appointment)"
+    # )
 
-# # When I process the open "J4" letter batch for my subject
-# batch_processing(
-#     page,
-#     "J4",
-#     "Appointment Cancellation (Patient to Consider)",
-#     "J22 Appointment Cancellation letter sent (Patient to Consider)",
-#     False,
-# )
+    # When I switch users to BCSS "England" as user role "Hub Manager"
+    LogoutPage(page).log_out(close_page=False)
+    BasePage(page).go_to_log_in_page()
+    UserTools.user_login(page, "Hub Manager State Registered at BCS01")
 
-# # Then my subject has been updated as follows:
-# subject_assertion(
-#     nhs_no,
-#     {
-#         "latest event status": "J22 Appointment Cancellation letter sent (Patient to Consider)",
-#     },
-# )
+    # And I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-# # But there is no "J22" letter batch for my subject with the exact title "Subject Discharge (Refused Appointment)"
-# batch_processing.assert_batch_absence(
-#     nhs_no, "J22", "Subject Discharge (Refused Appointment)"
-# )
+    # And I choose to book a practitioner clinic for my subject
+    SubjectScreeningSummaryPage(page).click_book_practitioner_clinic_button()
 
-# # When I switch users to BCSS "England" as user role "Hub Manager"
-# user_role = UserTools.user_login(
-#     page, "Hub Manager State Registered at BCS01", return_role_type=True
-# )
-# if user_role is None:
-#     raise ValueError("User cannot be assigned to a UserRoleType")
+    # And I select "BCS001" as the screening centre where the practitioner appointment will be held
+    # And I set the practitioner appointment date to "tomorrow"
+    # And I book the "earliest" available practitioner appointment on this date
+    book_appointments(
+        page,
+        "BCS001 - Wolverhampton Bowel Cancer Screening Centre",
+        "The Royal Hospital (Wolverhampton)",
+    )
 
-# # And I view the subject
-# screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "J20 Appointment Requested (Patient to Reschedule Letter)",
+        },
+    )
 
-# # And I choose to book a practitioner clinic for my subject
-# # And I select "BCS001" as the screening centre where the practitioner appointment will be held
-# # And I set the practitioner appointment date to "tomorrow"
-# # And I book the "earliest" available practitioner appointment on this date
-# CallAndRecallUtils().book_practitioner_clinic(
-#     nhs_no,
-#     screening_centre="BCS001",
-#     appointment_date=datetime.now().date() + timedelta(days=1),
-#     slot_preference="earliest",
-# )
+    # And there is a "J20" letter batch for my subject with the exact title "Practitioner Clinic 1st Appt Cancelled (Patient To Reschedule)"
+    batch_processing(
+        page,
+        "J20",
+        "Practitioner Clinic 1st Appt Cancelled (Patient To Reschedule)",
+        "J20 Appointment Requested (Patient to Reschedule Letter)",
+        True,
+    )
 
-# # Then my subject has been updated as follows:
-# subject_assertion(
-#     nhs_no,
-#     {
-#         "latest event status": "J20 Appointment Requested (Patient to Reschedule Letter)",
-#     },
-# )
+    # When I process the open "J20" letter batch for my subject
+    # Then my subject has been updated as follows:
+    batch_processing(
+        page,
+        "J20",
+        "Practitioner Clinic 1st Appt Cancelled (Patient To Reschedule)",
+        "A25 1st Colonoscopy Assessment Appointment Booked, letter sent",
+        False,
+    )
 
-# # And there is a "J20" letter batch for my subject with the exact title "Practitioner Clinic 1st Appt Cancelled (Patient To Reschedule)"
-# batch_processing(
-#     page,
-#     "J20",
-#     "Practitioner Clinic 1st Appt Cancelled (Patient To Reschedule)",
-#     "J20 Appointment Requested (Patient to Reschedule Letter)",
-#     True,
-# )
+    # When I switch users to BCSS "England" as user role "Screening Centre Manager"
+    LogoutPage(page).log_out(close_page=False)
+    BasePage(page).go_to_log_in_page()
+    UserTools.user_login(page, "Screening Centre Manager at BCS001")
 
-# # When I process the open "J20" letter batch for my subject
-# batch_processing(
-#     page,
-#     "J20",
-#     "Practitioner Clinic 1st Appt Cancelled (Patient To Reschedule)",
-#     "A25 1st Colonoscopy Assessment Appointment Booked, letter sent",
-#     False,
-# )
+    # And I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-# # Then my subject has been updated as follows:
-# subject_assertion(
-#     nhs_no,
-#     {
-#         "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked, letter sent",
-#     },
-# )
+    # And I view the event history for the subject's latest episode
+    SubjectScreeningSummaryPage(page).expand_episodes_list()
+    SubjectScreeningSummaryPage(page).click_first_fobt_episode_link()
 
-# # When I switch users to BCSS "England" as user role "Screening Centre Manager"
-# user_role = UserTools.user_login(
-#     page, "Screening Centre Manager at BCS001", return_role_type=True
-# )
-# if user_role is None:
-#     raise ValueError("User cannot be assigned to a UserRoleType")
+    # And I view the latest practitioner appointment in the subject's episode
+    EpisodeEventsAndNotesPage(page).click_view_appointment_link()
 
-# # And I view the subject
-# screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # And the subject cancels the practitioner appointment with reason "Patient Unsuitable - Recently Screened"
+    AppointmentDetailPage(page).check_cancel_radio()
+    AppointmentDetailPage(page).select_reason_for_cancellation_option(
+        ReasonForCancellationOptions.PATIENT_UNSUITABLE_RECENTLY_SCREENED
+    )
 
-# # And I view the event history for the subject's latest episode
-# summary_page.view_event_history()
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "J24 Screening Centre Discharge Patient",
+        },
+    )
 
-# # And I view the latest practitioner appointment in the subject's episode
-# summary_page.view_latest_practitioner_appointment()
+    # And there is a "J24" letter batch for my subject with the exact title "Subject Discharge (Screening Centre)"
+    batch_processing(
+        page,
+        "J24",
+        "Subject Discharge (Screening Centre)",
+        "J24 Screening Centre Discharge Patient",
+        True,
+    )
 
-# # And the subject cancels the practitioner appointment with reason "Patient Unsuitable - Recently Screened"
-# CallAndRecallUtils().cancel_practitioner_appointment(
-#     nhs_no, reason="Patient Unsuitable - Recently Screened", confirm=True
-# )
+    # When I process the open "J24 - Subject Discharge (Screening Centre)" letter batch for my subject
+    # Then my subject has been updated as follows:
+    batch_processing(
+        page,
+        "J24",
+        "Subject Discharge (Screening Centre)",
+        "J25 Patient discharge sent (Screening Centre discharge patient)",
+        False,
+    )
 
-# # Then my subject has been updated as follows:
-# subject_assertion(
-#     nhs_no,
-#     {
-#         "latest event status": "J24 Screening Centre Discharge Patient",
-#     },
-# )
+    # And there is a "J25" letter batch for my subject with the exact title "GP Discharge (Discharged By Screening Centre)"
+    batch_processing(
+        page,
+        "J25",
+        "GP Discharge (Discharged By Screening Centre)",
+        "J25 Patient discharge sent (Screening Centre discharge patient)",
+        True,
+    )
 
-# # And there is a "J24" letter batch for my subject with the exact title "Subject Discharge (Screening Centre)"
-# batch_processing(
-#     page,
-#     "J24",
-#     "Subject Discharge (Screening Centre)",
-#     "J24 Screening Centre Discharge Patient",
-#     True,
-# )
+    # When I switch users to BCSS "England" as user role "Hub Manager"
+    LogoutPage(page).log_out(close_page=False)
+    BasePage(page).go_to_log_in_page()
+    UserTools.user_login(page, "Hub Manager State Registered at BCS01")
 
-# # When I process the open "J24 - Subject Discharge (Screening Centre)" letter batch for my subject
-# batch_processing(
-#     page,
-#     "J24",
-#     "Subject Discharge (Screening Centre)",
-#     "J25 Patient discharge sent (Screening Centre discharge patient)",
-#     False,
-# )
+    # And I process the open "J25" letter batch for my subject
+    # Then my subject has been updated as follows:
+    batch_processing(
+        page,
+        "J25",
+        "GP Discharge (Discharged By Screening Centre)",
+        "P202 Waiting Completion of Outstanding Events",
+        False,
+    )
 
-# # Then my subject has been updated as follows:
-# subject_assertion(
-#     nhs_no,
-#     {
-#         "latest event status": "J25 Patient discharge sent (Screening Centre discharge patient)",
-#     },
-# )
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-# # And there is a "J25" letter batch for my subject with the exact title "GP Discharge (Discharged By Screening Centre)"
-# batch_processing(
-#     page,
-#     "J25",
-#     "GP Discharge (Discharged By Screening Centre)",
-#     "J25 Patient discharge sent (Screening Centre discharge patient)",
-#     True,
-# )
+    # # TODO: And I select the advance episode option for "Record Diagnosis Date"
+    # # And I select Diagnosis Date Reason "Patient choice"
+    # # And I save Diagnosis Date Information
+    # CallAndRecallUtils().record_diagnosis_date(
+    #     nhs_no, reason="Patient choice", has_diagnosis_date=False
+    # )
 
-# # When I switch users to BCSS "England" as user role "Hub Manager"
-# user_role = UserTools.user_login(
-#     page, "Hub Manager State Registered at BCS01", return_role_type=True
-# )
-# if user_role is None:
-#     raise ValueError("User cannot be assigned to a UserRoleType")
-
-# # And I process the open "J25" letter batch for my subject
-# batch_processing(
-#     page,
-#     "J25",
-#     "GP Discharge (Discharged By Screening Centre)",
-#     "P202 Waiting Completion of Outstanding Events",
-#     False,
-# )
-
-# # Then my subject has been updated as follows:
-# subject_assertion(
-#     nhs_no,
-#     {
-#         "latest event status": "P202 Waiting Completion of Outstanding Events",
-#     },
-# )
-
-# # When I view the subject
-# screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-
-# # And I select the advance episode option for "Record Diagnosis Date"
-# # And I select Diagnosis Date Reason "Patient choice"
-# # And I save Diagnosis Date Information
-# CallAndRecallUtils().record_diagnosis_date(
-#     nhs_no, reason="Patient choice", has_diagnosis_date=False
-# )
-
-# # Then my subject has been updated as follows:
-# subject_assertion(
-#     nhs_no,
-#     {
-#         "calculated FOBT due date": "2 years from latest J25 event",
-#         "calculated lynch due date": "Unchanged",
-#         "calculated surveillance due date": "Unchanged",
-#         "ceased confirmation date": None,
-#         "ceased confirmation details": None,
-#         "ceased confirmation user ID": None,
-#         "clinical reason for cease": None,
-#         "latest episode accumulated result": "Definitive abnormal FOBT outcome",
-#         "latest episode diagnosis date reason": "Patient choice",
-#         "latest episode has diagnosis date": "No",
-#         "latest episode includes event status": "A52 No diagnosis date recorded",
-#         "latest episode recall calculation method": "Date of last patient letter",
-#         "latest episode recall episode type": "FOBT Screening",
-#         "latest episode recall surveillance type": None,
-#         "latest episode status": "Closed",
-#         "latest episode status reason": "Discharged",
-#         "latest event status": "J26 GP Discharge letter sent (Discharge by Screening centre)",
-#         "lynch due date": None,
-#         "lynch due date date of change": "Unchanged",
-#         "lynch due date reason": "Unchanged",
-#         "screening due date": None,
-#         "screening due date date of change": "Today",
-#         "screening due date reason": "Awaiting failsafe",
-#         "screening status": "Recall",
-#         "screening status reason": "Recall",
-#         "surveillance due date": None,
-#         "surveillance due date reason": "Unchanged",
-#         "surveillance due date date of change": "Unchanged",
-#     },
-# )
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "calculated FOBT due date": "2 years from latest J25 event",
+            "calculated lynch due date": "Unchanged",
+            "calculated surveillance due date": "Unchanged",
+            "ceased confirmation date": None,
+            "ceased confirmation details": None,
+            "ceased confirmation user ID": None,
+            "clinical reason for cease": None,
+            "latest episode accumulated result": "Definitive abnormal FOBT outcome",
+            "latest episode diagnosis date reason": "Patient choice",
+            "latest episode has diagnosis date": "No",
+            "latest episode includes event status": "A52 No diagnosis date recorded",
+            "latest episode recall calculation method": "Date of last patient letter",
+            "latest episode recall episode type": "FOBT Screening",
+            "latest episode recall surveillance type": None,
+            "latest episode status": "Closed",
+            "latest episode status reason": "Discharged",
+            "latest event status": "J26 GP Discharge letter sent (Discharge by Screening centre)",
+            "lynch due date": None,
+            "lynch due date date of change": "Unchanged",
+            "lynch due date reason": "Unchanged",
+            "screening due date": None,
+            "screening due date date of change": "Today",
+            "screening due date reason": "Awaiting failsafe",
+            "screening status": "Recall",
+            "screening status reason": "Recall",
+            "surveillance due date": None,
+            "surveillance due date reason": "Unchanged",
+            "surveillance due date date of change": "Unchanged",
+        },
+    )
