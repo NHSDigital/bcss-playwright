@@ -41,3 +41,19 @@ class RecordDiagnosisDatePage(BasePage):
             return self.alert_message.inner_text()
         else:
             return ""
+        
+    def record_diagnosis_date_with_reason(self, date: datetime, reason_text: str) -> None:
+        """
+        Records a diagnosis date and selects a reason before saving.
+
+        Args:
+            date (datetime): The diagnosis date to enter.
+            reason_text (str): The visible text of the reason to select.
+        """
+        self.enter_date_in_diagnosis_date_field(date)
+
+        reason_dropdown = self.page.locator("#DIAGNOSIS_REASON")  # Replace with actual ID
+        reason_dropdown.select_option(label=reason_text)
+
+        self.safe_accept_dialog(self.save_button)
+

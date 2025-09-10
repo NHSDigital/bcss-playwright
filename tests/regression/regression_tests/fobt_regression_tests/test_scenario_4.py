@@ -26,9 +26,16 @@ from pages.screening_practitioner_appointments.appointment_detail_page import (
     AppointmentDetailPage,
     ReasonForCancellationOptions,
 )
+from pages.screening_subject_search.advance_fobt_screening_episode_page import (
+    AdvanceFOBTScreeningEpisodePage,
+)
+from pages.screening_subject_search.record_diagnosis_date_page import (
+    RecordDiagnosisDatePage,
+)
 
 
 @pytest.mark.wip
+@pytest.mark.usefixtures("setup_org_and_appointments")
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.fobt_regression_tests
@@ -294,41 +301,25 @@ def test_scenario_4(page: Page) -> None:
     )
 
     # And there is a "A183" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment"
-    batch_processing(
-        page,
-        "A183",
-        "Practitioner Clinic 1st Appointment",
-        "A183 1st Colonoscopy Assessment Appointment Requested",
-        True,
-    )
-
-    # And there is a "A183" letter batch for my subject with the exact title "GP Result (Abnormal)"
-    batch_processing(
-        page,
-        "A183",
-        "GP Result (Abnormal)",
-        "A183 1st Colonoscopy Assessment Appointment Requested",
-        True,
-    )
-
     # When I process the open "A183 - Practitioner Clinic 1st Appointment" letter batch for my subject
     # Then my subject has been updated as follows:
     batch_processing(
         page,
         "A183",
         "Practitioner Clinic 1st Appointment",
-        "A25 1st Colonoscopy Assessment Appointment Booked, letter sent",
-        False,
+        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+        True,
     )
 
+    # And there is a "A183" letter batch for my subject with the exact title "GP Result (Abnormal)"
     # When I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
     # Then my subject has been updated as follows:
     batch_processing(
         page,
         "A183",
         "GP Result (Abnormal)",
-        "A167 GP Abnormal FOBT Result Sent",
-        False,
+        "A167 - GP Abnormal FOBT Result Sent",
+        True,
     )
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
@@ -366,14 +357,9 @@ def test_scenario_4(page: Page) -> None:
         page,
         "J4",
         "Appointment Cancellation (Patient to Consider)",
-        "J22 Appointment Cancellation letter sent (Patient to Consider)",
+        "J22 - Appointment Cancellation letter sent (Patient to Consider)",
         False,
     )
-
-    # # TODO: But there is no "J22" letter batch for my subject with the exact title "Subject Discharge (Refused Appointment)"
-    # batch_processing.assert_batch_absence(
-    #     nhs_no, "J22", "Subject Discharge (Refused Appointment)"
-    # )
 
     # When I switch users to BCSS "England" as user role "Hub Manager"
     LogoutPage(page).log_out(close_page=False)
@@ -404,22 +390,14 @@ def test_scenario_4(page: Page) -> None:
     )
 
     # And there is a "J20" letter batch for my subject with the exact title "Practitioner Clinic 1st Appt Cancelled (Patient To Reschedule)"
-    batch_processing(
-        page,
-        "J20",
-        "Practitioner Clinic 1st Appt Cancelled (Patient To Reschedule)",
-        "J20 Appointment Requested (Patient to Reschedule Letter)",
-        True,
-    )
-
     # When I process the open "J20" letter batch for my subject
     # Then my subject has been updated as follows:
     batch_processing(
         page,
         "J20",
         "Practitioner Clinic 1st Appt Cancelled (Patient To Reschedule)",
-        "A25 1st Colonoscopy Assessment Appointment Booked, letter sent",
-        False,
+        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+        True,
     )
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
@@ -452,30 +430,13 @@ def test_scenario_4(page: Page) -> None:
     )
 
     # And there is a "J24" letter batch for my subject with the exact title "Subject Discharge (Screening Centre)"
-    batch_processing(
-        page,
-        "J24",
-        "Subject Discharge (Screening Centre)",
-        "J24 Screening Centre Discharge Patient",
-        True,
-    )
-
     # When I process the open "J24 - Subject Discharge (Screening Centre)" letter batch for my subject
     # Then my subject has been updated as follows:
     batch_processing(
         page,
         "J24",
         "Subject Discharge (Screening Centre)",
-        "J25 Patient discharge sent (Screening Centre discharge patient)",
-        False,
-    )
-
-    # And there is a "J25" letter batch for my subject with the exact title "GP Discharge (Discharged By Screening Centre)"
-    batch_processing(
-        page,
-        "J25",
-        "GP Discharge (Discharged By Screening Centre)",
-        "J25 Patient discharge sent (Screening Centre discharge patient)",
+        "J25 - Patient discharge sent (Screening Centre discharge patient)",
         True,
     )
 
@@ -484,25 +445,30 @@ def test_scenario_4(page: Page) -> None:
     BasePage(page).go_to_log_in_page()
     UserTools.user_login(page, "Hub Manager State Registered at BCS01")
 
+    # And there is a "J25" letter batch for my subject with the exact title "GP Discharge (Discharged By Screening Centre)"
     # And I process the open "J25" letter batch for my subject
     # Then my subject has been updated as follows:
     batch_processing(
         page,
         "J25",
         "GP Discharge (Discharged By Screening Centre)",
-        "P202 Waiting Completion of Outstanding Events",
+        "P202 - Waiting Completion of Outstanding Events",
         False,
     )
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # # TODO: And I select the advance episode option for "Record Diagnosis Date"
-    # # And I select Diagnosis Date Reason "Patient choice"
+    # And I select the advance episode option for "Record Diagnosis Date"
+    AdvanceFOBTScreeningEpisodePage(page).click_record_diagnosis_date_button()
+
+    # # TODO: And I select Diagnosis Date Reason "Patient choice"
+    RecordDiagnosisDatePage(page).record_diagnosis_date_with_reason(
+        date=datetime.now(), reason_text="Patient Choice"
+    )
+
     # # And I save Diagnosis Date Information
-    # CallAndRecallUtils().record_diagnosis_date(
-    #     nhs_no, reason="Patient choice", has_diagnosis_date=False
-    # )
+    RecordDiagnosisDatePage(page).click_save_button()
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -511,29 +477,29 @@ def test_scenario_4(page: Page) -> None:
             "calculated FOBT due date": "2 years from latest J25 event",
             "calculated lynch due date": "Unchanged",
             "calculated surveillance due date": "Unchanged",
-            "ceased confirmation date": None,
-            "ceased confirmation details": None,
-            "ceased confirmation user ID": None,
-            "clinical reason for cease": None,
+            "ceased confirmation date": "Null",
+            "ceased confirmation details": "Null",
+            "ceased confirmation user ID": "Null",
+            "clinical reason for cease": "Null",
             "latest episode accumulated result": "Definitive abnormal FOBT outcome",
             "latest episode diagnosis date reason": "Patient choice",
             "latest episode has diagnosis date": "No",
             "latest episode includes event status": "A52 No diagnosis date recorded",
             "latest episode recall calculation method": "Date of last patient letter",
             "latest episode recall episode type": "FOBT Screening",
-            "latest episode recall surveillance type": None,
+            "latest episode recall surveillance type": "Null",
             "latest episode status": "Closed",
             "latest episode status reason": "Discharged",
             "latest event status": "J26 GP Discharge letter sent (Discharge by Screening centre)",
-            "lynch due date": None,
+            "lynch due date": "Null",
             "lynch due date date of change": "Unchanged",
             "lynch due date reason": "Unchanged",
-            "screening due date": None,
+            "screening due date": "Null",
             "screening due date date of change": "Today",
             "screening due date reason": "Awaiting failsafe",
             "screening status": "Recall",
             "screening status reason": "Recall",
-            "surveillance due date": None,
+            "surveillance due date": "Null",
             "surveillance due date reason": "Unchanged",
             "surveillance due date date of change": "Unchanged",
         },
