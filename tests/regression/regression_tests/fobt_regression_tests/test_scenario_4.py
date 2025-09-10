@@ -226,46 +226,46 @@ def test_scenario_4(page: Page) -> None:
         },
     )
 
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-# # When I view the subject
-# screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # And I reopen the subject's episode for "Reopen episode for correction"
+    SubjectScreeningSummaryPage(page).reopen_fobt_screening_episode()
 
-# # And I reopen the subject's episode for "Reopen episode for correction"
-# CallAndRecallUtils().reopen_episode(nhs_no, reason="Reopen episode for correction")
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "calculated FOBT due date": "As at episode start",
+            "calculated lynch due date": "Null",
+            "calculated surveillance due date": "Null",
+            "ceased confirmation date": "Null",
+            "ceased confirmation details": "Null",
+            "ceased confirmation user ID": "Null",
+            "clinical reason for cease": "Null",
+            "latest episode accumulated result": "Null",
+            "latest episode includes event code": "E63 Reopen episode for correction",
+            "latest episode recall calculation method": "S92 Interrupt Close Date",
+            "latest episode recall episode type": "Null",
+            "latest episode recall surveillance type": "Null",
+            "latest episode status": "Open",
+            "latest episode status reason": "Null",
+            "latest event status": "A8 Abnormal",
+            "lynch due date": "Null",
+            "lynch due date date of change": "Unchanged",
+            "lynch due date reason": "Unchanged",
+            "screening due date": "Calculated FOBT due date",
+            "screening due date date of change": "Today",
+            "screening due date reason": "Reopened episode",
+            "surveillance due date": "Null",
+            "surveillance due date date of change": "Unchanged",
+            "surveillance due date reason": "Unchanged",
+        },
+    )
 
-# # Then my subject has been updated as follows:
-# subject_assertion(
-#     nhs_no,
-#     {
-#         "calculated FOBT due date": "As at episode start",
-#         "calculated lynch due date": None,
-#         "calculated surveillance due date": None,
-#         "ceased confirmation date": None,
-#         "ceased confirmation details": None,
-#         "ceased confirmation user ID": None,
-#         "clinical reason for cease": None,
-#         "latest episode accumulated result": None,
-#         "latest episode includes event code": "E63 Reopen episode for correction",
-#         "latest episode recall calculation method": "S92 Interrupt Close Date",
-#         "latest episode recall episode type": None,
-#         "latest episode recall surveillance type": None,
-#         "latest episode status": "Open",
-#         "latest episode status reason": None,
-#         "latest event status": "A8 Abnormal",
-#         "lynch due date": None,
-#         "lynch due date date of change": "Unchanged",
-#         "lynch due date reason": "Unchanged",
-#         "screening due date": "Calculated FOBT due date",
-#         "screening due date date of change": "Today",
-#         "screening due date reason": "Reopened episode",
-#         "surveillance due date": None,
-#         "surveillance due date date of change": "Unchanged",
-#         "surveillance due date reason": "Unchanged",
-#     },
-# )
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-# # When I view the subject
-# screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
 # # And I choose to book a practitioner clinic for my subject
 # # And I select "BCS001" as the screening centre where the practitioner appointment will be held

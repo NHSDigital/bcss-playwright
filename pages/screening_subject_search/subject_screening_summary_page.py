@@ -86,6 +86,9 @@ class SubjectScreeningSummaryPage(BasePage):
         self.reopen_fobt_screening_episode_button = self.page.get_by_role(
             "button", name="Reopen FOBT Screening Episode"
         )
+        self.reopen_for_correction_button = self.page.get_by_role(
+            "button", name="Reopen episode for correction"
+        )
 
     def wait_for_page_title(self) -> None:
         """Waits for the page to be the Subject Screening Summary"""
@@ -406,6 +409,18 @@ class SubjectScreeningSummaryPage(BasePage):
     def click_reopen_fobt_screening_episode_button(self) -> None:
         """Click on the 'Reopen FOBT Screening Episode' button"""
         self.click(self.reopen_fobt_screening_episode_button)
+
+    def reopen_fobt_screening_episode(self) -> None:
+        """
+        Reopen a previously closed FOBT screening episode, including confirmation modal.
+        - Clicks the 'Reopen FOBT Screening Episode' button
+        - Then safely accepts the dialog triggered by 'Reopen episode for correction'
+        """
+        # Step 1: Click the initial 'Reopen FOBT Screening Episode' button
+        self.click_reopen_fobt_screening_episode_button()
+
+        # Step 2: Safely accept the confirmation dialog triggered by the correction button
+        self.safe_accept_dialog(self.reopen_for_correction_button)
 
 
 class ChangeScreeningStatusOptions(Enum):
