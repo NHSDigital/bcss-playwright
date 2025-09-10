@@ -10,6 +10,11 @@ from classes.screening_status_type import ScreeningStatusType
 from classes.sdd_reason_for_change_type import SDDReasonForChangeType
 from classes.ss_reason_for_change_type import SSReasonForChangeType
 from classes.ssdd_reason_for_change_type import SSDDReasonForChangeType
+from classes.user import User
+from utils.date_time_utils import DateTimeUtils
+from utils.oracle.oracle import OracleDB
+import pandas as pd
+import logging
 
 
 @dataclass
@@ -1241,3 +1246,93 @@ class Subject:
             f"datestamp={self.datestamp}"
             f"]"
         )
+
+    @staticmethod
+    def from_dataframe_row(row: pd.Series) -> "Subject":
+        """
+        Populates a Subject object from a pandas DataFrame row.
+        Handles type conversions for dates and datetimes.
+        Only fields present in the SQL query are populated.
+        """
+
+        field_map = {
+            "screening_subject_id": row.get("screening_subject_id"),
+            "nhs_number": row.get("subject_nhs_number"),
+            "surname": row.get("person_family_name"),
+            "forename": row.get("person_given_name"),
+            "datestamp": DateTimeUtils.parse_datetime(row.get("datestamp")),
+            "screening_status_id": row.get("screening_status_id"),
+            "screening_status_change_reason_id": row.get("ss_reason_for_change_id"),
+            "screening_status_change_date": DateTimeUtils.parse_date(
+                row.get("screening_status_change_date")
+            ),
+            "screening_due_date": DateTimeUtils.parse_date(
+                row.get("screening_due_date")
+            ),
+            "screening_due_date_change_reason_id": row.get("sdd_reason_for_change_id"),
+            "screening_due_date_change_date": DateTimeUtils.parse_date(
+                row.get("sdd_change_date")
+            ),
+            "calculated_screening_due_date": DateTimeUtils.parse_date(
+                row.get("calculated_sdd")
+            ),
+            "surveillance_screening_due_date": DateTimeUtils.parse_date(
+                row.get("surveillance_screen_due_date")
+            ),
+            "calculated_surveillance_due_date": DateTimeUtils.parse_date(
+                row.get("calculated_ssdd")
+            ),
+            "surveillance_due_date_change_reason_id": row.get(
+                "surveillance_sdd_rsn_change_id"
+            ),
+            "surveillance_due_date_change_date": DateTimeUtils.parse_date(
+                row.get("surveillance_sdd_change_date")
+            ),
+            "lynch_due_date": DateTimeUtils.parse_date(
+                row.get("lynch_screening_due_date")
+            ),
+            "lynch_due_date_change_reason_id": row.get(
+                "lynch_sdd_reason_for_change_id"
+            ),
+            "lynch_due_date_change_date": DateTimeUtils.parse_date(
+                row.get("lynch_sdd_change_date")
+            ),
+            "calculated_lynch_due_date": DateTimeUtils.parse_date(
+                row.get("lynch_calculated_sdd")
+            ),
+            "date_of_birth": DateTimeUtils.parse_date(row.get("date_of_birth")),
+            "date_of_death": DateTimeUtils.parse_date(row.get("date_of_death")),
+        }
+
+        return Subject(**field_map)
+
+    def populate_subject_object_from_nhs_no(self, nhs_no: str) -> "Subject":
+        """
+        Populates a Subject object from the NHS number.
+        Args:
+            nhs_no (str): The NHS number to populate the subject from.
+        Returns:
+            Subject: A populated Subject object from the database
+        """
+        from utils.oracle.subject_selection_query_builder import (
+            SubjectSelectionQueryBuilder,
+        )
+
+        nhs_no_criteria = {"nhs number": nhs_no}
+        subject = Subject()
+        user = User()
+        builder = SubjectSelectionQueryBuilder()
+
+        query, bind_vars = builder.build_subject_selection_query(
+            criteria=nhs_no_criteria,
+            user=user,
+            subject=subject,
+            subjects_to_retrieve=1,
+        )
+
+        logging.debug(
+            "[SUBJECT ASSERTIONS] Executing base query to populate subject object"
+        )
+
+        subject_df = OracleDB().execute_query(query, bind_vars)
+        return self.from_dataframe_row(subject_df.iloc[0])

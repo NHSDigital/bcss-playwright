@@ -7,6 +7,7 @@ from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
 from playwright.sync_api import Page, expect
+import logging
 
 
 def verify_subject_event_status_by_nhs_no(
@@ -20,8 +21,14 @@ def verify_subject_event_status_by_nhs_no(
     Args:
         page (Page): This is the playwright page object
         nhs_no (str): The screening subject's nhs number
-        latest_event_status (str | list): the screening subjects's latest event status
+        latest_event_status (str | list): the screening subject's latest event status
     """
+    if isinstance(latest_event_status, list):
+        status_str = f" one of : {', '.join(map(str, latest_event_status))}"
+    else:
+        status_str = f": {str(latest_event_status)}"
+
+    logging.info(f"[UI ASSERTIONS] Asserting subject's event status is{status_str}")
     BasePage(page).click_main_menu_link()
     BasePage(page).go_to_screening_subject_search_page()
     SubjectScreeningPage(page).click_nhs_number_filter()
@@ -49,6 +56,9 @@ def search_subject_by_nhs_number(page: Page, nhs_number: str) -> None:
     SubjectScreeningPage(page).click_clear_filters_button()
     SubjectScreeningPage(page).nhs_number_filter.fill(nhs_number)
     SubjectScreeningPage(page).nhs_number_filter.press("Tab")
+    SubjectScreeningPage(page).select_search_area_option(
+        SearchAreaSearchOptions.SEARCH_AREA_WHOLE_DATABASE.value
+    )
     SubjectScreeningPage(page).click_search_button()
 
 
@@ -230,3 +240,18 @@ def search_subject_episode_by_nhs_number(page: Page, nhs_number: str) -> None:
         SearchAreaSearchOptions.SEARCH_AREA_WHOLE_DATABASE.value
     )
     SubjectScreeningPage(page).click_search_button()
+
+
+def navigate_to_subject_summary_page(page, nhs_no: str) -> None:
+    """
+    Navigates to the subject summary page in the UI using the given NHS number.
+    This method can be used from anywhere in bcss providing the main menu link is displayed.
+
+    Args:
+        page (Page): The Playwright page object.
+        nhs_no (str): The NHS number of the subject to view.
+    """
+    BasePage(page).click_main_menu_link()
+    BasePage(page).go_to_screening_subject_search_page()
+    search_subject_by_nhs_number(page, nhs_no)
+    logging.info(f"[SUBJECT VIEW] Subject {nhs_no} loaded in UI")

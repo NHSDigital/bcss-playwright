@@ -1,13 +1,14 @@
 import re
 from playwright.sync_api import Page, expect, Locator
 from pages.base_page import BasePage
-from enum import StrEnum
+from enum import Enum, StrEnum
 from utils.oracle.oracle_specific_functions import (
     get_investigation_dataset_polyp_category,
     get_investigation_dataset_polyp_algorithm_size,
 )
-from typing import Optional
+from typing import Optional, Any, Union, List
 import logging
+import sys
 
 
 class InvestigationDatasetsPage(BasePage):
@@ -79,6 +80,11 @@ class InvestigationDatasetsPage(BasePage):
         ).get_by_role("button", name="Edit Dataset")
         self.visible_ui_results_string = 'select[id^="UI_RESULTS_"]:visible'
         self.sections = self.page.locator(".DatasetSection")
+
+        # Repeat strings:
+        self.bowel_preparation_administered_string = "Bowel Preparation Administered"
+        self.antibiotics_administered_string = "Antibiotics Administered"
+        self.other_drugs_administered_string = "Other Drugs Administered"
 
     def select_site_lookup_option(self, option: str) -> None:
         """
@@ -244,14 +250,14 @@ class InvestigationDatasetsPage(BasePage):
         This method is designed to check the endoscope inserted yes option.
         It checks the endoscope inserted yes option.
         """
-        self.endoscope_inserted_yes.check()
+        self.click(self.endoscope_inserted_yes)
 
     def check_endoscope_inserted_no(self) -> None:
         """
         This method is designed to check the endoscope inserted no option.
         It checks the endoscope inserted no option.
         """
-        self.endoscope_inserted_no.check()
+        self.click(self.endoscope_inserted_no)
 
     def select_therapeutic_procedure_type(self) -> None:
         """
@@ -540,12 +546,13 @@ class InvestigationDatasetsPage(BasePage):
     def get_dataset_section(self, dataset_section_name: str) -> Locator | None:
         """
         Retrieves a dataset section by matching its header text.
+        Only returns the locator if the section is visible.
         Searches through all elements representing dataset sections, looking for one whose
         first <h4> header text matches the provided section name (case-insensitive).
         Args:
             dataset_section_name (str): The name of the dataset section to locate.
         Returns:
-            Locator | None: A Playwright Locator for the matching section, or None if not found.
+            Locator | None: A Playwright Locator for the matching section if visible, or None if not found or not visible.
         """
         logging.info(f"START: Looking for section '{dataset_section_name}'")
 
@@ -556,14 +563,61 @@ class InvestigationDatasetsPage(BasePage):
             header = section.locator("h4")
             if header.count() > 0:
                 header_text = header.first.inner_text().strip().lower()
-                if header_text == dataset_section_name.strip().lower():
+                if (
+                    header_text == dataset_section_name.strip().lower()
+                    and section.is_visible()
+                ):
                     section_found = section
                     break
 
         logging.info(
-            f"Dataset section '{dataset_section_name}' found: {section_found is not None}"
+            f"Dataset section '{dataset_section_name}' found and visible: {section_found is not None}"
         )
         return section_found
+
+    def is_dataset_section_on_page(
+        self, dataset_section: str | List[str], should_be_present: bool = True
+    ) -> None:
+        """
+        Asserts whether the specified dataset section(s) are present or not on the page.
+        Args:
+            dataset_section (str or List[str]): The name of the dataset section to check for presence,
+                or a list of section names.
+                Examples:
+                    "Investigation Dataset"
+                    ["Investigation Dataset", "Drug Information", "Endoscopy Information"]
+            should_be_present (bool): If True, asserts the section(s) are present.
+                                    If False, asserts the section(s) are not present.
+        Raises:
+            AssertionError: If the actual presence does not match should_be_present.
+        """
+        if isinstance(dataset_section, str):
+            section_found = self.get_dataset_section(dataset_section) is not None
+            if should_be_present:
+                assert (
+                    section_found
+                ), f"Expected section '{dataset_section}' to be present, but it was not found."
+                logging.info(f"Section '{dataset_section}' is present as expected.")
+            else:
+                assert (
+                    not section_found
+                ), f"Expected section '{dataset_section}' to be absent, but it was found."
+                logging.info(f"Section '{dataset_section}' is absent as expected.")
+        elif isinstance(dataset_section, list):
+            for section_name in dataset_section:
+                section_found = self.get_dataset_section(section_name) is not None
+                if should_be_present:
+                    assert (
+                        section_found
+                    ), f"Expected section '{section_name}' to be present, but it was not found."
+                    logging.info(f"Section '{section_name}' is present as expected.")
+                else:
+                    assert (
+                        not section_found
+                    ), f"Expected section '{section_name}' to be absent, but it was found."
+                    logging.info(f"Section '{section_name}' is absent as expected.")
+        else:
+            raise TypeError("dataset_section must be a string or a list of strings.")
 
     def get_dataset_subsection(
         self, dataset_section_name: str, dataset_subsection_name: str
@@ -707,33 +761,49 @@ class InvestigationDatasetsPage(BasePage):
 
     def check_visibility_of_drug_type(
         self, drug_type: str, drug_number: int, visible: bool
-    ) -> bool:
+    ) -> None:
         """
         Checks the visibility of the drug type input cell.
         Args:
             drug_type (str): The drug type to check
             drug_number (int): The number of the drug type cell to check.
             expected_text (str): The expected text content of the cell.
-        Returns:
-            bool: True if the visibility matches the expectation, False otherwise.
+        Raises:
+            AssertionError: If the visibility does not match the expectation.
         """
         locator = self.get_drug_type_locator(drug_type, drug_number)
-        return locator.is_visible() == visible
+        actual_visibility = locator.is_visible()
+        assert actual_visibility == visible, (
+            f"The {ordinal(drug_number)} {drug_type} drug type input cell visibility was {actual_visibility}, "
+            f"expected {visible}"
+        )
+        logging.info(
+            f"The {ordinal(drug_number)} {drug_type} drug type input cell is "
+            f"{'visible' if actual_visibility else 'not visible'} as expected"
+        )
 
     def check_visibility_of_drug_dose(
         self, drug_type: str, drug_number: int, visible: bool
-    ) -> bool:
+    ) -> None:
         """
-        Checks the visibility of the drug dose input cell.
+        Asserts the visibility of the drug dose input cell and logs the result.
         Args:
-            drug_type (str): The drug type to check
+            drug_type (str): The drug type to check.
             drug_number (int): The number of the drug dose cell to check.
             visible (bool): True if the field should be visible, False if it should not.
-        Returns:
-            bool: True if the visibility matches the expectation, False otherwise.
+        Raises:
+            AssertionError: If the visibility does not match the expectation.
         """
         locator = self.get_drug_dose_locator(drug_type, drug_number)
-        return locator.is_visible() == visible
+        actual_visibility = locator.is_visible()
+        assert actual_visibility == visible, (
+            f"The {ordinal(drug_number)} {drug_type} drug dose input cell visibility was {actual_visibility}, "
+            f"expected {visible}"
+        )
+        logging.info(
+            f"The {ordinal(drug_number)} {drug_type} drug dose input cell is "
+            f"{'visible' if actual_visibility else 'not visible'} as expected"
+        )
 
     def assert_drug_type_text(
         self, drug_type: str, drug_number: int, expected_text: str
@@ -750,11 +820,13 @@ class InvestigationDatasetsPage(BasePage):
         locator = self.get_drug_type_locator(drug_type, drug_number)
         actual_text = locator.input_value().strip()
         logging.info(
-            f"Drug type text for drug {drug_number}: '{actual_text}' (expected: '{expected_text}')"
+            f"Drug type text for drug {drug_number}: "
+            f"'{to_enum_name_or_value(actual_text)}' "
+            f"(expected: '{to_enum_name_or_value(expected_text)}')"
         )
         assert (
             actual_text == expected_text
-        ), f"Expected drug type text '{expected_text}' but found '{actual_text}'"
+        ), f"Expected drug type text '{to_enum_name_or_value(expected_text)}' but found '{to_enum_name_or_value(actual_text)}'"
 
     def assert_drug_dose_text(
         self, drug_type: str, drug_number: int, expected_text: str
@@ -784,11 +856,11 @@ class InvestigationDatasetsPage(BasePage):
             drug_type (str): The drug type to check
             drug_number (int): The number of the drug to check
         """
-        if drug_type == "Bowel Preparation Administered":
+        if drug_type == self.bowel_preparation_administered_string:
             locator_prefix = "#UI_BOWEL_PREP_DRUG"
-        elif drug_type == "Antibiotics Administered":
+        elif drug_type == self.antibiotics_administered_string:
             locator_prefix = "#UI_ANTIBIOTIC"
-        elif drug_type == "Other Drugs Administered":
+        elif drug_type == self.other_drugs_administered_string:
             locator_prefix = "#UI_DRUG"
         return self.page.locator(f"{locator_prefix}{drug_number}")
 
@@ -799,11 +871,11 @@ class InvestigationDatasetsPage(BasePage):
             drug_type (str): The drug type to check
             drug_number (int): The number of the drug to check
         """
-        if drug_type.lower() == "bowel preparation administered":
+        if drug_type == self.bowel_preparation_administered_string:
             locator_prefix = "#UI_BOWEL_PREP_DRUG_DOSE"
-        elif drug_type.lower() == "antibiotics administered":
+        elif drug_type == self.antibiotics_administered_string:
             locator_prefix = "#UI_ANTIBIOTIC_DOSE"
-        elif drug_type.lower() == "other drugs administered":
+        elif drug_type == self.other_drugs_administered_string:
             locator_prefix = "#UI_DOSE"
         return self.page.locator(f"{locator_prefix}{drug_number}")
 
@@ -847,7 +919,11 @@ class InvestigationDatasetsPage(BasePage):
         drug_numbers = [
             int(match.group(1))
             for key in drug_information
-            if (match := re.match(r"drug_(?:dose|type)(\d+)", key))
+            if (
+                match := re.match(
+                    r"(?:drug|other_drug|antibiotic_drug)_(?:dose|type)(\d+)", key
+                )
+            )
         ]
 
         if not drug_numbers:
@@ -857,8 +933,16 @@ class InvestigationDatasetsPage(BasePage):
         max_drug_number = max(drug_numbers)
 
         for drug_index in range(1, max_drug_number + 1):
-            drug_type = drug_information.get(f"drug_type{drug_index}")
-            drug_dose = drug_information.get(f"drug_dose{drug_index}")
+            drug_type = (
+                drug_information.get(f"drug_type{drug_index}")
+                or drug_information.get(f"other_drug_type{drug_index}")
+                or drug_information.get(f"antibiotic_drug_type{drug_index}")
+            )
+            drug_dose = (
+                drug_information.get(f"drug_dose{drug_index}")
+                or drug_information.get(f"other_drug_dose{drug_index}")
+                or drug_information.get(f"antibiotic_drug_dose{drug_index}")
+            )
 
             if drug_type is not None:
                 self.assert_drug_type_text(drug_type_label, drug_index, drug_type)
@@ -891,8 +975,40 @@ class InvestigationDatasetsPage(BasePage):
                         | DrugTypeOptions.FLEET_PHOSPHO_SODA
                     ):
                         expected_unit = "Mls Solution"
-                    case DrugTypeOptions.OTHER:
+                    case (
+                        DrugTypeOptions.OTHER
+                        | AntibioticsAdministeredDrugTypeOptions.OTHER_ANTIBIOTIC
+                    ):
                         expected_unit = ""
+                    case (
+                        AntibioticsAdministeredDrugTypeOptions.AMOXYCILLIN
+                        | AntibioticsAdministeredDrugTypeOptions.CEFOTAXIME
+                        | AntibioticsAdministeredDrugTypeOptions.VANCOMYCIN
+                    ):
+                        expected_unit = "g"
+                    case (
+                        AntibioticsAdministeredDrugTypeOptions.CIPROFLAXACIN
+                        | AntibioticsAdministeredDrugTypeOptions.CO_AMOXICLAV
+                        | AntibioticsAdministeredDrugTypeOptions.GENTAMICIN
+                        | AntibioticsAdministeredDrugTypeOptions.METRONIDAZOLE
+                        | AntibioticsAdministeredDrugTypeOptions.TEICOPLANIN
+                        | OtherDrugsAdministeredDrugTypeOptions.BUSCOPAN
+                        | OtherDrugsAdministeredDrugTypeOptions.DIAZEMULS
+                        | OtherDrugsAdministeredDrugTypeOptions.GLUCAGON
+                        | OtherDrugsAdministeredDrugTypeOptions.HYDROCORTISONE
+                        | OtherDrugsAdministeredDrugTypeOptions.MEPTAZINOL
+                        | OtherDrugsAdministeredDrugTypeOptions.MIDAZOLAM
+                        | OtherDrugsAdministeredDrugTypeOptions.PETHIDINE
+                        | OtherDrugsAdministeredDrugTypeOptions.PROPOFOL
+                    ):
+                        expected_unit = "mg"
+                    case (
+                        OtherDrugsAdministeredDrugTypeOptions.ALFENTANYL
+                        | OtherDrugsAdministeredDrugTypeOptions.FENTANYL
+                        | OtherDrugsAdministeredDrugTypeOptions.FLUMAZENIL
+                        | OtherDrugsAdministeredDrugTypeOptions.NALOXONE
+                    ):
+                        expected_unit = "mcg"
                     case _:
                         expected_unit = None
 
@@ -911,11 +1027,11 @@ class InvestigationDatasetsPage(BasePage):
             drug_type (str): The drug type to check
             drug_number (int): The number of the drug to check
         """
-        if drug_type.lower() == "bowel preparation administered":
+        if drug_type == self.bowel_preparation_administered_string:
             locator_prefix = "#spanBowelPrepDrugDosageUnit"
-        elif drug_type.lower() == "antibiotics administered":
+        elif drug_type == self.antibiotics_administered_string:
             locator_prefix = "#spanAntibioticDosageUnit"
-        elif drug_type.lower() == "other drugs administered":
+        elif drug_type == self.other_drugs_administered_string:
             locator_prefix = "#spanDosageUnit"
         return self.page.locator(f"{locator_prefix}{drug_number}")
 
@@ -939,6 +1055,46 @@ class InvestigationDatasetsPage(BasePage):
         assert (
             actual_text == expected_text
         ), f"Expected drug unit dose text '{expected_text}' but found '{actual_text}'"
+
+    def assert_drug_dosage_unit_text(
+        self, drug_type: str, drug_number: int, expected_text: str
+    ) -> None:
+        """
+        Asserts that the drug dosage unit contains the expected text.
+
+        Args:
+            drug_type (str): The drug type to check
+            drug_number (int): The number of the drug dosage unit cell to check.
+            expected_text (str): The expected text content of the cell.
+
+        Raises:
+            AssertionError: If the actual text does not match the expected text.
+        """
+        locator = self.get_drug_dosage_text_locator(drug_type, drug_number)
+        actual_text = locator.inner_text().strip()
+
+        logging.info(
+            f"Drug dosage unit text for drug {drug_number}: "
+            f"'{actual_text}' (expected: '{expected_text}')"
+        )
+
+        assert actual_text == expected_text, (
+            f"Expected drug dosage unit text '{expected_text}' "
+            f"but found '{actual_text}'"
+        )
+
+    def get_drug_dosage_text_locator(self, drug_type: str, drug_number: int) -> Locator:
+        """
+        Returns the drug dosage text locator for the matching drug type and number
+        Args:
+            drug_type (str): The drug type to check
+            drug_number (int): The number of the drug to check
+        """
+        if drug_type == self.bowel_preparation_administered_string:
+            locator_prefix = "#HILITE_spanBowelPrepDrugDosageUnit"
+        elif drug_type == self.antibiotics_administered_string:
+            locator_prefix = "#HILITE_spanAntibioticDosageUnit"
+        return self.page.locator(f"{locator_prefix}{drug_number}")
 
 
 def normalize_label(text: str) -> str:
@@ -1276,3 +1432,114 @@ class PolypReasonLeftInSituOptions(StrEnum):
     REQUIRES_SURGICAL_RESECTION = "200558"
     CANNOT_FIND_POLYP_ON_WITHDRAWAL = "200559"
     CLINICAL_DECISION_NOT_TO_EXCISE = "203082"
+
+
+class AntibioticsAdministeredDrugTypeOptions(StrEnum):
+    """Enum for antobiotics administered drug type options"""
+
+    AMOXYCILLIN = "17941~g"
+    CEFOTAXIME = "17950~g"
+    CIPROFLAXACIN = "17945~mg"
+    CO_AMOXICLAV = "17951~mg"
+    GENTAMICIN = "17942~mg"
+    METRONIDAZOLE = "17949~mg"
+    TEICOPLANIN = "17944~mg"
+    VANCOMYCIN = "17943~g"
+    OTHER_ANTIBIOTIC = "305493"
+
+
+class OtherDrugsAdministeredDrugTypeOptions(StrEnum):
+    """Enum for other drugs administered drug type options"""
+
+    ALFENTANYL = "200252~mcg"
+    BUSCOPAN = "17133~mg"
+    DIAZEMULS = "17959~mg"
+    FENTANYL = "17958~mcg"
+    FLUMAZENIL = "17134~mcg"
+    GLUCAGON = "17940~mg"
+    HYDROCORTISONE = "17527~mg"
+    MEPTAZINOL = "200251~mg"
+    MIDAZOLAM = "17135~mg"
+    NALOXONE = "17136~mcg~204333"
+    PETHIDINE = "17137~mg"
+    PROPOFOL = "17960~mg"
+
+
+class EndoscopeNotInsertedOptions(StrEnum):
+    """Enum for why endoscope not inserted options"""
+
+    CLINICAL_REASON_ON_PR = "200541~Abnormalities allowed"
+    CONSENT_REFUSED = "200542"
+    EQUIPMENT_FAILURE = "200544"
+    NO_BOWEL_PREPERATION = "200543"
+    PATIENT_UNSUITABLE = "200545"
+    SERVICE_INTERRUPTION = "203000"
+    SOLID_STOLL_ON_PR = "200546"
+    UNSCHEDULED_ATTENDANCE_TIME = "203001"
+
+
+class SedationOptions(StrEnum):
+    """Enum for sedation options"""
+
+    UNSEDATED = "18504~Read-only"
+    AWAKE = "17324"
+    DROWSY = "17325"
+    ASLEEP_BUT_RESPONDING_TO_NAME = "17326"
+    ASLEEP_BUT_RESPONDING_TO_TOUCH = "17327"
+    ASLEEP_AND_UNRESPONSIVE = "17328"
+
+
+# Registry of all known Enums to search when matching string values
+ALL_ENUMS: List[type[Enum]] = [
+    obj
+    for obj in globals().values()
+    if (
+        isinstance(obj, type)
+        and issubclass(obj, Enum)
+        and obj is not Enum
+        and obj is not StrEnum  # Exclude only the base classes, not subclasses
+    )
+]
+
+
+def to_enum_name_or_value(val: Any) -> Union[str, Any]:
+    """
+    Convert an Enum member or matching string value to its Enum name.
+
+    If the input is:
+    - An Enum member → returns the `.name` (e.g., "KLEAN_PREP")
+    - A string matching any Enum value in ALL_ENUMS → returns that member's `.name`
+    - Anything else → returns the value unchanged
+
+    Args:
+        val (Any): The value to convert. Can be an Enum member, a string,
+                or any other type.
+
+    Returns:
+        Union[str, Any]: The Enum name (string) if matched, otherwise the original value.
+    """
+    # Directly handle Enum instances
+    if isinstance(val, Enum):
+        return val.name
+
+    # Handle strings that match known Enum values
+    if isinstance(val, str):
+        for enum_cls in ALL_ENUMS:
+            try:
+                return enum_cls(val).name
+            except ValueError:
+                continue
+
+    # Fallback: return unchanged
+    return val
+
+
+def ordinal(n: int) -> str:
+    """
+    Converts an integer to its ordinal representation (e.g., 1 -> '1st', 2 -> '2nd').
+    """
+    if 10 <= n % 100 <= 20:
+        suffix = "th"
+    else:
+        suffix = {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+    return f"{n}{suffix}"
