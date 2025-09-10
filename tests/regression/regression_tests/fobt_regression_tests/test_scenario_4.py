@@ -16,6 +16,9 @@ from pages.screening_subject_search.subject_screening_summary_page import (
 )
 from pages.communication_production.batch_list_page import BatchListPage
 from pages.logout.log_out_page import LogoutPage
+from pages.screening_subject_search.close_fobt_screening_episode_page import (
+    CloseFobtScreeningEpisodePage,
+)
 
 
 @pytest.mark.wip
@@ -131,14 +134,6 @@ def test_scenario_4(page: Page) -> None:
     )
 
     # Then there is a "S1" letter batch for my subject with the exact title "Pre-invitation (FIT)"
-    batch_processing(
-        page,
-        "S1",
-        "Pre-invitation (FIT)",
-        "S9 - Pre-invitation Sent",
-        True,
-    )
-
     # When I process the open "S1" letter batch for my subject
     # Then my subject has been updated as follows:
     batch_processing(
@@ -146,7 +141,7 @@ def test_scenario_4(page: Page) -> None:
         "S1",
         "Pre-invitation (FIT)",
         "S9 - Pre-invitation Sent",
-        False,
+        True,
     )
 
     # When I view the subject
@@ -157,14 +152,6 @@ def test_scenario_4(page: Page) -> None:
 
     # When I run Timed Events for my subject
     # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
-    batch_processing(
-        page,
-        "S9",
-        "Invitation & Test Kit (FIT)",
-        "S10 - Invitation & Test Kit Sent",
-        True,
-    )
-
     # When I process the open "S9" letter batch for my subject
     # # Then my subject has been updated as follows:
     batch_processing(
@@ -172,7 +159,7 @@ def test_scenario_4(page: Page) -> None:
         "S9",
         "Invitation & Test Kit (FIT)",
         "S10 - Invitation & Test Kit Sent",
-        False,
+        True,
     )
 
     # When I log my subject's latest unlogged FIT kit
@@ -202,42 +189,43 @@ def test_scenario_4(page: Page) -> None:
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
+    # And I close the subject's episode for "Opt out of current episode"
+    CloseFobtScreeningEpisodePage(page).close_fobt_screening_episode(
+        "Opt out of current episode"
+    )
 
-# # And I close the subject's episode for "Opt out of current episode"
-# CallAndRecallUtils().close_episode(nhs_no, reason="Opt out of current episode")
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "calculated FOBT due date": "2 years from episode end",
+            "calculated lynch due date": "Null",
+            "calculated surveillance due date": "Null",
+            "ceased confirmation date": "Null",
+            "ceased confirmation details": "Null",
+            "ceased confirmation user ID": "Null",
+            "clinical reason for cease": "Null",
+            "latest episode accumulated result": "Definitive abnormal FOBT outcome",
+            "latest episode recall calculation method": "S92 Interrupt Close Date",
+            "latest episode recall episode type": "FOBT Screening",
+            "latest episode recall surveillance type": "Null",
+            "latest episode status": "Closed",
+            "latest episode status reason": "Opt out of current episode",
+            "latest event status": "S92 Close Screening Episode via Interrupt",
+            "lynch due date": "Null",
+            "lynch due date date of change": "Unchanged",
+            "lynch due date reason": "Unchanged",
+            "screening due date": "Null",
+            "screening due date date of change": "Today",
+            "screening due date reason": "Awaiting failsafe",
+            "screening status": "Recall",
+            "screening status reason": "Recall",
+            "surveillance due date": "Null",
+            "surveillance due date date of change": "Unchanged",
+            "surveillance due date reason": "Unchanged",
+        },
+    )
 
-
-# # Then my subject has been updated as follows:
-# subject_assertion(
-#     nhs_no,
-#     {
-#         "calculated FOBT due date": "2 years from episode end",
-#         "calculated lynch due date": None,
-#         "calculated surveillance due date": None,
-#         "ceased confirmation date": None,
-#         "ceased confirmation details": None,
-#         "ceased confirmation user ID": None,
-#         "clinical reason for cease": None,
-#         "latest episode accumulated result": "Definitive abnormal FOBT outcome",
-#         "latest episode recall calculation method": "S92 Interrupt Close Date",
-#         "latest episode recall episode type": "FOBT Screening",
-#         "latest episode recall surveillance type": None,
-#         "latest episode status": "Closed",
-#         "latest episode status reason": "Opt out of current episode",
-#         "latest event status": "S92 Close Screening Episode via Interrupt",
-#         "lynch due date": None,
-#         "lynch due date date of change": "Unchanged",
-#         "lynch due date reason": "Unchanged",
-#         "screening due date": None,
-#         "screening due date date of change": "Today",
-#         "screening due date reason": "Awaiting failsafe",
-#         "screening status": "Recall",
-#         "screening status reason": "Recall",
-#         "surveillance due date": None,
-#         "surveillance due date date of change": "Unchanged",
-#         "surveillance due date reason": "Unchanged",
-#     },
-# )
 
 # # When I view the subject
 # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
