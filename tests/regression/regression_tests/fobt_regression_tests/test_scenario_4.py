@@ -79,9 +79,6 @@ def test_scenario_4(page: Page) -> None:
     if nhs_no is None:
         pytest.fail("Failed to create subject: NHS number not returned.")
 
-    # And I pause for 5 seconds to let the process complete
-    page.wait_for_timeout(5000)
-
     # Then Comment: NHS number
     logging.info(f"[SUBJECT CREATED] NHS number: {nhs_no}")
 
@@ -94,7 +91,7 @@ def test_scenario_4(page: Page) -> None:
             "screening status": "Inactive",
         },
     )
-
+    # Assert subject details in the UI
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     summary_page.assert_subject_age(62)
     summary_page.assert_screening_status("Inactive")
@@ -116,14 +113,12 @@ def test_scenario_4(page: Page) -> None:
         },
     )
 
+    # Assert subject details in the UI
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     summary_page.assert_screening_status("Call")
 
     # When I invite my subject for FOBT screening
     CallAndRecallUtils().invite_subject_for_fobt_screening(nhs_no, user_role)
-
-    # And I pause for 5 seconds to let the process complete
-    page.wait_for_timeout(5000)
 
     # Then my subject has been updated as follows:
     subject_assertion(

@@ -365,6 +365,7 @@ class SubjectScreeningSummaryPage(BasePage):
         assert (
             actual_age == expected_age
         ), f"[AGE MISMATCH] Expected age {expected_age}, but found {actual_age} in UI."
+        logging.info("[UI ASSERTIONS COMPLETE] Subject age checked in the UI")
 
     def assert_screening_status(self, expected_status: str) -> None:
         """
@@ -380,6 +381,7 @@ class SubjectScreeningSummaryPage(BasePage):
         assert (
             actual_status.lower() == expected_status.lower()
         ), f"[SCREENING STATUS MISMATCH] Expected '{expected_status}', but found '{actual_status}' in UI."
+        logging.info("[UI ASSERTIONS COMPLETE] Subject screening status checked in the UI")
 
     def assert_latest_event_status(self, expected_status: str) -> None:
         """
@@ -395,6 +397,7 @@ class SubjectScreeningSummaryPage(BasePage):
         assert (
             actual_status == expected_status
         ), f"[LATEST EVENT STATUS MISMATCH] Expected '{expected_status}', but found '{actual_status}' in UI."
+        logging.info("[UI ASSERTIONS COMPLETE] Subject latest event status checked in the UI")
 
     def click_reopen_fobt_screening_episode_button(self) -> None:
         """Click on the 'Reopen FOBT Screening Episode' button"""
