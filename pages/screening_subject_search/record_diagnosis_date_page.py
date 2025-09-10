@@ -41,7 +41,7 @@ class RecordDiagnosisDatePage(BasePage):
             return self.alert_message.inner_text()
         else:
             return ""
-        
+
     def record_diagnosis_date_with_reason(self, date: datetime, reason_text: str) -> None:
         """
         Records a diagnosis date and selects a reason before saving.
