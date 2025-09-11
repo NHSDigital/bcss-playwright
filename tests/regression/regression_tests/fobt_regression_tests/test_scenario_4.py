@@ -351,8 +351,6 @@ def test_scenario_4(page: Page) -> None:
         },
     )
 
-
-def test_process_j4_letter_batch(page: Page, nhs_no: str) -> None:
     # When I process the open "J4" letter batch for my subject
     # # Then my subject has been updated as follows:
     batch_processing(
