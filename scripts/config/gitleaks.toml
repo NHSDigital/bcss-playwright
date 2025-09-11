@@ -17,14 +17,3 @@ regexes = [
 
 [allowlist]
 paths = ['''poetry.lock''', '''yarn.lock''']
-
-[[rules]]
-description = "Ignore SUBJECT_75TH_BIRTHDAY key"
-id = "ignore_subject_75th_birthday"
-regex = '''"key":\s*"SUBJECT_75TH_BIRTHDAY"'''
-
-[rules.allowlist]
-regexTarget = "match"
-regexes = [
-  '''"key":\s*"SUBJECT_75TH_BIRTHDAY"'''
-]
