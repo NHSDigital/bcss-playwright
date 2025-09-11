@@ -75,13 +75,15 @@ def show_dependency_warnings(dependencies: Optional[list]) -> None:
         for dep in dependencies:
             if dep == "User":
                 st.warning(
-                    """This key may require a populated User object to work in playwright.  
-                    If using only the UI, please select a user from the dropdown below."""
+                    """This key may require a populated User object to work in playwright.
+
+If using only the UI, please select a user from the dropdown below."""
                 )
             elif dep == "Subject":
                 st.warning(
-                    """This key may require a populated Subject object to work in playwright.  
-                    If using only the UI, please enter an NHS number in the section below."""
+                    """This key may require a populated Subject object to work in playwright.
+
+If using only the UI, please enter an NHS number in the section below."""
                 )
 
 

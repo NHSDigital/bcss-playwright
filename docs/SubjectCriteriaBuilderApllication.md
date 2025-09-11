@@ -34,7 +34,7 @@ This application is a Streamlit-based tool for interactively building subject se
 
 ### Pre-requisites
 
-Before running the application, you must create a `local.env` file containing your Oracle database credentials.  
+Before running the application, you must create a `local.env` file containing your Oracle database credentials.<br>
 You can generate a template for this file by running:
 
 ```bash
@@ -83,14 +83,14 @@ These credentials are required for the application to connect to the Oracle data
 
 ### User and Subject Dependencies
 
-Some criteria require additional context, such as a User or Subject object.  
+Some criteria require additional context, such as a User or Subject object.<br>
 If you select a criterion that has a dependency on "User" or "Subject" (as defined in `criteria.json`):
 
-- **User Dependency:**  
+- **User Dependency:**
   - A section will appear allowing you to select a user from the list defined in `users.json`.
   - Once selected, the user's name and username are displayed, and a populated user object is created for use in the SQL query.
 
-- **Subject Dependency:**  
+- **Subject Dependency:**
   - A section will appear allowing you to enter a subject's NHS number.
   - Once entered, the application will attempt to populate a subject object using this NHS number for use in the SQL query.
 
@@ -145,16 +145,16 @@ Or, with allowed values and dependencies:
 }
 ```
 
-- **key:** The unique identifier for the criterion (must match the code).
-- **value_source:** (Optional) The source of the value, can be left blank. This refers to the class + method used in the subject selection query builder. This is not used by the code but is there to allow easier tracking/mapping.
-- **notes:** A clear, user-focused description of what the key is and what the user should input.
-- **allowed_values:** (Optional) An array of allowed values for the dropdown selection.
-- **dependencies:** (Optional) An array that can include `"User"` and/or `"Subject"`. If present, the app will prompt for a user selection or subject NHS number as needed.
+- **`key`:** The unique identifier for the criterion (must match the code).
+- **`value_source`:** (Optional) The source of the value, can be left blank. This refers to the class + method used in the subject selection query builder. This is not used by the code but is there to allow easier tracking/mapping.
+- **`notes`:** A clear, user-focused description of what the key is and what the user should input.
+- **`allowed_values`:** (Optional) An array of allowed values for the dropdown selection.
+- **`dependencies`:** (Optional) An array that can include `"User"` and/or `"Subject"`. If present, the app will prompt for a user selection or subject NHS number as needed.
 
 #### To add a new criterion
 
 1. Add a new object to the JSON array with the following fields:
-   - `"key"`: The Enum member name (must match the code).
+   - `"key"`: The `Enum` member name (must match the code).
    - `"value_source"`: (Optional) The value source, can be left blank.
    - `"notes"`: A clear, user-focused description of what the key is and what the user should input.
    - `"allowed_values"`: (Optional) An array of allowed values for the dropdown selection.
@@ -175,19 +175,19 @@ Or, with allowed values and dependencies:
 #### About the `dependencies` field
 
 - If a criterion requires a User or Subject context, add a `"dependencies"` array to its entry, e.g.:
-  
+
   ```json
   "dependencies": ["User"]
   ```
 
   or
-  
+
   ```json
   "dependencies": ["Subject"]
   ```
 
   or both:
-  
+
   ```json
   "dependencies": ["User", "Subject"]
   ```
@@ -198,7 +198,7 @@ Or, with allowed values and dependencies:
 
 ### Adding New Criteria Keys
 
-If you add new keys to the `SubjectSelectionCriteriaKey` Enum in your code, you should also add a corresponding entry in `criteria.json` with a description (`notes`), and (optionally) allowed values and dependencies.
+If you add new keys to the `SubjectSelectionCriteriaKey` `Enum` in your code, you should also add a corresponding entry in `criteria.json` with a description (`notes`), and (optionally) allowed values and dependencies.
 
 ---
 
@@ -212,22 +212,22 @@ If you add new keys to the `SubjectSelectionCriteriaKey` Enum in your code, you 
 
 ### Troubleshooting
 
-- **A key does not appear in the UI:**  
-  Ensure it exists in both the `SubjectSelectionCriteriaKey` Enum and in `criteria.json`.
+- **A key does not appear in the UI:**
+  Ensure it exists in both the `SubjectSelectionCriteriaKey` `Enum` and in `criteria.json`.
 
-- **Dropdown is missing for a key:**  
+- **Dropdown is missing for a key:**
   Add or update the `"allowed_values"` array for that key in `criteria.json`.
 
-- **Descriptions are unclear or missing:**  
+- **Descriptions are unclear or missing:**
   Update the `"notes"` field for the relevant key in `criteria.json`.
 
-- **App does not reload changes:**  
-  Save your changes and refresh the Streamlit app in your browser.
+- **App does not reload changes:**
+  Save your changes and refresh the `Streamlit` app in your browser.
 
-- **Copy to clipboard does not work:**  
+- **Copy to clipboard does not work:**
   Some browsers may not support auto-copy. Manually select and copy the JSON from the code block.
 
-- **Oracle DB errors:**  
+- **Oracle DB errors:**
   Ensure your `local.env` file is present and contains valid values for `ORACLE_USERNAME`, `ORACLE_DB`, and `ORACLE_PASS`.
 
 ---
@@ -259,5 +259,5 @@ If you add new keys to the `SubjectSelectionCriteriaKey` Enum in your code, you 
 - **All configuration is driven by `criteria.json`.**
 - **Descriptions, allowed values, and dependencies are fully customizable.**
 - **No code changes are needed for most updates—just edit the JSON file.**
-- **For new Enum keys, add them to both the `SubjectSelectionCriteriaKey` Enum and the JSON.**
+- **For new `Enum` keys, add them to both the `SubjectSelectionCriteriaKey` `Enum` and the JSON.**
 - **For criteria that require user or subject context, use the `dependencies` field.**
