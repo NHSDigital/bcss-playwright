@@ -11,7 +11,7 @@ from utils.user_tools import UserTools
 import sqlparse
 from typing import Optional
 
-# Load environment variables from local.env. Needed for DB connectios
+# Load environment variables from local.env. Needed for DB connections
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "local.env"))
 
 CRITERIA_JSON_PATH = os.path.join(
@@ -51,7 +51,7 @@ def get_metadata_for_key(enum_key: str) -> dict:
         dict: The metadata for the specified criteria key, or an empty dictionary if not found.
     """
     for entry in CRITERIA_METADATA:
-        if entry["key_name"] == enum_key:
+        if entry["key"] == enum_key:
             return entry
     return {}
 
@@ -169,7 +169,7 @@ def get_filtered_keys(search_term: str) -> list:
     """
     Get a list of keys that match the search term.
     Args:
-        search_term (str): What the user is seraching
+        search_term (str): What the user is searching
     Returns:
         list: A list of all criteria matching the user's search
     """
