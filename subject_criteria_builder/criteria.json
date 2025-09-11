@@ -1,21 +1,21 @@
 [
   {
-    "key": "NHS_NUMBER",
+    "key_name": "NHS_NUMBER",
     "value_source": "",
     "notes": "Enter the 10-digit NHS Number of the subject you want to search for."
   },
   {
-    "key": "SUBJECT_AGE",
+    "key_name": "SUBJECT_AGE",
     "value_source": "",
     "notes": "Enter the subject's age in years (e.g., 65)."
   },
   {
-    "key": "SUBJECT_AGE_YD",
+    "key_name": "SUBJECT_AGE_YD",
     "value_source": "",
     "notes": "Enter the subject's age in years and days, separated by a slash (e.g., 65/25 for 65 years and 25 days)."
   },
   {
-    "key": "SUBJECT_HUB_CODE",
+    "key_name": "SUBJECT_HUB_CODE",
     "value_source": "SubjectHubCode.by_description",
     "notes": "Select the hub or organisation for the subject.",
     "allowed_values": [
@@ -27,7 +27,7 @@
     ]
   },
   {
-    "key": "DEMOGRAPHICS_TEMPORARY_ADDRESS",
+    "key_name": "DEMOGRAPHICS_TEMPORARY_ADDRESS",
     "value_source": "YesNoType.by_description_case_insensitive",
     "notes": "Specify if the subject should have a temporary address.",
     "allowed_values": [
@@ -37,7 +37,7 @@
     ]
   },
   {
-    "key": "RESPONSIBLE_SCREENING_CENTRE_CODE",
+    "key_name": "RESPONSIBLE_SCREENING_CENTRE_CODE",
     "value_source": "SubjectScreeningCentreCode.by_description",
     "notes": "Select the screening centre code to use.",
     "allowed_values": [
@@ -53,7 +53,7 @@
     ]
   },
   {
-    "key": "HAS_GP_PRACTICE",
+    "key_name": "HAS_GP_PRACTICE",
     "value_source": "HasGPPractice.by_description",
     "notes": "Specify if the subject has a GP practice.",
     "allowed_values": [
@@ -63,12 +63,12 @@
     ]
   },
   {
-    "key": "HAS_GP_PRACTICE_ASSOCIATED_WITH_SCREENING_CENTRE_CODE",
+    "key_name": "HAS_GP_PRACTICE_ASSOCIATED_WITH_SCREENING_CENTRE_CODE",
     "value_source": "",
     "notes": "Enter the screening centre code to check if the subject's GP practice is associated with it."
   },
   {
-    "key": "SCREENING_STATUS",
+    "key_name": "SCREENING_STATUS",
     "value_source": "ScreeningStatusType.by_description_case_insensitive",
     "notes": "Select the current screening status for the subject.",
     "allowed_values": [
@@ -92,7 +92,7 @@
     ]
   },
   {
-    "key": "PREVIOUS_SCREENING_STATUS",
+    "key_name": "PREVIOUS_SCREENING_STATUS",
     "value_source": "ScreeningStatusType.by_description_case_insensitive",
     "notes": "Select the previous screening status for the subject.",
     "allowed_values": [
@@ -112,7 +112,7 @@
     ]
   },
   {
-    "key": "SCREENING_STATUS_REASON",
+    "key_name": "SCREENING_STATUS_REASON",
     "value_source": "SSReasonForChangeType.by_description_case_insensitive",
     "notes": "Select the reason for the current screening status.",
     "allowed_values": [
@@ -188,7 +188,7 @@
     ]
   },
   {
-    "key": "SCREENING_STATUS_DATE_OF_CHANGE",
+    "key_name": "SCREENING_STATUS_DATE_OF_CHANGE",
     "value_source": "",
     "notes": "Enter the date when the screening status was last changed in DD/MM/YYYY or YYYY-MM-DD format.",
     "allowed_values": [
@@ -251,7 +251,7 @@
     ]
   },
   {
-    "key": "PREVIOUS_LYNCH_DUE_DATE",
+    "key_name": "PREVIOUS_LYNCH_DUE_DATE",
     "value_source": "",
     "notes": "Enter the previous Lynch due date for the subject, or use a special value.",
     "dependencies": [
@@ -259,7 +259,7 @@
     ]
   },
   {
-    "key": "PREVIOUS_SCREENING_DUE_DATE",
+    "key_name": "PREVIOUS_SCREENING_DUE_DATE",
     "value_source": "",
     "notes": "Enter the previous screening due date for the subject in DD/MM/YYYY or YYYY-MM-DD format.",
     "allowed_values": [
@@ -320,7 +320,7 @@
     ]
   },
   {
-    "key": "PREVIOUS_SCREENING_DUE_DATE_BIRTHDAY",
+    "key_name": "PREVIOUS_SCREENING_DUE_DATE_BIRTHDAY",
     "value_source": "",
     "notes": "Enter the previous screening due date that falls on the subject's birthday in DD/MM/YYYY or YYYY-MM-DD format.",
     "allowed_values": [
@@ -381,7 +381,7 @@
     ]
   },
   {
-    "key": "PREVIOUS_SURVEILLANCE_DUE_DATE",
+    "key_name": "PREVIOUS_SURVEILLANCE_DUE_DATE",
     "value_source": "",
     "notes": "Enter the previous surveillance due date for the subject, or use a special value.",
     "dependencies": [
@@ -389,7 +389,7 @@
     ]
   },
   {
-    "key": "SCREENING_DUE_DATE",
+    "key_name": "SCREENING_DUE_DATE",
     "value_source": "",
     "notes": "Enter the current screening due date for the subject in DD/MM/YYYY or YYYY-MM-DD format.",
     "allowed_values": [
@@ -452,7 +452,7 @@
     ]
   },
   {
-    "key": "SCREENING_DUE_DATE_BIRTHDAY",
+    "key_name": "SCREENING_DUE_DATE_BIRTHDAY",
     "value_source": "",
     "notes": "Enter the screening due date that falls on the subject's birthday in DD/MM/YYYY or YYYY-MM-DD format.",
     "allowed_values": [
@@ -515,7 +515,7 @@
     ]
   },
   {
-    "key": "CALCULATED_SCREENING_DUE_DATE",
+    "key_name": "CALCULATED_SCREENING_DUE_DATE",
     "value_source": "",
     "notes": "Enter the calculated screening due date for the subject, or use a special value.",
     "dependencies": [
@@ -523,7 +523,7 @@
     ]
   },
   {
-    "key": "CALCULATED_SCREENING_DUE_DATE_BIRTHDAY",
+    "key_name": "CALCULATED_SCREENING_DUE_DATE_BIRTHDAY",
     "value_source": "",
     "notes": "Enter the calculated screening due date that falls on the subject's birthday, or use a special value.",
     "dependencies": [
@@ -531,7 +531,7 @@
     ]
   },
   {
-    "key": "CALCULATED_FOBT_DUE_DATE",
+    "key_name": "CALCULATED_FOBT_DUE_DATE",
     "value_source": "",
     "notes": "Enter the calculated FOBT due date for the subject in DD/MM/YYYY or YYYY-MM-DD format.",
     "allowed_values": [
@@ -594,7 +594,7 @@
     ]
   },
   {
-    "key": "SCREENING_DUE_DATE_REASON",
+    "key_name": "SCREENING_DUE_DATE_REASON",
     "value_source": "SDDReasonForChangeType.by_description_case_insensitive",
     "notes": "Select the reason for the current screening due date.",
     "allowed_values": [
@@ -644,7 +644,7 @@
     ]
   },
   {
-    "key": "SCREENING_DUE_DATE_DATE_OF_CHANGE",
+    "key_name": "SCREENING_DUE_DATE_DATE_OF_CHANGE",
     "value_source": "",
     "notes": "Enter the date when the screening due date was last changed in DD/MM/YYYY or YYYY-MM-DD format.",
     "allowed_values": [
@@ -707,7 +707,7 @@
     ]
   },
   {
-    "key": "SURVEILLANCE_DUE_DATE",
+    "key_name": "SURVEILLANCE_DUE_DATE",
     "value_source": "",
     "notes": "Enter the current surveillance due date for the subject in DD/MM/YYYY or YYYY-MM-DD format.",
     "allowed_values": [
@@ -770,7 +770,7 @@
     ]
   },
   {
-    "key": "CALCULATED_SURVEILLANCE_DUE_DATE",
+    "key_name": "CALCULATED_SURVEILLANCE_DUE_DATE",
     "value_source": "",
     "notes": "Enter the calculated surveillance due date for the subject in DD/MM/YYYY or YYYY-MM-DD format.",
     "allowed_values": [
@@ -833,7 +833,7 @@
     ]
   },
   {
-    "key": "SURVEILLANCE_DUE_DATE_REASON",
+    "key_name": "SURVEILLANCE_DUE_DATE_REASON",
     "value_source": "SSDDReasonForChangeType.by_description_case_insensitive",
     "notes": "Select the reason for the current surveillance due date.",
     "allowed_values": [
@@ -874,7 +874,7 @@
     ]
   },
   {
-    "key": "SURVEILLANCE_DUE_DATE_DATE_OF_CHANGE",
+    "key_name": "SURVEILLANCE_DUE_DATE_DATE_OF_CHANGE",
     "value_source": "",
     "notes": "Enter the date when the surveillance due date was last changed in DD/MM/YYYY or YYYY-MM-DD format.",
     "allowed_values": [
@@ -937,7 +937,7 @@
     ]
   },
   {
-    "key": "BOWEL_SCOPE_DUE_DATE_REASON",
+    "key_name": "BOWEL_SCOPE_DUE_DATE_REASON",
     "value_source": "BowelScopeDDReasonForChangeType.by_description",
     "notes": "Select the reason for the bowel scope due date.",
     "allowed_values": [
@@ -952,7 +952,7 @@
     ]
   },
   {
-    "key": "MANUAL_CEASE_REQUESTED",
+    "key_name": "MANUAL_CEASE_REQUESTED",
     "value_source": "ManualCeaseRequested.by_description_case_insensitive",
     "notes": "Specify if a manual cease has been requested for the subject.",
     "allowed_values": [
@@ -963,7 +963,7 @@
     ]
   },
   {
-    "key": "CEASED_CONFIRMATION_DATE",
+    "key_name": "CEASED_CONFIRMATION_DATE",
     "value_source": "",
     "notes": "Enter the date when the subject's cease was confirmed in DD/MM/YYYY or YYYY-MM-DD format.",
     "allowed_values": [
@@ -1026,7 +1026,7 @@
     ]
   },
   {
-    "key": "CEASED_CONFIRMATION_DETAILS",
+    "key_name": "CEASED_CONFIRMATION_DETAILS",
     "value_source": "CeasedConfirmationDetails.by_description",
     "notes": "Enter details or select a reason for the subject's cease confirmation.",
     "allowed_values": [
@@ -1035,7 +1035,7 @@
     ]
   },
   {
-    "key": "CEASED_CONFIRMATION_USER_ID",
+    "key_name": "CEASED_CONFIRMATION_USER_ID",
     "value_source": "CeasedConfirmationUserId.by_description",
     "notes": "Select or enter the user ID that confirmed the cease. Can be an Enum value, 'User's ID', or a numeric value.",
     "allowed_values": [
@@ -1046,7 +1046,7 @@
     ]
   },
   {
-    "key": "CLINICAL_REASON_FOR_CEASE",
+    "key_name": "CLINICAL_REASON_FOR_CEASE",
     "value_source": "ClinicalCeaseReasonType.by_description_case_insensitive",
     "notes": "Select the clinical reason for ceasing the subject.",
     "allowed_values": [
@@ -1064,7 +1064,7 @@
     ]
   },
   {
-    "key": "SUBJECT_HAS_EVENT_STATUS",
+    "key_name": "SUBJECT_HAS_EVENT_STATUS",
     "value_source": "EventStatusType.get_by_code",
     "notes": "Select the event status that the subject must have.",
     "allowed_values": [
@@ -1534,7 +1534,7 @@
     ]
   },
   {
-    "key": "SUBJECT_DOES_NOT_HAVE_EVENT_STATUS",
+    "key_name": "SUBJECT_DOES_NOT_HAVE_EVENT_STATUS",
     "value_source": "EventStatusType.get_by_code",
     "notes": "Select the event status that the subject must not have.",
     "allowed_values": [
@@ -2004,7 +2004,7 @@
     ]
   },
   {
-    "key": "SUBJECT_HAS_UNPROCESSED_SSPI_UPDATES",
+    "key_name": "SUBJECT_HAS_UNPROCESSED_SSPI_UPDATES",
     "value_source": "HasUnprocessedSSPIUpdates.by_description",
     "notes": "Specify if the subject has unprocessed SSPI updates.",
     "allowed_values": [
@@ -2013,7 +2013,7 @@
     ]
   },
   {
-    "key": "SUBJECT_HAS_USER_DOB_UPDATES",
+    "key_name": "SUBJECT_HAS_USER_DOB_UPDATES",
     "value_source": "HasUserDobUpdate.by_description",
     "notes": "Specify if the subject has user date of birth updates.",
     "allowed_values": [
@@ -2022,7 +2022,7 @@
     ]
   },
   {
-    "key": "SUBJECT_HAS_EPISODES",
+    "key_name": "SUBJECT_HAS_EPISODES",
     "value_source": "SubjectHasEpisode.by_description",
     "notes": "Specify if the subject has any episodes.",
     "allowed_values": [
@@ -2031,7 +2031,7 @@
     ]
   },
   {
-    "key": "SUBJECT_HAS_AN_OPEN_EPISODE",
+    "key_name": "SUBJECT_HAS_AN_OPEN_EPISODE",
     "value_source": "SubjectHasEpisode.by_description",
     "notes": "Specify if the subject has an open episode.",
     "allowed_values": [
@@ -2040,7 +2040,7 @@
     ]
   },
   {
-    "key": "SUBJECT_HAS_FOBT_EPISODES",
+    "key_name": "SUBJECT_HAS_FOBT_EPISODES",
     "value_source": "SubjectHasEpisode.by_description",
     "notes": "Specify if the subject has FOBT episodes.",
     "allowed_values": [
@@ -2049,17 +2049,17 @@
     ]
   },
   {
-    "key": "SUBJECT_LOWER_FOBT_AGE",
+    "key_name": "SUBJECT_LOWER_FOBT_AGE",
     "value_source": "",
     "notes": "Enter the minimum FOBT age for the subject."
   },
   {
-    "key": "SUBJECT_LOWER_LYNCH_AGE",
+    "key_name": "SUBJECT_LOWER_LYNCH_AGE",
     "value_source": "",
     "notes": "Enter the minimum Lynch age for the subject."
   },
   {
-    "key": "LATEST_EPISODE_TYPE",
+    "key_name": "LATEST_EPISODE_TYPE",
     "value_source": "EpisodeType.by_description_case_insensitive",
     "notes": "Select the type of the latest episode for the subject.",
     "allowed_values": [
@@ -2072,7 +2072,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_SUB_TYPE",
+    "key_name": "LATEST_EPISODE_SUB_TYPE",
     "value_source": "EpisodeSubType.by_description_case_insensitive",
     "notes": "Select the sub-type of the latest episode for the subject.",
     "allowed_values": [
@@ -2084,7 +2084,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_STATUS",
+    "key_name": "LATEST_EPISODE_STATUS",
     "value_source": "EpisodeStatusType.by_description_case_insensitive",
     "notes": "Select the status of the latest episode for the subject.",
     "allowed_values": [
@@ -2095,7 +2095,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_STATUS_REASON",
+    "key_name": "LATEST_EPISODE_STATUS_REASON",
     "value_source": "EpisodeStatusReasonType.by_description_case_insensitive",
     "notes": "Select the reason for the status of the latest episode.",
     "allowed_values": [
@@ -2140,7 +2140,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_RECALL_CALCULATION_METHOD",
+    "key_name": "LATEST_EPISODE_RECALL_CALCULATION_METHOD",
     "value_source": "RecallCalculationMethodType.by_description_case_insensitive",
     "notes": "Select the recall calculation method for the latest episode.",
     "allowed_values": [
@@ -2159,7 +2159,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_RECALL_EPISODE_TYPE",
+    "key_name": "LATEST_EPISODE_RECALL_EPISODE_TYPE",
     "value_source": "RecallEpisodeType.by_description_case_insensitive",
     "notes": "Select the recall episode type for the latest episode.",
     "allowed_values": [
@@ -2174,7 +2174,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_RECALL_SURVEILLANCE_TYPE",
+    "key_name": "LATEST_EPISODE_RECALL_SURVEILLANCE_TYPE",
     "value_source": "RecallSurveillanceType.by_description_case_insensitive",
     "notes": "Select the recall surveillance type for the latest episode.",
     "allowed_values": [
@@ -2186,7 +2186,7 @@
     ]
   },
   {
-    "key": "LATEST_EVENT_STATUS",
+    "key_name": "LATEST_EVENT_STATUS",
     "value_source": "EventStatusType.get_by_code",
     "notes": "Select the status of the latest event for the subject.",
     "allowed_values": [
@@ -2656,7 +2656,7 @@
     ]
   },
   {
-    "key": "PRE_INTERRUPT_EVENT_STATUS",
+    "key_name": "PRE_INTERRUPT_EVENT_STATUS",
     "value_source": "EventStatusType.get_by_code",
     "notes": "Select the event status before an interruption.",
     "allowed_values": [
@@ -2667,7 +2667,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_INCLUDES_EVENT_CODE",
+    "key_name": "LATEST_EPISODE_INCLUDES_EVENT_CODE",
     "value_source": "EventCodeType.by_code",
     "notes": "Select the event code that must be included in the latest episode.",
     "allowed_values": [
@@ -2927,7 +2927,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_DOES_NOT_INCLUDE_EVENT_CODE",
+    "key_name": "LATEST_EPISODE_DOES_NOT_INCLUDE_EVENT_CODE",
     "value_source": "EventCodeType.by_code",
     "notes": "Select the event code that must not be included in the latest episode.",
     "allowed_values": [
@@ -3187,7 +3187,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_INCLUDES_EVENT_STATUS",
+    "key_name": "LATEST_EPISODE_INCLUDES_EVENT_STATUS",
     "value_source": "EventStatusType.get_by_code",
     "notes": "Select the event status that must be included in the latest episode.",
     "allowed_values": [
@@ -3447,7 +3447,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_DOES_NOT_INCLUDE_EVENT_STATUS",
+    "key_name": "LATEST_EPISODE_DOES_NOT_INCLUDE_EVENT_STATUS",
     "value_source": "EventStatusType.get_by_code",
     "notes": "Select the event status that must not be included in the latest episode.",
     "allowed_values": [
@@ -3707,7 +3707,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_STARTED",
+    "key_name": "LATEST_EPISODE_STARTED",
     "value_source": "",
     "notes": "Enter the start date of the latest episode in DD/MM/YYYY or YYYY-MM-DD format.",
     "allowed_values": [
@@ -3770,7 +3770,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_ENDED",
+    "key_name": "LATEST_EPISODE_ENDED",
     "value_source": "",
     "notes": "Enter the end date of the latest episode using one of the options.",
     "allowed_values": [
@@ -3784,17 +3784,17 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_KIT_CLASS",
+    "key_name": "LATEST_EPISODE_KIT_CLASS",
     "value_source": "",
     "notes": "Specify the kit class for the latest episode (e.g., 'FIT', 'GFOBT')."
   },
   {
-    "key": "LATEST_EPISODE_HAS_SIGNIFICANT_KIT_RESULT",
+    "key_name": "LATEST_EPISODE_HAS_SIGNIFICANT_KIT_RESULT",
     "value_source": "",
     "notes": "Specify if the latest episode has a significant kit result. Options: 'yes' or 'no'."
   },
   {
-    "key": "LATEST_EPISODE_HAS_REFERRAL_DATE",
+    "key_name": "LATEST_EPISODE_HAS_REFERRAL_DATE",
     "value_source": "HasReferralDate.by_description",
     "notes": "Specify if the latest episode has a referral date.",
     "allowed_values": [
@@ -3806,7 +3806,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_HAS_DIAGNOSIS_DATE",
+    "key_name": "LATEST_EPISODE_HAS_DIAGNOSIS_DATE",
     "value_source": "",
     "notes": "Specify if the latest episode has a diagnosis date.",
     "allowed_values": [
@@ -3816,7 +3816,7 @@
     ]
   },
   {
-    "key": "SUBJECT_HAS_DIAGNOSTIC_TESTS",
+    "key_name": "SUBJECT_HAS_DIAGNOSTIC_TESTS",
     "value_source": "",
     "notes": "Specify if the subject has diagnostic tests.",
     "allowed_values": [
@@ -3825,7 +3825,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_HAS_DIAGNOSTIC_TEST",
+    "key_name": "LATEST_EPISODE_HAS_DIAGNOSTIC_TEST",
     "value_source": "",
     "notes": "Specify if the latest episode has a diagnostic test.",
     "allowed_values": [
@@ -3834,7 +3834,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_DIAGNOSIS_DATE_REASON",
+    "key_name": "LATEST_EPISODE_DIAGNOSIS_DATE_REASON",
     "value_source": "DiagnosisDateReasonType.by_description_case_insensitive",
     "notes": "Select the reason for the diagnosis date in the latest episode.",
     "allowed_values": [
@@ -3855,7 +3855,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_COMPLETED_SATISFACTORILY",
+    "key_name": "LATEST_EPISODE_COMPLETED_SATISFACTORILY",
     "value_source": "",
     "notes": "Specify if the latest episode was completed satisfactorily.",
     "allowed_values": [
@@ -3864,7 +3864,7 @@
     ]
   },
   {
-    "key": "HAS_DIAGNOSTIC_TEST_CONTAINING_POLYP",
+    "key_name": "HAS_DIAGNOSTIC_TEST_CONTAINING_POLYP",
     "value_source": "",
     "notes": "Specify if the subject has a diagnostic test containing a polyp.",
     "allowed_values": [
@@ -3873,7 +3873,7 @@
     ]
   },
   {
-    "key": "SUBJECT_HAS_UNLOGGED_KITS",
+    "key_name": "SUBJECT_HAS_UNLOGGED_KITS",
     "value_source": "",
     "notes": "Specify if the subject has unlogged kits. Options:"
     ,
@@ -3884,7 +3884,7 @@
     ]
   },
   {
-    "key": "SUBJECT_HAS_LOGGED_FIT_KITS",
+    "key_name": "SUBJECT_HAS_LOGGED_FIT_KITS",
     "value_source": "",
     "notes": "Specify if the subject has logged FIT kits.",
     "allowed_values": [
@@ -3893,7 +3893,7 @@
     ]
   },
   {
-    "key": "SUBJECT_HAS_KIT_NOTES",
+    "key_name": "SUBJECT_HAS_KIT_NOTES",
     "value_source": "",
     "notes": "Specify if the subject has kit notes.",
     "allowed_values": [
@@ -3902,7 +3902,7 @@
     ]
   },
   {
-    "key": "SUBJECT_HAS_LYNCH_DIAGNOSIS",
+    "key_name": "SUBJECT_HAS_LYNCH_DIAGNOSIS",
     "value_source": "",
     "notes": "Specify if the subject has a Lynch diagnosis.",
     "allowed_values": [
@@ -3911,7 +3911,7 @@
     ]
   },
   {
-    "key": "WHICH_TEST_KIT",
+    "key_name": "WHICH_TEST_KIT",
     "value_source": "",
     "notes": "Specify which test kit to use.",
     "allowed_values": [
@@ -3925,7 +3925,7 @@
     ]
   },
   {
-    "key": "KIT_HAS_BEEN_READ",
+    "key_name": "KIT_HAS_BEEN_READ",
     "value_source": "",
     "notes": "Specify if the kit has been read, you must also use 'which test kit'.",
     "allowed_values": [
@@ -3934,7 +3934,7 @@
     ]
   },
   {
-    "key": "KIT_RESULT",
+    "key_name": "KIT_RESULT",
     "value_source": "",
     "notes": "Specify the kit result, you must also use 'which test kit'.",
     "allowed_values": [
@@ -3949,7 +3949,7 @@
     ]
   },
   {
-    "key": "KIT_HAS_ANALYSER_RESULT_CODE",
+    "key_name": "KIT_HAS_ANALYSER_RESULT_CODE",
     "value_source": "",
     "notes": "Specify if the kit has an analyser result code, you must also use 'which test kit'.",
     "allowed_values": [
@@ -3958,7 +3958,7 @@
     ]
   },
   {
-    "key": "WHICH_APPOINTMENT",
+    "key_name": "WHICH_APPOINTMENT",
     "value_source": "",
     "notes": "Specify which appointment to use.",
     "allowed_values": [
@@ -3970,7 +3970,7 @@
     ]
   },
   {
-    "key": "APPOINTMENT_TYPE",
+    "key_name": "APPOINTMENT_TYPE",
     "value_source": "AppointmentSlotType.get_id",
     "notes": "Select the type of appointment, you must also use 'which appointment'.",
     "allowed_values": [
@@ -3980,7 +3980,7 @@
     ]
   },
   {
-    "key": "APPOINTMENT_STATUS",
+    "key_name": "APPOINTMENT_STATUS",
     "value_source": "AppointmentStatusType.get_id",
     "notes": "Select the status of the appointment, you must also use 'which appointment'.",
     "allowed_values": [
@@ -3991,7 +3991,7 @@
     ]
   },
   {
-    "key": "APPOINTMENT_DATE",
+    "key_name": "APPOINTMENT_DATE",
     "value_source": "",
     "notes": "Enter the date of the appointment using one of the options, you must also use 'which appointment'.",
     "allowed_values": [
@@ -4004,7 +4004,7 @@
     ]
   },
   {
-    "key": "WHICH_DIAGNOSTIC_TEST",
+    "key_name": "WHICH_DIAGNOSTIC_TEST",
     "value_source": "WhichDiagnosticTest.from_description",
     "notes": "Select which diagnostic test to use.",
     "allowed_values": [
@@ -4020,7 +4020,7 @@
     ]
   },
   {
-    "key": "DIAGNOSTIC_TEST_CONFIRMED_TYPE",
+    "key_name": "DIAGNOSTIC_TEST_CONFIRMED_TYPE",
     "value_source": "DiagnosticTestType.get_valid_value_id",
     "notes": "Select the confirmed type of diagnostic test, you must also use 'which diagnostic test'.",
     "allowed_values": [
@@ -4030,7 +4030,7 @@
     ]
   },
   {
-    "key": "DIAGNOSTIC_TEST_PROPOSED_TYPE",
+    "key_name": "DIAGNOSTIC_TEST_PROPOSED_TYPE",
     "value_source": "DiagnosticTestType.get_valid_value_id",
     "notes": "Select the proposed type of diagnostic test, you must also use 'which diagnostic test'.",
     "allowed_values": [
@@ -4040,7 +4040,7 @@
     ]
   },
   {
-    "key": "DIAGNOSTIC_TEST_IS_VOID",
+    "key_name": "DIAGNOSTIC_TEST_IS_VOID",
     "value_source": "DiagnosticTestIsVoid.from_description",
     "notes": "Specify if the diagnostic test is void, you must also use 'which diagnostic test'.",
     "allowed_values": [
@@ -4049,7 +4049,7 @@
     ]
   },
   {
-    "key": "DIAGNOSTIC_TEST_HAS_RESULT",
+    "key_name": "DIAGNOSTIC_TEST_HAS_RESULT",
     "value_source": "DiagnosticTestHasResult.from_description",
     "notes": "Specify if the diagnostic test has a result, you must also use 'which diagnostic test'.",
     "allowed_values": [
@@ -4058,7 +4058,7 @@
     ]
   },
   {
-    "key": "DIAGNOSTIC_TEST_HAS_OUTCOME",
+    "key_name": "DIAGNOSTIC_TEST_HAS_OUTCOME",
     "value_source": "DiagnosticTestHasOutcomeOfResult.from_description",
     "notes": "Specify if the diagnostic test has an outcome, you must also use 'which diagnostic test'.",
     "allowed_values": [
@@ -4067,7 +4067,7 @@
     ]
   },
   {
-    "key": "DIAGNOSTIC_TEST_FAILED",
+    "key_name": "DIAGNOSTIC_TEST_FAILED",
     "value_source": "YesNo.by_description_case_insensitive",
     "notes": "Specify if the diagnostic test failed.",
     "allowed_values": [
@@ -4076,7 +4076,7 @@
     ]
   },
   {
-    "key": "DIAGNOSTIC_TEST_INTENDED_EXTENT",
+    "key_name": "DIAGNOSTIC_TEST_INTENDED_EXTENT",
     "value_source": "IntendedExtentType.from_description",
     "notes": "Select the intended extent of the diagnostic test, you must also use 'which diagnostic test'.",
     "allowed_values": [
@@ -4086,7 +4086,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_HAS_CANCER_AUDIT_DATASET",
+    "key_name": "LATEST_EPISODE_HAS_CANCER_AUDIT_DATASET",
     "value_source": "LatestEpisodeHasDataset.from_description",
     "notes": "Specify if the latest episode has a cancer audit dataset.",
     "allowed_values": [
@@ -4097,7 +4097,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_HAS_COLONOSCOPY_ASSESSMENT_DATASET",
+    "key_name": "LATEST_EPISODE_HAS_COLONOSCOPY_ASSESSMENT_DATASET",
     "value_source": "LatestEpisodeHasDataset.from_description",
     "notes": "Specify if the latest episode has a colonoscopy assessment dataset.",
     "allowed_values": [
@@ -4108,7 +4108,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_HAS_MDT_DATASET",
+    "key_name": "LATEST_EPISODE_HAS_MDT_DATASET",
     "value_source": "LatestEpisodeHasDataset.from_description",
     "notes": "Specify if the latest episode has an MDT dataset.",
     "allowed_values": [
@@ -4119,7 +4119,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_LATEST_INVESTIGATION_DATASET",
+    "key_name": "LATEST_EPISODE_LATEST_INVESTIGATION_DATASET",
     "value_source": "LatestEpisodeLatestInvestigationDataset.from_description",
     "notes": "Specify the latest investigation dataset for the latest episode.",
     "allowed_values": [
@@ -4133,7 +4133,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_DATASET_INTENDED_EXTENT",
+    "key_name": "LATEST_EPISODE_DATASET_INTENDED_EXTENT",
     "value_source": "IntendedExtentType.get_id",
     "notes": "Select the intended extent for the latest episode dataset.",
     "allowed_values": [
@@ -4143,7 +4143,7 @@
     ]
   },
   {
-    "key": "SURVEILLANCE_REVIEW_CASE_TYPE",
+    "key_name": "SURVEILLANCE_REVIEW_CASE_TYPE",
     "value_source": "SurveillanceReviewCaseType.get_id",
     "notes": "Select the type of surveillance review case.",
     "allowed_values": [
@@ -4153,7 +4153,7 @@
     ]
   },
   {
-    "key": "DATE_OF_DEATH",
+    "key_name": "DATE_OF_DEATH",
     "value_source": "",
     "notes": "Select the date of death for the subject.",
     "allowed_values": [
@@ -4165,7 +4165,7 @@
     ]
   },
   {
-    "key": "HAS_HAD_A_DATE_OF_DEATH_REMOVAL",
+    "key_name": "HAS_HAD_A_DATE_OF_DEATH_REMOVAL",
     "value_source": "HasDateOfDeathRemoval.from_description",
     "notes": "Specify if the subject has had a date of death removal.",
     "allowed_values": [
@@ -4174,7 +4174,7 @@
     ]
   },
   {
-    "key": "INVITED_SINCE_AGE_EXTENSION",
+    "key_name": "INVITED_SINCE_AGE_EXTENSION",
     "value_source": "InvitedSinceAgeExtension.from_description",
     "notes": "Specify if the subject has been invited since the age extension.",
     "allowed_values": [
@@ -4183,12 +4183,12 @@
     ]
   },
   {
-    "key": "NOTE_COUNT",
+    "key_name": "NOTE_COUNT",
     "value_source": "",
     "notes": "Enter a comparator and integer for the note count (e.g., '>= 2')."
   },
   {
-    "key": "SURVEILLANCE_REVIEW_STATUS",
+    "key_name": "SURVEILLANCE_REVIEW_STATUS",
     "value_source": "SurveillanceReviewStatusType.get_id",
     "notes": "Select the status of the surveillance review.",
     "allowed_values": [
@@ -4198,7 +4198,7 @@
     ]
   },
   {
-    "key": "HAS_EXISTING_SURVEILLANCE_REVIEW_CASE",
+    "key_name": "HAS_EXISTING_SURVEILLANCE_REVIEW_CASE",
     "value_source": "DoesSubjectHaveSurveillanceReviewCase.from_description",
     "notes": "Specify if the subject has an existing surveillance review case.",
     "allowed_values": [
@@ -4207,7 +4207,7 @@
     ]
   },
   {
-    "key": "SUBJECT_75TH_BIRTHDAY",
+    "key_name": "SUBJECT_75TH_BIRTHDAY",
     "value_source": "",
     "notes": "Enter the date of the subject's 75th birthday, or use a special value.",
     "dependencies": [
@@ -4215,7 +4215,7 @@
     ]
   },
   {
-    "key": "LATEST_EPISODE_ACCUMULATED_RESULT",
+    "key_name": "LATEST_EPISODE_ACCUMULATED_RESULT",
     "value_source": "EpisodeResultType.by_description_case_insensitive",
     "notes": "Select the accumulated result for the latest episode.",
     "allowed_values": [
@@ -4244,7 +4244,7 @@
     ]
   },
   {
-    "key": "SYMPTOMATIC_PROCEDURE_RESULT",
+    "key_name": "SYMPTOMATIC_PROCEDURE_RESULT",
     "value_source": "SymptomaticProcedureResultType.get_id",
     "notes": "Select the result of the symptomatic procedure, you must also use 'which diagnostic test'",
     "allowed_values": [
@@ -4254,7 +4254,7 @@
     ]
   },
   {
-    "key": "SYMPTOMATIC_PROCEDURE_DATE",
+    "key_name": "SYMPTOMATIC_PROCEDURE_DATE",
     "value_source": "",
     "notes": "Enter the date of the symptomatic procedure, you must also use 'which diagnostic test'.",
     "dependencies": [
@@ -4262,7 +4262,7 @@
     ]
   },
   {
-    "key": "DIAGNOSTIC_TEST_CONFIRMED_DATE",
+    "key_name": "DIAGNOSTIC_TEST_CONFIRMED_DATE",
     "value_source": "",
     "notes": "Enter the confirmed date of the diagnostic test, or use a special value.",
     "dependencies": [
@@ -4270,7 +4270,7 @@
     ]
   },
   {
-    "key": "SCREENING_REFERRAL_TYPE",
+    "key_name": "SCREENING_REFERRAL_TYPE",
     "value_source": "ScreeningReferralType.get_id",
     "notes": "Select the type of screening referral.",
     "allowed_values": [
@@ -4280,7 +4280,7 @@
     ]
   },
   {
-    "key": "CALCULATED_LYNCH_DUE_DATE",
+    "key_name": "CALCULATED_LYNCH_DUE_DATE",
     "value_source": "",
     "notes": "Enter the calculated Lynch due date for the subject in DD/MM/YYYY or YYYY-MM-DD format.",
     "allowed_values": [
@@ -4343,7 +4343,7 @@
     ]
   },
   {
-    "key": "LYNCH_DUE_DATE",
+    "key_name": "LYNCH_DUE_DATE",
     "value_source": "",
     "notes": "Enter the Lynch due date for the subject in DD/MM/YYYY or YYYY-MM-DD format.",
     "allowed_values": [
@@ -4406,7 +4406,7 @@
     ]
   },
   {
-    "key": "LYNCH_DUE_DATE_REASON",
+    "key_name": "LYNCH_DUE_DATE_REASON",
     "value_source": "LynchDueDateReasonType.from_description",
     "notes": "Select the reason for the Lynch due date.",
     "allowed_values": [
@@ -4419,7 +4419,7 @@
     ]
   },
   {
-    "key": "LYNCH_DUE_DATE_DATE_OF_CHANGE",
+    "key_name": "LYNCH_DUE_DATE_DATE_OF_CHANGE",
     "value_source": "",
     "notes": "Enter the date when the Lynch due date was last changed, or use a special value.",
     "dependencies": [
@@ -4427,7 +4427,7 @@
     ]
   },
   {
-    "key": "LYNCH_INCIDENT_EPISODE",
+    "key_name": "LYNCH_INCIDENT_EPISODE",
     "value_source": "LynchIncidentEpisodeType.from_description",
     "notes": "Select the Lynch incident episode type.",
     "allowed_values": [
@@ -4438,7 +4438,7 @@
     ]
   },
   {
-    "key": "LYNCH_DIAGNOSIS_DATE",
+    "key_name": "LYNCH_DIAGNOSIS_DATE",
     "value_source": "",
     "notes": "Enter the date of the Lynch diagnosis, or use a special value.",
     "dependencies": [
@@ -4446,7 +4446,7 @@
     ]
   },
   {
-    "key": "LYNCH_LAST_COLONOSCOPY_DATE",
+    "key_name": "LYNCH_LAST_COLONOSCOPY_DATE",
     "value_source": "",
     "notes": "Enter the date of the last Lynch colonoscopy, or use a special value.",
     "dependencies": [
@@ -4454,7 +4454,7 @@
     ]
   },
   {
-    "key": "CADS_ASA_GRADE",
+    "key_name": "CADS_ASA_GRADE",
     "value_source": "ASAGradeType.by_description_case_insensitive",
     "notes": "Select the ASA grade for the CADS dataset.",
     "allowed_values": [
@@ -4469,7 +4469,7 @@
     ]
   },
   {
-    "key": "CADS_STAGING_SCANS",
+    "key_name": "CADS_STAGING_SCANS",
     "value_source": "YesNoType.by_description_case_insensitive",
     "notes": "Specify if staging scans were performed for the CADS dataset.",
     "allowed_values": [
@@ -4479,7 +4479,7 @@
     ]
   },
   {
-    "key": "CADS_TYPE_OF_SCAN",
+    "key_name": "CADS_TYPE_OF_SCAN",
     "value_source": "ScanType.by_description_case_insensitive",
     "notes": "Select the type of scan for the CADS dataset.",
     "allowed_values": [
@@ -4492,7 +4492,7 @@
     ]
   },
   {
-    "key": "CADS_METASTASES_PRESENT",
+    "key_name": "CADS_METASTASES_PRESENT",
     "value_source": "MetastasesPresentType.by_description_case_insensitive",
     "notes": "Specify if metastases are present in the CADS dataset.",
     "allowed_values": [
@@ -4502,7 +4502,7 @@
     ]
   },
   {
-    "key": "CADS_METASTASES_LOCATION",
+    "key_name": "CADS_METASTASES_LOCATION",
     "value_source": "MetastasesLocationType.by_description_case_insensitive",
     "notes": "Select the location of metastases in the CADS dataset.",
     "allowed_values": [
@@ -4514,12 +4514,12 @@
     ]
   },
   {
-    "key": "CADS_METASTASES_OTHER_LOCATION",
+    "key_name": "CADS_METASTASES_OTHER_LOCATION",
     "value_source": "",
     "notes": "Enter any other location of metastases not covered by the standard options."
   },
   {
-    "key": "CADS_FINAL_PRE_TREATMENT_T_CATEGORY",
+    "key_name": "CADS_FINAL_PRE_TREATMENT_T_CATEGORY",
     "value_source": "FinalPretreatmentTCategoryType.by_description_case_insensitive",
     "notes": "Select the final pre-treatment T category for the CADS dataset.",
     "allowed_values": [
@@ -4533,7 +4533,7 @@
     ]
   },
   {
-    "key": "CADS_FINAL_PRE_TREATMENT_N_CATEGORY",
+    "key_name": "CADS_FINAL_PRE_TREATMENT_N_CATEGORY",
     "value_source": "FinalPretreatmentNCategoryType.by_description_case_insensitive",
     "notes": "Select the final pre-treatment N category for the CADS dataset.",
     "allowed_values": [
@@ -4545,7 +4545,7 @@
     ]
   },
   {
-    "key": "CADS_FINAL_PRETREATMENT_M_CATEGORY",
+    "key_name": "CADS_FINAL_PRETREATMENT_M_CATEGORY",
     "value_source": "FinalPretreatmentMCategoryType.by_description_case_insensitive",
     "notes": "Select the final pre-treatment M category for the CADS dataset.",
     "allowed_values": [
@@ -4555,7 +4555,7 @@
     ]
   },
   {
-    "key": "CADS_TREATMENT_RECEIVED",
+    "key_name": "CADS_TREATMENT_RECEIVED",
     "value_source": "YesNoType.by_description_case_insensitive",
     "notes": "Specify if treatment was received for the CADS dataset.",
     "allowed_values": [
@@ -4565,7 +4565,7 @@
     ]
   },
   {
-    "key": "CADS_REASON_NO_TREATMENT_RECEIVED",
+    "key_name": "CADS_REASON_NO_TREATMENT_RECEIVED",
     "value_source": "ReasonNoTreatmentReceivedType.by_description_case_insensitive",
     "notes": "Select the reason why no treatment was received for the CADS dataset.",
     "allowed_values": [
@@ -4577,7 +4577,7 @@
     ]
   },
   {
-    "key": "CADS_TUMOUR_DATE_OF_DIAGNOSIS",
+    "key_name": "CADS_TUMOUR_DATE_OF_DIAGNOSIS",
     "value_source": "",
     "notes": "Enter the date of tumour diagnosis for the CADS dataset, or use a special value.",
     "dependencies": [
@@ -4585,7 +4585,7 @@
     ]
   },
   {
-    "key": "CADS_TUMOUR_LOCATION",
+    "key_name": "CADS_TUMOUR_LOCATION",
     "value_source": "LocationType.by_description_case_insensitive",
     "notes": "Select the tumour location for the CADS dataset.",
     "allowed_values": [
@@ -4609,12 +4609,12 @@
     ]
   },
   {
-    "key": "CADS_TUMOUR_HEIGHT_OF_TUMOUR_ABOVE_ANAL_VERGE",
+    "key_name": "CADS_TUMOUR_HEIGHT_OF_TUMOUR_ABOVE_ANAL_VERGE",
     "value_source": "",
     "notes": "Enter the height of the tumour above the anal verge (numeric value)."
   },
   {
-    "key": "CADS_TUMOUR_PREVIOUSLY_EXCISED_TUMOUR",
+    "key_name": "CADS_TUMOUR_PREVIOUSLY_EXCISED_TUMOUR",
     "value_source": "PreviouslyExcisedTumourType.by_description_case_insensitive",
     "notes": "Specify if the tumour was previously excised for the CADS dataset.",
     "allowed_values": [
@@ -4625,7 +4625,7 @@
     ]
   },
   {
-    "key": "CADS_TREATMENT_START_DATE",
+    "key_name": "CADS_TREATMENT_START_DATE",
     "value_source": "",
     "notes": "Enter the treatment start date for the CADS dataset, or use a special value.",
     "dependencies": [
@@ -4633,7 +4633,7 @@
     ]
   },
   {
-    "key": "CADS_TREATMENT_TYPE",
+    "key_name": "CADS_TREATMENT_TYPE",
     "value_source": "TreatmentType.by_description_case_insensitive",
     "notes": "Select the type of treatment for the CADS dataset.",
     "allowed_values": [
@@ -4642,7 +4642,7 @@
     ]
   },
   {
-    "key": "CADS_TREATMENT_GIVEN",
+    "key_name": "CADS_TREATMENT_GIVEN",
     "value_source": "TreatmentGiven.by_description_case_insensitive",
     "notes": "Specify the treatment given for the CADS dataset.",
     "allowed_values": [
@@ -4654,7 +4654,7 @@
     ]
   },
   {
-    "key": "CADS_CANCER_TREATMENT_INTENT",
+    "key_name": "CADS_CANCER_TREATMENT_INTENT",
     "value_source": "CancerTreatmentIntent.by_description_case_insensitive",
     "notes": "Select the intent of cancer treatment for the CADS dataset.",
     "allowed_values": [
@@ -4665,7 +4665,7 @@
     ]
   },
   {
-    "key": "HAS_PREVIOUSLY_HAD_CANCER",
+    "key_name": "HAS_PREVIOUSLY_HAD_CANCER",
     "value_source": "YesNoType.by_description_case_insensitive",
     "notes": "Specify if the subject has previously had cancer.",
     "allowed_values": [
@@ -4675,7 +4675,7 @@
     ]
   },
   {
-    "key": "FOBT_PREVALENT_INCIDENT_STATUS",
+    "key_name": "FOBT_PREVALENT_INCIDENT_STATUS",
     "value_source": "PrevalentIncidentStatusType.from_description",
     "notes": "Select the prevalent/incident status for FOBT.",
     "allowed_values": [
@@ -4684,7 +4684,7 @@
     ]
   },
   {
-    "key": "NOTIFY_QUEUED_MESSAGE_STATUS",
+    "key_name": "NOTIFY_QUEUED_MESSAGE_STATUS",
     "value_source": "NotifyEventStatus.get_id",
     "notes": "Select the status of the queued Notify message.",
     "allowed_values": [
@@ -4694,7 +4694,7 @@
     ]
   },
   {
-    "key": "NOTIFY_ARCHIVED_MESSAGE_STATUS",
+    "key_name": "NOTIFY_ARCHIVED_MESSAGE_STATUS",
     "value_source": "NotifyEventStatus.get_id",
     "notes": "Select the status of the archived Notify message.",
     "allowed_values": [
@@ -4704,7 +4704,7 @@
     ]
   },
   {
-    "key": "REASON_FOR_ONWARD_REFERRAL",
+    "key_name": "REASON_FOR_ONWARD_REFERRAL",
     "value_source": "ReasonForOnwardReferralType.by_description_case_insensitive",
     "notes": "Select the reason for onward referral.",
     "allowed_values": [
@@ -4720,7 +4720,7 @@
     ]
   },
   {
-    "key": "REFER_FROM_SYMPTOMATIC_REASON",
+    "key_name": "REFER_FROM_SYMPTOMATIC_REASON",
     "value_source": "ReasonForOnwardReferralType.by_description_case_insensitive",
     "notes": "Select the reason for referral from symptomatic, you must also use 'which diagnostic test'.",
     "allowed_values": [
@@ -4736,7 +4736,7 @@
     ]
   },
   {
-    "key": "REFER_ANOTHER_DIAGNOSTIC_TEST_TYPE",
+    "key_name": "REFER_ANOTHER_DIAGNOSTIC_TEST_TYPE",
     "value_source": "DiagnosticTestReferralType.by_description_case_insensitive",
     "notes": "Select the type for another diagnostic test referral.",
     "allowed_values": [
@@ -4745,7 +4745,7 @@
     ]
   },
   {
-    "key": "REFER_FROM_SYMPTOMATIC_TYPE",
+    "key_name": "REFER_FROM_SYMPTOMATIC_TYPE",
     "value_source": "DiagnosticTestReferralType.by_description_case_insensitive",
     "notes": "Select the type for referral from symptomatic, you must also use 'which diagnostic test'.",
     "allowed_values": [
@@ -4754,7 +4754,7 @@
     ]
   },
   {
-    "key": "REASON_FOR_SYMPTOMATIC_REFERRAL",
+    "key_name": "REASON_FOR_SYMPTOMATIC_REFERRAL",
     "value_source": "ReasonForSymptomaticReferralType.by_description_case_insensitive",
     "notes": "Select the reason for symptomatic referral.",
     "allowed_values": [
@@ -4764,7 +4764,7 @@
     ]
   },
   {
-    "key": "ADD_COLUMN_TO_SELECT_STATEMENT",
+    "key_name": "ADD_COLUMN_TO_SELECT_STATEMENT",
     "value_source": "",
     "notes": "Enter the name of the column to add to the select statement, also specify the prefix. E.g. ss.screening_subject_id."
   }

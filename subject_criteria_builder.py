@@ -51,7 +51,7 @@ def get_metadata_for_key(enum_key: str) -> dict:
         dict: The metadata for the specified criteria key, or an empty dictionary if not found.
     """
     for entry in CRITERIA_METADATA:
-        if entry["key"] == enum_key:
+        if entry["key_name"] == enum_key:
             return entry
     return {}
 

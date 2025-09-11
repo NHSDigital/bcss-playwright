@@ -122,7 +122,7 @@ Each entry in the file looks like this:
 
 ```json
 {
-  "key": "NHS_NUMBER",
+  "key_name": "NHS_NUMBER",
   "value_source": "",
   "notes": "Enter the 10-digit NHS Number of the subject you want to search for."
 }
@@ -132,7 +132,7 @@ Or, with allowed values and dependencies:
 
 ```json
 {
-  "key": "SUBJECT_HUB_CODE",
+  "key_name": "SUBJECT_HUB_CODE",
   "value_source": "SubjectHubCode.by_description",
   "notes": "Select the hub or organisation for the subject.",
   "allowed_values": [
@@ -145,7 +145,7 @@ Or, with allowed values and dependencies:
 }
 ```
 
-- **`key`:** The unique identifier for the criterion (must match the code).
+- **`key_name`:** The unique identifier for the criterion (must match the code).
 - **`value_source`:** (Optional) The source of the value, can be left blank. This refers to the class + method used in the subject selection query builder. This is not used by the code but is there to allow easier tracking/mapping.
 - **`notes`:** A clear, user-focused description of what the key is and what the user should input.
 - **`allowed_values`:** (Optional) An array of allowed values for the dropdown selection.
@@ -154,7 +154,7 @@ Or, with allowed values and dependencies:
 #### To add a new criterion
 
 1. Add a new object to the JSON array with the following fields:
-   - `"key"`: The `Enum` member name (must match the code).
+   - `"key_name"`: The `Enum` member name (must match the code).
    - `"value_source"`: (Optional) The value source, can be left blank.
    - `"notes"`: A clear, user-focused description of what the key is and what the user should input.
    - `"allowed_values"`: (Optional) An array of allowed values for the dropdown selection.
@@ -164,7 +164,7 @@ Or, with allowed values and dependencies:
 
 #### To edit a criterion
 
-- Find the object with the matching `"key"` and update the `"notes"`, `"allowed_values"`, or `"dependencies"` as needed.
+- Find the object with the matching `"key_name"` and update the `"notes"`, `"allowed_values"`, or `"dependencies"` as needed.
 - Save the file and reload the app.
 
 #### To remove a criterion
@@ -236,7 +236,7 @@ If you add new keys to the `SubjectSelectionCriteriaKey` `Enum` in your code, yo
 
 ```json
 {
-  "key": "SCREENING_STATUS",
+  "key_name": "SCREENING_STATUS",
   "value_source": "ScreeningStatusType.by_description_case_insensitive",
   "notes": "Select the current screening status for the subject.",
   "allowed_values": [
