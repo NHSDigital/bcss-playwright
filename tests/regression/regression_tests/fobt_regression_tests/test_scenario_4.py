@@ -34,7 +34,6 @@ from pages.screening_subject_search.record_diagnosis_date_page import (
 )
 
 
-@pytest.mark.wip
 @pytest.mark.usefixtures("setup_org_and_appointments")
 @pytest.mark.vpn_required
 @pytest.mark.regression
@@ -352,6 +351,8 @@ def test_scenario_4(page: Page) -> None:
         },
     )
 
+
+def test_process_j4_letter_batch(page: Page, nhs_no: str) -> None:
     # When I process the open "J4" letter batch for my subject
     # # Then my subject has been updated as follows:
     batch_processing(
@@ -421,7 +422,7 @@ def test_scenario_4(page: Page) -> None:
         ReasonForCancellationOptions.PATIENT_UNSUITABLE_RECENTLY_SCREENED
     )
 
-    # And I press OK on my confirmation prompt TODO: This step is resulting in a 403 forbidden error
+    # And I press OK on my confirmation prompt
     AppointmentDetailPage(page).click_save_button(accept_dialog=True)
 
     # Then my subject has been updated as follows:
@@ -459,10 +460,10 @@ def test_scenario_4(page: Page) -> None:
     # And I select the advance episode option for "Record Diagnosis Date"
     AdvanceFOBTScreeningEpisodePage(page).click_record_diagnosis_date_button()
 
-    # And I enter a Diagnosis Date of "today"
-    RecordDiagnosisDatePage(page).enter_date_in_diagnosis_date_field(datetime.today())
+    # And I select Diagnosis Date Reason "Patient choice"
+    RecordDiagnosisDatePage(page).record_diagnosis_reason(reason_text="Patient Choice")
 
-    # # And I save Diagnosis Date Information
+    # And I save Diagnosis Date Information
     RecordDiagnosisDatePage(page).click_save_button()
 
     # Then my subject has been updated as follows:
