@@ -453,13 +453,14 @@ def test_scenario_4(page: Page) -> None:
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
+    # And I view the advance episode options
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+
     # And I select the advance episode option for "Record Diagnosis Date"
     AdvanceFOBTScreeningEpisodePage(page).click_record_diagnosis_date_button()
 
-    # And I select Diagnosis Date Reason "Patient choice"
-    RecordDiagnosisDatePage(page).record_diagnosis_date_with_reason(
-        date=datetime.now(), reason_text="Patient Choice"
-    )
+    # And I enter a Diagnosis Date of "today"
+    RecordDiagnosisDatePage(page).enter_date_in_diagnosis_date_field(datetime.today())
 
     # # And I save Diagnosis Date Information
     RecordDiagnosisDatePage(page).click_save_button()
@@ -498,3 +499,6 @@ def test_scenario_4(page: Page) -> None:
             "surveillance due date date of change": "Unchanged",
         },
     )
+
+    logging.info("[TEST COMPLETE] Scenario 4 passed all assertions")
+    LogoutPage(page).log_out()
