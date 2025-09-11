@@ -459,10 +459,7 @@ def test_scenario_4(page: Page) -> None:
     AdvanceFOBTScreeningEpisodePage(page).click_record_diagnosis_date_button()
 
     # And I select Diagnosis Date Reason "Patient choice"
-    RecordDiagnosisDatePage(page).record_diagnosis_reason(reason_text="Patient Choice")
-
-    # And I save Diagnosis Date Information
-    RecordDiagnosisDatePage(page).click_save_button()
+    RecordDiagnosisDatePage(page).record_diagnosis_reason(reason_text="Patient choice")
 
     # Then my subject has been updated as follows:
     subject_assertion(

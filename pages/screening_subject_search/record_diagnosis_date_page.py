@@ -44,7 +44,6 @@ class RecordDiagnosisDatePage(BasePage):
         else:
             return ""
 
-
     def record_diagnosis_reason(self, reason_text: str) -> None:
         """
         Selects a diagnosis reason from the dropdown and saves the form.
