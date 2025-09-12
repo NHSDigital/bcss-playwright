@@ -40,7 +40,7 @@ def before_each(page: Page):
 ICB_ORGANISATION_CODE = "Z9Z1S"
 NHS_TRUST_SITE_CODE = "Z9Z1X"
 
-@pytest.mark.wip
+
 @pytest.mark.regression
 @pytest.mark.organisations_users_and_contacts_tests
 @pytest.mark.organisations_and_contacts_build_level_tests
@@ -55,7 +55,6 @@ def test_check_list_all_organisations_page(page) -> None:
     ViewOrganisation(page).verify_page_title()
 
 
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.organisations_users_and_contacts_tests
 @pytest.mark.organisations_and_contacts_develop_level_tests
@@ -76,7 +75,6 @@ def test_create_new_icb_z9z1s_using_create_new_org(page) -> None:
     CreateOrganisation(page).verify_success_message()
 
 
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.organisations_users_and_contacts_tests
 @pytest.mark.organisations_and_contacts_develop_level_tests
@@ -97,7 +95,6 @@ def test_create_new_nhs_trust_site_z9z1x_using_create_site(page) -> None:
     CreateSite(page).verify_success_message()
 
 
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.organisations_users_and_contacts_tests
 @pytest.mark.organisations_and_contacts_develop_level_tests
@@ -117,7 +114,6 @@ def test_view_and_edit_organisation_values_z9z1s(page) -> None:
     ViewOrganisation(page).verify_organisation_code_details("ICB")
 
 
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.organisations_users_and_contacts_tests
 @pytest.mark.organisations_and_contacts_develop_level_tests
@@ -135,11 +131,9 @@ def test_remove_all_created_organisation(page) -> None:
     )
 
 
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.organisations_users_and_contacts_tests
 @pytest.mark.organisations_and_contacts_develop_level_tests
-@pytest.mark.wip
 def test_remove_all_created_sites(page) -> None:
     """
     Verifies that the 'Remove All Created Sites' functionality works correctly
