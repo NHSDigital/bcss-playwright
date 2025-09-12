@@ -921,7 +921,7 @@ def delete_people_in_org_created_for_test(org_codes: list[str]) -> None:
     """
     Deletes people in organisations for the given org codes.
     Must be run before deleting organisations due to foreign key constraints.
-    Args:   
+    Args:
         org_codes (list[str]): A list of organisation codes to delete people in organisations for.
     """
     placeholders = ", ".join([f":org{i}" for i in range(len(org_codes))])
@@ -971,7 +971,7 @@ def delete_organisations_created_for_test(org_codes: list[str]) -> None:
 def delete_sites_created_for_test(site_codes: list[str]) -> None:
     """
     Deletes sites from the SITES table based on the given site codes.
-    Args:   
+    Args:
         site_codes (list[str]): A list of site codes to delete.
     """
     logging.info("Start: delete_sites_created_for_test(%s)", site_codes)

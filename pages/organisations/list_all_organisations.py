@@ -49,7 +49,7 @@ class ListAllOrganisations(BasePage):
         self.search_org_code.fill(org_code)
         self.search_org_code.press("Enter")
 
-    def verify_no_organisation_record_found(self, text: str) -> None: 
+    def verify_no_organisation_record_found(self, text: str) -> None:
         """Verifies that no organisation record is found.
         Args:
             text (str): The text to verify is present indicating no records found. Example: "No organisation record found"
