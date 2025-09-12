@@ -94,14 +94,14 @@ OracleDB().create_subjects_via_sspi(
 
 ## Oracle Specific Functions
 
-Oracle-specific functions are now organized into separate files under `utils/oracle/oracle_specific_functions/` for better maintainability and discoverability.  
+Oracle-specific functions are now organized into separate files under `utils/oracle/oracle_specific_functions/` for better maintainability and discoverability.<br>
 Each file groups related functions by their domain or purpose.
 
 Below is a table showing the current structure and which functions are found in each file:
 
 | File Name                                 | Functions/Classes Included                                                                                   |
 |--------------------------------------------|--------------------------------------------------------------------------------------------------------------|
-| **enums.py**                              | `SqlQueryValues` (common enum values for queries)                                                            |
+| **enums.py**                              | `SqlQueryValues` (common `enum` values for queries)                                                            |
 | **kit_management.py**                      | `get_kit_id_from_db`, `get_kit_id_logged_from_db`, `get_service_management_by_device_id`,<br>`update_kit_service_management_entity`, `execute_fit_kit_stored_procedures` |
 | **organisation_parameters.py**             | `set_org_parameter_value`, `get_org_parameter_value`, `check_parameter`                                      |
 | **screening_colonoscopist.py**             | `build_accredited_screening_colonoscopist_query`, `get_accredited_screening_colonoscopist_in_bcs001`         |
@@ -112,8 +112,8 @@ Below is a table showing the current structure and which functions are found in 
 | **investigation_dataset.py**               | `get_investigation_dataset_polyp_category`, `get_investigation_dataset_polyp_algorithm_size`,<br>`get_subjects_for_investigation_dataset_updates` |
 | **subject_selector.py**                    | `SubjectSelector` (class for subject selection logic)                                                        |
 
-> **Note:**  
-> If you are looking for a specific function, check the relevant file in `utils/oracle/oracle_specific_functions/`.  
+> **Note:**
+> If you are looking for a specific function, check the relevant file in `utils/oracle/oracle_specific_functions/`.
 > Common values used in queries are placed in `enums.py` as the `SqlQueryValues` class.
 
 ---
