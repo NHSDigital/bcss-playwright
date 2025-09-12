@@ -39,7 +39,7 @@ class CreateSite(BasePage):
         This method is designed to click the Start Date Calendar button on the Create Site page.
         """
         logging.info("Clicking Start Date Calendar on Create Site page")
-        self.start_date_calendar.click()
+        self.click(self.start_date_calendar)
 
     def fill_audit_reason(self, text: str) -> None:
         """

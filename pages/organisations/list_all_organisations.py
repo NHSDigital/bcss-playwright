@@ -37,7 +37,7 @@ class ListAllOrganisations(BasePage):
     def click_create_new_org(self) -> None:
         """Clicks the 'Create New Org' button."""
         logging.info("Clicking the 'Create New Org' button")
-        self.create_new_org.click()
+        self.click(self.create_new_org)
 
     def search_organisation_code(self, org_code: str) -> None:
         """

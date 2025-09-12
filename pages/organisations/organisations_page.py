@@ -80,7 +80,7 @@ class OrganisationSwitchPage:
         """
         Retrieves the list of available organisation IDs from the radio button on the page.
 
-        Returns:
+        Args:
             List[str]: A list of organisation ID strings.
         """
         org_ids = []

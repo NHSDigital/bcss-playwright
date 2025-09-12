@@ -29,4 +29,4 @@ class ViewOrganisation(BasePage):
     def click_edit_button(self) -> None:
         """Clicks the Edit button on the View Organisation page."""
         logging.info("Clicking Edit button on View Organisation page")
-        self.edit_button.click()
+        self.click(self.edit_button)

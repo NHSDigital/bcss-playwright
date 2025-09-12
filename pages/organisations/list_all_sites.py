@@ -26,15 +26,13 @@ class ListAllSites(BasePage):
 
     def click_create_new_site(self) -> None:
         """Clicks the 'Create New Site' button."""
-        self.create_new_site.click()
+        self.click(self.create_new_site)
 
     def search_site_code(self, site_code: str) -> None:
         """
         This method is designed to search for an site by its code.
         Args:
             site_code (str): The site code to search for.
-        Returns:
-            None
         """
         logging.info(f"Searching for Site with code: {site_code}")
         self.site_code.fill(site_code)
