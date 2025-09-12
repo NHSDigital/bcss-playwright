@@ -56,8 +56,10 @@
       "Hub Manager, Southern Bowel Cancer Screening Programme Hub"
     ]
   },
-    "Bureau Staff": {
+    "BCSS Bureau Staff": {
     "username": "BCSS33",
+    "role_id": 5042,
+    "org_code": "X26",
     "roles": [
       "BCSS Bureau Staff"
     ]

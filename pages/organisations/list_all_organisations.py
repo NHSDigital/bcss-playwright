@@ -10,7 +10,6 @@ class ListAllOrganisations(BasePage):
 
     def __init__(self, page: Page):
         super().__init__(page)
-        self.page = page
         # Initialize TableUtils for the table with id="displayRS"
         self.list_all_org_table = TableUtils(page, "#listAllOrgsTable")
 
@@ -24,8 +23,6 @@ class ListAllOrganisations(BasePage):
         This method is designed to select a specific organisation type from the List All Organisations page.
         Args:
             option (str): The organisation type option to be selected. This should be a string that matches one of the available options in the dropdown menu.
-        Returns:
-            None
         """
         logging.info(f"Selecting Organisation Type: {option}")
         self.select_organisation_type.select_option(option)
@@ -47,15 +44,16 @@ class ListAllOrganisations(BasePage):
         This method is designed to search for an organisation by its code.
         Args:
             org_code (str): The organisation code to search for.
-        Returns:
-            None
         """
         logging.info(f"Searching for Organisation with code: {org_code}")
         self.search_org_code.fill(org_code)
         self.search_org_code.press("Enter")
 
-    def verify_no_organisation_record_found(self, text: str) -> None:
-        """Verifies that no organisation record is found."""
+    def verify_no_organisation_record_found(self, text: str) -> None: 
+        """Verifies that no organisation record is found.
+        Args:
+            text (str): The text to verify is present indicating no records found. Example: "No organisation record found"
+        """
         logging.info("Verifying that no organisation record is found")
         expect(self.page.locator('form[name="frm"]')).to_contain_text(text)
 

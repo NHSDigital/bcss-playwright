@@ -10,8 +10,7 @@ class ListAllSites(BasePage):
 
     def __init__(self, page: Page):
         super().__init__(page)
-        self.page = page
-        # Initialize TableUtils for the table with id="displayRS"
+        # Initialize TableUtils for the table with id="listAllOrgsTable"
         self.list_all_org_table = TableUtils(page, "#listAllOrgsTable")
 
         # List All Site links
@@ -26,14 +25,14 @@ class ListAllSites(BasePage):
         self.select_site_type.select_option(option)
 
     def click_create_new_site(self) -> None:
-        """Clicks the 'Create New Org' button."""
+        """Clicks the 'Create New Site' button."""
         self.create_new_site.click()
 
     def search_site_code(self, site_code: str) -> None:
         """
         This method is designed to search for an site by its code.
         Args:
-            org_code (str): The site code to search for.
+            site_code (str): The site code to search for.
         Returns:
             None
         """

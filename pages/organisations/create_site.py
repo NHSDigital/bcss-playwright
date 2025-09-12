@@ -8,7 +8,6 @@ class CreateSite(BasePage):
 
     def __init__(self, page: Page):
         super().__init__(page)
-        self.page = page
 
         # Create Site links
         self.site_code = self.page.get_by_label("Site Code*")
@@ -20,17 +19,17 @@ class CreateSite(BasePage):
     def fill_site_code(self, text: str) -> None:
         """
         This method is designed to fill in the site Code field on the Create site page.
-        Returns:
-            None
+        Args:
+            text (str): The site code to be entered. Example: "Z9Z1X"
         """
-        logging.info("Filling Site Code on Create Organisation page")
+        logging.info("Filling Site Code on Create site page")
         self.site_code.fill(text)
 
     def fill_site_name(self, text: str) -> None:
         """
         This method is designed to fill in the Site Name field on the Create Site page.
-        Returns:
-            None
+        Args:
+            text (str): The site name to be entered. Example: "TEST ANANA NHS TRUST SITE"
         """
         logging.info("Filling Site Name on Create Site page")
         self.site_name.fill(text)
@@ -38,8 +37,6 @@ class CreateSite(BasePage):
     def click_start_date_calendar(self) -> None:
         """
         This method is designed to click the Start Date Calendar button on the Create Site page.
-        Returns:
-            None
         """
         logging.info("Clicking Start Date Calendar on Create Site page")
         self.start_date_calendar.click()
@@ -47,8 +44,8 @@ class CreateSite(BasePage):
     def fill_audit_reason(self, text: str) -> None:
         """
         This method is designed to fill in the Audit Reason field on the Create Site page.
-        Returns:
-            None
+        Args:
+            text (str): The audit reason to be entered. Example: "Automated ANANA Test"
         """
         logging.info("Filling Audit Reason on Create Site page")
         self.audit_reason.fill(text)
@@ -56,8 +53,7 @@ class CreateSite(BasePage):
     def click_save_button(self) -> None:
         """
         This method is designed to click the Save button on the Create Site page.
-        Returns:
-            None
+
         """
         logging.info("Clicking Save button on Create Site page")
         self.save_button.click()

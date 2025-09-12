@@ -7,7 +7,6 @@ class OrganisationsPage(BasePage):
 
     def __init__(self, page: Page):
         super().__init__(page)
-        self.page = page
 
         # Organisations page links
         self.screening_centre_parameters_page = self.page.get_by_role(

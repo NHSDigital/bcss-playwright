@@ -8,7 +8,6 @@ class OrganisationsAndSiteDetails(BasePage):
 
     def __init__(self, page: Page):
         super().__init__(page)
-        self.page = page
 
         # Organisations And Site Details Page links
         self.my_organisation = self.page.get_by_role("link", name="My Organisation")
