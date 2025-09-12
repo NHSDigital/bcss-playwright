@@ -20,9 +20,11 @@ CRITERIA_JSON_PATH = os.path.join(
 USERS_JSON_PATH = os.path.join(os.path.dirname(__file__), "users.json")
 
 
-def load_criteria_metadata():
+def load_criteria_metadata() -> dict:
     """
     Load criteria metadata from JSON
+    Returns:
+        dict: The criteria metadata loaded from the JSON file
     """
     with open(CRITERIA_JSON_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
@@ -203,6 +205,8 @@ def show_user_selection() -> User:
     Show the user selection dropdown.
     Returns:
         User: The selected user object.
+    Raises:
+        ValueError: If user details are missing or invalid.
     """
     st.markdown("### User Selection (Required for selected criteria)")
     user_names = [k for k in USERS_DATA.keys() if not k.startswith("_")]
