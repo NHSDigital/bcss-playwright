@@ -1,6 +1,7 @@
-from utils.oracle.oracle_specific_functions import (
+from utils.oracle.oracle_specific_functions.kit_management import (
     get_kit_id_from_db,
     get_kit_id_logged_from_db,
+    execute_fit_kit_stored_procedures,
 )
 from pages.base_page import BasePage
 from pages.fit_test_kits.log_devices_page import LogDevicesPage
@@ -18,7 +19,6 @@ from classes.repositories.kit_service_management_repository import (
     KitServiceManagementRepository,
 )
 from classes.kit_status import KitStatus
-from oracle.oracle_specific_functions import execute_fit_kit_stored_procedures
 
 
 class FitKitGeneration:

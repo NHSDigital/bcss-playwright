@@ -23,7 +23,9 @@ from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
 from utils.table_util import TableUtils
-from utils.oracle.oracle_specific_functions import get_nhs_no_from_batch_id
+from utils.oracle.oracle_specific_functions.subject_batch import (
+    get_nhs_no_from_batch_id,
+)
 from utils import batch_processing
 from utils import screening_subject_page_searcher
 

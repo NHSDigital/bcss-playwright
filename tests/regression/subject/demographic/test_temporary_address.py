@@ -12,7 +12,7 @@ from utils.screening_subject_page_searcher import (
     search_subject_demographics_by_nhs_number,
 )
 from utils.oracle.oracle import OracleDB
-from utils.oracle.oracle_specific_functions import (
+from utils.oracle.oracle_specific_functions.subject_address import (
     check_if_subject_has_temporary_address,
 )
 from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder

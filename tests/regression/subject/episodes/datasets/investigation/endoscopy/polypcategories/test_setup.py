@@ -35,7 +35,7 @@ from utils.batch_processing import batch_processing
 from utils.calendar_picker import CalendarPicker
 from utils.fit_kit import FitKitGeneration
 from utils.oracle.oracle import OracleDB
-from utils.oracle.oracle_specific_functions import (
+from utils.oracle.oracle_specific_functions.kit_management import (
     update_kit_service_management_entity,
     execute_fit_kit_stored_procedures,
 )
