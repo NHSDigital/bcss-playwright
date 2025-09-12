@@ -56,7 +56,7 @@ class CreateSite(BasePage):
 
         """
         logging.info("Clicking Save button on Create Site page")
-        self.save_button.click()
+        self.click(self.save_button)
 
     def verify_success_message(self) -> None:
         """Verifies that the success message is displayed after saving the Site."""
