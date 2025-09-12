@@ -23,8 +23,8 @@ from pages.datasets.investigation_dataset_page import (
     BowelPreparationQualityOptions,
     SedationOptions,
 )
-from classes.user import User
-from classes.subject import Subject
+from classes.user.user import User
+from classes.subject.subject import Subject
 from utils.oracle.oracle import OracleDB
 from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
 from pages.datasets.subject_datasets_page import SubjectDatasetsPage

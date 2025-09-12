@@ -12,13 +12,13 @@ import pandas as pd
 import pytest
 from utils.oracle.oracle import OracleDB
 from decimal import Decimal
-from classes.user_role_type import UserRoleType
+from classes.user.user_role_type import UserRoleType
 from classes.repositories.analyser_repository import AnalyserRepository
 from classes.repositories.user_repository import UserRepository
 from classes.repositories.kit_service_management_repository import (
     KitServiceManagementRepository,
 )
-from classes.kit_status import KitStatus
+from classes.kits.kit_status import KitStatus
 
 
 class FitKitGeneration:

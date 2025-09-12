@@ -1,6 +1,6 @@
 from typing import Optional
 from datetime import date, datetime
-from classes.invitation_plan_status_type import InvitationPlanStatusType
+from classes.invitation.invitation_plan_status_type import InvitationPlanStatusType
 
 
 class InvitationPlan:

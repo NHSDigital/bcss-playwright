@@ -2,15 +2,15 @@ from typing import Optional, Union
 from dataclasses import dataclass
 from datetime import datetime, date
 from sys import platform
-from classes.address_contact_type import AddressContactType
-from classes.address_type import AddressType
-from classes.gender_type import GenderType
-from classes.lynch_sdd_reason_for_change_type import LynchSDDReasonForChangeType
-from classes.screening_status_type import ScreeningStatusType
-from classes.sdd_reason_for_change_type import SDDReasonForChangeType
-from classes.ss_reason_for_change_type import SSReasonForChangeType
-from classes.ssdd_reason_for_change_type import SSDDReasonForChangeType
-from classes.user import User
+from classes.address.address_contact_type import AddressContactType
+from classes.address.address_type import AddressType
+from classes.subject.gender_type import GenderType
+from classes.lynch.lynch_sdd_reason_for_change_type import LynchSDDReasonForChangeType
+from classes.screening.screening_status_type import ScreeningStatusType
+from classes.surveillance.sdd_reason_for_change_type import SDDReasonForChangeType
+from classes.screening.ss_reason_for_change_type import SSReasonForChangeType
+from classes.surveillance.ssdd_reason_for_change_type import SSDDReasonForChangeType
+from classes.user.user import User
 from utils.date_time_utils import DateTimeUtils
 from utils.oracle.oracle import OracleDB
 import pandas as pd

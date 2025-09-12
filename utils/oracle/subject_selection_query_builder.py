@@ -2,89 +2,107 @@ from typing import Dict, Optional
 import logging
 from datetime import datetime, date
 from utils.notify_criteria_parser import parse_notify_criteria
-from classes.bowel_scope_dd_reason_for_change_type import (
+from classes.bowel_scope.bowel_scope_dd_reason_for_change_type import (
     BowelScopeDDReasonForChangeType,
 )
-from classes.ceased_confirmation_details import CeasedConfirmationDetails
-from classes.ceased_confirmation_user_id import CeasedConfirmationUserId
-from classes.clinical_cease_reason_type import ClinicalCeaseReasonType
-from classes.date_description import DateDescription
-from classes.event_status_type import EventStatusType
-from classes.episode_type import EpisodeType
-from classes.has_gp_practice import HasGPPractice
-from classes.has_unprocessed_sspi_updates import HasUnprocessedSSPIUpdates
-from classes.has_user_dob_update import HasUserDobUpdate
-from classes.subject_has_episode import SubjectHasEpisode
-from classes.manual_cease_requested import ManualCeaseRequested
-from classes.screening_status_type import ScreeningStatusType
-from classes.sdd_reason_for_change_type import SDDReasonForChangeType
-from classes.ssdd_reason_for_change_type import SSDDReasonForChangeType
-from classes.ss_reason_for_change_type import SSReasonForChangeType
-from classes.subject_hub_code import SubjectHubCode
-from classes.subject_screening_centre_code import SubjectScreeningCentreCode
-from classes.subject_selection_criteria_key import SubjectSelectionCriteriaKey
-from classes.subject import Subject
-from classes.user import User
-from classes.selection_builder_exception import SelectionBuilderException
-from classes.appointments_slot_type import AppointmentSlotType
-from classes.appointment_status_type import AppointmentStatusType
-from classes.which_diagnostic_test import WhichDiagnosticTest
-from classes.diagnostic_test_type import DiagnosticTestType
-from classes.diagnostic_test_is_void import DiagnosticTestIsVoid
-from classes.diagnostic_test_has_result import DiagnosticTestHasResult
-from classes.diagnostic_test_has_outcome_of_result import (
+from classes.ceased.ceased_confirmation_details import CeasedConfirmationDetails
+from classes.ceased.ceased_confirmation_user_id import CeasedConfirmationUserId
+from classes.ceased.clinical_cease_reason_type import ClinicalCeaseReasonType
+from classes.date.date_description import DateDescription
+from classes.event.event_status_type import EventStatusType
+from classes.episode.episode_type import EpisodeType
+from classes.screening.has_gp_practice import HasGPPractice
+from classes.screening.has_unprocessed_sspi_updates import HasUnprocessedSSPIUpdates
+from classes.date.has_user_dob_update import HasUserDobUpdate
+from classes.episode.subject_has_episode import SubjectHasEpisode
+from classes.ceased.manual_cease_requested import ManualCeaseRequested
+from classes.screening.screening_status_type import ScreeningStatusType
+from classes.surveillance.sdd_reason_for_change_type import SDDReasonForChangeType
+from classes.surveillance.ssdd_reason_for_change_type import SSDDReasonForChangeType
+from classes.screening.ss_reason_for_change_type import SSReasonForChangeType
+from classes.screening.subject_hub_code import SubjectHubCode
+from classes.screening.subject_screening_centre_code import SubjectScreeningCentreCode
+from classes.subject_selection_query_builder.subject_selection_criteria_key import (
+    SubjectSelectionCriteriaKey,
+)
+from classes.subject.subject import Subject
+from classes.user.user import User
+from classes.subject_selection_query_builder.selection_builder_exception import (
+    SelectionBuilderException,
+)
+from classes.appointment.appointments_slot_type import AppointmentSlotType
+from classes.appointment.appointment_status_type import AppointmentStatusType
+from classes.diagnostic.which_diagnostic_test import WhichDiagnosticTest
+from classes.diagnostic.diagnostic_test_type import DiagnosticTestType
+from classes.diagnostic.diagnostic_test_is_void import DiagnosticTestIsVoid
+from classes.diagnostic.diagnostic_test_has_result import DiagnosticTestHasResult
+from classes.diagnostic.diagnostic_test_has_outcome_of_result import (
     DiagnosticTestHasOutcomeOfResult,
 )
-from classes.intended_extent_type import IntendedExtentType
-from classes.latest_episode_has_dataset import LatestEpisodeHasDataset
-from classes.latest_episode_latest_investigation_dataset import (
+from classes.datasets.intended_extent_type import IntendedExtentType
+from classes.episode.latest_episode_has_dataset import LatestEpisodeHasDataset
+from classes.episode.latest_episode_latest_investigation_dataset import (
     LatestEpisodeLatestInvestigationDataset,
 )
-from classes.surveillance_review_status_type import SurveillanceReviewStatusType
-from classes.does_subject_have_surveillance_review_case import (
+from classes.surveillance.surveillance_review_status_type import (
+    SurveillanceReviewStatusType,
+)
+from classes.surveillance.does_subject_have_surveillance_review_case import (
     DoesSubjectHaveSurveillanceReviewCase,
 )
-from classes.surveillance_review_case_type import SurveillanceReviewCaseType
-from classes.has_date_of_death_removal import HasDateOfDeathRemoval
-from classes.invited_since_age_extension import InvitedSinceAgeExtension
-from classes.episode_result_type import EpisodeResultType
-from classes.symptomatic_procedure_result_type import SymptomaticProcedureResultType
-from classes.screening_referral_type import ScreeningReferralType
-from classes.lynch_due_date_reason_type import LynchDueDateReasonType
-from classes.lynch_incident_episode_type import (
+from classes.surveillance.surveillance_review_case_type import (
+    SurveillanceReviewCaseType,
+)
+from classes.date.has_date_of_death_removal import HasDateOfDeathRemoval
+from classes.invitation.invited_since_age_extension import InvitedSinceAgeExtension
+from classes.episode.episode_result_type import EpisodeResultType
+from classes.datasets.symptomatic_procedure_result_type import (
+    SymptomaticProcedureResultType,
+)
+from classes.screening.screening_referral_type import ScreeningReferralType
+from classes.lynch.lynch_due_date_reason_type import LynchDueDateReasonType
+from classes.lynch.lynch_incident_episode_type import (
     LynchIncidentEpisodeType,
 )
-from classes.prevalent_incident_status_type import PrevalentIncidentStatusType
-from classes.notify_event_status import NotifyEventStatus
-from classes.yes_no_type import YesNoType
-from classes.episode_sub_type import EpisodeSubType
-from classes.episode_status_type import EpisodeStatusType
-from classes.episode_status_reason_type import EpisodeStatusReasonType
-from classes.recall_calculation_method_type import RecallCalculationMethodType
-from classes.recall_episode_type import RecallEpisodeType
-from classes.recall_surveillance_type import RecallSurveillanceType
-from classes.event_code_type import EventCodeType
-from classes.has_referral_date import HasReferralDate
-from classes.diagnosis_date_reason_type import DiagnosisDateReasonType
-from classes.yes_no import YesNo
-from classes.diagnostic_test_referral_type import DiagnosticTestReferralType
-from classes.reason_for_onward_referral_type import ReasonForOnwardReferralType
-from classes.reason_for_symptomatic_referral_type import (
+from classes.episode.prevalent_incident_status_type import PrevalentIncidentStatusType
+from classes.event.notify_event_status import NotifyEventStatus
+from classes.yes_no.yes_no_type import YesNoType
+from classes.episode.episode_sub_type import EpisodeSubType
+from classes.episode.episode_status_type import EpisodeStatusType
+from classes.episode.episode_status_reason_type import EpisodeStatusReasonType
+from classes.recall.recall_calculation_method_type import RecallCalculationMethodType
+from classes.recall.recall_episode_type import RecallEpisodeType
+from classes.recall.recall_surveillance_type import RecallSurveillanceType
+from classes.event.event_code_type import EventCodeType
+from classes.referral.has_referral_date import HasReferralDate
+from classes.diagnostic.diagnosis_date_reason_type import DiagnosisDateReasonType
+from classes.yes_no.yes_no import YesNo
+from classes.diagnostic.diagnostic_test_referral_type import DiagnosticTestReferralType
+from classes.referral.reason_for_onward_referral_type import ReasonForOnwardReferralType
+from classes.referral.reason_for_symptomatic_referral_type import (
     ReasonForSymptomaticReferralType,
 )
-from classes.asa_grade_type import ASAGradeType
-from classes.scan_type import ScanType
-from classes.metastases_present_type import MetastasesPresentType
-from classes.metastases_location_type import MetastasesLocationType
-from classes.final_pretreatment_t_category_type import FinalPretreatmentTCategoryType
-from classes.final_pretreatment_n_category_type import FinalPretreatmentNCategoryType
-from classes.final_pretreatment_m_category_type import FinalPretreatmentMCategoryType
-from classes.reason_no_treatment_received_type import ReasonNoTreatmentReceivedType
-from classes.location_type import LocationType
-from classes.previously_excised_tumour_type import PreviouslyExcisedTumourType
-from classes.treatment_type import TreatmentType
-from classes.treatment_given import TreatmentGiven
-from classes.cancer_treatment_intent import CancerTreatmentIntent
+from classes.datasets.asa_grade_type import ASAGradeType
+from classes.datasets.scan_type import ScanType
+from classes.datasets.metastases_present_type import MetastasesPresentType
+from classes.datasets.metastases_location_type import MetastasesLocationType
+from classes.datasets.final_pretreatment_t_category_type import (
+    FinalPretreatmentTCategoryType,
+)
+from classes.datasets.final_pretreatment_n_category_type import (
+    FinalPretreatmentNCategoryType,
+)
+from classes.datasets.final_pretreatment_m_category_type import (
+    FinalPretreatmentMCategoryType,
+)
+from classes.datasets.reason_no_treatment_received_type import (
+    ReasonNoTreatmentReceivedType,
+)
+from classes.datasets.location_type import LocationType
+from classes.datasets.previously_excised_tumour_type import PreviouslyExcisedTumourType
+from classes.datasets.treatment_type import TreatmentType
+from classes.datasets.treatment_given import TreatmentGiven
+from classes.datasets.cancer_treatment_intent import CancerTreatmentIntent
 
 
 class SubjectSelectionQueryBuilder:

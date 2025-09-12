@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Optional
 from datetime import date
-from classes.subject import Subject
+from classes.subject.subject import Subject
 
 
 @dataclass

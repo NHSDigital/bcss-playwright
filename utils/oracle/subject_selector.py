@@ -2,7 +2,7 @@ from oracle.oracle import OracleDB
 import logging
 from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
 from utils.user_tools import UserTools
-from classes.subject import Subject
+from classes.subject.subject import Subject
 
 
 class SubjectSelector:

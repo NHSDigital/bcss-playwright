@@ -3,9 +3,9 @@ from typing import List, Optional, Any
 from utils.oracle.oracle import OracleDB
 import oracledb
 from classes.database.database_error import DatabaseError
-from classes.invitation_plan import InvitationPlan
-from classes.invitation_plan_week import InvitationPlanWeek
-from classes.invitation_plan_status_type import InvitationPlanStatusType
+from classes.invitation.invitation_plan import InvitationPlan
+from classes.invitation.invitation_plan_week import InvitationPlanWeek
+from classes.invitation.invitation_plan_status_type import InvitationPlanStatusType
 
 
 class InvitationRepository:

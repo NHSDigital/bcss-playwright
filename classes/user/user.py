@@ -1,6 +1,6 @@
 from typing import Optional
-from classes.organisation_complex import Organisation
-from classes.user_role_type import UserRoleType
+from classes.organisation.organisation_complex import Organisation
+from classes.user.user_role_type import UserRoleType
 
 
 class User:

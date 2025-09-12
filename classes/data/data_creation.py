@@ -2,12 +2,12 @@ import random
 import datetime
 from typing import Dict
 import logging
-from classes.organisation_complex import Organisation
-from classes.gender_type import GenderType
-from classes.address import Address
-from classes.person import Person
-from classes.region_type import RegionType
-from classes.pi_subject import PISubject
+from classes.organisation.organisation_complex import Organisation
+from classes.subject.gender_type import GenderType
+from classes.address.address import Address
+from classes.person.person import Person
+from classes.screening.region_type import RegionType
+from classes.subject.pi_subject import PISubject
 from utils.nhs_number_tools import NHSNumberTools
 
 

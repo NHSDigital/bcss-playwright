@@ -3,8 +3,8 @@ import pandas as pd
 import pytest
 import logging
 from playwright.sync_api import Page
-from classes.subject import Subject
-from classes.user import User
+from classes.subject.subject import Subject
+from classes.user.user import User
 from pages.base_page import BasePage
 from pages.datasets.colonoscopy_dataset_page import (
     ColonoscopyDatasetsPage,

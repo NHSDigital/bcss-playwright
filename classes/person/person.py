@@ -1,6 +1,6 @@
 import logging
 from typing import Optional
-from classes.gender_type import GenderType
+from classes.subject.gender_type import GenderType
 
 
 class Person:

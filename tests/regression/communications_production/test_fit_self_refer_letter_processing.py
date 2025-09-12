@@ -10,7 +10,7 @@ from pages.screening_subject_search.subject_screening_search_page import (
     SubjectScreeningPage,
 )
 from utils.oracle.oracle import OracleDB, OracleSubjectTools
-from classes.subject import Subject
+from classes.subject.subject import Subject
 from utils.oracle.oracle import OracleSubjectTools
 from pages.communication_production.communications_production_page import (
     CommunicationsProductionPage,

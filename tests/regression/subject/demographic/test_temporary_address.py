@@ -1,8 +1,8 @@
 import pytest
 from playwright.sync_api import Page
 from utils.user_tools import UserTools
-from classes.user import User
-from classes.subject import Subject
+from classes.user.user import User
+from classes.subject.subject import Subject
 from pages.base_page import BasePage
 from pages.screening_subject_search.subject_demographic_page import (
     SubjectDemographicPage,

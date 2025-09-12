@@ -4,14 +4,14 @@ from typing import Optional
 import random
 from utils.oracle.oracle import OracleDB
 from utils.nhs_number_tools import NHSNumberTools
-from classes.region_type import RegionType
+from classes.screening.region_type import RegionType
 from classes.repositories.investigation_repository import InvitationRepository
 from classes.data.data_creation import DataCreation
 from classes.repositories.word_repository import WordRepository
-from classes.pi_subject import PISubject
+from classes.subject.pi_subject import PISubject
 from classes.repositories.subject_repository import SubjectRepository
 from classes.repositories.user_repository import UserRepository
-from classes.user_role_type import UserRoleType
+from classes.user.user_role_type import UserRoleType
 
 
 class CreateSubjectSteps:
