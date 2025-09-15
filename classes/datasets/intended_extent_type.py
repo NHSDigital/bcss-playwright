@@ -1,94 +1,79 @@
-class IntendedExtentType:
+from enum import Enum
+from typing import Optional, Dict
+
+
+class IntendedExtentType(Enum):
     """
-    Utility class for mapping intended extent values to nullability flags or valid value IDs.
-
-    This class provides:
-        - Logical flags for "null" and "not null" to indicate nullability.
-        - A mapping from descriptive intended extent labels (e.g., "full", "partial", "none") to internal valid value IDs.
-        - Methods to convert descriptions to flags or IDs, and to get a description from a sentinel value.
-
-    Methods:
-        from_description(description: str) -> str | int:
-            Returns the logical flag ("null"/"not null") or the valid value ID for a given description.
-            Raises ValueError if the description is not recognized.
-
-        get_id(description: str) -> int:
-            Returns the valid value ID for a given intended extent description.
-            Raises ValueError if the description is not recognized or has no ID.
-
-        get_description(sentinel: str) -> str:
-            Returns the string description for a sentinel value ("null" or "not null").
-            Raises ValueError if the sentinel is not recognized.
+    Enum for representing intended extent types.
     """
 
-    NULL = "null"
-    NOT_NULL = "not null"
+    ANASTOMOSIS = (17241, "Anastomosis")
+    ANUS = (17231, "Anus")
+    APPENDIX = (17242, "Appendix")
+    ASCENDING_COLON = (17238, "Ascending Colon")
+    CAECUM = (17239, "Caecum")
+    DESCENDING_COLON = (17234, "Descending Colon")
+    DISTAL_SIGMOID = (17965, "Distal sigmoid")  # Legacy value
+    ENTIRE_COLON = (17245, "Entire colon")  # Legacy value
+    HEPATIC_FLEXURE = (17237, "Hepatic Flexure")
+    ILEUM = (17240, "Ileum")
+    LEFT_COLON = (17244, "Left colon")  # Legacy value
+    MID_SIGMOID = (17966, "Mid sigmoid")  # Legacy value
+    PROXIMAL_SIGMOID = (17967, "Proximal sigmoid")  # Legacy value
+    RECTO_SIGMOID = (17243, "Recto/Sigmoid")  # Legacy value
+    RECTOSIGMOID_JUNCTION = (17964, "Rectosigmoid junction")  # Legacy value
+    RECTUM = (17232, "Rectum")
+    SIGMOID_COLON = (17233, "Sigmoid Colon")
+    SPLENIC_FLEXURE = (17235, "Splenic Flexure")
+    TRANSVERSE_COLON = (17236, "Transverse Colon")
+    NULL = (None, "NULL")
+    NOT_NULL = (None, "NOT NULL")
 
-    _label_to_id = {
-        "full": 9201,
-        "partial": 9202,
-        "none": 9203,
-        # Add others as needed
-    }
+    def __init__(self, valid_value_id: Optional[int], description: str):
+        self._valid_value_id = valid_value_id
+        self._description = description
 
-    _null_flags = {NULL, NOT_NULL}
+    @property
+    def valid_value_id(self) -> Optional[int]:
+        """Returns the valid value ID."""
+        return self._valid_value_id
 
-    @classmethod
-    def from_description(cls, description: str):
-        """
-        Returns the logical flag ("null"/"not null") or the valid value ID for a given description.
-
-        Args:
-            description (str): The intended extent description.
-
-        Returns:
-            str | int: The logical flag ("null"/"not null") or the valid value ID.
-
-        Raises:
-            ValueError: If the description is not recognized.
-        """
-        key = description.strip().lower()
-        if key in cls._null_flags:
-            return key
-        if key in cls._label_to_id:
-            return cls._label_to_id[key]
-        raise ValueError(f"Unknown intended extent: '{description}'")
-
-    @classmethod
-    def get_id(cls, description: str) -> int:
-        """
-        Returns the valid value ID for a given intended extent description.
-
-        Args:
-            description (str): The intended extent description.
-
-        Returns:
-            int: The valid value ID.
-
-        Raises:
-            ValueError: If the description is not recognized or has no ID.
-        """
-        key = description.strip().lower()
-        if key not in cls._label_to_id:
-            raise ValueError(f"No ID available for intended extent: '{description}'")
-        return cls._label_to_id[key]
+    @property
+    def description(self) -> str:
+        """Returns the description."""
+        return self._description
 
     @classmethod
-    def get_description(cls, sentinel: str) -> str:
+    def by_description(cls, description: str) -> Optional["IntendedExtentType"]:
         """
-        Returns the string description for a sentinel value ("null" or "not null").
-
-        Args:
-            sentinel (str): The sentinel value to describe.
-
-        Returns:
-            str: The string description ("NULL" or "NOT NULL").
-
-        Raises:
-            ValueError: If the sentinel is not recognized.
+        Returns the IntendedExtentType member matching the given description.
         """
-        if sentinel == cls.NULL:
-            return "NULL"
-        if sentinel == cls.NOT_NULL:
-            return "NOT NULL"
-        raise ValueError(f"Invalid sentinel: '{sentinel}'")
+        for member in cls:
+            if member.description == description:
+                return member
+        return None
+
+    @classmethod
+    def by_description_case_insensitive(
+        cls, description: str
+    ) -> Optional["IntendedExtentType"]:
+        """
+        Returns the IntendedExtentType member matching the given description (case insensitive).
+        """
+        desc_lower = description.lower()
+        for member in cls:
+            if member.description.lower() == desc_lower:
+                return member
+        return None
+
+    @classmethod
+    def by_valid_value_id(
+        cls, valid_value_id: Optional[int]
+    ) -> Optional["IntendedExtentType"]:
+        """
+        Returns the IntendedExtentType member matching the given valid value ID.
+        """
+        for member in cls:
+            if member.valid_value_id == valid_value_id:
+                return member
+        return None

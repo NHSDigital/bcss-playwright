@@ -1,70 +1,77 @@
-class DiagnosticTestHasOutcomeOfResult:
+from enum import Enum
+from typing import Optional
+
+
+class DiagnosticTestHasOutcomeOfResult(Enum):
     """
-    Utility class for mapping diagnostic test outcome-of-result descriptions to logical flags or valid value IDs.
-
-    This class provides:
-        - Logical flags for "yes" and "no" outcomes.
-        - A mapping from descriptive outcome labels (e.g., "referred", "treated") to internal valid value IDs.
-        - Methods to convert descriptions to flags or IDs.
-
-    Methods:
-        from_description(description: str) -> str | int:
-            Returns the logical flag ("yes"/"no") or the valid value ID for a given description.
-            Raises ValueError if the description is not recognized.
-
-        get_id(description: str) -> int:
-            Returns the valid value ID for a given outcome description.
-            Raises ValueError if the description is not recognized or has no ID.
+    Enum representing possible outcomes of a diagnostic test, mapped to IDs and descriptions.
     """
 
-    YES = "yes"
-    NO = "no"
+    NO = (-1, "No")
+    YES = (-2, "Yes")
+    INVESTIGATION_COMPLETE = (20360, "Investigation Complete")
+    CONSENT_REFUSED_REFER_ANOTHER = (20361, "Consent Refused, Refer Another")
+    WITHDRAWN_CONSENT_REFER_ANOTHER = (20362, "Withdrawn Consent, Refer Another")
+    FAILED_TEST_REFER_ANOTHER = (20363, "Failed Test - Refer Another")
+    REFER_ANOTHER_DIAGNOSTIC_TEST = (20364, "Refer Another Diagnostic Test")
+    REFER_SURVEILLANCE_BCSP = (20365, "Refer Surveillance (BCSP)")
+    REFER_SYMPTOMATIC = (20366, "Refer Symptomatic")
+    REFER_MDT = (20367, "Refer MDT")
+    DID_NOT_ATTEND = (20368, "Did Not Attend")
+    CANCELLED = (20369, "Cancelled")
+    REFER_COLONOSCOPY = (203018, "Refer Colonoscopy")
+    BOOK_ANOTHER_BOWEL_SCOPE = (203019, "Book another bowel scope")
+    RETURN_TO_FOBT_SCREENING = (203020, "Return to FOBT Screening")
 
-    _label_to_id = {
-        "referred": 9101,
-        "treated": 9102,
-        "not required": 9103,
-        # Extend as needed
-    }
+    def __init__(self, id: int, description: str) -> None:
+        self._id = id
+        self._description = description
 
-    _valid_flags = {YES, NO}
+    @property
+    def valid_value_id(self) -> int:
+        """
+        Returns the unique ID for the diagnostic test outcome.
+        """
+        return self._id
+
+    @property
+    def description(self) -> str:
+        """
+        Returns the description for the diagnostic test outcome.
+        """
+        return self._description
 
     @classmethod
-    def from_description(cls, description: str):
+    def by_description(
+        cls, description: str
+    ) -> Optional["DiagnosticTestHasOutcomeOfResult"]:
         """
-        Returns the logical flag ("yes"/"no") or the valid value ID for a given description.
-
-        Args:
-            description (str): The outcome-of-result description.
-
-        Returns:
-            str | int: The logical flag ("yes"/"no") or the valid value ID.
-
-        Raises:
-            ValueError: If the description is not recognized.
+        Returns the enum member matching the given description (case-sensitive).
         """
-        key = description.strip().lower()
-        if key in cls._valid_flags:
-            return key
-        if key in cls._label_to_id:
-            return cls._label_to_id[key]
-        raise ValueError(f"Unknown outcome-of-result description: '{description}'")
+        for member in cls:
+            if member.description == description:
+                return member
+        return None
 
     @classmethod
-    def get_id(cls, description: str) -> int:
+    def by_description_case_insensitive(
+        cls, description: str
+    ) -> Optional["DiagnosticTestHasOutcomeOfResult"]:
         """
-        Returns the valid value ID for a given outcome description.
-
-        Args:
-            description (str): The outcome-of-result description.
-
-        Returns:
-            int: The valid value ID.
-
-        Raises:
-            ValueError: If the description is not recognized or has no ID.
+        Returns the enum member matching the given description (case-insensitive).
         """
-        key = description.strip().lower()
-        if key not in cls._label_to_id:
-            raise ValueError(f"No ID available for outcome: '{description}'")
-        return cls._label_to_id[key]
+        desc_lower = description.lower()
+        for member in cls:
+            if member.description.lower() == desc_lower:
+                return member
+        return None
+
+    @classmethod
+    def by_id(cls, id: int) -> Optional["DiagnosticTestHasOutcomeOfResult"]:
+        """
+        Returns the enum member matching the given ID.
+        """
+        for member in cls:
+            if member.valid_value_id == id:
+                return member
+        return None

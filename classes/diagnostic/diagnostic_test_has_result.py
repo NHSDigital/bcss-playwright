@@ -1,70 +1,72 @@
-class DiagnosticTestHasResult:
+from enum import Enum
+from typing import Optional
+
+
+class DiagnosticTestHasResult(Enum):
     """
-    Utility class for mapping diagnostic test result descriptions to logical flags or internal IDs.
-
-    This class provides:
-        - Logical flags for "yes" and "no" results.
-        - A mapping from descriptive result labels (e.g., "positive", "negative", "indeterminate") to internal valid value IDs.
-        - Methods to convert descriptions to flags or IDs.
-
-    Methods:
-        from_description(description: str) -> str | int:
-            Returns the logical flag ("yes"/"no") or the valid value ID for a given description.
-            Raises ValueError if the description is not recognized.
-
-        get_id(description: str) -> int:
-            Returns the valid value ID for a given result description.
-            Raises ValueError if the description is not recognized or has no ID.
+    Enum representing possible results of a diagnostic test, mapped to IDs and descriptions.
     """
 
-    YES = "yes"
-    NO = "no"
+    NO = (-1, "No")
+    YES = (-2, "Yes")
+    NO_RESULT = (20311, "No Result")
+    NORMAL = (20312, "Normal (No Abnormalities Found)")
+    ABNORMAL = (20313, "Abnormal")
+    LOW_RISK_ADENOMA = (20314, "Low-risk Adenoma")
+    INTERMEDIATE_RISK_ADENOMA = (20315, "Intermediate-risk Adenoma")
+    HIGH_RISK_ADENOMA = (20316, "High-risk Adenoma")
+    CANCER_DETECTED = (20317, "Cancer Detected")
+    ABNORMAL_PROCEDURE_INCOMPLETE = (20318, "Abnormal, procedure incomplete")
+    HIGH_RISK_FINDINGS = (305606, "High-risk findings")
+    LNPCP = (305607, "LNPCP")
 
-    _label_to_id = {
-        "positive": 9001,
-        "negative": 9002,
-        "indeterminate": 9003,
-        # Add additional mappings as needed
-    }
+    def __init__(self, id: int, description: str) -> None:
+        self._id = id
+        self._description = description
 
-    _valid_flags = {YES, NO}
+    @property
+    def valid_value_id(self) -> int:
+        """
+        Returns the unique ID for the diagnostic test result.
+        """
+        return self._id
+
+    @property
+    def description(self) -> str:
+        """
+        Returns the description for the diagnostic test result.
+        """
+        return self._description
 
     @classmethod
-    def from_description(cls, description: str):
+    def by_description(cls, description: str) -> Optional["DiagnosticTestHasResult"]:
         """
-        Returns the logical flag ("yes"/"no") or the valid value ID for a given description.
-
-        Args:
-            description (str): The diagnostic test result description.
-
-        Returns:
-            str | int: The logical flag ("yes"/"no") or the valid value ID.
-
-        Raises:
-            ValueError: If the description is not recognized.
+        Returns the enum member matching the given description (case-sensitive).
         """
-        key = description.strip().lower()
-        if key in cls._valid_flags:
-            return key
-        if key in cls._label_to_id:
-            return cls._label_to_id[key]
-        raise ValueError(f"Unknown diagnostic test result description: '{description}'")
+        for member in cls:
+            if member.description == description:
+                return member
+        return None
 
     @classmethod
-    def get_id(cls, description: str) -> int:
+    def by_description_case_insensitive(
+        cls, description: str
+    ) -> Optional["DiagnosticTestHasResult"]:
         """
-        Returns the valid value ID for a given result description.
-
-        Args:
-            description (str): The diagnostic test result description.
-
-        Returns:
-            int: The valid value ID.
-
-        Raises:
-            ValueError: If the description is not recognized or has no ID.
+        Returns the enum member matching the given description (case-insensitive).
         """
-        key = description.strip().lower()
-        if key not in cls._label_to_id:
-            raise ValueError(f"No ID available for result description: '{description}'")
-        return cls._label_to_id[key]
+        desc_lower = description.lower()
+        for member in cls:
+            if member.description.lower() == desc_lower:
+                return member
+        return None
+
+    @classmethod
+    def by_id(cls, id: int) -> Optional["DiagnosticTestHasResult"]:
+        """
+        Returns the enum member matching the given ID.
+        """
+        for member in cls:
+            if member.valid_value_id == id:
+                return member
+        return None

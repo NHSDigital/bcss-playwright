@@ -1,7 +1,6 @@
 from typing import Dict, Optional
 import logging
 from datetime import datetime, date
-from utils.notify_criteria_parser import parse_notify_criteria
 from classes.bowel_scope.bowel_scope_dd_reason_for_change_type import (
     BowelScopeDDReasonForChangeType,
 )
@@ -60,12 +59,11 @@ from classes.datasets.symptomatic_procedure_result_type import (
     SymptomaticProcedureResultType,
 )
 from classes.screening.screening_referral_type import ScreeningReferralType
-from classes.lynch.lynch_due_date_reason_type import LynchDueDateReasonType
+from classes.lynch.lynch_sdd_reason_for_change_type import LynchSDDReasonForChangeType
 from classes.lynch.lynch_incident_episode_type import (
     LynchIncidentEpisodeType,
 )
 from classes.episode.prevalent_incident_status_type import PrevalentIncidentStatusType
-from classes.event.notify_event_status import NotifyEventStatus
 from classes.yes_no.yes_no_type import YesNoType
 from classes.episode.episode_sub_type import EpisodeSubType
 from classes.episode.episode_status_type import EpisodeStatusType
@@ -103,6 +101,8 @@ from classes.datasets.previously_excised_tumour_type import PreviouslyExcisedTum
 from classes.datasets.treatment_type import TreatmentType
 from classes.datasets.treatment_given import TreatmentGiven
 from classes.datasets.cancer_treatment_intent import CancerTreatmentIntent
+from classes.notify.notify_message_status import NotifyMessageStatus
+from classes.notify.notify_message_type import NotifyMessageType
 
 
 class SubjectSelectionQueryBuilder:
@@ -131,6 +131,7 @@ class SubjectSelectionQueryBuilder:
         self.sql_from_episode = []
         self.sql_from_genetic_condition_diagnosis = []
         self.sql_from_cancer_audit_datasets = []
+        self.sql_from_surveillance_review = []
         self.bind_vars = {}
         self.criteria_value_count = 0
 
@@ -183,6 +184,7 @@ class SubjectSelectionQueryBuilder:
                 + self.sql_from_episode
                 + self.sql_from_genetic_condition_diagnosis
                 + self.sql_from_cancer_audit_datasets
+                + self.sql_from_surveillance_review
                 + self.sql_where
             )
         )
@@ -1858,7 +1860,11 @@ class SubjectSelectionQueryBuilder:
             idx = getattr(self, "criteria_index", 0)
             xt = f"xt{idx}"
             value = self.criteria_value.strip().lower()
-            result = DiagnosticTestHasResult.from_description(value)
+            result = DiagnosticTestHasResult.by_description_case_insensitive(value)
+            if result is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
 
             self.sql_where.append(f"AND {xt}.result_id ")
 
@@ -1867,7 +1873,7 @@ class SubjectSelectionQueryBuilder:
             elif result == DiagnosticTestHasResult.NO:
                 self.sql_where.append(self._SQL_IS_NULL)
             else:
-                result_id = DiagnosticTestHasResult.get_id(value)
+                result_id = result.valid_value_id
                 self.sql_where.append(f"= {result_id}")
 
         except Exception:
@@ -1881,7 +1887,13 @@ class SubjectSelectionQueryBuilder:
             idx = getattr(self, "criteria_index", 0)
             xt = f"xt{idx}"
             value = self.criteria_value.strip().lower()
-            outcome = DiagnosticTestHasOutcomeOfResult.from_description(value)
+            outcome = DiagnosticTestHasOutcomeOfResult.by_description_case_insensitive(
+                value
+            )
+            if outcome is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
 
             self.sql_where.append(f"AND {xt}.outcome_of_result_id ")
 
@@ -1890,8 +1902,8 @@ class SubjectSelectionQueryBuilder:
             elif outcome == DiagnosticTestHasOutcomeOfResult.NO:
                 self.sql_where.append(self._SQL_IS_NULL)
             else:
-                outcome_id = DiagnosticTestHasOutcomeOfResult.get_id(value)
-                self.sql_where.append(f"= {outcome_id}")
+                outcome_id = outcome.valid_value_id
+                self.sql_where.append(f" = {outcome_id} ")
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
@@ -1904,17 +1916,21 @@ class SubjectSelectionQueryBuilder:
         try:
             idx = getattr(self, "criteria_index", 0)
             xt = f"xt{idx}"
-            extent = IntendedExtentType.from_description(self.criteria_value)
+            extent = IntendedExtentType.by_description_case_insensitive(
+                self.criteria_value
+            )
+            if extent is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
 
             self.sql_where.append(f"AND {xt}.intended_extent_id ")
 
             if extent in (IntendedExtentType.NULL, IntendedExtentType.NOT_NULL):
-                self.sql_where.append(
-                    f"IS {IntendedExtentType.get_description(extent)}"
-                )
+                self.sql_where.append(f"IS {extent.description}")
             else:
                 self.sql_where.append(
-                    f"{self.criteria_comparator} {IntendedExtentType.get_id(self.criteria_value)}"
+                    f"{self.criteria_comparator} {extent.valid_value_id}"
                 )
 
         except Exception:
@@ -2067,12 +2083,19 @@ class SubjectSelectionQueryBuilder:
         """
         try:
             self._add_join_to_latest_episode()
-            extent_id = IntendedExtentType.get_id(self.criteria_value)
+            extent = IntendedExtentType.by_description_case_insensitive(
+                self.criteria_value
+            )
+            if extent is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+            extent_id = extent.valid_value_id
 
             self.sql_where.append(
-                "AND EXISTS (SELECT 'dsc' FROM v_ds_colonoscopy dsc "
-                "WHERE dsc.episode_id = ep.subject_epis_id "
-                f"AND dsc.intended_extent_id = {extent_id})"
+                " AND EXISTS (SELECT 'dsc' FROM v_ds_colonoscopy dsc "
+                " WHERE dsc.episode_id = ep.subject_epis_id "
+                f" AND dsc.intended_extent_id = {extent_id})"
             )
 
         except Exception:
@@ -2084,10 +2107,18 @@ class SubjectSelectionQueryBuilder:
         """
         try:
             self._add_join_to_surveillance_review()
-            status_id = SurveillanceReviewStatusType.get_id(self.criteria_value)
+            surveillance_review_status_type = (
+                SurveillanceReviewStatusType.by_description_case_insensitive(
+                    self.criteria_value
+                )
+            )
+            if surveillance_review_status_type is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
 
             self.sql_where.append(
-                f"AND sr.review_status_id {self.criteria_comparator} {status_id}"
+                f"AND sr.review_status_id {self.criteria_comparator} {surveillance_review_status_type.valid_value_id}"
             )
 
         except Exception:
@@ -2097,7 +2128,10 @@ class SubjectSelectionQueryBuilder:
         """
         Internal helper. Adds the necessary join to the surveillance review dataset for filtering.
         """
-        self.sql_from.append("-- JOIN to surveillance review placeholder")
+        if not self.sql_from_surveillance_review:
+            self.sql_from_surveillance_review.append(
+                " INNER JOIN surveillance_review sr ON sr.subject_id = ss.screening_subject_id "
+            )
 
     def _add_criteria_does_subject_have_surveillance_review_case(self) -> None:
         """
@@ -2126,10 +2160,18 @@ class SubjectSelectionQueryBuilder:
         """
         try:
             self._add_join_to_surveillance_review()
-            type_id = SurveillanceReviewCaseType.get_id(self.criteria_value)
+            surveillance_review_case_type = (
+                SurveillanceReviewCaseType.by_description_case_insensitive(
+                    self.criteria_value
+                )
+            )
+            if surveillance_review_case_type is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
 
             self.sql_where.append(
-                f"AND sr.review_case_type_id {self.criteria_comparator} {type_id}"
+                f" AND sr.review_case_type_id {self.criteria_comparator} {surveillance_review_case_type.valid_value_id} "
             )
 
         except Exception:
@@ -2230,12 +2272,21 @@ class SubjectSelectionQueryBuilder:
         """
         try:
             column = f"{self.xt}.surgery_result_id"
-            value = self.criteria_value.strip().lower()
 
-            if value == "null":
+            result_type = (
+                SymptomaticProcedureResultType.by_description_case_insensitive(
+                    self.criteria_value
+                )
+            )
+            if result_type is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+
+            if result_type == SymptomaticProcedureResultType.NULL:
                 self.sql_where.append(f" AND {column} IS NULL ")
             else:
-                result_id = SymptomaticProcedureResultType.get_id(self.criteria_value)
+                result_id = result_type.valid_value_id
                 self.sql_where.append(
                     f" AND {column} {self.criteria_comparator} {result_id} "
                 )
@@ -2254,9 +2305,15 @@ class SubjectSelectionQueryBuilder:
             if value == "null":
                 self.sql_where.append(f"AND {column} IS NULL")
             else:
-                type_id = ScreeningReferralType.get_id(self.criteria_value)
+                referral_type = ScreeningReferralType.by_description_case_insensitive(
+                    self.criteria_value
+                )
+                if referral_type is None:
+                    raise SelectionBuilderException(
+                        self.criteria_key_name, self.criteria_value
+                    )
                 self.sql_where.append(
-                    f"AND {column} {self.criteria_comparator} {type_id}"
+                    f" AND {column} {self.criteria_comparator} {referral_type.valid_value_id} "
                 )
 
         except Exception:
@@ -2270,21 +2327,28 @@ class SubjectSelectionQueryBuilder:
         """
         try:
             column = "ss.lynch_sdd_reason_for_change_id"
-            reason = LynchDueDateReasonType.from_description(self.criteria_value)
+            reason = LynchSDDReasonForChangeType.by_description_case_insensitive(
+                self.criteria_value
+            )
+            if reason is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
 
-            if reason == LynchDueDateReasonType.NULL:
-                self.sql_where.append(f"AND {column} IS NULL")
+            if reason == LynchSDDReasonForChangeType.NULL:
+                self.sql_where.append(f" AND {column} IS NULL ")
 
-            elif reason == LynchDueDateReasonType.NOT_NULL:
-                self.sql_where.append(f"AND {column} IS NOT NULL")
+            elif reason == LynchSDDReasonForChangeType.NOT_NULL:
+                self.sql_where.append(f" AND {column} IS NOT NULL ")
 
-            elif reason == LynchDueDateReasonType.UNCHANGED:
+            elif reason == LynchSDDReasonForChangeType.UNCHANGED:
+                self._force_not_modifier_is_invalid_for_criteria_value()
                 if subject is None:
                     raise SelectionBuilderException(
                         self.criteria_key_name,
                         "No subject provided for 'unchanged' logic",
                     )
-                elif getattr(subject, "lynch_due_date_change_reason_id", None) is None:
+                elif subject.lynch_due_date_change_reason_id is None:
                     self.sql_where.append(f"AND {column} IS NULL")
                 else:
                     self.sql_where.append(
@@ -2293,7 +2357,7 @@ class SubjectSelectionQueryBuilder:
 
             else:
                 self.sql_where.append(
-                    f"AND {column} {self.criteria_comparator} {reason}"
+                    f"AND {column} {self.criteria_comparator} {reason.valid_value_id}"
                 )
 
         except Exception:
@@ -2341,34 +2405,37 @@ class SubjectSelectionQueryBuilder:
 
     def _add_criteria_notify_queued_message_status(self) -> None:
         """
-        Filters subjects based on Notify queued message status, e.g. 'S1 (S1w) - new'.
+        Filters subjects based on Notify queued message status.
         """
         try:
-            parts = parse_notify_criteria(self.criteria_value)
-            status = parts["status"]
+            notify_message_event_status_id = (
+                self._get_notify_message_event_status_id_from_criteria()
+            )
+            notify_message_code = self._get_notify_message_code_from_criteria()
+            notify_message_status = self._get_notify_message_status_from_criteria()
 
-            if status == "none":
-                clause = self._SQL_NOT_EXISTS
+            if notify_message_status == NotifyMessageStatus.NONE:
+                self.sql_where.append(" AND NOT EXISTS (")
             else:
-                clause = "EXISTS"
+                self.sql_where.append(" AND EXISTS (")
 
-            self.sql_where.append(f" AND {clause} (")
             self.sql_where.append(
                 " SELECT 1 FROM notify_message_queue nmq "
                 " INNER JOIN notify_message_definition nmd ON nmd.message_definition_id = nmq.message_definition_id "
                 " WHERE nmq.nhs_number = c.nhs_number "
+                f" AND nmd.event_status_id = {notify_message_event_status_id} "
             )
-
-            # Simulate getNotifyMessageEventStatusIdFromCriteria()
-            event_status_id = NotifyEventStatus.get_id(parts["type"])
-            self.sql_where.append(f"AND nmd.event_status_id = {event_status_id} ")
-
-            if status != "none":
-                self.sql_where.append(f" AND nmq.message_status = '{status}' ")
-
-            if "code" in parts and parts["code"]:
-                self.sql_where.append(f" AND nmd.message_code = '{parts['code']}' ")
-
+            if (
+                notify_message_status != NotifyMessageStatus.NONE
+                and notify_message_status is not None
+            ):
+                self.sql_where.append(
+                    f" AND nmq.message_status = '{notify_message_status.description}'"
+                )
+            if notify_message_code is not None:
+                self.sql_where.append(
+                    f" AND nmd.message_code = '{notify_message_code}'"
+                )
             self.sql_where.append(")")
 
         except Exception:
@@ -2376,31 +2443,38 @@ class SubjectSelectionQueryBuilder:
 
     def _add_criteria_notify_archived_message_status(self) -> None:
         """
-        Filters subjects based on archived Notify message criteria, e.g. 'S1 (S1w) - sending'.
+        Filters subjects based on archived Notify message criteria.
         """
         try:
-            parts = parse_notify_criteria(self.criteria_value)
-            status = parts["status"]
+            notify_message_event_status_id = (
+                self._get_notify_message_event_status_id_from_criteria()
+            )
+            notify_message_code = self._get_notify_message_code_from_criteria()
+            notify_message_status = self._get_notify_message_status_from_criteria()
 
-            clause = self._SQL_NOT_EXISTS if status == "none" else "EXISTS"
+            if notify_message_status == NotifyMessageStatus.NONE:
+                self.sql_where.append(" AND NOT EXISTS (")
+            else:
+                self.sql_where.append(" AND EXISTS (")
 
-            self.sql_where.append(f"AND {clause} (")
             self.sql_where.append(
-                "SELECT 1 FROM notify_message_record nmr "
+                " SELECT 1 FROM notify_message_record nmr "
                 "INNER JOIN notify_message_batch nmb ON nmb.batch_id = nmr.batch_id "
                 "INNER JOIN notify_message_definition nmd ON nmd.message_definition_id = nmb.message_definition_id "
                 "WHERE nmr.subject_id = ss.screening_subject_id "
+                f"AND nmd.event_status_id = {notify_message_event_status_id}"
             )
-
-            event_status_id = NotifyEventStatus.get_id(parts["type"])
-            self.sql_where.append(f"AND nmd.event_status_id = {event_status_id} ")
-
-            if "code" in parts and parts["code"]:
-                self.sql_where.append(f"AND nmd.message_code = '{parts['code']}' ")
-
-            if status != "none":
-                self.sql_where.append(f"AND nmr.message_status = '{status}' ")
-
+            if notify_message_code is not None:
+                self.sql_where.append(
+                    f" AND nmd.message_code = '{notify_message_code}'"
+                )
+            if (
+                notify_message_status != NotifyMessageStatus.NONE
+                and notify_message_status is not None
+            ):
+                self.sql_where.append(
+                    f" AND nmr.message_status = '{notify_message_status.description}'"
+                )
             self.sql_where.append(")")
 
         except Exception:
@@ -4467,6 +4541,61 @@ class SubjectSelectionQueryBuilder:
             return True
         except ValueError:
             return False
+
+    def _get_notify_message_event_status_id_from_criteria(self) -> Optional[int]:
+        """
+        Get the event status ID from the notify message criteria.
+        Returns:
+            Optional[int]: The event status ID if found, None otherwise.
+        """
+        if " " in self.criteria_value:
+            notify_message_criteria = self.criteria_value.split(" ")
+            message_type = NotifyMessageType.by_description_case_insensitive(
+                notify_message_criteria[0]
+            )
+            if message_type is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+            return message_type.event_status_id
+        return None
+
+    def _get_notify_message_code_from_criteria(self) -> Optional[str]:
+        """
+        Get the message code from the notify message criteria.
+        Returns:
+            Optional[str]: The message code if found, None otherwise.
+        """
+        if "(" in self.criteria_value:
+            notify_message_criteria = self.criteria_value.split("(")
+            notify_message_codes = notify_message_criteria[1].split(")")
+            message_type = NotifyMessageType.by_description_case_insensitive(
+                notify_message_codes[0]
+            )
+            if message_type is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+            return message_type.description
+        return None
+
+    def _get_notify_message_status_from_criteria(self) -> Optional[NotifyMessageStatus]:
+        """
+        Get the message status from the notify message criteria.
+        Returns:
+            Optional[NotifyMessageStatus]: The message status if found, None otherwise.
+        """
+        if " - " in self.criteria_value:
+            notify_message_criteria = self.criteria_value.split(" - ")
+            message_status = NotifyMessageStatus.by_description_case_insensitive(
+                notify_message_criteria[1]
+            )
+            if message_status is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
+            return message_status
+        return None
 
     @staticmethod
     def single_quoted(value: str) -> str:
