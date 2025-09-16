@@ -2008,8 +2008,8 @@
     "value_source": "HasUnprocessedSSPIUpdates.by_description",
     "notes": "Specify if the subject has unprocessed SSPI updates.",
     "allowed_values": [
-      "yes",
-      "no"
+      "Yes",
+      "No"
     ]
   },
   {
@@ -2017,8 +2017,8 @@
     "value_source": "HasUserDobUpdate.by_description",
     "notes": "Specify if the subject has user date of birth updates.",
     "allowed_values": [
-      "yes",
-      "no"
+      "Yes",
+      "No"
     ]
   },
   {
@@ -2026,8 +2026,8 @@
     "value_source": "SubjectHasEpisode.by_description",
     "notes": "Specify if the subject has any episodes.",
     "allowed_values": [
-      "yes",
-      "no"
+      "Yes",
+      "No"
     ]
   },
   {
@@ -2035,8 +2035,8 @@
     "value_source": "SubjectHasEpisode.by_description",
     "notes": "Specify if the subject has an open episode.",
     "allowed_values": [
-      "yes",
-      "no"
+      "Yes",
+      "No"
     ]
   },
   {
@@ -2044,8 +2044,8 @@
     "value_source": "SubjectHasEpisode.by_description",
     "notes": "Specify if the subject has FOBT episodes.",
     "allowed_values": [
-      "yes",
-      "no"
+      "Yes",
+      "No"
     ]
   },
   {
@@ -3810,9 +3810,9 @@
     "value_source": "",
     "notes": "Specify if the latest episode has a diagnosis date.",
     "allowed_values": [
-      "yes",
-      "no",
-      "yes_date_of_death"
+      "Yes",
+      "No",
+      "Yes - date of death"
     ]
   },
   {
@@ -3820,8 +3820,8 @@
     "value_source": "",
     "notes": "Specify if the subject has diagnostic tests.",
     "allowed_values": [
-      "yes",
-      "no"
+      "Yes",
+      "No"
     ]
   },
   {
@@ -3829,8 +3829,8 @@
     "value_source": "",
     "notes": "Specify if the latest episode has a diagnostic test.",
     "allowed_values": [
-      "yes",
-      "no"
+      "Yes",
+      "No"
     ]
   },
   {
@@ -3859,8 +3859,8 @@
     "value_source": "",
     "notes": "Specify if the latest episode was completed satisfactorily.",
     "allowed_values": [
-      "yes",
-      "no"
+      "Yes",
+      "No"
     ]
   },
   {
@@ -3868,8 +3868,8 @@
     "value_source": "",
     "notes": "Specify if the subject has a diagnostic test containing a polyp.",
     "allowed_values": [
-      "yes",
-      "no"
+      "Yes",
+      "No"
     ]
   },
   {
@@ -3878,9 +3878,9 @@
     "notes": "Specify if the subject has unlogged kits. Options:"
     ,
     "allowed_values": [
-      "yes",
-      "no",
-      "yes_latest_episode"
+      "Yes",
+      "No",
+      "Yes - latest episode"
     ]
   },
   {
@@ -3888,8 +3888,8 @@
     "value_source": "",
     "notes": "Specify if the subject has logged FIT kits.",
     "allowed_values": [
-      "yes",
-      "no"
+      "Yes",
+      "No"
     ]
   },
   {
@@ -3897,8 +3897,8 @@
     "value_source": "",
     "notes": "Specify if the subject has kit notes.",
     "allowed_values": [
-      "yes",
-      "no"
+      "Yes",
+      "No"
     ]
   },
   {
@@ -3906,8 +3906,8 @@
     "value_source": "",
     "notes": "Specify if the subject has a Lynch diagnosis.",
     "allowed_values": [
-      "yes",
-      "no"
+      "Yes",
+      "No"
     ]
   },
   {
@@ -3929,8 +3929,8 @@
     "value_source": "",
     "notes": "Specify if the kit has been read, you must also use 'which test kit'.",
     "allowed_values": [
-      "yes",
-      "no"
+      "Yes",
+      "No"
     ]
   },
   {
@@ -3953,8 +3953,8 @@
     "value_source": "",
     "notes": "Specify if the kit has an analyser result code, you must also use 'which test kit'.",
     "allowed_values": [
-      "yes",
-      "no"
+      "Yes",
+      "No"
     ]
   },
   {
@@ -4061,8 +4061,8 @@
     "value_source": "DiagnosticTestIsVoid.from_description",
     "notes": "Specify if the diagnostic test is void, you must also use 'which diagnostic test'.",
     "allowed_values": [
-      "yes",
-      "no"
+      "Yes",
+      "No"
     ]
   },
   {
@@ -4246,8 +4246,8 @@
     "value_source": "HasDateOfDeathRemoval.from_description",
     "notes": "Specify if the subject has had a date of death removal.",
     "allowed_values": [
-      "yes",
-      "no"
+      "Yes",
+      "No"
     ]
   },
   {
@@ -4255,8 +4255,8 @@
     "value_source": "InvitedSinceAgeExtension.from_description",
     "notes": "Specify if the subject has been invited since the age extension.",
     "allowed_values": [
-      "yes",
-      "no"
+      "Yes",
+      "No"
     ]
   },
   {
@@ -4283,8 +4283,8 @@
     "value_source": "DoesSubjectHaveSurveillanceReviewCase.from_description",
     "notes": "Specify if the subject has an existing surveillance review case.",
     "allowed_values": [
-      "yes",
-      "no"
+      "Yes",
+      "No"
     ]
   },
   {
