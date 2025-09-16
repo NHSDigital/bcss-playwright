@@ -3917,8 +3917,8 @@
     "allowed_values": [
       "any kit in any episode",
       "only issued in latest episode",
-      "first issued in latest_episode",
-      "latest issued in latest_episode",
+      "first issued in latest episode",
+      "latest issued in latest episode",
       "only logged in latest episode",
       "first logged in latest episode",
       "latest logged in latest episode"
