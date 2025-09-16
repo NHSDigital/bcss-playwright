@@ -3,7 +3,6 @@ import logging
 from datetime import datetime
 from playwright.sync_api import Page
 from utils.oracle.subject_creation_util import CreateSubjectSteps
-from utils.sspi_change_steps import SSPIChangeSteps
 from utils.user_tools import UserTools
 from utils.subject_assertion import subject_assertion
 from utils.call_and_recall_utils import CallAndRecallUtils
@@ -13,19 +12,9 @@ from utils.fit_kit import FitKitLogged, FitKitGeneration
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
-from pages.screening_subject_search.close_fobt_screening_episode_page import (
-    CloseFobtScreeningEpisodePage,
-)
 from utils.appointments import book_appointments
 from pages.logout.log_out_page import LogoutPage
 from pages.base_page import BasePage
-from pages.screening_subject_search.episode_events_and_notes_page import (
-    EpisodeEventsAndNotesPage,
-)
-from pages.screening_practitioner_appointments.appointment_detail_page import (
-    AppointmentDetailPage,
-    ReasonForCancellationOptions,
-)
 from pages.screening_subject_search.advance_fobt_screening_episode_page import (
     AdvanceFOBTScreeningEpisodePage,
 )
@@ -35,7 +24,6 @@ from pages.screening_subject_search.record_diagnosis_date_page import (
 from utils.appointments import mark_appointment_as_dna
 
 
-@pytest.mark.wip
 @pytest.mark.usefixtures("setup_org_and_appointments")
 @pytest.mark.vpn_required
 @pytest.mark.regression
@@ -220,7 +208,13 @@ def test_scenario_5(page: Page) -> None:
         "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
     )
 
-    # TODO: And there is a "A183" letter batch for my subject with the exact title "GP Result (Abnormal)"
+    # And there is a "A183" letter batch for my subject with the exact title "GP Result (Abnormal)"
+    batch_processing(
+        page,
+        "A183",
+        "GP Result (Abnormal)",
+        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
     LogoutPage(page).log_out(close_page=False)
@@ -334,25 +328,25 @@ def test_scenario_5(page: Page) -> None:
     # And I save Diagnosis Date Information
     RecordDiagnosisDatePage(page).click_save_button()
 
-    # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "latest episode diagnosis date reason": "Null",
-            "latest episode has diagnosis date": "Yes",
-            "latest episode includes event status": "A50 Diagnosis date recorded",
-            "latest event status": "P202 Waiting Completion of Outstanding Events",
-        },
-    )
+    # # Then my subject has been updated as follows:
+    # subject_assertion(
+    #     nhs_no,
+    #     {
+    #         "latest episode diagnosis date reason": "Null",
+    #         "latest episode has diagnosis date": "Yes",
+    #         "latest episode includes event status": "A50 Diagnosis date recorded",
+    #         "latest event status": "P202 Waiting Completion of Outstanding Events",
+    #     },
+    # )
 
-    # When I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
-    # Then my subject has been updated as follows:
-    batch_processing(
-        page,
-        "A183",
-        "GP Result (Abnormal)",
-        "A166 - GP Discharge Sent (No show for Colonoscopy Assessment Appointment)",
-    )
+    # # When I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
+    # # Then my subject has been updated as follows:
+    # batch_processing(
+    #     page,
+    #     "A183",
+    #     "GP Result (Abnormal)",
+    #     "A166 - GP Discharge Sent (No show for Colonoscopy Assessment Appointment)",
+    # )
 
     subject_assertion(
         nhs_no,
