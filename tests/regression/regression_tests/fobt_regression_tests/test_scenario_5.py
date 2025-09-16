@@ -242,7 +242,7 @@ def test_scenario_5(page: Page) -> None:
         page,
         "J11",
         "Practitioner Clinic 1st Appointment Non Attendance (Patient)",
-        "J27 Appointment Non-attendance Letter Sent (Patient)",
+        "J27 - Appointment Non-attendance Letter Sent (Patient)",
     )
 
     # When I view the subject
@@ -301,7 +301,7 @@ def test_scenario_5(page: Page) -> None:
         page,
         "A185",
         "Patient Discharge (Non Attendance of Practitioner Clinic)",
-        "A37 Patient Discharge Sent (Non-attendance at Colonoscopy Assessment Appointment)",
+        "A37 - Patient Discharge Sent (Non-attendance at Colonoscopy Assessment Appointment)",
     )
 
     # When I switch users to BCSS "England" as user role "Hub Manager"
@@ -316,7 +316,7 @@ def test_scenario_5(page: Page) -> None:
         page,
         "A37",
         "GP Discharge (Non Attendance of Practitioner Clinic)",
-        "P202 Waiting Completion of Outstanding Events",
+        "P202 - Waiting Completion of Outstanding Events",
     )
 
     # When I view the subject
@@ -351,7 +351,7 @@ def test_scenario_5(page: Page) -> None:
         page,
         "A183",
         "GP Result (Abnormal)",
-        "A166 GP Discharge Sent (No show for Colonoscopy Assessment Appointment)",
+        "A166 - GP Discharge Sent (No show for Colonoscopy Assessment Appointment)",
     )
 
     subject_assertion(

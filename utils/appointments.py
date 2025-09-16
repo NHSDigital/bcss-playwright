@@ -160,7 +160,7 @@ def mark_appointment_as_dna(page: Page, non_attendance_reason: str) -> None:
     )
     subject_screening_summary_page.click_list_episodes()
     subject_screening_summary_page.click_view_events_link()
-    episode_events_and_notes_page.click_view_appointment_link()
+    episode_events_and_notes_page.click_most_recent_view_appointment_link()
     appointment_detail_page.check_attendance_radio()
     page.locator("#UI_NON_ATTENDANCE_REASON").select_option(label=non_attendance_reason)
     appointment_detail_page.click_save_button(accept_dialog=True)
