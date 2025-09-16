@@ -1502,18 +1502,18 @@ class SubjectSelectionQueryBuilder:
 
             # Base join for all paths (only FIT kits)
             self.sql_from.append(
-                f"INNER JOIN tk_items_t {tk_alias} ON {tk_alias}.screening_subject_id = ss.screening_subject_id "
-                f"AND {tk_alias}.tk_type_id > 1"
+                f" INNER JOIN tk_items_t {tk_alias} ON {tk_alias}.screening_subject_id = ss.screening_subject_id "
+                f" AND {tk_alias}.tk_type_id > 1 "
             )
 
-            if value == "any_kit_in_any_episode":
+            if value == "any kit in any episode":
                 return
 
-            if "issued_in_latest_episode" in value:
+            if "issued in latest episode" in value:
                 self._add_join_to_latest_episode()
                 self.sql_from.append(
-                    f"AND {tk_alias}.subject_epis_id = ep.subject_epis_id "
-                    f"AND NOT EXISTS ("
+                    f" AND {tk_alias}.subject_epis_id = ep.subject_epis_id "
+                    f" AND NOT EXISTS ("
                     f" SELECT 'tko1' FROM tk_items_t tko "
                     f" WHERE tko.screening_subject_id = ss.screening_subject_id "
                     f" AND tko.subject_epis_id = ep.subject_epis_id "
@@ -1524,26 +1524,26 @@ class SubjectSelectionQueryBuilder:
                     comparator = "<"
                 else:  # latest
                     comparator = ">"
-                self.sql_from.append(f" AND tko.kitid {comparator} {tk_alias}.kitid)")
+                self.sql_from.append(f" AND tko.kitid {comparator} {tk_alias}.kitid) ")
 
-            elif "logged_in_latest_episode" in value:
+            elif "logged in latest episode" in value:
                 self._add_join_to_latest_episode()
                 self.sql_from.append(
-                    f"AND {tk_alias}.logged_subject_epis_id = ep.subject_epis_id "
-                    f"AND NOT EXISTS ("
+                    f" AND {tk_alias}.logged_subject_epis_id = ep.subject_epis_id "
+                    f" AND NOT EXISTS ( "
                     f" SELECT 'tko2' FROM tk_items_t tko "
                     f" WHERE tko.screening_subject_id = ss.screening_subject_id "
-                    f" AND tko.logged_subject_epis_id = ep.subject_epis_id"
+                    f" AND tko.logged_subject_epis_id = ep.subject_epis_id "
                 )
                 if value.startswith("only"):
-                    self.sql_from.append(f" AND tko.kitid != {tk_alias}.kitid")
+                    self.sql_from.append(f" AND tko.kitid != {tk_alias}.kitid ")
                 elif value.startswith("first"):
                     self.sql_from.append(
-                        f" AND tko.logged_in_on < {tk_alias}.logged_in_on"
+                        f" AND tko.logged_in_on < {tk_alias}.logged_in_on "
                     )
                 else:  # latest
                     self.sql_from.append(
-                        f" AND tko.logged_in_on > {tk_alias}.logged_in_on"
+                        f" AND tko.logged_in_on > {tk_alias}.logged_in_on "
                     )
                 self.sql_from.append(")")
 
@@ -1634,26 +1634,26 @@ class SubjectSelectionQueryBuilder:
 
             self._add_join_to_latest_episode()
             self.sql_from.append(
-                f"INNER JOIN appointment_t {ap_alias} ON {ap_alias}.subject_epis_id = ep.subject_epis_id"
+                f" INNER JOIN appointment_t {ap_alias} ON {ap_alias}.subject_epis_id = ep.subject_epis_id "
             )
 
             if value == "any_appointment_in_latest_episode":
                 return
-            elif value == "latest_appointment_in_latest_episode":
+            elif value == "latest appointment in latest episode":
                 self.sql_from.append(
-                    f"AND {ap_alias}.appointment_id = ("
-                    f" SELECT MAX(apx.appointment_id)"
-                    f" FROM appointment_t apx"
-                    f" WHERE apx.subject_epis_id = ep.subject_epis_id"
-                    f" AND apx.void = 'N')"
+                    f" AND {ap_alias}.appointment_id = ( "
+                    f" SELECT MAX(apx.appointment_id) "
+                    f" FROM appointment_t apx "
+                    f" WHERE apx.subject_epis_id = ep.subject_epis_id "
+                    f" AND apx.void = 'N') "
                 )
-            elif value == "earlier_appointment_in_latest_episode":
+            elif value == "earlier appointment in latest episode":
                 self.sql_from.append(
-                    f"AND {ap_alias}.appointment_id < {apr_alias}.appointment_id"
+                    f" AND {ap_alias}.appointment_id < {apr_alias}.appointment_id "
                 )
-            elif value == "later_appointment_in_latest_episode":
+            elif value == "later appointment in latest episode":
                 self.sql_from.append(
-                    f"AND {ap_alias}.appointment_id > {apr_alias}.appointment_id"
+                    f" AND {ap_alias}.appointment_id > {apr_alias}.appointment_id "
                 )
             else:
                 raise ValueError(f"Invalid appointment selection value: {value}")

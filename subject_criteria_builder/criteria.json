@@ -3915,13 +3915,13 @@
     "value_source": "",
     "notes": "Specify which test kit to use.",
     "allowed_values": [
-      "any_kit_in_any_episode",
-      "only issued_in_latest_episode",
-      "first issued_in_latest_episode",
-      "latest issued_in_latest_episode",
-      "only logged_in_latest_episode",
-      "first logged_in_latest_episode",
-      "latest logged_in_latest_episode"
+      "any kit in any episode",
+      "only issued in latest episode",
+      "first issued in latest_episode",
+      "latest issued in latest_episode",
+      "only logged in latest episode",
+      "first logged in latest episode",
+      "latest logged in latest episode"
     ]
   },
   {
@@ -3962,10 +3962,10 @@
     "value_source": "",
     "notes": "Specify which appointment to use.",
     "allowed_values": [
-      "any_appointment_in_latest_episode",
-      "latest_appointment_in_latest_episode",
-      "earlier_appointment_in_latest_episode",
-      "later_appointment_in_latest_episode"
+      "any appointment in latest episode",
+      "latest appointment in latest episode",
+      "earlier appointment in latest_episode",
+      "later appointment in latest episode"
 
     ]
   },
