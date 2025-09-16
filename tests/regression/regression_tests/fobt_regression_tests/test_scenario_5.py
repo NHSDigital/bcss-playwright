@@ -328,6 +328,9 @@ def test_scenario_5(page: Page) -> None:
     # And I save Diagnosis Date Information
     RecordDiagnosisDatePage(page).click_save_button()
 
+    # The steps below have been commented out because it appears that the A50 event is not currently being created when the diagnosis date is recorded. 
+    # The final assertion (line 353) passes without these steps so this needs to be investigated and fixed when Kate and Rob return from leave.
+    
     # # Then my subject has been updated as follows:
     # subject_assertion(
     #     nhs_no,
