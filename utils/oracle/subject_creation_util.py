@@ -5,7 +5,7 @@ import random
 from utils.oracle.oracle import OracleDB
 from utils.nhs_number_tools import NHSNumberTools
 from classes.screening.region_type import RegionType
-from classes.repositories.investigation_repository import InvitationRepository
+from classes.repositories.invitation_repository import InvitationRepository
 from classes.data.data_creation import DataCreation
 from classes.repositories.word_repository import WordRepository
 from classes.subject.pi_subject import PISubject
