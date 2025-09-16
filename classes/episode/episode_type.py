@@ -16,11 +16,11 @@ class EpisodeType(Enum):
     """
 
     FOBT = (11350, "FOBT")
-    Fobt = (11350, "FOBT Screening")
-    BowelScope = (200640, "Bowel Scope")
-    Surveillance = (11351, "Surveillance")
+    FOBT_SCREENING = (11350, "FOBT Screening")
+    BOWEL_SCOPE = (200640, "Bowel Scope")
+    SURVEILLANCE = (11351, "Surveillance")
     LYNCH_SURVEILLANCE = (305633, "Lynch Surveillance")
-    Lynch = (305633, "Lynch")
+    LYNCH = (305633, "Lynch")
 
     def __init__(self, valid_value_id, description):
         """
