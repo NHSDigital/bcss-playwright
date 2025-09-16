@@ -2,15 +2,18 @@ from enum import Enum
 from typing import Optional
 
 
-class AppointmentStatusType(Enum):
+class AppointmentSlotType(Enum):
     """
-    Enum representing appointment status types, mapped to valid value IDs and descriptions.
+    Enum representing appointment slot types, mapped to valid value IDs and descriptions.
+    Provides utility methods for lookup by description (case-sensitive and insensitive) and by valid value ID.
     """
 
-    ATTENDED = (6121, "Attended")
-    BOOKED = (6120, "Booked")
-    CANCELLED = (6122, "Cancelled")
-    DID_NOT_ATTEND = (6123, "Did Not Attend")
+    COLONOSCOPY_ASSESSMENT = (209028, "Colonoscopy Assessment")
+    BOWEL_SCOPE_AUTOMATIC = (200526, "FS Automatic")
+    BOWEL_SCOPE_MANUAL = (200527, "FS Manual")
+    POSITIVE_ASSESSMENT = (6016, "Positive Assessment")
+    POST_INVESTIGATION = (6017, "Post-Investigation")
+    SURVEILLANCE = (20061, "Surveillance")
 
     def __init__(self, valid_value_id: int, description: str) -> None:
         self._valid_value_id = valid_value_id
@@ -19,19 +22,19 @@ class AppointmentStatusType(Enum):
     @property
     def valid_value_id(self) -> int:
         """
-        Returns the valid value ID for the appointment status type.
+        Returns the valid value ID for the appointment slot type.
         """
         return self._valid_value_id
 
     @property
     def description(self) -> str:
         """
-        Returns the description for the appointment status type.
+        Returns the description for the appointment slot type.
         """
         return self._description
 
     @classmethod
-    def by_description(cls, description: str) -> Optional["AppointmentStatusType"]:
+    def by_description(cls, description: str) -> Optional["AppointmentSlotType"]:
         """
         Returns the enum member matching the given description (case-sensitive).
         """
@@ -43,7 +46,7 @@ class AppointmentStatusType(Enum):
     @classmethod
     def by_description_case_insensitive(
         cls, description: str
-    ) -> Optional["AppointmentStatusType"]:
+    ) -> Optional["AppointmentSlotType"]:
         """
         Returns the enum member matching the given description (case-insensitive).
         """
@@ -54,9 +57,7 @@ class AppointmentStatusType(Enum):
         return None
 
     @classmethod
-    def by_valid_value_id(
-        cls, valid_value_id: int
-    ) -> Optional["AppointmentStatusType"]:
+    def by_valid_value_id(cls, valid_value_id: int) -> Optional["AppointmentSlotType"]:
         """
         Returns the enum member matching the given valid value ID.
         """

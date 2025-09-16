@@ -1,64 +1,76 @@
-class WhichDiagnosticTest:
+from enum import Enum
+from typing import Optional
+
+
+class WhichDiagnosticTest(Enum):
     """
-    Maps descriptive diagnostic test selection types to internal constants.
-    Used to determine join and filter behavior in the query builder.
-
-    Members:
-        ANY_TEST_IN_ANY_EPISODE: Any test in any episode.
-        ANY_TEST_IN_LATEST_EPISODE: Any test in the latest episode.
-        ONLY_TEST_IN_LATEST_EPISODE: Only test in the latest episode.
-        ONLY_NOT_VOID_TEST_IN_LATEST_EPISODE: Only not void test in the latest episode.
-        LATEST_TEST_IN_LATEST_EPISODE: Latest test in the latest episode.
-        LATEST_NOT_VOID_TEST_IN_LATEST_EPISODE: Latest not void test in the latest episode.
-        EARLIEST_NOT_VOID_TEST_IN_LATEST_EPISODE: Earliest not void test in the latest episode.
-        EARLIER_TEST_IN_LATEST_EPISODE: Earlier test in the latest episode.
-        LATER_TEST_IN_LATEST_EPISODE: Later test in the latest episode.
-
-    Methods:
-        from_description(description: str) -> str:
-            Returns the internal constant for a given description.
-            Raises ValueError if the description is not recognized.
+    Enum representing which diagnostic test to select, with description and test number.
+    Provides utility methods for lookup by description (case-sensitive and insensitive).
     """
 
-    ANY_TEST_IN_ANY_EPISODE = "any_test_in_any_episode"
-    ANY_TEST_IN_LATEST_EPISODE = "any_test_in_latest_episode"
-    ONLY_TEST_IN_LATEST_EPISODE = "only_test_in_latest_episode"
-    ONLY_NOT_VOID_TEST_IN_LATEST_EPISODE = "only_not_void_test_in_latest_episode"
-    LATEST_TEST_IN_LATEST_EPISODE = "latest_test_in_latest_episode"
-    LATEST_NOT_VOID_TEST_IN_LATEST_EPISODE = "latest_not_void_test_in_latest_episode"
-    EARLIEST_NOT_VOID_TEST_IN_LATEST_EPISODE = (
-        "earliest_not_void_test_in_latest_episode"
+    ANY_TEST_IN_ANY_EPISODE = ("any test in any episode", 0)
+    ANY_TEST_IN_LATEST_EPISODE = ("any test in latest episode", 0)
+    EARLIER_TEST_IN_LATEST_EPISODE = ("earlier test in latest episode", 0)
+    LATER_TEST_IN_LATEST_EPISODE = ("later test in latest episode", 0)
+    LATEST_EPISODE_TEST_1 = ("latest episode test 1", 1)
+    LATEST_EPISODE_TEST_2 = ("latest episode test 2", 2)
+    LATEST_EPISODE_TEST_3 = ("latest episode test 3", 3)
+    LATEST_EPISODE_TEST_4 = ("latest episode test 4", 4)
+    LATEST_EPISODE_TEST_5 = ("latest episode test 5", 5)
+    LATEST_EPISODE_TEST_6 = ("latest episode test 6", 6)
+    LATEST_EPISODE_TEST_7 = ("latest episode test 7", 7)
+    LATEST_EPISODE_TEST_8 = ("latest episode test 8", 8)
+    LATEST_EPISODE_TEST_9 = ("latest episode test 9", 9)
+    LATEST_EPISODE_TEST_10 = ("latest episode test 10", 10)
+    LATEST_NOT_VOID_TEST_IN_LATEST_EPISODE = (
+        "latest not-void test in latest episode",
+        0,
     )
-    EARLIER_TEST_IN_LATEST_EPISODE = "earlier_test_in_latest_episode"
-    LATER_TEST_IN_LATEST_EPISODE = "later_test_in_latest_episode"
+    LATEST_TEST_IN_LATEST_EPISODE = ("latest test in latest episode", 0)
+    EARLIEST_NOT_VOID_TEST_IN_LATEST_EPISODE = (
+        "earliest not-void test in latest episode",
+        0,
+    )
+    ONLY_NOT_VOID_TEST_IN_LATEST_EPISODE = ("only not-void test in latest episode", 0)
+    ONLY_TEST_IN_LATEST_EPISODE = ("only test in latest episode", 0)
 
-    _valid_values = {
-        ANY_TEST_IN_ANY_EPISODE,
-        ANY_TEST_IN_LATEST_EPISODE,
-        ONLY_TEST_IN_LATEST_EPISODE,
-        ONLY_NOT_VOID_TEST_IN_LATEST_EPISODE,
-        LATEST_TEST_IN_LATEST_EPISODE,
-        LATEST_NOT_VOID_TEST_IN_LATEST_EPISODE,
-        EARLIEST_NOT_VOID_TEST_IN_LATEST_EPISODE,
-        EARLIER_TEST_IN_LATEST_EPISODE,
-        LATER_TEST_IN_LATEST_EPISODE,
-    }
+    def __init__(self, description: str, test_number: int) -> None:
+        self._description = description
+        self._test_number = test_number
+
+    @property
+    def description(self) -> str:
+        """
+        Returns the description for the diagnostic test selection.
+        """
+        return self._description
+
+    @property
+    def test_number(self) -> int:
+        """
+        Returns the test number for the diagnostic test selection.
+        """
+        return self._test_number
 
     @classmethod
-    def from_description(cls, description: str) -> str:
+    def by_description(cls, description: str) -> Optional["WhichDiagnosticTest"]:
         """
-        Returns the internal constant for a given description.
-
-        Args:
-            description (str): The description to look up.
-
-        Returns:
-            str: The internal constant matching the description.
-
-        Raises:
-            ValueError: If the description is not recognized.
+        Returns the enum member matching the given description (case-sensitive).
         """
-        key = description.strip().lower()
-        if key not in cls._valid_values:
-            raise ValueError(f"Unknown diagnostic test selection: '{description}'")
-        return key
+        for member in cls:
+            if member.description == description:
+                return member
+        return None
+
+    @classmethod
+    def by_description_case_insensitive(
+        cls, description: str
+    ) -> Optional["WhichDiagnosticTest"]:
+        """
+        Returns the enum member matching the given description (case-insensitive).
+        """
+        desc_lower = description.lower()
+        for member in cls:
+            if member.description.lower() == desc_lower:
+                return member
+        return None

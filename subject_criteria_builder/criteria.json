@@ -57,9 +57,9 @@
     "value_source": "HasGPPractice.by_description",
     "notes": "Specify if the subject has a GP practice.",
     "allowed_values": [
-      "no",
-      "yes - active",
-      "yes - inactive"
+      "No",
+      "Yes - active",
+      "Yes - inactive"
     ]
   },
   {
@@ -956,10 +956,10 @@
     "value_source": "ManualCeaseRequested.by_description_case_insensitive",
     "notes": "Specify if a manual cease has been requested for the subject.",
     "allowed_values": [
-      "no",
-      "yes - disclaimer letter required (c1)",
-      "yes - disclaimer letter sent (c2)",
-      "yes"
+      "No",
+      "Yes - disclaimer letter required (C1)",
+      "Yes - disclaimer letter sent (C2)",
+      "Yes"
     ]
   },
   {
@@ -3801,8 +3801,8 @@
       "more than 28 days ago",
       "within the last 28 days",
       "past",
-      "no",
-      "yes"
+      "No",
+      "Yes"
     ]
   },
   {
@@ -3971,23 +3971,26 @@
   },
   {
     "key": "APPOINTMENT_TYPE",
-    "value_source": "AppointmentSlotType.get_id",
+    "value_source": "AppointmentSlotType.valid_value_id",
     "notes": "Select the type of appointment, you must also use 'which appointment'.",
     "allowed_values": [
-        "clinic",
-        "phone",
-        "video"
+        "Colonoscopy Assessment",
+        "FS Automatic",
+        "FS Manual",
+        "Positive Assessment",
+        "Post-Investigation",
+        "Surveillance"
     ]
   },
   {
     "key": "APPOINTMENT_STATUS",
-    "value_source": "AppointmentStatusType.get_id",
+    "value_source": "AppointmentStatusType.valid_value_id",
     "notes": "Select the status of the appointment, you must also use 'which appointment'.",
     "allowed_values": [
-      "booked",
-      "attended",
-      "cancelled",
-      "dna"
+      "Booked",
+      "Attended",
+      "Cancelled",
+      "Did Not Attend"
     ]
   },
   {
@@ -4005,38 +4008,52 @@
   },
   {
     "key": "WHICH_DIAGNOSTIC_TEST",
-    "value_source": "WhichDiagnosticTest.from_description",
+    "value_source": "WhichDiagnosticTest.by_description_case_insensitive",
     "notes": "Select which diagnostic test to use.",
     "allowed_values": [
-      "any_test_in_any_episode",
-      "any_test_in_latest_episode",
-      "only_test_in_latest_episode",
-      "only_not_void_test_in_latest_episode",
-      "latest_test_in_latest_episode",
-      "latest_not_void_test_in_latest_episode",
-      "earliest_not_void_test_in_latest_episode",
-      "earlier_test_in_latest_episode",
-      "later_test_in_latest_episode"
+      "any test in any episode",
+      "any test in latest episode",
+      "earlier test in latest episode",
+      "later test in latest episode",
+      "latest episode test 1",
+      "latest episode test 2",
+      "latest episode test 3",
+      "latest episode test 4",
+      "latest episode test 5",
+      "latest episode test 6",
+      "latest episode test 7",
+      "latest episode test 8",
+      "latest episode test 9",
+      "latest episode test 10",
+      "latest not-void test in latest episode",
+      "latest test in latest episode",
+      "earliest not-void test in latest episode",
+      "only not-void test in latest episode",
+      "only test in latest episode"
     ]
   },
   {
     "key": "DIAGNOSTIC_TEST_CONFIRMED_TYPE",
-    "value_source": "DiagnosticTestType.get_valid_value_id",
+    "value_source": "DiagnosticTestType.valid_value_id",
     "notes": "Select the confirmed type of diagnostic test, you must also use 'which diagnostic test'.",
     "allowed_values": [
-      "pcr",
-      "antigen",
-      "lateral flow"
+      "CT Colonography",
+      "Colonoscopy",
+      "Flexible Sigmoidoscopy",
+      "Limited Colonoscopy",
+      "NHS bowel scope"
     ]
   },
   {
     "key": "DIAGNOSTIC_TEST_PROPOSED_TYPE",
-    "value_source": "DiagnosticTestType.get_valid_value_id",
+    "value_source": "DiagnosticTestType.valid_value_id",
     "notes": "Select the proposed type of diagnostic test, you must also use 'which diagnostic test'.",
     "allowed_values": [
-      "pcr",
-      "antigen",
-      "lateral flow"
+      "CT Colonography",
+      "Colonoscopy",
+      "Flexible Sigmoidoscopy",
+      "Limited Colonoscopy",
+      "NHS bowel scope"
     ]
   },
   {
@@ -4131,10 +4148,10 @@
     "value_source": "LatestEpisodeHasDataset.from_description",
     "notes": "Specify if the latest episode has a cancer audit dataset.",
     "allowed_values": [
-      "yes_incomplete",
-      "yes_complete",
-      "no",
-      "past"
+      "Yes - incomplete",
+      "Yes - complete",
+      "No",
+      "Past"
     ]
   },
   {
@@ -4142,10 +4159,10 @@
     "value_source": "LatestEpisodeHasDataset.from_description",
     "notes": "Specify if the latest episode has a colonoscopy assessment dataset.",
     "allowed_values": [
-      "yes_incomplete",
-      "yes_complete",
-      "no",
-      "past"
+      "Yes - incomplete",
+      "Yes - complete",
+      "No",
+      "Past"
     ]
   },
   {
@@ -4153,10 +4170,10 @@
     "value_source": "LatestEpisodeHasDataset.from_description",
     "notes": "Specify if the latest episode has an MDT dataset.",
     "allowed_values": [
-      "yes_incomplete",
-      "yes_complete",
-      "no",
-      "past"
+      "Yes - incomplete",
+      "Yes - complete",
+      "No",
+      "Past"
     ]
   },
   {
@@ -4164,13 +4181,13 @@
     "value_source": "LatestEpisodeLatestInvestigationDataset.from_description",
     "notes": "Specify the latest investigation dataset for the latest episode.",
     "allowed_values": [
-      "none",
-      "colonoscopy_new",
-      "limited_colonoscopy_new",
-      "flexible_sigmoidoscopy_new",
-      "ct_colonography_new",
-      "endoscopy_incomplete",
-      "radiology_incomplete"
+      "None",
+      "Colonoscopy - new",
+      "Limited colonoscopy - new",
+      "Flexible sigmoidoscopy - new",
+      "CT colonography - new",
+      "Endoscopy - incomplete",
+      "Radiology - incomplete"
     ]
   },
   {
@@ -4514,9 +4531,9 @@
     "notes": "Select the Lynch incident episode type.",
     "allowed_values": [
       "null",
-      "not_null",
-      "latest_episode",
-      "earlier_episode"
+      "not null",
+      "latest episode",
+      "earlier episode"
     ]
   },
   {

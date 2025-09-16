@@ -20,10 +20,10 @@ class ManualCeaseRequested(Enum):
             Returns the enum member matching the given description (case-insensitive), or None if not found.
     """
 
-    NO = "no"
-    DISCLAIMER_LETTER_REQUIRED = "yes - disclaimer letter required (c1)"
-    DISCLAIMER_LETTER_SENT = "yes - disclaimer letter sent (c2)"
-    YES = "yes"
+    NO = "No"
+    DISCLAIMER_LETTER_REQUIRED = "Yes - disclaimer letter required (C1)"
+    DISCLAIMER_LETTER_SENT = "Yes - disclaimer letter sent (C2)"
+    YES = "Yes"
 
     def __init__(self, description: str) -> None:
         """

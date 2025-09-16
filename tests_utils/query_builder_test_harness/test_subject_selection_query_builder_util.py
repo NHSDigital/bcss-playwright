@@ -49,7 +49,7 @@ def test_subject_selection_query_builder():
     ), "NHS number should match the input"
 
     criteria = {
-        "subject has temporary address": "no",
+        "subject has temporary address": "No",
     }
     user = User()
     subject = Subject()

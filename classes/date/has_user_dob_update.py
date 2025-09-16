@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional, Dict
+from typing import Optional
 
 
 class HasUserDobUpdate(Enum):
@@ -17,8 +17,8 @@ class HasUserDobUpdate(Enum):
             Returns the string description of the enum member.
     """
 
-    NO = "no"
-    YES = "yes"
+    NO = "No"
+    YES = "Yes"
 
     @classmethod
     def by_description(cls, description: str) -> Optional["HasUserDobUpdate"]:

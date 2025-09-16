@@ -17,8 +17,8 @@ class SubjectHasEpisode(Enum):
             Returns the string description of the enum member.
     """
 
-    YES = "yes"
-    NO = "no"
+    YES = "Yes"
+    NO = "No"
 
     @classmethod
     def by_description(cls, description: str) -> Optional["SubjectHasEpisode"]:

@@ -19,13 +19,13 @@ class LatestEpisodeLatestInvestigationDataset:
             Raises ValueError if the description is not recognized.
     """
 
-    NONE = "none"
-    COLONOSCOPY_NEW = "colonoscopy_new"
-    LIMITED_COLONOSCOPY_NEW = "limited_colonoscopy_new"
-    FLEXIBLE_SIGMOIDOSCOPY_NEW = "flexible_sigmoidoscopy_new"
-    CT_COLONOGRAPHY_NEW = "ct_colonography_new"
-    ENDOSCOPY_INCOMPLETE = "endoscopy_incomplete"
-    RADIOLOGY_INCOMPLETE = "radiology_incomplete"
+    NONE = "None"
+    COLONOSCOPY_NEW = "Colonoscopy - new"
+    LIMITED_COLONOSCOPY_NEW = "Limited colonoscopy - new"
+    FLEXIBLE_SIGMOIDOSCOPY_NEW = "Flexible sigmoidoscopy - new"
+    CT_COLONOGRAPHY_NEW = "CT colonography - new"
+    ENDOSCOPY_INCOMPLETE = "Endoscopy - incomplete"
+    RADIOLOGY_INCOMPLETE = "Radiology - incomplete"
 
     _valid_values = {
         NONE,

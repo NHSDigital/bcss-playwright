@@ -187,7 +187,7 @@ def find_subject(
     if column:
         criteria["add column to select statement"] = column
     if inactive_gp_practice:
-        criteria["has gp practice"] = "yes - inactive"
+        criteria["has gp practice"] = "Yes - inactive"
     subject = Subject()
     user = User()
     builder = SubjectSelectionQueryBuilder()

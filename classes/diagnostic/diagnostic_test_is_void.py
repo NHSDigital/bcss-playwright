@@ -1,37 +1,30 @@
-class DiagnosticTestIsVoid:
+from enum import Enum
+
+
+class DiagnosticTestIsVoid(Enum):
     """
-    Utility class for mapping descriptive yes/no flags to test void state checks.
-
-    This class provides:
-        - Logical flags for "yes" and "no" to indicate if a diagnostic test is void.
-        - A method to convert a description to a valid flag.
-
-    Methods:
-        from_description(description: str) -> str:
-            Returns the logical flag ("yes" or "no") for a given description.
-            Raises ValueError if the description is not recognized.
+    Enum for mapping descriptive yes/no flags to test void state checks.
     """
 
-    YES = "yes"
-    NO = "no"
-
-    _valid_values = {YES, NO}
+    YES = "Yes"
+    NO = "No"
 
     @classmethod
-    def from_description(cls, description: str) -> str:
+    def from_description(cls, description: str) -> "DiagnosticTestIsVoid":
         """
-        Returns the logical flag ("yes" or "no") for a given description.
+        Returns the Enum member for a given description.
 
         Args:
-            description (str): The description to check (e.g., "yes" or "no").
+            description (str): The description to check (e.g., "Yes" or "No").
 
         Returns:
-            str: The logical flag ("yes" or "no").
+            DiagnosticTestIsVoid: The corresponding Enum member.
 
         Raises:
             ValueError: If the description is not recognized.
         """
         key = description.strip().lower()
-        if key not in cls._valid_values:
-            raise ValueError(f"Unknown test void flag: '{description}'")
-        return key
+        for member in cls:
+            if member.value == key:
+                return member
+        raise ValueError(f"Unknown test void flag: '{description}'")

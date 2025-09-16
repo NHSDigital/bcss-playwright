@@ -8,9 +8,9 @@ class HasReferralDate(Enum):
     """
 
     MORE_THAN_28_DAYS_AGO = "more than 28 days ago"
-    NO = "no"
+    NO = "No"
     PAST = "past"
-    YES = "yes"
+    YES = "Yes"
     WITHIN_THE_LAST_28_DAYS = "within the last 28 days"
 
     def __init__(self, description: str):

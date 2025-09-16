@@ -364,7 +364,7 @@ def obtain_test_data_nhs_no() -> str:
     """
     criteria = {
         "subject age": "<= 80",
-        "subject has temporary address": "no",
+        "subject has temporary address": "No",
     }
     user = User()
     subject = Subject()

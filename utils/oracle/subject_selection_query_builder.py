@@ -29,7 +29,7 @@ from classes.user.user import User
 from classes.subject_selection_query_builder.selection_builder_exception import (
     SelectionBuilderException,
 )
-from classes.appointment.appointments_slot_type import AppointmentSlotType
+from classes.appointment.appointment_slot_type import AppointmentSlotType
 from classes.appointment.appointment_status_type import AppointmentStatusType
 from classes.diagnostic.which_diagnostic_test import WhichDiagnosticTest
 from classes.diagnostic.diagnostic_test_type import DiagnosticTestType
@@ -1199,12 +1199,12 @@ class SubjectSelectionQueryBuilder:
             value = self.criteria_value.strip().lower()
 
             if value == "yes":
-                self.sql_where.append("AND ep.diagnosis_date IS NOT NULL")
+                self.sql_where.append(" AND ep.diagnosis_date IS NOT NULL ")
             elif value == "no":
-                self.sql_where.append("AND ep.diagnosis_date IS NULL")
-            elif value == "yes_date_of_death":
-                self.sql_where.append("AND ep.diagnosis_date IS NOT NULL")
-                self.sql_where.append("AND ep.diagnosis_date = c.date_of_death")
+                self.sql_where.append(" AND ep.diagnosis_date IS NULL ")
+            elif value == "yes - date of death":
+                self.sql_where.append(" AND ep.diagnosis_date IS NOT NULL ")
+                self.sql_where.append(" AND ep.diagnosis_date = c.date_of_death ")
             else:
                 raise ValueError(f"Unknown condition for diagnosis date: {value}")
 
@@ -1365,13 +1365,13 @@ class SubjectSelectionQueryBuilder:
         Adds a filter to check for unlogged kits across subject history,
         or scoped to the latest episode. Accepts:
         - "yes"
-        - "yes_latest_episode"
+        - "yes - latest episode"
         - "no"
         """
         try:
             value = self.criteria_value.strip().lower()
 
-            if value in ("yes", "yes_latest_episode"):
+            if value in ("yes", "yes - latest episode"):
                 prefix = self._SQL_AND_EXISTS
             elif value == "no":
                 prefix = self._SQL_AND_NOT_EXISTS
@@ -1380,17 +1380,17 @@ class SubjectSelectionQueryBuilder:
 
             subquery = [
                 f"{prefix} (",
-                "  SELECT 'tku'",
-                "  FROM tk_items_t tku",
-                "  WHERE tku.screening_subject_id = ss.screening_subject_id",
+                "  SELECT 'tku' ",
+                "  FROM tk_items_t tku ",
+                "  WHERE tku.screening_subject_id = ss.screening_subject_id ",
             ]
 
-            if value == "yes_latest_episode":
+            if value == "yes - latest episode":
                 self._add_join_to_latest_episode()
-                subquery.append("    AND tku.subject_epis_id = ep.subject_epis_id")
+                subquery.append("    AND tku.subject_epis_id = ep.subject_epis_id ")
 
-            subquery.append("    AND tku.logged_in_flag = 'N'")
-            subquery.append(")")
+            subquery.append("    AND tku.logged_in_flag = 'N' ")
+            subquery.append(" ) ")
 
             self.sql_where.append("\n".join(subquery))
 
@@ -1670,11 +1670,16 @@ class SubjectSelectionQueryBuilder:
         """
         try:
             comparator = self.criteria_comparator
-            value = self.criteria_value.strip()
-            slot_type_id = AppointmentSlotType.get_id(value)
+            appointment_slot_type = AppointmentSlotType.by_description_case_insensitive(
+                self.criteria_value
+            )
+            if appointment_slot_type is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
 
             self.sql_where.append(
-                f" AND /*ast*/ {self.ap}.appointment_slot_type_id {comparator} {slot_type_id} "
+                f" AND /*ast*/ {self.ap}.appointment_slot_type_id {comparator} {appointment_slot_type.valid_value_id} "
             )
 
         except Exception:
@@ -1689,11 +1694,18 @@ class SubjectSelectionQueryBuilder:
         """
         try:
             comparator = self.criteria_comparator
-            value = self.criteria_value.strip()
-            status_id = AppointmentStatusType.get_id(value)
+            appointment_status_type = (
+                AppointmentStatusType.by_description_case_insensitive(
+                    self.criteria_value
+                )
+            )
+            if appointment_status_type is None:
+                raise SelectionBuilderException(
+                    self.criteria_key_name, self.criteria_value
+                )
 
             self.sql_where.append(
-                f" AND /*as*/ {self.ap}.appointment_status_id {comparator} {status_id} "
+                f" AND /*as*/ {self.ap}.appointment_status_id {comparator} {appointment_status_type.valid_value_id} "
             )
 
         except Exception:
@@ -1716,13 +1728,15 @@ class SubjectSelectionQueryBuilder:
             - "later_test_in_latest_episode"
         """
         try:
-            which = WhichDiagnosticTest.from_description(self.criteria_value)
+            which = WhichDiagnosticTest.by_description_case_insensitive(
+                self.criteria_value
+            )
             idx = getattr(self, "criteria_index", 0)
             xt = f"xt{idx}"
             xtp = f"xt{idx - 1}"
 
             self.sql_from.append(
-                f"INNER JOIN external_tests_t {xt} ON {xt}.screening_subject_id = ss.screening_subject_id"
+                f" INNER JOIN external_tests_t {xt} ON {xt}.screening_subject_id = ss.screening_subject_id "
             )
 
             if which == WhichDiagnosticTest.ANY_TEST_IN_ANY_EPISODE:
@@ -1756,36 +1770,36 @@ class SubjectSelectionQueryBuilder:
 
     def _handle_only_test_in_latest_episode(self, which, xt, _):
         """Helper method for diagnostic test filtering"""
-        self.sql_from.append(f"AND {xt}.subject_epis_id = ep.subject_epis_id")
+        self.sql_from.append(f" AND {xt}.subject_epis_id = ep.subject_epis_id ")
         if which == WhichDiagnosticTest.ONLY_NOT_VOID_TEST_IN_LATEST_EPISODE:
-            self.sql_from.append(f"AND {xt}.void = 'N'")
+            self.sql_from.append(f" AND {xt}.void = 'N' ")
         self.sql_from.append(
-            f"""AND NOT EXISTS (
+            f""" AND NOT EXISTS (
         SELECT 'xto' FROM external_tests_t xto
         WHERE xto.screening_subject_id = ss.screening_subject_id
         {'AND xto.void = \'N\'' if which == WhichDiagnosticTest.ONLY_NOT_VOID_TEST_IN_LATEST_EPISODE else ''}
         AND xto.subject_epis_id = ep.subject_epis_id
-        AND xto.ext_test_id != {xt}.ext_test_id )"""
+        AND xto.ext_test_id != {xt}.ext_test_id ) """
         )
 
     def _handle_latest_test_in_latest_episode(self, which, xt, _):
         """Helper method for diagnostic test filtering"""
         self.sql_from.append(
-            f"""AND {xt}.ext_test_id = (
+            f""" AND {xt}.ext_test_id = (
         SELECT MAX(xtx.ext_test_id) FROM external_tests_t xtx
         WHERE xtx.screening_subject_id = ss.screening_subject_id
         {'AND xtx.void = \'N\'' if which == WhichDiagnosticTest.LATEST_NOT_VOID_TEST_IN_LATEST_EPISODE else ''}
-        AND xtx.subject_epis_id = ep.subject_epis_id )"""
+        AND xtx.subject_epis_id = ep.subject_epis_id ) """
         )
 
     def _handle_earliest_test_in_latest_episode(self, which, xt, _):
         """Helper method for diagnostic test filtering"""
         self.sql_from.append(
-            f"""AND {xt}.ext_test_id = (
+            f""" AND {xt}.ext_test_id = (
         SELECT MIN(xtn.ext_test_id) FROM external_tests_t xtn
         WHERE xtn.screening_subject_id = ss.screening_subject_id
         AND xtn.void = 'N'
-        AND xtn.subject_epis_id = ep.subject_epis_id )"""
+        AND xtn.subject_epis_id = ep.subject_epis_id ) """
         )
 
     def _handle_earlier_or_later_test(self, which, xt, xtp):
@@ -1795,7 +1809,7 @@ class SubjectSelectionQueryBuilder:
         comparator = (
             "<" if which == WhichDiagnosticTest.EARLIER_TEST_IN_LATEST_EPISODE else ">"
         )
-        self.sql_from.append(f"AND {xt}.ext_test_id {comparator} {xtp}.ext_test_id")
+        self.sql_from.append(f" AND {xt}.ext_test_id {comparator} {xtp}.ext_test_id ")
 
     def _add_criteria_diagnostic_test_type(self, proposed_or_confirmed: str) -> None:
         """
@@ -1824,8 +1838,18 @@ class SubjectSelectionQueryBuilder:
                 self.sql_where.append(self._SQL_IS_NOT_NULL)
             else:
                 comparator = self.criteria_comparator
-                type_id = DiagnosticTestType.get_valid_value_id(self.criteria_value)
-                self.sql_where.append(f"{comparator} {type_id}")
+                diagnostic_test_type = (
+                    DiagnosticTestType.by_description_case_insensitive(
+                        self.criteria_value
+                    )
+                )
+                if diagnostic_test_type is None:
+                    raise SelectionBuilderException(
+                        self.criteria_key_name, self.criteria_value
+                    )
+                self.sql_where.append(
+                    f" {comparator} {diagnostic_test_type.valid_value_id} "
+                )
 
         except Exception:
             raise SelectionBuilderException(self.criteria_key_name, self.criteria_value)
@@ -1953,14 +1977,14 @@ class SubjectSelectionQueryBuilder:
             filter_clause = ""
 
             if status == LatestEpisodeHasDataset.NO:
-                clause = "AND NOT EXISTS ( "
+                clause = " AND NOT EXISTS ( "
             elif status == LatestEpisodeHasDataset.YES_INCOMPLETE:
-                filter_clause = f"AND {alias}.dataset_completed_date IS NULL"
+                filter_clause = f" AND {alias}.dataset_completed_date IS NULL "
             elif status == LatestEpisodeHasDataset.YES_COMPLETE:
-                filter_clause = f"AND {alias}.dataset_completed_date IS NOT NULL"
+                filter_clause = f" AND {alias}.dataset_completed_date IS NOT NULL "
             elif status == LatestEpisodeHasDataset.PAST:
                 filter_clause = (
-                    f"AND TRUNC({alias}.dataset_completed_date) < TRUNC(SYSDATE)"
+                    f" AND TRUNC({alias}.dataset_completed_date) < TRUNC(SYSDATE) "
                 )
             else:
                 raise SelectionBuilderException(
@@ -1971,11 +1995,11 @@ class SubjectSelectionQueryBuilder:
                 "".join(
                     [
                         clause,
-                        f"SELECT 1 FROM {dataset_table} {alias} ",
-                        f"WHERE {alias}.episode_id = ep.subject_epis_id ",
-                        f"AND {alias}.deleted_flag = 'N' ",
+                        f" SELECT 1 FROM {dataset_table} {alias} ",
+                        f" WHERE {alias}.episode_id = ep.subject_epis_id ",
+                        f" AND {alias}.deleted_flag = 'N' ",
                         filter_clause,
-                        ")",
+                        " ) ",
                     ]
                 )
             )
@@ -2010,63 +2034,63 @@ class SubjectSelectionQueryBuilder:
             self._add_join_to_latest_episode()
             value = LatestEpisodeLatestInvestigationDataset.from_description(
                 self.criteria_value
-            )
+            ).lower()
 
             if value == "none":
                 self.sql_where.append(
-                    "AND NOT EXISTS (SELECT 'dsc1' FROM v_ds_colonoscopy dsc1 "
-                    "WHERE dsc1.episode_id = ep.subject_epis_id "
-                    "AND dsc1.confirmed_type_id = 16002)"
+                    " AND NOT EXISTS (SELECT 'dsc1' FROM v_ds_colonoscopy dsc1 "
+                    " WHERE dsc1.episode_id = ep.subject_epis_id "
+                    " AND dsc1.confirmed_type_id = 16002) "
                 )
-            elif value == "colonoscopy_new":
+            elif value == "colonoscopy - new":
                 self.sql_where.append(
-                    "AND EXISTS (SELECT 'dsc2' FROM v_ds_colonoscopy dsc2 "
-                    "WHERE dsc2.episode_id = ep.subject_epis_id "
-                    "AND dsc2.confirmed_type_id = 16002 "
-                    "AND dsc2.deleted_flag = 'N' "
-                    "AND dsc2.dataset_new_flag = 'Y')"
+                    " AND EXISTS (SELECT 'dsc2' FROM v_ds_colonoscopy dsc2 "
+                    " WHERE dsc2.episode_id = ep.subject_epis_id "
+                    " AND dsc2.confirmed_type_id = 16002 "
+                    " AND dsc2.deleted_flag = 'N' "
+                    " AND dsc2.dataset_new_flag = 'Y') "
                 )
-            elif value == "limited_colonoscopy_new":
+            elif value == "limited colonoscopy - new":
                 self.sql_where.append(
-                    "AND EXISTS (SELECT 'dsc3' FROM v_ds_colonoscopy dsc3 "
-                    "WHERE dsc3.episode_id = ep.subject_epis_id "
-                    "AND dsc3.confirmed_type_id = 17996 "
-                    "AND dsc3.deleted_flag = 'N' "
-                    "AND dsc3.dataset_new_flag = 'Y')"
+                    " AND EXISTS (SELECT 'dsc3' FROM v_ds_colonoscopy dsc3 "
+                    " WHERE dsc3.episode_id = ep.subject_epis_id "
+                    " AND dsc3.confirmed_type_id = 17996 "
+                    " AND dsc3.deleted_flag = 'N' "
+                    " AND dsc3.dataset_new_flag = 'Y') "
                 )
-            elif value == "flexible_sigmoidoscopy_new":
+            elif value == "flexible sigmoidoscopy - new":
                 self.sql_where.append(
-                    "AND EXISTS (SELECT 'dsc4' FROM v_ds_colonoscopy dsc4 "
-                    "WHERE dsc4.episode_id = ep.subject_epis_id "
-                    "AND dsc4.confirmed_type_id = 16004 "
-                    "AND dsc4.deleted_flag = 'N' "
-                    "AND dsc4.dataset_new_flag = 'Y')"
+                    " AND EXISTS (SELECT 'dsc4' FROM v_ds_colonoscopy dsc4 "
+                    " WHERE dsc4.episode_id = ep.subject_epis_id "
+                    " AND dsc4.confirmed_type_id = 16004 "
+                    " AND dsc4.deleted_flag = 'N' "
+                    " AND dsc4.dataset_new_flag = 'Y') "
                 )
-            elif value == "ct_colonography_new":
+            elif value == "ct colonography - new":
                 self.sql_where.append(
-                    "AND EXISTS (SELECT 'dsr1' FROM v_ds_radiology dsr1 "
-                    "WHERE dsr1.episode_id = ep.subject_epis_id "
-                    "AND dsr1.confirmed_type_id = 16087 "
-                    "AND dsr1.deleted_flag = 'N' "
-                    "AND dsr1.dataset_new_flag = 'Y')"
+                    " AND EXISTS (SELECT 'dsr1' FROM v_ds_radiology dsr1 "
+                    " WHERE dsr1.episode_id = ep.subject_epis_id "
+                    " AND dsr1.confirmed_type_id = 16087 "
+                    " AND dsr1.deleted_flag = 'N' "
+                    " AND dsr1.dataset_new_flag = 'Y') "
                 )
-            elif value == "endoscopy_incomplete":
+            elif value == "endoscopy - incomplete":
                 self.sql_where.append(
-                    "AND EXISTS (SELECT 'dsei' FROM v_ds_colonoscopy dsei "
-                    "WHERE dsei.episode_id = ep.subject_epis_id "
-                    "AND dsei.deleted_flag = 'N' "
-                    "AND dsei.dataset_completed_flag = 'N' "
-                    "AND dsei.dataset_new_flag = 'N' "
-                    "AND dsei.confirmed_test_date >= TO_DATE('01/01/2020','dd/mm/yyyy'))"
+                    " AND EXISTS (SELECT 'dsei' FROM v_ds_colonoscopy dsei "
+                    " WHERE dsei.episode_id = ep.subject_epis_id "
+                    " AND dsei.deleted_flag = 'N' "
+                    " AND dsei.dataset_completed_flag = 'N' "
+                    " AND dsei.dataset_new_flag = 'N' "
+                    " AND dsei.confirmed_test_date >= TO_DATE('01/01/2020','dd/mm/yyyy')) "
                 )
-            elif value == "radiology_incomplete":
+            elif value == "radiology - incomplete":
                 self.sql_where.append(
-                    "AND EXISTS (SELECT 'dsri' FROM v_ds_radiology dsri "
-                    "WHERE dsri.episode_id = ep.subject_epis_id "
-                    "AND dsri.deleted_flag = 'N' "
-                    "AND dsri.dataset_completed_flag = 'N' "
-                    "AND dsri.dataset_new_flag = 'N' "
-                    "AND dsri.confirmed_test_date >= TO_DATE('01/01/2020','dd/mm/yyyy'))"
+                    " AND EXISTS (SELECT 'dsri' FROM v_ds_radiology dsri "
+                    " WHERE dsri.episode_id = ep.subject_epis_id "
+                    " AND dsri.deleted_flag = 'N' "
+                    " AND dsri.dataset_completed_flag = 'N' "
+                    " AND dsri.dataset_new_flag = 'N' "
+                    " AND dsri.confirmed_test_date >= TO_DATE('01/01/2020','dd/mm/yyyy')) "
                 )
             else:
                 raise SelectionBuilderException(
@@ -2183,12 +2207,12 @@ class SubjectSelectionQueryBuilder:
         """
         try:
             value = HasDateOfDeathRemoval.from_description(self.criteria_value)
-            clause = "EXISTS" if value == "yes" else self._SQL_NOT_EXISTS
+            clause = "EXISTS" if value == "Yes" else self._SQL_NOT_EXISTS
 
             self.sql_where.append(
-                f"AND {clause} (SELECT 'dodr' FROM report_additional_data_t dodr "
-                "WHERE dodr.rad_type_id = 15901 "
-                "AND dodr.entity_id = c.contact_id)"
+                f" AND {clause} (SELECT 'dodr' FROM report_additional_data_t dodr "
+                " WHERE dodr.rad_type_id = 15901 "
+                " AND dodr.entity_id = c.contact_id) "
             )
 
         except Exception:

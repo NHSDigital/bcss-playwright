@@ -52,7 +52,7 @@ class InvitationRepository:
         error_cursor = result[4]  # OUT param 4
         error = DatabaseError.from_cursor(error_cursor)
         if error.is_error():
-            raise RuntimeError(f"Database error: {error.get_return_message()}")
+            raise RuntimeError(f"Database error: {error.return_message}")
 
         logging.debug("map plansCursor")
         plans_cursor = result[5]

@@ -17,9 +17,9 @@ class HasGPPractice(Enum):
             Returns the string description of the enum member.
     """
 
-    NO = "no"
-    YES_ACTIVE = "yes - active"
-    YES_INACTIVE = "yes - inactive"
+    NO = "No"
+    YES_ACTIVE = "Yes - active"
+    YES_INACTIVE = "Yes - inactive"
 
     @classmethod
     def by_description(cls, description: str):

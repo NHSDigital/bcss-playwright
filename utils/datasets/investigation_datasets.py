@@ -52,7 +52,7 @@ def get_subject_with_investigation_dataset_ready() -> pd.DataFrame:
     """
     criteria = {
         "latest episode status": "open",
-        "latest episode latest investigation dataset": "colonoscopy_new",
+        "latest episode latest investigation dataset": "Colonoscopy - new",
         "latest episode started": "less than 4 years ago",
     }
     user = User()
@@ -76,8 +76,8 @@ def get_subject_with_a99_status() -> pd.DataFrame:
     This functions obtains 1 subject who has the latest episode status A99 - Suitable for Endoscopic Test
     """
     criteria = {
-        "latest episode has colonoscopy assessment dataset": "yes_complete",
-        "latest episode has diagnostic test": "no",
+        "latest episode has colonoscopy assessment dataset": "Yes - complete",
+        "latest episode has diagnostic test": "No",
         "latest event status": "A99",
         "latest episode type": "FOBT",
         "latest episode started": "less than 4 years ago",
