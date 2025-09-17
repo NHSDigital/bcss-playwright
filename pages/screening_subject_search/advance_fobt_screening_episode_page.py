@@ -17,7 +17,9 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         self.calendar_button = self.page.get_by_role("button", name="Calendar")
         self.test_type_dropdown = self.page.locator("#UI_EXT_TEST_TYPE_2233")
         self.test_type_dropdown_2 = self.page.locator("#UI_EXT_TEST_TYPE_4325")
-        self.advance_checkbox = self.page.get_by_label("There are some events available which should only be used in exceptional circumstances. If you wish to see them, check this box")
+        self.advance_checkbox = self.page.get_by_label(
+            "There are some events available which should only be used in exceptional circumstances. If you wish to see them, check this box"
+        )
         self.invite_for_diagnostic_test_button = self.page.get_by_role(
             "button", name="Invite for Diagnostic Test >>"
         )
@@ -41,6 +43,14 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         )
         self.record_contact_with_patient_button = self.page.get_by_role(
             "button", name="Record Contact with Patient"
+        )
+        self.suitable_for_radiological_test_button = self.page.get_by_role(
+            "button", name="Suitable for Radiological Test"
+        )
+        self.decision_not_to_continue_with_diagnostic_test_button = (
+            self.page.get_by_role(
+                "button", name="Decision not to Continue with Diagnostic Test"
+            )
         )
 
     def click_suitable_for_endoscopic_test_button(self) -> None:
@@ -116,3 +126,15 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
     def check_advance_checkbox(self) -> None:
         """Selects the 'Advance FOBT' checkbox"""
         self.advance_checkbox.check()
+
+    def click_suitable_for_radiological_test_button(self) -> None:
+        """Click the 'Suitable for Radiological Test' button."""
+        AdvanceFOBTScreeningEpisodePage(self.page).safe_accept_dialog(
+            self.suitable_for_radiological_test_button
+        )
+
+    def click_decision_not_to_continue_with_diagnostic_test(self) -> None:
+        """Click the 'Decision not to Continue with Diagnostic Test' button."""
+        AdvanceFOBTScreeningEpisodePage(self.page).safe_accept_dialog(
+            self.decision_not_to_continue_with_diagnostic_test_button
+        )
