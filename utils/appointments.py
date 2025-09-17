@@ -166,3 +166,48 @@ def mark_appointment_as_dna(page: Page, non_attendance_reason: str) -> None:
     appointment_detail_page.click_save_button(accept_dialog=True)
 
     logging.info("[APPOINTMENT DNA] DNA flow completed successfully")
+
+
+def mark_appointment_as_attended(page: Page) -> None:
+    """
+    Marks an appointment as attended and logs the auto-filled attendance details.
+    This process starts from the subject screening summary page.
+
+    This method navigates through the subject's episode and appointment pages,
+    selects the 'Attendance' radio option, checks the 'Attended' checkbox,
+    and logs the resulting date and time values.
+
+    Args:
+        page (Page): Playwright page object.
+
+    Raises:
+        AssertionError: If expected elements are not found or interaction fails.
+    """
+    appointment_detail_page = AppointmentDetailPage(page)
+    subject_screening_summary_page = SubjectScreeningSummaryPage(page)
+    episode_events_and_notes_page = EpisodeEventsAndNotesPage(page)
+
+    logging.info("[APPOINTMENT ATTENDED] Starting attended flow")
+
+    subject_screening_summary_page.click_list_episodes()
+    subject_screening_summary_page.click_view_events_link()
+    episode_events_and_notes_page.click_most_recent_view_appointment_link()
+    appointment_detail_page.check_attendance_radio()
+
+    # Check the 'Attended' checkbox
+    attended_checkbox = page.locator("#UI_ATTENDED")
+    attended_checkbox.check()
+
+    # Log the auto-filled attendance details
+    attended_date = page.locator("#UI_ATTENDED_DATE").input_value()
+    time_from = page.locator("#UI_ATTENDED_TIME_FROM").input_value()
+    time_to = page.locator("#UI_ATTENDED_TIME_TO").input_value()
+    meeting_mode = page.locator("#UI_NEW_MEETING_MODE").input_value()
+
+    logging.info(
+        f"[APPOINTMENT ATTENDED] How Attended: {meeting_mode}, Date: {attended_date}, Time From: {time_from}, Time To: {time_to}"
+    )
+
+    appointment_detail_page.click_save_button(accept_dialog=True)
+
+    logging.info("[APPOINTMENT ATTENDED] Attended flow completed successfully")
