@@ -21,7 +21,7 @@ from pages.screening_subject_search.advance_fobt_screening_episode_page import (
 from pages.screening_subject_search.record_diagnosis_date_page import (
     RecordDiagnosisDatePage,
 )
-from utils.appointments import mark_appointment_as_dna, mark_appointment_as_attended
+from utils.appointments import AppointmentAttendance
 
 
 @pytest.mark.wip
@@ -69,6 +69,7 @@ def test_scenario_6(page: Page) -> None:
     """
 
     summary_page = SubjectScreeningSummaryPage(page)
+    attendance = AppointmentAttendance(page)
     logging.info(
         "[TEST START] Regression - Scenario: 6: Non-agreement to diagnostic tests"
     )
@@ -235,7 +236,7 @@ def test_scenario_6(page: Page) -> None:
     # And I view the event history for the subject's latest episode
     # And I view the latest practitioner appointment in the subject's episode
     # And The Screening Centre DNAs the practitioner appointment
-    mark_appointment_as_dna(page, "Screening Centre did not attend")  # TODO: Line 1188
+    attendance.mark_as_dna("Screening Centre did not attend")
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -269,7 +270,7 @@ def test_scenario_6(page: Page) -> None:
     )
 
     # And there is a "J30" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment Non Attendance (Screening Centre)"
-    # When I process the open "J30" letter batch for my subject TODO: Line 1203
+    # When I process the open "J30" letter batch for my subject
     # Then my subject has been updated as follows:
     batch_processing(
         page,
@@ -298,7 +299,7 @@ def test_scenario_6(page: Page) -> None:
     # And I save Diagnosis Date Information
     RecordDiagnosisDatePage(page).click_save_button()
 
-    # Then my subject has been updated as follows: TODO: line 1215
+    # Then my subject has been updated as follows: TODO: Selenium Feature File line 1215
     subject_assertion(
         nhs_no,
         {
@@ -320,7 +321,7 @@ def test_scenario_6(page: Page) -> None:
     # 	And I view the event history for the subject's latest episode
     # 	And I view the latest practitioner appointment in the subject's episode
     # 	And I attend the subject's practitioner appointment "today"
-    mark_appointment_as_attended(page)
+    attendance.mark_as_attended()
 
     # Then my subject has been updated as follows:
     subject_assertion(
