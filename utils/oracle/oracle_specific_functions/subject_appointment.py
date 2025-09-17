@@ -91,7 +91,7 @@ def get_subjects_with_booked_appointments(subjects_to_retrieve: int) -> pd.DataF
     fetch first :subjects_to_retrieve rows only
     """
 
-    hub_id = 23159 
+    hub_id = 23159
     algorithm_sc_id = 23162
 
     params = {

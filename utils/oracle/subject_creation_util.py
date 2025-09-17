@@ -10,8 +10,7 @@ from classes.data.data_creation import DataCreation
 from classes.repositories.word_repository import WordRepository
 from classes.subject.pi_subject import PISubject
 from classes.repositories.subject_repository import SubjectRepository
-from classes.repositories.user_repository import UserRepository
-from classes.user.user_role_type import UserRoleType
+from dateutil.relativedelta import relativedelta
 
 
 class CreateSubjectSteps:
@@ -227,7 +226,7 @@ class CreateSubjectSteps:
                 logging.debug(f"date of birth updated = {subject.birth_date}")
             elif key_lower == "age (y/d)":
                 years, days = map(int, value.split("/"))
-                birth_date = date.today() - timedelta(days=years * 365 + days)
+                birth_date = date.today() - relativedelta(years=years, days=days)
                 subject.birth_date = birth_date
                 logging.debug(f"date of birth updated = {subject.birth_date}")
             elif key_lower == "gp practice":
