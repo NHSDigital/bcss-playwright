@@ -4,7 +4,7 @@ from typing import Optional, Dict
 
 class YesNoType(Enum):
     """
-    Enum representing Yes/No values for investigation datasets, with valid value IDs and descriptions.
+    Enum representing Yes/No values, with valid value IDs and descriptions.
     """
 
     YES = (17058, "Yes")

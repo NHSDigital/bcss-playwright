@@ -9,7 +9,10 @@ def get_subjects_for_investigation_dataset_updates(
 ) -> pd.DataFrame:
     """
     This is used to get subjects for compartment 6
-    It finds subjects with latest envent status of A323 - Post-investigation Appointment
+    It finds subjects who:
+        - Have the latest event status of A323 - Post-investigation Appointment
+        - Have a single episode with an incomplete colonoscopy dataset
+        - Have a valid GP practice linked and are associated  with the specified hub
 
     Args:
         number_of_subjects (int): The number of subjects to retrieve
@@ -107,7 +110,7 @@ def get_investigation_dataset_polyp_algorithm_size(
         polyp_number (int): The number of the polyp.
 
     Returns:
-        Optional[int]: The polyp algorithm size if found, otherwise None.
+        Optional[str]: The polyp algorithm size if found, otherwise None.
     """
     query = """
     select polyp_algorithm_size

@@ -26,20 +26,12 @@ class Address:
         Raises:
             ValueError: If line_number is not between 1 and 5.
         """
-        if line_number == 1:
-            self.address_line1 = address_line
-        elif line_number == 2:
-            self.address_line2 = address_line
-        elif line_number == 3:
-            self.address_line3 = address_line
-        elif line_number == 4:
-            self.address_line4 = address_line
-        elif line_number == 5:
-            self.address_line5 = address_line
-        else:
+        if not 1 <= line_number <= 5:
             raise ValueError(
                 f"Invalid line number {line_number}, must be between 1 and 5"
             )
+
+        setattr(self, f"address_line{line_number}", address_line)
 
     def __str__(self) -> str:
         """

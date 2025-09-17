@@ -5,6 +5,7 @@ from typing import Optional
 class NotifyMessageType(Enum):
     """
     Enum representing notify message types, with description and event status ID.
+    '11197' is the event status id for all S1 notify message types
     """
 
     NONE = ("None", None)

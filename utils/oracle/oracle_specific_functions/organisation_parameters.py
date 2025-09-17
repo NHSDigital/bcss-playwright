@@ -30,20 +30,24 @@ def set_org_parameter_value(param_id: int, param_value: str, org_id: str) -> Non
     OracleDB().update_or_insert_data_to_table(sql_update, params)
 
     # Insert new value
-    sql_insert = (
-        "INSERT INTO org_parameters (org_param_id, org_code, org_id, param_id, val, effective_from, pio_id, audit_reason, datestamp) "
-        "VALUES ("
-        "seq_org_param.NEXTVAL, "
-        f"(SELECT org_code FROM org WHERE org_id = :org_id), "
-        f"{org_id}, "
-        f"{param_id}, "
-        f"'{param_value}', "
-        "TRUNC(SYSDATE), "
-        "1, "
-        "'AUTOMATED TESTING - ADD', "
-        "SYSTIMESTAMP)"
-    )
-    params = {"org_id": org_id}
+    sql_insert = """
+        INSERT INTO org_parameters (
+        org_param_id, org_code, org_id, param_id, val,
+        effective_from, pio_id, audit_reason, datestamp
+        )
+        VALUES (
+        seq_org_param.NEXTVAL,
+        (SELECT org_code FROM org WHERE org_id = :org_id),
+        :org_id,
+        :param_id,
+        :param_value,
+        TRUNC(SYSDATE),
+        1,
+        'AUTOMATED TESTING - ADD',
+        SYSTIMESTAMP
+        )
+        """
+    params = {"org_id": org_id, "param_id": param_id, "param_value": param_value}
     logging.info(f"executing query to set new value: {sql_insert}")
     OracleDB().update_or_insert_data_to_table(sql_insert, params)
 
@@ -66,6 +70,7 @@ def get_org_parameter_value(param_id: int, org_id: str) -> pd.DataFrame:
         AND org_id = :org_id
     """
     bind_vars = {"param_id": param_id, "org_id": org_id}
+    logging.debug(f"Fetching parameter {param_id} for org_id={org_id}")
     df = OracleDB().execute_query(query, bind_vars)
     return df
 

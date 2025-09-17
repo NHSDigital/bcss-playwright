@@ -79,11 +79,10 @@ def get_supporting_notes(
 
 def get_subjects_with_multiple_notes(note_type: int) -> pd.DataFrame:
     """
-    Retrieves subjects with a multiple note counts for a specific note type and status.
+    Retrieves subjects with a multiple note counts for a specific note type.
 
     Args:
         note_type (int): The type ID of the note.
-        note_status (int): The status ID of the note.
 
     Returns:
         pd.DataFrame: A pandas DataFrame containing the result of the query.

@@ -5,6 +5,7 @@ from typing import Optional
 class DiagnosticTestHasOutcomeOfResult(Enum):
     """
     Enum representing possible outcomes of a diagnostic test, mapped to IDs and descriptions.
+    'Yes' and 'No' have negative IDs to clearly mark them as special, non-database values.
     """
 
     NO = (-1, "No")

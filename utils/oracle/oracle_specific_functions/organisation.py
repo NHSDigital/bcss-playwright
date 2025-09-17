@@ -9,7 +9,7 @@ def delete_organisation_relationships_created_for_test(org_codes: list[str]) -> 
     Args:
         org_codes (list[str]): A list of organisation codes to delete relationships for.
     """
-    placeholders = ", ".join([f":org{i}" for i in range(len(org_codes))])
+    placeholders, params = _make_placeholders_and_params("org", org_codes)
     subquery = f"SELECT ORG_ID FROM ORG WHERE ORG_CODE IN ({placeholders})"
 
     query = f"""
@@ -17,8 +17,6 @@ def delete_organisation_relationships_created_for_test(org_codes: list[str]) -> 
     WHERE CHILD_ORG_ID IN ({subquery})
     OR PARENT_ORG_ID IN ({subquery})
     """
-
-    params = {f"org{i}": code for i, code in enumerate(org_codes)}
     OracleDB().update_or_insert_data_to_table(query, params)
 
 
@@ -29,15 +27,13 @@ def delete_people_in_org_created_for_test(org_codes: list[str]) -> None:
     Args:
         org_codes (list[str]): A list of organisation codes to delete people in organisations for.
     """
-    placeholders = ", ".join([f":org{i}" for i in range(len(org_codes))])
+    placeholders, params = _make_placeholders_and_params("org", org_codes)
     subquery = f"SELECT ORG_ID FROM ORG WHERE ORG_CODE IN ({placeholders})"
 
     query = f"""
     DELETE FROM PERSON_IN_ORG
     WHERE ORG_ID IN ({subquery})
     """
-
-    params = {f"org{i}": code for i, code in enumerate(org_codes)}
     OracleDB().update_or_insert_data_to_table(query, params)
 
 
@@ -48,13 +44,11 @@ def delete_orgs_created_for_test(org_codes: list[str]) -> None:
     Args:
         org_codes (list[str]): A list of organisation codes to delete.
     """
-    placeholders = ", ".join([f":org{i}" for i in range(len(org_codes))])
+    placeholders, params = _make_placeholders_and_params("org", org_codes)
     query = f"""
     DELETE FROM ORG
     WHERE ORG_CODE IN ({placeholders})
     """
-
-    params = {f"org{i}": code for i, code in enumerate(org_codes)}
     OracleDB().update_or_insert_data_to_table(query, params)
 
 
@@ -82,15 +76,25 @@ def delete_sites_created_for_test(site_codes: list[str]) -> None:
     logging.info("Start: delete_sites_created_for_test(%s)", site_codes)
 
     # Dynamically create placeholders like :site0, :site1, ...
-    placeholders = ", ".join([f":site{i}" for i in range(len(site_codes))])
+    placeholders, params = _make_placeholders_and_params("site", site_codes)
     query = f"""
     DELETE FROM SITES
     WHERE SITE_CODE IN ({placeholders})
     """
-
-    # Bind each site code to its placeholder
-    params = {f"site{i}": code for i, code in enumerate(site_codes)}
-
     OracleDB().update_or_insert_data_to_table(query, params)
 
     logging.info("End: delete_sites_created_for_test(%s)", site_codes)
+
+
+def _make_placeholders_and_params(prefix: str, values: list[str]) -> tuple[str, dict]:
+    """
+    Helper to generate SQL placeholders and parameter dict for IN clauses.
+    Args:
+        prefix (str): The prefix for the placeholder (e.g., 'org', 'site').
+        values (list[str]): The values to bind.
+    Returns:
+        tuple: (placeholders string, params dict)
+    """
+    placeholders = ", ".join([f":{prefix}{i}" for i in range(len(values))])
+    params = {f"{prefix}{i}": value for i, value in enumerate(values)}
+    return placeholders, params

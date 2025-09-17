@@ -66,7 +66,7 @@ def get_kit_id_logged_from_db(smokescreen_properties: dict) -> pd.DataFrame:
     AND se.episode_status_id = :open_episode_status_id
     AND tk.tk_type_id = 2
     AND se.latest_event_status_id = :s43_event_status
-    AND tk.logged_in_at = :logged_in_at
+    AND tk.logged_in_at = :test_org_id
     AND tk.reading_flag = 'N'
     AND tk.test_results IS NULL
     fetch first :subjects_to_retrieve rows only
@@ -74,7 +74,7 @@ def get_kit_id_logged_from_db(smokescreen_properties: dict) -> pd.DataFrame:
 
     params = {
         "s43_event_status": SqlQueryValues.S43_EVENT_STATUS,
-        "logged_in_at": smokescreen_properties["c3_fit_kit_results_test_org_id"],
+        "test_org_id": smokescreen_properties["c3_fit_kit_results_test_org_id"],
         "open_episode_status_id": SqlQueryValues.OPEN_EPISODE_STATUS_ID,
         "subjects_to_retrieve": smokescreen_properties["c3_total_fit_kits_to_retrieve"],
     }
@@ -146,18 +146,22 @@ def update_kit_service_management_entity(
         subject_nhs_number (str): The NHS Number of the affected subject
     """
     get_service_management_df = get_service_management_by_device_id(device_id)
-
-    # Extract the NHS number from the DataFrame
-    subject_nhs_number = get_service_management_df["subject_nhs_number"].iloc[0]
-    test_kit_name = get_service_management_df["test_kit_name"].iloc[0]
-    test_kit_type = get_service_management_df["test_kit_type"].iloc[0]
-    logged_by_hub = get_service_management_df["logged_by_hub"].iloc[0]
-    date_time_logged = get_service_management_df["date_time_logged"].iloc[0]
-    calculated_result = get_service_management_df["calculated_result"].iloc[0]
-    post_response = get_service_management_df["post_response"].iloc[0]
-    post_attempts = get_service_management_df["post_attempts"].iloc[0]
-    put_response = get_service_management_df["put_response"].iloc[0]
-    put_attempts = get_service_management_df["put_attempts"].iloc[0]
+    try:
+        # Extract the NHS number from the DataFrame
+        subject_nhs_number = get_service_management_df["subject_nhs_number"].iloc[0]
+        test_kit_name = get_service_management_df["test_kit_name"].iloc[0]
+        test_kit_type = get_service_management_df["test_kit_type"].iloc[0]
+        logged_by_hub = get_service_management_df["logged_by_hub"].iloc[0]
+        date_time_logged = get_service_management_df["date_time_logged"].iloc[0]
+        calculated_result = get_service_management_df["calculated_result"].iloc[0]
+        post_response = get_service_management_df["post_response"].iloc[0]
+        post_attempts = get_service_management_df["post_attempts"].iloc[0]
+        put_response = get_service_management_df["put_response"].iloc[0]
+        put_attempts = get_service_management_df["put_attempts"].iloc[0]
+    except IndexError as e:
+        raise IndexError(
+            f"No service management records found for device_id={device_id}"
+        ) from e
     # format date
     date_time_authorised = (
         datetime.now().strftime("%d-%b-%y %H.%M.%S.")

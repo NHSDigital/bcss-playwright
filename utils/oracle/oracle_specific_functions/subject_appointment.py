@@ -78,8 +78,8 @@ def get_subjects_with_booked_appointments(subjects_to_retrieve: int) -> pd.DataF
     where se.latest_event_status_id = :positive_appointment_booked
     and tk.logged_in_flag = 'Y'
     and se.episode_status_id = :open_episode_status_id
-    and tk.logged_in_at = 23159
-    and tk.algorithm_sc_id = 23162
+    and tk.logged_in_at = :hub_id
+    and tk.algorithm_sc_id = :algorithm_sc_id
     --and a.appointment_date > sysdate-27
     and a.cancel_date is null
     and a.attend_info_id is null and a.attend_date is null
@@ -91,9 +91,14 @@ def get_subjects_with_booked_appointments(subjects_to_retrieve: int) -> pd.DataF
     fetch first :subjects_to_retrieve rows only
     """
 
+    hub_id = 23159 
+    algorithm_sc_id = 23162
+
     params = {
         "positive_appointment_booked": SqlQueryValues.POSITIVE_APPOINTMENT_BOOKED,
         "open_episode_status_id": SqlQueryValues.OPEN_EPISODE_STATUS_ID,
+        "hub_id": hub_id,
+        "algorithm_sc_id": algorithm_sc_id,
         "subjects_to_retrieve": subjects_to_retrieve,
     }
 

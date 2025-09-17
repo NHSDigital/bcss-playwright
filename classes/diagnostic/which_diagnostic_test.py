@@ -6,6 +6,11 @@ class WhichDiagnosticTest(Enum):
     """
     Enum representing which diagnostic test to select, with description and test number.
     Provides utility methods for lookup by description (case-sensitive and insensitive).
+    Conventions:
+        - test_number > 0: Refers to an explicit test index within the latest episode
+        (e.g., test 1, test 2, ...).
+        - test_number == 0: Indicates a selection rule or condition rather than a
+        fixed test index (e.g., "any test", "latest test", "earliest not-void test").
     """
 
     ANY_TEST_IN_ANY_EPISODE = ("any test in any episode", 0)

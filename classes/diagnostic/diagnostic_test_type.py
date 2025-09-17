@@ -6,6 +6,7 @@ class DiagnosticTestType(Enum):
     """
     Enum representing diagnostic test types, mapped to valid value IDs, descriptions, categories, and allowed status.
     Provides utility methods for lookup by description (case-sensitive and insensitive) and by valid value ID.
+    'ANY' is a special placeholder representing a wildcard or default fallback when a specific diagnostic test type is not required.
     """
 
     BARIUM_ENEMA = (16003, "Barium Enema", "RADIOLOGY", "DISALLOWED")

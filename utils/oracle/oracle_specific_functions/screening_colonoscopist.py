@@ -10,7 +10,7 @@ def build_accredited_screening_colonoscopist_query(query_type: str) -> pd.DataFr
         query_type (str): Either "Current" or "Expiring soon".
 
     Returns:
-        str: The SQL query string.
+        pd.DataFrame: A DataFrame containing accredited colonoscopist records.
 
     Raises:
         ValueError: If query_type is invalid.
