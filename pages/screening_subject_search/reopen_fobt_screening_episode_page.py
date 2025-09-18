@@ -32,6 +32,8 @@ class ReopenFOBTScreeningEpisodePage(BasePage):
 
     def click_reopen_due_to_subject_or_patient_decision(self) -> None:
         """Click the 'Reopen due to subject or patient decision' button."""
+        self.safe_accept_dialog(self.reopen_due_to_subject_or_patient_decision)
 
     def click_reopen_following_non_response_button(self) -> None:
         """Click the 'Reopen following Non-Response' button."""
+        self.safe_accept_dialog(self.reopen_following_non_response_button)

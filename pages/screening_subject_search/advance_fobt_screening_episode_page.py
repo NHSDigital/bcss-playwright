@@ -73,9 +73,7 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
 
     def click_suitable_for_endoscopic_test_button(self) -> None:
         """Click the 'Suitable for Endoscopic Test' button."""
-        AdvanceFOBTScreeningEpisodePage(self.page).safe_accept_dialog(
-            self.suitable_for_endoscopic_test_button
-        )
+        self.safe_accept_dialog(self.suitable_for_endoscopic_test_button)
 
     def click_calendar_button(self) -> None:
         """Click the calendar button to open the calendar picker."""
@@ -91,9 +89,7 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
 
     def click_invite_for_diagnostic_test_button(self) -> None:
         """Click the 'Invite for Diagnostic Test' button."""
-        AdvanceFOBTScreeningEpisodePage(self.page).safe_accept_dialog(
-            self.invite_for_diagnostic_test_button
-        )
+        self.safe_accept_dialog(self.invite_for_diagnostic_test_button)
 
     def click_attend_diagnostic_test_button(self) -> None:
         """Click the 'Attend Diagnostic Test' button."""
@@ -101,9 +97,7 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
 
     def click_other_post_investigation_button(self) -> None:
         """Click the 'Other Post-investigation' button."""
-        AdvanceFOBTScreeningEpisodePage(self.page).safe_accept_dialog(
-            self.other_post_investigation_button
-        )
+        self.safe_accept_dialog(self.other_post_investigation_button)
 
     def get_latest_event_status_cell(self, latest_event_status: str) -> Locator:
         """Get the cell containing the latest event status."""
