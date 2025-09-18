@@ -288,7 +288,7 @@ def setup_a99_status(page: Page, df: pd.DataFrame) -> pd.DataFrame:
         search_subject_episode_by_nhs_number(page, nhs_no)
         SubjectScreeningSummaryPage(page).expand_episodes_list()
         SubjectScreeningSummaryPage(page).click_first_fobt_episode_link()
-        EpisodeEventsAndNotesPage(page).click_view_appointment_link()
+        EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
         AppointmentDetailPage(page).wait_for_attendance_radio(
             600000
         )  # Max of 10 minute wait as appointments need to be set for future times and they are in 10 minute intervals

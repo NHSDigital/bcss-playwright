@@ -17,7 +17,9 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         self.calendar_button = self.page.get_by_role("button", name="Calendar")
         self.test_type_dropdown = self.page.locator("#UI_EXT_TEST_TYPE_2233")
         self.test_type_dropdown_2 = self.page.locator("#UI_EXT_TEST_TYPE_4325")
-        self.advance_checkbox = self.page.get_by_label("There are some events available which should only be used in exceptional circumstances. If you wish to see them, check this box")
+        self.advance_checkbox = self.page.get_by_label(
+            "There are some events available which should only be used in exceptional circumstances. If you wish to see them, check this box"
+        )
         self.invite_for_diagnostic_test_button = self.page.get_by_role(
             "button", name="Invite for Diagnostic Test >>"
         )
@@ -41,6 +43,16 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         )
         self.record_contact_with_patient_button = self.page.get_by_role(
             "button", name="Record Contact with Patient"
+        )
+        self.amend_diagnosis_date_button = self.page.get_by_role(
+            "button", name="Amend Diagnosis Date"
+        )
+        self.advance_checkbox_v2 = self.page.get_by_role("checkbox")
+        self.subsequent_assessment_appointment_required_dropdown = (
+            self.page.get_by_role("combobox")
+        )
+        self.subsequent_assessment_appointment_required_button = self.page.get_by_role(
+            "button", name="Subsequent Assessment Appointment Required"
         )
 
     def click_suitable_for_endoscopic_test_button(self) -> None:
@@ -116,3 +128,25 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
     def check_advance_checkbox(self) -> None:
         """Selects the 'Advance FOBT' checkbox"""
         self.advance_checkbox.check()
+
+    def click_amend_diagnosis_date_button(self) -> None:
+        """Click the 'Amend Diagnosis Date' button."""
+        self.advance_checkbox_v2.check()
+        self.click(self.amend_diagnosis_date_button)
+
+    def click_and_select_subsequent_assessment_appointment_required(
+        self, option: str
+    ) -> None:
+        """
+        Click the 'Subsequent Assessment Appointment Required' button and select an option from the dropdown.
+        Args:
+            option (str): The option to select from the dropdown.
+            Must be one of:
+                - 'Previous attendance, further assessment required'
+                - 'Interpreter requirement not identified'
+                - 'SC interpreter DNA'
+        """
+        self.subsequent_assessment_appointment_required_dropdown.select_option(
+            label=option
+        )
+        self.safe_accept_dialog(self.subsequent_assessment_appointment_required_button)
