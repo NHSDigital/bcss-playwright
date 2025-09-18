@@ -34,6 +34,7 @@ from pages.screening_subject_search.reopen_fobt_screening_episode_page import (
 from utils.oracle.oracle import OracleDB
 
 
+@pytest.mark.wip
 @pytest.mark.usefixtures("setup_org_and_appointments")
 @pytest.mark.vpn_required
 @pytest.mark.regression
@@ -107,14 +108,13 @@ def test_scenario_6(page: Page) -> None:
     logging.info(f"[SUBJECT CREATED] NHS number: {nhs_no}")
 
     # And my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "subject age": "68",
-            "subject has episodes": "No",
-            "screening status": "Inactive",
-        },
-    )
+    criteria = {
+        "subject age": "68",
+        "subject has episodes": "No",
+        "screening status": "Inactive",
+    }
+    subject_assertion(nhs_no, criteria)
+
     # Assert subject details in the UI
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     summary_page.assert_subject_age(68)
@@ -124,31 +124,27 @@ def test_scenario_6(page: Page) -> None:
     CallAndRecallUtils().run_failsafe(nhs_no)
 
     # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "subject has episodes": "No",
-            "Screening Due Date": "Last Birthday",
-            "Screening due date date of change": "Today",
-            "Screening Due Date Reason": "Failsafe Trawl",
-            "screening status": "Call",
-            "Screening Status Date of Change": "Today",
-            "Screening Status Reason": "Failsafe Trawl",
-        },
-    )
+    criteria = {
+        "subject has episodes": "No",
+        "Screening Due Date": "Last Birthday",
+        "Screening due date date of change": "Today",
+        "Screening Due Date Reason": "Failsafe Trawl",
+        "screening status": "Call",
+        "Screening Status Date of Change": "Today",
+        "Screening Status Reason": "Failsafe Trawl",
+    }
+    subject_assertion(nhs_no, criteria)
 
     # When I invite my subject for FOBT screening
     CallAndRecallUtils().invite_subject_for_fobt_screening(nhs_no, user_role)
 
     # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "S1 Selected for Screening",
-            "latest episode kit class": "FIT",
-            "latest episode type": "FOBT",
-        },
-    )
+    criteria = {
+        "latest event status": "S1 Selected for Screening",
+        "latest episode kit class": "FIT",
+        "latest episode type": "FOBT",
+    }
+    subject_assertion(nhs_no, criteria)
 
     # Then there is a "S1" letter batch for my subject with the exact title "Pre-invitation (FIT)"
     # When I process the open "S1" letter batch for my subject
@@ -179,23 +175,19 @@ def test_scenario_6(page: Page) -> None:
     FitKitLogged().log_fit_kits(page, fit_kit, sample_date)
 
     # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "S43 Kit Returned and Logged (Initial Test)",
-        },
-    )
+    criteria = {
+        "latest event status": "S43 Kit Returned and Logged (Initial Test)",
+    }
+    subject_assertion(nhs_no, criteria)
 
     # When I read my subject's latest logged FIT kit as "ABNORMAL"
     FitKitLogged().read_latest_logged_kit(user_role, 2, fit_kit, "ABNORMAL")
 
     # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "A8 Abnormal",
-        },
-    )
+    criteria = {
+        "latest event status": "A8 Abnormal",
+    }
+    subject_assertion(nhs_no, criteria)
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -213,12 +205,10 @@ def test_scenario_6(page: Page) -> None:
     )
 
     # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "A183 1st Colonoscopy Assessment Appointment Requested",
-        },
-    )
+    criteria = {
+        "latest event status": "A183 1st Colonoscopy Assessment Appointment Requested",
+    }
+    subject_assertion(nhs_no, criteria)
 
     # And there is a "A183" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment"
     # When I process the open "A183 - Practitioner Clinic 1st Appointment" letter batch for my subject
@@ -252,12 +242,10 @@ def test_scenario_6(page: Page) -> None:
     attendance.mark_as_dna("Screening Centre did not attend")
 
     # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "J28 Appointment Non-attendance (Screening Centre)",
-        },
-    )
+    criteria = {
+        "latest event status": "J28 Appointment Non-attendance (Screening Centre)",
+    }
+    subject_assertion(nhs_no, criteria)
 
     # And I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -275,12 +263,10 @@ def test_scenario_6(page: Page) -> None:
     )
 
     # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "J30 Appointment Requested (SC Non-attendance Letter)",
-        },
-    )
+    criteria = {
+        "latest event status": "J30 Appointment Requested (SC Non-attendance Letter)",
+    }
+    subject_assertion(nhs_no, criteria)
 
     # And there is a "J30" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment Non Attendance (Screening Centre)"
     # When I process the open "J30" letter batch for my subject
@@ -313,15 +299,13 @@ def test_scenario_6(page: Page) -> None:
     RecordDiagnosisDatePage(page).click_save_button()
 
     # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "latest episode diagnosis date reason": "Null",
-            "latest episode has diagnosis date": "Yes",
-            "latest episode includes event status": "A50 Diagnosis date recorded",
-            "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked",
-        },
-    )
+    criteria = {
+        "latest episode diagnosis date reason": "Null",
+        "latest episode has diagnosis date": "Yes",
+        "latest episode includes event status": "A50 Diagnosis date recorded",
+        "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked",
+    }
+    subject_assertion(nhs_no, criteria)
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
     LogoutPage(page).log_out(close_page=False)
@@ -337,12 +321,10 @@ def test_scenario_6(page: Page) -> None:
     attendance.mark_as_attended()
 
     # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "J10 Attended Colonoscopy Assessment Appointment",
-        },
-    )
+    criteria = {
+        "latest event status": "J10 Attended Colonoscopy Assessment Appointment",
+    }
+    subject_assertion(nhs_no, criteria)
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -366,12 +348,10 @@ def test_scenario_6(page: Page) -> None:
     advance_fobt_episode.click_suitable_for_radiological_test_button()
 
     # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "A100 Suitable for Radiological Test",
-        },
-    )
+    criteria = {
+        "latest event status": "A100 Suitable for Radiological Test",
+    }
+    subject_assertion(nhs_no, criteria)
 
     # When I switch users to BCSS "England" as user role "Hub Manager"
     LogoutPage(page).log_out(close_page=False)
@@ -379,13 +359,11 @@ def test_scenario_6(page: Page) -> None:
     UserTools.user_login(page, "Hub Manager at BCS01")
 
     # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "latest episode includes event status": "A167 GP Abnormal FOBT Result Sent",
-            "latest event status": "A100 Suitable for Radiological Test",
-        },
-    )
+    criteria = {
+        "latest episode includes event status": "A167 GP Abnormal FOBT Result Sent",
+        "latest event status": "A100 Suitable for Radiological Test",
+    }
+    subject_assertion(nhs_no, criteria)
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
     LogoutPage(page).log_out(close_page=False)
@@ -401,12 +379,10 @@ def test_scenario_6(page: Page) -> None:
 
     # Then my subject has been updated as follows:
     # 	| Latest event status | A38 Decision not to Continue with Diagnostic Test |
-    subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "A38 Decision not to Continue with Diagnostic Test",
-        },
-    )
+    criteria = {
+        "latest event status": "A38 Decision not to Continue with Diagnostic Test",
+    }
+    subject_assertion(nhs_no, criteria)
 
     # And there is a "A38" letter batch for my subject with the exact title "Discharge (No Agreement To Proceed With Diagnostic Tests) - Patient letter"
     # When I process the open "A38" letter batch for my subject
@@ -417,36 +393,34 @@ def test_scenario_6(page: Page) -> None:
         "Discharge (No Agreement To Proceed With Diagnostic Tests) - Patient letter",
         "A168 - GP Discharge Sent (No Agreement to Proceed with Diagnostic Tests)",
     )
-    subject_assertion(
-        nhs_no,
-        {
-            "calculated FOBT due date": "2 years from episode end",
-            "calculated lynch due date": "Unchanged",
-            "calculated surveillance due date": "Unchanged",
-            "ceased confirmation date": "Null",
-            "ceased confirmation details": "Null",
-            "ceased confirmation user ID": "Null",
-            "clinical reason for cease": "Null",
-            "latest episode accumulated result": "Definitive abnormal FOBT outcome",
-            "latest episode recall calculation method": "Episode end date",
-            "latest episode recall episode type": "FOBT Screening",
-            "latest episode recall surveillance type": "Null",
-            "latest episode status": "Closed",
-            "latest episode status reason": "Informed Dissent",
-            "lynch due date": "Null",
-            "lynch due date date of change": "Unchanged",
-            "lynch due date reason": "Unchanged",
-            "screening due date": "Calculated FOBT due date",
-            "screening due date date of change": "Today",
-            "screening due date reason": "Recall",
-            "screening status": "Recall",
-            "screening status date of change": "# Not checking as status may or may not have changed",
-            "screening status reason": "Recall",
-            "surveillance due date": "Null",
-            "surveillance due date date of change": "Unchanged",
-            "surveillance due date reason": "Unchanged",
-        },
-    )
+    criteria = {
+        "calculated FOBT due date": "2 years from episode end",
+        "calculated lynch due date": "Unchanged",
+        "calculated surveillance due date": "Unchanged",
+        "ceased confirmation date": "Null",
+        "ceased confirmation details": "Null",
+        "ceased confirmation user ID": "Null",
+        "clinical reason for cease": "Null",
+        "latest episode accumulated result": "Definitive abnormal FOBT outcome",
+        "latest episode recall calculation method": "Episode end date",
+        "latest episode recall episode type": "FOBT Screening",
+        "latest episode recall surveillance type": "Null",
+        "latest episode status": "Closed",
+        "latest episode status reason": "Informed Dissent",
+        "lynch due date": "Null",
+        "lynch due date date of change": "Unchanged",
+        "lynch due date reason": "Unchanged",
+        "screening due date": "Calculated FOBT due date",
+        "screening due date date of change": "Today",
+        "screening due date reason": "Recall",
+        "screening status": "Recall",
+        "screening status date of change": "# Not checking as status may or may not have changed",
+        "screening status reason": "Recall",
+        "surveillance due date": "Null",
+        "surveillance due date date of change": "Unchanged",
+        "surveillance due date reason": "Unchanged",
+    }
+    subject_assertion(nhs_no, criteria)
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -456,38 +430,36 @@ def test_scenario_6(page: Page) -> None:
     ReopenFOBTScreeningEpisodePage(page).click_reopen_following_non_response_button()
 
     # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "calculated FOBT due date": "As at episode start",
-            "calculated lynch due date": "Null",
-            "calculated surveillance due date": "Null",
-            "ceased confirmation date": "Null",
-            "ceased confirmation details": "Null",
-            "ceased confirmation user ID": "Null",
-            "clinical reason for cease": "Null",
-            "latest episode accumulated result": "Null",
-            "latest episode includes event code": "E62 Reopen following Non-Response",
-            "latest episode recall calculation method": "Episode end date",
-            "latest episode recall episode type": "Null",
-            "latest episode recall surveillance type": "Null",
-            "latest episode status": "Open",
-            "latest episode status reason": "Null",
-            "latest event status": "J10 Attended Colonoscopy Assessment Appointment",
-            "lynch due date": "Null",
-            "lynch due date date of change": "Unchanged",
-            "lynch due date reason": "Unchanged",
-            "screening due date": "Calculated FOBT due date",
-            "screening due date date of change": "Today",
-            "screening due date reason": "Reopened episode",
-            "screening status": "# Not checking as status may or may not have changed",
-            "screening status date of change": "# Not checking as status may or may not have changed",
-            "screening status reason": "# Not checking as status may or may not have changed",
-            "surveillance due date": "Null",
-            "surveillance due date date of change": "Unchanged",
-            "surveillance due date reason": "Unchanged",
-        },
-    )
+    criteria = {
+        "calculated FOBT due date": "As at episode start",
+        "calculated lynch due date": "Null",
+        "calculated surveillance due date": "Null",
+        "ceased confirmation date": "Null",
+        "ceased confirmation details": "Null",
+        "ceased confirmation user ID": "Null",
+        "clinical reason for cease": "Null",
+        "latest episode accumulated result": "Null",
+        "latest episode includes event code": "E62 Reopen following Non-Response",
+        "latest episode recall calculation method": "Episode end date",
+        "latest episode recall episode type": "Null",
+        "latest episode recall surveillance type": "Null",
+        "latest episode status": "Open",
+        "latest episode status reason": "Null",
+        "latest event status": "J10 Attended Colonoscopy Assessment Appointment",
+        "lynch due date": "Null",
+        "lynch due date date of change": "Unchanged",
+        "lynch due date reason": "Unchanged",
+        "screening due date": "Calculated FOBT due date",
+        "screening due date date of change": "Today",
+        "screening due date reason": "Reopened episode",
+        "screening status": "# Not checking as status may or may not have changed",
+        "screening status date of change": "# Not checking as status may or may not have changed",
+        "screening status reason": "# Not checking as status may or may not have changed",
+        "surveillance due date": "Null",
+        "surveillance due date date of change": "Unchanged",
+        "surveillance due date reason": "Unchanged",
+    }
+    subject_assertion(nhs_no, criteria, user_role)
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -507,12 +479,10 @@ def test_scenario_6(page: Page) -> None:
     # Then I get a confirmation prompt that "contains" "If there has been further discussion regarding the patient's suitability for a colonoscopy then the colonoscopy assessment dataset will be updated with this further review"
     # When I press OK on my confirmation prompt
     # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "A99 Suitable for Endoscopic Test",
-        },
-    )
+    criteria = {
+        "latest event status": "A99 Suitable for Endoscopic Test",
+    }
+    subject_assertion(nhs_no, criteria)
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -522,12 +492,10 @@ def test_scenario_6(page: Page) -> None:
     advance_fobt_episode.click_waiting_decision_to_proceed_with_diagnostic_test()
 
     # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "A165 Waiting Decision to Proceed with Diagnostic Test",
-        },
-    )
+    criteria = {
+        "latest event status": "A165 Waiting Decision to Proceed with Diagnostic Test",
+    }
+    subject_assertion(nhs_no, criteria)
 
     # When I run Timed Events for my subject
     OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
