@@ -60,24 +60,19 @@ class OracleDB:
         """
         conn = self.connect_to_db()
         try:
+            subject_ids = []
+
             if nhs_number_df is not None:
-                for _, row in nhs_number_df.iterrows():
-                    subject_id = self.get_subject_id_from_nhs_number(
-                        row["subject_nhs_number"]
-                    )
-                    try:
-                        logging.info(
-                            f"[ORACLE] Attempting to execute stored procedure: 'bcss_timed_events', [{subject_id}, 'Y']"
-                        )
-                        cursor = conn.cursor()
-                        cursor.callproc("bcss_timed_events", [subject_id, "Y"])
-                        logging.info("Stored procedure execution successful!")
-                    except Exception as spExecutionError:
-                        logging.error(
-                            f"[ORACLE] Failed to execute stored procedure with execution error: {spExecutionError}"
-                        )
+                subject_ids = [
+                    self.get_subject_id_from_nhs_number(row["subject_nhs_number"])
+                    for _, row in nhs_number_df.iterrows()
+                ]
             elif nhs_number is not None:
-                subject_id = self.get_subject_id_from_nhs_number(nhs_number)
+                subject_ids = [self.get_subject_id_from_nhs_number(nhs_number)]
+            else:
+                raise ValueError("Must provide either nhs_number_df or nhs_number")
+
+            for subject_id in subject_ids:
                 try:
                     logging.info(
                         f"[ORACLE] Attempting to execute stored procedure: 'bcss_timed_events', [{subject_id}, 'Y']"
@@ -89,8 +84,7 @@ class OracleDB:
                     logging.error(
                         f"[ORACLE] Failed to execute stored procedure with execution error: {spExecutionError}"
                     )
-            else:
-                raise ValueError("Must provide either nhs_number_df or nhs_number")
+
         except Exception as queryExecutionError:
             logging.error(
                 f"[ORACLE] Failed to extract subject ID with error: {queryExecutionError}"
