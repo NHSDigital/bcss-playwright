@@ -338,7 +338,7 @@ def setup_a99_status(page: Page, df: pd.DataFrame) -> pd.DataFrame:
         SubjectDatasetsPage(page).click_colonoscopy_show_datasets()
 
         ColonoscopyDatasetsPage(page).select_fit_for_colonoscopy_option(
-            FitForColonoscopySspOptions.YES.value
+            FitForColonoscopySspOptions.YES
         )
         ColonoscopyDatasetsPage(page).click_dataset_complete_radio_button_yes()
         ColonoscopyDatasetsPage(page).save_dataset()

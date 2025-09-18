@@ -54,6 +54,19 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         self.subsequent_assessment_appointment_required_button = self.page.get_by_role(
             "button", name="Subsequent Assessment Appointment Required"
         )
+        self.suitable_for_radiological_test_button = self.page.get_by_role(
+            "button", name="Suitable for Radiological Test"
+        )
+        self.decision_not_to_continue_with_diagnostic_test_button = (
+            self.page.get_by_role(
+                "button", name="Decision not to Continue with Diagnostic Test"
+            )
+        )
+        self.waiting_decision_to_proceed_with_diagnostic_test_button = (
+            self.page.get_by_role(
+                "button", name="Waiting Decision to Proceed with Diagnostic Test"
+            )
+        )
 
     def click_suitable_for_endoscopic_test_button(self) -> None:
         """Click the 'Suitable for Endoscopic Test' button."""
@@ -150,3 +163,21 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
             label=option
         )
         self.safe_accept_dialog(self.subsequent_assessment_appointment_required_button)
+
+    def click_suitable_for_radiological_test_button(self) -> None:
+        """Click the 'Suitable for Radiological Test' button."""
+        AdvanceFOBTScreeningEpisodePage(self.page).safe_accept_dialog(
+            self.suitable_for_radiological_test_button
+        )
+
+    def click_decision_not_to_continue_with_diagnostic_test(self) -> None:
+        """Click the 'Decision not to Continue with Diagnostic Test' button."""
+        AdvanceFOBTScreeningEpisodePage(self.page).safe_accept_dialog(
+            self.decision_not_to_continue_with_diagnostic_test_button
+        )
+
+    def click_waiting_decision_to_proceed_with_diagnostic_test(self) -> None:
+        """Click the 'Waiting Decision to Proceed with Diagnostic Test' button."""
+        AdvanceFOBTScreeningEpisodePage(self.page).safe_accept_dialog(
+            self.waiting_decision_to_proceed_with_diagnostic_test_button
+        )
