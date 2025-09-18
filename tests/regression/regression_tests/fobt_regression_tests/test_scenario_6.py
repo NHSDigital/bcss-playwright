@@ -32,10 +32,8 @@ from pages.screening_subject_search.reopen_fobt_screening_episode_page import (
     ReopenFOBTScreeningEpisodePage,
 )
 from utils.oracle.oracle import OracleDB
-import pandas as pd
 
 
-@pytest.mark.wip
 @pytest.mark.usefixtures("setup_org_and_appointments")
 @pytest.mark.vpn_required
 @pytest.mark.regression
@@ -392,7 +390,7 @@ def test_scenario_6(page: Page) -> None:
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
     LogoutPage(page).log_out(close_page=False)
     BasePage(page).go_to_log_in_page()
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
+    user_role = UserTools.user_login(page, "Screening Centre Manager at BCS001", True)
 
     # And I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -516,6 +514,9 @@ def test_scenario_6(page: Page) -> None:
         },
     )
 
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
     # When I advance the subject's episode for "Waiting Decision to Proceed with Diagnostic Test"
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
     advance_fobt_episode.click_waiting_decision_to_proceed_with_diagnostic_test()
@@ -529,7 +530,7 @@ def test_scenario_6(page: Page) -> None:
     )
 
     # When I run Timed Events for my subject
-    OracleDB().exec_bcss_timed_events(pd.DataFrame({"subject_nhs_number": [nhs_no]}))
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
 
     # Then there is a "A165" letter batch for my subject with the exact title "Patient Discharge (No Agreement To Proceed With Diagnostic Tests) - Patient Letter"
     # When I process the open "A165" letter batch for my subject
@@ -540,36 +541,33 @@ def test_scenario_6(page: Page) -> None:
         "Patient Discharge (No Agreement To Proceed With Diagnostic Tests) - Patient Letter",
         "A168 - GP Discharge Sent (No Agreement to Proceed with Diagnostic Tests)",
     )
+    criteria = {
+        "calculated fobt due date": "2 years from episode end",
+        "calculated surveillance due date": "Unchanged",
+        "ceased confirmation date": "Today",
+        "ceased confirmation details": "Outside screening population at recall.",
+        "ceased confirmation user id": "User's ID",
+        "clinical reason for cease": "Null",
+        "latest episode accumulated result": "Definitive abnormal FOBT outcome",
+        "latest episode recall calculation method": "Episode end date",
+        "latest episode recall episode type": "FOBT Screening",
+        "latest episode recall surveillance type": "Null",
+        "latest episode status": "Closed",
+        "latest episode status reason": "Informed Dissent",
+        "lynch due date": "Null",
+        "lynch due date date of change": "Unchanged",
+        "lynch due date reason": "Unchanged",
+        "screening due date": "Null",
+        "screening due date date of change": "Today",
+        "screening due date reason": "Ceased",
+        "screening status": "Ceased",
+        "screening status date of change": "Today",
+        "screening status reason": "Outside screening population",
+        "surveillance due date": "Null",
+        "surveillance due date date of change": "Unchanged",
+        "surveillance due date reason": "Unchanged",
+    }
+    subject_assertion(nhs_no, criteria, user_role)
 
-    subject_assertion(
-        nhs_no,
-        {
-            "calculated FOBT due date": "2 years from episode end",
-            "calculated lynch due date": "Unchanged",
-            "calculated surveillance due date": "Unchanged",
-            "ceased confirmation date": "Today",
-            "ceased confirmation details": "Outside screening population at recall.",
-            "ceased confirmation user ID": "User's ID",
-            "clinical reason for cease": "Null",
-            "latest episode accumulated result": "Definitive abnormal FOBT outcome",
-            "latest episode recall calculation method": "Episode end date",
-            "latest episode recall episode type": "FOBT Screening",
-            "latest episode recall surveillance type": "Null",
-            "latest episode status": "Closed",
-            "latest episode status reason": "Informed Dissent",
-            "lynch due date": "Null",
-            "lynch due date date of change": "Unchanged",
-            "lynch due date reason": "Unchanged",
-            "screening due date": "Null",
-            "screening due date date of change": "Today",
-            "screening due date reason": "Ceased",
-            "screening status": "Ceased",
-            "screening status date of change": "Today",
-            "screening status reason": "Outside screening population",
-            "surveillance due date": "Null",
-            "surveillance due date date of change": "Unchanged",
-            "surveillance due date reason": "Unchanged",
-        },
-    )
     logging.info("[TEST COMPLETE] Scenario 6 passed all assertions")
     LogoutPage(page).log_out()
