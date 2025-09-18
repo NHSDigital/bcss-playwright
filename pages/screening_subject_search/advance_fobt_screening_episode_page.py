@@ -60,9 +60,7 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
 
     def click_suitable_for_endoscopic_test_button(self) -> None:
         """Click the 'Suitable for Endoscopic Test' button."""
-        AdvanceFOBTScreeningEpisodePage(self.page).safe_accept_dialog(
-            self.suitable_for_endoscopic_test_button
-        )
+        self.safe_accept_dialog(self.suitable_for_endoscopic_test_button)
 
     def click_calendar_button(self) -> None:
         """Click the calendar button to open the calendar picker."""
@@ -78,9 +76,7 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
 
     def click_invite_for_diagnostic_test_button(self) -> None:
         """Click the 'Invite for Diagnostic Test' button."""
-        AdvanceFOBTScreeningEpisodePage(self.page).safe_accept_dialog(
-            self.invite_for_diagnostic_test_button
-        )
+        self.safe_accept_dialog(self.invite_for_diagnostic_test_button)
 
     def click_attend_diagnostic_test_button(self) -> None:
         """Click the 'Attend Diagnostic Test' button."""
@@ -88,9 +84,7 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
 
     def click_other_post_investigation_button(self) -> None:
         """Click the 'Other Post-investigation' button."""
-        AdvanceFOBTScreeningEpisodePage(self.page).safe_accept_dialog(
-            self.other_post_investigation_button
-        )
+        self.safe_accept_dialog(self.other_post_investigation_button)
 
     def get_latest_event_status_cell(self, latest_event_status: str) -> Locator:
         """Get the cell containing the latest event status."""
@@ -134,18 +128,16 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
 
     def click_suitable_for_radiological_test_button(self) -> None:
         """Click the 'Suitable for Radiological Test' button."""
-        AdvanceFOBTScreeningEpisodePage(self.page).safe_accept_dialog(
-            self.suitable_for_radiological_test_button
-        )
+        self.safe_accept_dialog(self.suitable_for_radiological_test_button)
 
     def click_decision_not_to_continue_with_diagnostic_test(self) -> None:
         """Click the 'Decision not to Continue with Diagnostic Test' button."""
-        AdvanceFOBTScreeningEpisodePage(self.page).safe_accept_dialog(
+        self.safe_accept_dialog(
             self.decision_not_to_continue_with_diagnostic_test_button
         )
 
     def click_waiting_decision_to_proceed_with_diagnostic_test(self) -> None:
         """Click the 'Waiting Decision to Proceed with Diagnostic Test' button."""
-        AdvanceFOBTScreeningEpisodePage(self.page).safe_accept_dialog(
+        self.safe_accept_dialog(
             self.waiting_decision_to_proceed_with_diagnostic_test_button
         )

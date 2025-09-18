@@ -34,7 +34,6 @@ from pages.screening_subject_search.reopen_fobt_screening_episode_page import (
 from utils.oracle.oracle import OracleDB
 
 
-@pytest.mark.wip
 @pytest.mark.usefixtures("setup_org_and_appointments")
 @pytest.mark.vpn_required
 @pytest.mark.regression
