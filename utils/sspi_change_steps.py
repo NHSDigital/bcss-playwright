@@ -10,6 +10,9 @@ from utils.date_time_utils import DateTimeUtils
 
 
 class SSPIChangeSteps:
+    def __init__(self) -> None:
+        self.subject_repo = SubjectRepository()
+
     def sspi_update_to_change_dob_received(
         self, nhs_no: str, age_to_change_to: int
     ) -> None:
@@ -45,7 +48,6 @@ class SSPIChangeSteps:
         if DeductionReasonType.by_deduction_code(deduction_code) is None:
             raise ValueError(f"Unknown Deduction Code: {deduction_code}")
 
-        subject_repo = SubjectRepository()
         pi_subject = PISubject().from_subject(subject)
 
         if subject is not None:
@@ -67,7 +69,7 @@ class SSPIChangeSteps:
             elif deduction_code in ["LDN", "R/C"]:
                 # Logical deletion requires a "superseded by" NHS number
                 subject_criteria: Dict[str, str] = {"Screening Status": "Call"}
-                superseded_subject = subject_repo.get_matching_subject(
+                superseded_subject = self.subject_repo.get_matching_subject(
                     subject_criteria, Subject(), User()
                 )
                 if not superseded_subject:
@@ -100,12 +102,11 @@ class SSPIChangeSteps:
         method_name = "reregister_subject_with_latest_gp_practice"
         logging.debug(f"start: {method_name}()")
 
-        subject_repo = SubjectRepository()
         subject = Subject().populate_subject_object_from_nhs_no(nhs_no)
         pi_subject = PISubject().from_subject(subject)
 
         if subject is not None:
-            gp_code = subject_repo.get_latest_gp_practice_for_subject(nhs_no)
+            gp_code = self.subject_repo.get_latest_gp_practice_for_subject(nhs_no)
             logging.debug(f"Set GP code to {gp_code} and remove all deduction details")
 
             pi_subject.gp_practice_code = gp_code
@@ -132,13 +133,12 @@ class SSPIChangeSteps:
         """
         logging.debug("start: handle_update(Subject, date)")
 
-        subject_repo = SubjectRepository()
         pi_subject.pi_reference = "AUTOMATED TEST"
         # Check if a date of birth change needs to be made first
         if birth_date is not None:
             pi_subject.birth_date = birth_date
 
         # Run the update into the DB (SSPI updates are always run as automated process user 2)
-        subject_repo.update_pi_subject(2, pi_subject)
+        self.subject_repo.update_pi_subject(2, pi_subject)
 
         logging.debug("exit: handle_update()")

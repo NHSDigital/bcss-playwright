@@ -69,6 +69,10 @@ class DeductionReasonType(Enum):
     def by_description(cls, description: str) -> Optional["DeductionReasonType"]:
         """
         Returns the enum member matching the given description (case-sensitive).
+        Args:
+            description (str): The description to match.
+        Returns:
+            Optional[DeductionReasonType]: The matching enum member, or None if not found.
         """
         for member in cls:
             if member.description == description:
@@ -81,6 +85,10 @@ class DeductionReasonType(Enum):
     ) -> Optional["DeductionReasonType"]:
         """
         Returns the enum member matching the given description (case-insensitive).
+        Args:
+            description (str): The description to match.
+        Returns:
+            Optional[DeductionReasonType]: The matching enum member, or None if not found.
         """
         desc_lower = description.lower()
         for member in cls:
@@ -92,6 +100,10 @@ class DeductionReasonType(Enum):
     def by_deduction_code(cls, code: str) -> Optional["DeductionReasonType"]:
         """
         Returns the enum member matching the given allowed value (deduction code).
+        Args:
+            code (str): The code to match.
+        Returns:
+            Optional[DeductionReasonType]: The matching enum member, or None if not found.
         """
         code_upper = code.upper()
         for member in cls:
@@ -103,6 +115,10 @@ class DeductionReasonType(Enum):
     def by_valid_value_id(cls, valid_value_id: int) -> Optional["DeductionReasonType"]:
         """
         Returns the enum member matching the given valid value ID.
+        Args:
+            valid_value_id (str): The valid_value_id to match.
+        Returns:
+            Optional[DeductionReasonType]: The matching enum member, or None if not found.
         """
         for member in cls:
             if member.valid_value_id == valid_value_id:

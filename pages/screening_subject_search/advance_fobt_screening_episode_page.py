@@ -140,7 +140,7 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         self.advance_checkbox.check()
 
     def click_amend_diagnosis_date_button(self) -> None:
-        """Click the 'Amend Diagnosis Date' button."""
+        """Checks the 'Advance FOBT' checkbox and clicks the 'Amend Diagnosis Date' button."""
         self.advance_checkbox_v2.check()
         self.click(self.amend_diagnosis_date_button)
 
