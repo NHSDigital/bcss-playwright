@@ -67,6 +67,9 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
                 "button", name="Waiting Decision to Proceed with Diagnostic Test"
             )
         )
+        self.not_suitable_for_diagnostic_tests_button = self.page.get_by_role(
+            "button", name="Not Suitable for Diagnostic Tests"
+        )
 
     def click_suitable_for_endoscopic_test_button(self) -> None:
         """Click the 'Suitable for Endoscopic Test' button."""
@@ -166,18 +169,20 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
 
     def click_suitable_for_radiological_test_button(self) -> None:
         """Click the 'Suitable for Radiological Test' button."""
-        AdvanceFOBTScreeningEpisodePage(self.page).safe_accept_dialog(
-            self.suitable_for_radiological_test_button
-        )
+        self.safe_accept_dialog(self.suitable_for_radiological_test_button)
 
     def click_decision_not_to_continue_with_diagnostic_test(self) -> None:
         """Click the 'Decision not to Continue with Diagnostic Test' button."""
-        AdvanceFOBTScreeningEpisodePage(self.page).safe_accept_dialog(
+        self.safe_accept_dialog(
             self.decision_not_to_continue_with_diagnostic_test_button
         )
 
     def click_waiting_decision_to_proceed_with_diagnostic_test(self) -> None:
         """Click the 'Waiting Decision to Proceed with Diagnostic Test' button."""
-        AdvanceFOBTScreeningEpisodePage(self.page).safe_accept_dialog(
+        self.safe_accept_dialog(
             self.waiting_decision_to_proceed_with_diagnostic_test_button
         )
+
+    def click_not_suitable_for_diagnostic_tests_button(self) -> None:
+        """Click the 'Not Suitable for Diagnostic Tests' button."""
+        self.safe_accept_dialog(self.not_suitable_for_diagnostic_tests_button)

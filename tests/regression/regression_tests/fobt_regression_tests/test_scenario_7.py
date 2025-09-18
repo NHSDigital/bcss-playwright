@@ -31,9 +31,13 @@ from pages.screening_subject_search.advance_fobt_screening_episode_page import (
 from pages.screening_subject_search.patient_advised_of_diagnosis_page import (
     PatientAdvisedOfDiagnosisPage,
 )
+from pages.datasets.subject_datasets_page import SubjectDatasetsPage
+from pages.datasets.colonoscopy_dataset_page import (
+    ColonoscopyDatasetsPage,
+    FitForColonoscopySspOptions,
+)
 
 
-@pytest.mark.wip
 @pytest.mark.usefixtures("setup_org_and_appointments")
 @pytest.mark.vpn_required
 @pytest.mark.regression
@@ -458,92 +462,82 @@ def test_scenario_7(page: Page) -> None:
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
     # And I edit the Colonoscopy Assessment Dataset for this subject
+    SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_colonoscopy_show_datasets()
 
     # And I update the Colonoscopy Assessment Dataset with the following values:
-
-    logging.info(f"NHS NUMBER: {nhs_no}")
-    LogoutPage(page).log_out()
-
-
-@pytest.mark.wip2
-def test_test(page: Page) -> None:
-    nhs_no = "9625261559"
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
+    ColonoscopyDatasetsPage(page).select_fit_for_colonoscopy_option(
+        FitForColonoscopySspOptions.NO
+    )
+    ColonoscopyDatasetsPage(page).click_dataset_complete_radio_button_yes()
+    ColonoscopyDatasetsPage(page).save_dataset()
 
     # And I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # And I view the advance episode options
+    # And I advance the subject's episode for "Not Suitable for Diagnostic Tests"
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-
-    # And I select Subsequent Assessment Appointment Required reason "Previous attendance, further assessment required"
     AdvanceFOBTScreeningEpisodePage(
         page
-    ).click_and_select_subsequent_assessment_appointment_required(
-        "Previous attendance, further assessment required"
-    )
+    ).click_not_suitable_for_diagnostic_tests_button()
 
     # Then my subject has been updated as follows:
     subject_assertion(
-        nhs_no, {"latest event status": "J1 Subsequent Assessment Appointment Required"}
+        nhs_no, {"latest event status": "J15 Not Suitable for Diagnostic Tests"}
     )
 
-    # When I view the subject
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-
-    # And I choose to book a practitioner clinic for my subject
-    SubjectScreeningSummaryPage(page).click_book_practitioner_clinic_button()
-
-    # And I select "BCS001" as the screening centre where the practitioner appointment will be held
-    # And I set the practitioner appointment date to "today"
-    # And I book the "earliest" available practitioner appointment on this date
-    book_appointments(
-        page,
-        "BCS001 - Wolverhampton Bowel Cancer Screening Centre",
-        "The Royal Hospital (Wolverhampton)",
-    )
-
-    # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "J34 Subsequent Appointment Requested",
-        },
-    )
-
-    # And there is a "J34" letter batch for my subject with the exact title "Practitioner Clinic 1st Subsequent Appointment"
-    # When I process the open "J34" letter batch for my subject
+    # And there is a "J15" letter batch for my subject with the exact title "Subject Discharge (Unsuitable For Further Diagnostic Tests)"
+    # When I process the open "J15" letter batch for my subject
     batch_processing(
         page,
-        "J34",
-        "Practitioner Clinic 1st Subsequent Appointment",
-        "J35 - Subsequent Appointment Booked, letter sent",
+        "J15",
+        "Subject Discharge (Unsuitable For Further Diagnostic Tests)",
+        "J16 - Patient Discharge Sent (Unsuitable for Diagnostic Tests)",
     )
 
-    # When I view the event history for the subject's latest episode
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-    SubjectScreeningSummaryPage(page).expand_episodes_list()
-    SubjectScreeningSummaryPage(page).click_first_fobt_episode_link()
+    # When I switch users to BCSS "England" as user role "Hub Manager"
+    LogoutPage(page).log_out(close_page=False)
+    BasePage(page).go_to_log_in_page()
+    UserTools.user_login(page, "Hub Manager State Registered at BCS01")
 
-    # And I view the latest practitioner appointment in the subject's episode
-    EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
+    # And there is a "J16" letter batch for my subject with the exact title "GP Discharge (Not Suitable For Diagnostic Tests)"
+    # And I process the open "J16" letter batch for my subject
 
-    # And I attend the subject's practitioner appointment "today"
-    AppointmentDetailPage(page).mark_appointment_as_attended(datetime.today())
+    batch_processing(
+        page,
+        "J16",
+        "GP Discharge (Not Suitable For Diagnostic Tests)",
+        "J17 - GP Discharge Sent (Unsuitable for Diagnostic Tests)",
+    )
 
     # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "J10 Attended Colonoscopy Assessment Appointment",
-        },
-    )
-
-    # When I view the subject
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-
-    # And I edit the Colonoscopy Assessment Dataset for this subject
-
-    # And I update the Colonoscopy Assessment Dataset with the following values:
-
-    logging.info(f"NHS NUMBER: {nhs_no}")
+    criteria = {
+        "calculated fobt due date": "2 years from latest J16 event",
+        "calculated lynch due date": "Unchanged",
+        "calculated surveillance due date": "Unchanged",
+        "ceased confirmation date": "Null",
+        "ceased confirmation details": "Null",
+        "ceased confirmation user id": "Null",
+        "clinical reason for cease": "Null",
+        "latest episode accumulated result": "Definitive abnormal FOBT outcome",
+        "latest episode recall calculation method": "Date of last patient letter",
+        "latest episode recall episode type": "FOBT Screening",
+        "latest episode recall surveillance type": "Null",
+        "latest episode status": "Closed",
+        "latest episode status reason": "Clinical Reason",
+        "latest event status": "J17 GP Discharge Sent (Unsuitable for Diagnostic Tests)",
+        "lynch due date": "Null",
+        "lynch due date date of change": "Unchanged",
+        "lynch due date reason": "unchanged",
+        "screening due date": "Calculated FOBT due date",
+        "screening due date date of change": "Today",
+        "screening due date reason": "Recall",
+        "screening status": "Recall",
+        "screening status date of change": "Today",
+        "screening status reason": "Recall",
+        "surveillance due date date of change": "Unchanged",
+        "surveillance due date reason": "unchanged",
+        "surveillance due date": "Null",
+    }
+    subject_assertion(nhs_no, criteria)
+    LogoutPage(page).log_out()
