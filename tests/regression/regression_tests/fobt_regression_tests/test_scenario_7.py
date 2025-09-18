@@ -107,6 +107,13 @@ def test_scenario_7(page: Page) -> None:
     }
     subject_assertion(nhs_no, criteria)
 
+    # Navigate to subject summary page in UI
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # Assert subject details in the UI
+    SubjectScreeningSummaryPage(page).assert_subject_age(61)
+    SubjectScreeningSummaryPage(page).assert_screening_status("Inactive")
+
     # When I run the FOBT failsafe trawl for my subject
     CallAndRecallUtils().run_failsafe(nhs_no)
 
@@ -123,6 +130,12 @@ def test_scenario_7(page: Page) -> None:
         "screening status reason": "Failsafe Trawl",
     }
     subject_assertion(nhs_no, criteria)
+
+    # Navigate to subject summary page in UI
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # Assert subject details in the UI
+    SubjectScreeningSummaryPage(page).assert_screening_status("Call")
 
     # When I invite my subject for FOBT screening
     CallAndRecallUtils().invite_subject_for_fobt_screening(nhs_no, user_role)
