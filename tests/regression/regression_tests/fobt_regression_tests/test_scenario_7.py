@@ -141,13 +141,15 @@ def test_scenario_7(page: Page) -> None:
     CallAndRecallUtils().invite_subject_for_fobt_screening(nhs_no, user_role)
 
     # Then my subject has been updated as follows:
-    criteria = {
-        "latest event status": "S1 Selected for Screening",
-        "latest episode kit class": "FIT",
-        "latest episode type": "FOBT",
-    }
 
-    subject_assertion(nhs_no, criteria)
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S1 Selected for Screening",
+            "latest episode kit class": "FIT",
+            "latest episode type": "FOBT",
+        },
+    )
 
     # Then there is a "S1" letter batch for my subject with the exact title "Pre-invitation (FIT)"
     # When I process the open "S1" letter batch for my subject
@@ -173,17 +175,18 @@ def test_scenario_7(page: Page) -> None:
     FitKitLogged().log_fit_kits(page, fit_kit, sample_date)
 
     # Then my subject has been updated as follows:
-    criteria = {
-        "latest event status": "S43 Kit Returned and Logged (Initial Test)",
-    }
-    subject_assertion(nhs_no, criteria)
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S43 Kit Returned and Logged (Initial Test)",
+        },
+    )
 
     # When I read my subject's latest logged FIT kit as "SPOILT"
     FitKitLogged().read_latest_logged_kit(user_role, 2, fit_kit, "ABNORMAL")
 
     # Then my subject has been updated as follows:
-    criteria = {"latest event status": "A8 Abnormal"}
-    subject_assertion(nhs_no, criteria)
+    subject_assertion(nhs_no, {"latest event status": "A8 Abnormal"})
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
