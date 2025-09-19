@@ -234,8 +234,6 @@ class AppointmentAttendance(BasePage):
         logging.info(
             "[APPOINTMENT DNA] Starting DNA flow with reason: Did not attend - Diagnostic Test"
         )
-        self.subject_screening_summary_page.click_advance_fobt_screening_episode_button()
-
         today = datetime.today().strftime("%d/%m/%Y")
         self.dna_diagnostic_test_date_field.fill(today)
 

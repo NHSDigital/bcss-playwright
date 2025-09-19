@@ -219,45 +219,52 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
 
         Steps:
             - Clicks the 'Record Contact with Patient' button
-            - Selects 'To patient' as the direction
+            - Selects direction and contact type
+            - Picks a calendar date
             - Fills start time, end time, and duration
             - Enters a note
+            - Selects 'Patient Contacted' as 'No'
             - Selects the outcome 'Close Episode - No Contact'
             - Clicks the save button
         """
-        logging.info(
-            "[CONTACT RECORD] Starting contact recording flow with outcome: Close Episode - No Contact"
-        )
+        logging.info("[CONTACT RECORD] Starting contact recording flow with outcome: Close Episode - No Contact")
 
         # Step 1: Click 'Record Contact with Patient' button
-        self.page.get_by_role("button", name="Record Contact with Patient").click()
-        logging.info("[CONTACT RECORD] Navigated to contact recording screen")
+        # self.page.get_by_role("button", name="Record Contact with Patient").click()
+        # logging.info("[CONTACT RECORD] Navigated to contact recording screen")
 
-        # Step 2: Select 'To patient' from direction dropdown
-        self.page.locator("#UI_DIRECTION").select_option(label="To patient")
-        logging.info("[CONTACT RECORD] Selected direction: To patient")
+        # Step 2: Select direction and contact type
+        self.page.get_by_label("Contact Direction").select_option("20159")
+        self.page.get_by_label("Contact made between patient").select_option("1171")
+        logging.info("[CONTACT RECORD] Selected direction and contact type")
 
-        # Step 3: Enter time details
-        self.page.locator("#UI_START_TIME").fill("09:00")
-        self.page.locator("#UI_END_TIME").fill("09:10")
+        # Step 3: Pick calendar date
+        self.page.get_by_role("button", name="Calendar").click()
+        self.page.get_by_role("cell", name="19", exact=True).click()
+        logging.info("[CONTACT RECORD] Selected calendar date: 19")
+
+        # Step 4: Enter time details
+        self.page.locator("#UI_START_TIME").fill("08:00")
+        self.page.locator("#UI_END_TIME").fill("08:10")
         self.page.locator("#UI_DURATION").fill("10")
-        logging.info(
-            "[CONTACT RECORD] Entered time details: 09:00–09:10, duration 10 mins"
-        )
+        logging.info("[CONTACT RECORD] Entered time details: 08:00–08:10")
 
-        # Step 4: Enter note
-        self.page.locator("#UI_COMMENT_ID").fill("automation test note")
-        logging.info("[CONTACT RECORD] Entered note: automation test note")
+        # Step 5: Enter note
+        self.page.get_by_text("(up to 500 char)").fill("Automation test record")
+        logging.info("[CONTACT RECORD] Entered note: Automation test record")
 
-        # Step 5: Select outcome
-        self.page.locator("#UI_OUTCOME").select_option(
-            label="Close Episode - No Contact"
-        )
+        # Step 6: Select 'Patient Contacted' as 'No'
+        self.page.get_by_label("Patient Contacted").select_option("N")
+        logging.info("[CONTACT RECORD] Selected 'Patient Contacted': No")
+
+        # Step 7: Select outcome
+        self.page.get_by_label("Outcome").select_option("20202")
         logging.info("[CONTACT RECORD] Selected outcome: Close Episode - No Contact")
 
-        # Step 6: Click save
+        # Step 8: Click save
         self.page.locator("input[name='UI_BUTTON_SAVE']").click()
         logging.info("[CONTACT RECORD] Contact recording flow completed successfully")
+
 
     def click_not_suitable_for_diagnostic_tests_button(self) -> None:
         """Click the 'Not Suitable for Diagnostic Tests' button."""
