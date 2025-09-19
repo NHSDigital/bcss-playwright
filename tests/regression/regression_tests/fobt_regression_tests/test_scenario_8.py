@@ -428,8 +428,12 @@ def test_scenario_8(page: Page) -> None:
 
     # When I select the advance episode option for "Record Contact with Patient"
     # 	And I record contact with the subject with outcome "Suitable for Radiological Test"
+
     # Then my subject has been updated as follows:
-    # 	| Latest event status | A100 Suitable for Radiological Test |
+    criteria = {
+        "latest event status": "A100 Suitable for Radiological Test",
+    }
+    subject_assertion(nhs_no, criteria)
 
     # When I view the advance episode options
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
@@ -447,7 +451,7 @@ def test_scenario_8(page: Page) -> None:
     subject_assertion(nhs_no, criteria)
 
     # When I select the advance episode option for "Attend Diagnostic Test"
-    # 	And I attend the subject's diagnostic test today
+    # And I attend the subject's diagnostic test today
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -458,7 +462,10 @@ def test_scenario_8(page: Page) -> None:
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # 	And I edit the Investigation Dataset for this subject
+    # And I edit the Investigation Dataset for this subject
+    SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_investigation_show_datasets()
+
     # 	And I open all minimized sections on the dataset
     # 	And I mark the Investigation Dataset as completed
     # 	And I set the following fields and values within the Investigation Dataset for this subject:
@@ -495,8 +502,12 @@ def test_scenario_8(page: Page) -> None:
 
     # When I press the save Investigation Dataset button
     # 	And I press OK on my confirmation prompt
+
     # Then my subject has been updated as follows:
-    # 	| Latest episode accumulated result | Abnormal |
+    criteria = {
+        "latest episode accumulated result": "Abnormal",
+    }
+    subject_assertion(nhs_no, criteria)
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -640,6 +651,9 @@ def test_scenario_8(page: Page) -> None:
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
     # 	And I edit the Investigation Dataset for this subject
+    SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_investigation_show_datasets()
+
     # 	And I open all minimized sections on the dataset
     # 	And I mark the Investigation Dataset as completed
     # 	And I add the following bowel preparation drugs and values within the Investigation Dataset for this subject:
