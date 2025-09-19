@@ -16,7 +16,7 @@ from pages.screening_practitioner_appointments.book_appointment_page import (
 )
 from utils.calendar_picker import CalendarPicker
 from utils.user_tools import UserTools
-from datetime import datetime
+from datetime import datetime, timedelta
 from pages.screening_practitioner_appointments.appointment_detail_page import (
     AppointmentDetailPage,
 )
@@ -171,7 +171,7 @@ class AppointmentAttendance:
 
         logging.info("[APPOINTMENT DNA] DNA flow completed successfully")
 
-    def mark_as_attended(self) -> None:
+    def mark_as_attended_today(self) -> None:
         """
         Marks an appointment as attended and logs the auto-filled attendance details.
         This process starts from the subject screening summary page.
@@ -210,3 +210,48 @@ class AppointmentAttendance:
         self.appointment_detail_page.click_save_button(accept_dialog=True)
 
         logging.info("[APPOINTMENT ATTENDED] Attended flow completed successfully")
+
+    def mark_as_attended_yesterday(self) -> None:
+        """
+        Marks an appointment as attended with the attendance date set to yesterday.
+        This process starts from the subject screening summary page.
+
+        Navigates through the subject's episode and appointment pages,
+        selects the 'Attendance' radio option, checks the 'Attended' checkbox,
+        manually sets the attendance date to yesterday, and logs the resulting details.
+
+        Raises:
+            AssertionError: If expected elements are not found or interaction fails.
+        """
+        logging.info("[APPOINTMENT ATTENDED] Starting attended-yesterday flow")
+
+        self.subject_screening_summary_page.click_list_episodes()
+        self.subject_screening_summary_page.click_view_events_link()
+        self.episode_events_and_notes_page.click_most_recent_view_appointment_link()
+        self.appointment_detail_page.check_attendance_radio()
+
+        # Check the 'Attended' checkbox
+        attended_checkbox = self.page.locator("#UI_ATTENDED")
+        attended_checkbox.check()
+
+        # Manually set the attendance date to yesterday
+        yesterday = (datetime.today() - timedelta(days=1)).strftime(
+            "%d/%m/%Y"
+        )
+        self.page.locator("#UI_ATTENDED_DATE").fill(yesterday)
+
+        # Log the attendance details
+        attended_date = self.page.locator("#UI_ATTENDED_DATE").input_value()
+        time_from = self.page.locator("#UI_ATTENDED_TIME_FROM").input_value()
+        time_to = self.page.locator("#UI_ATTENDED_TIME_TO").input_value()
+        meeting_mode = self.page.locator("#UI_NEW_MEETING_MODE").input_value()
+
+        logging.info(
+            f"[APPOINTMENT ATTENDED] How Attended: {meeting_mode}, Date: {attended_date}, Time From: {time_from}, Time To: {time_to}"
+        )
+
+        self.appointment_detail_page.click_save_button(accept_dialog=True)
+
+        logging.info(
+            "[APPOINTMENT ATTENDED] Attended-yesterday flow completed successfully"
+        )
