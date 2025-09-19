@@ -133,7 +133,8 @@ def test_scenario_9(page: Page) -> None:
     FitKitLogged().read_latest_logged_kit(user_role, 2, fit_kit, "ABNORMAL")
 
     # Then my subject has been updated as follows:
-    subject_assertion(nhs_no, {"latest event status": "A8 Abnormal"})
+    criteria = {"latest event status": "A8 Abnormal"}
+    subject_assertion(nhs_no, criteria)
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -153,7 +154,7 @@ def test_scenario_9(page: Page) -> None:
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
-        {
+        criteria={
             "latest event status": "A183 1st Colonoscopy Assessment Appointment Requested",
         },
     )
@@ -191,7 +192,7 @@ def test_scenario_9(page: Page) -> None:
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
-        {
+        criteria={
             "latest event status": "J10 Attended Colonoscopy Assessment Appointment",
         },
     )

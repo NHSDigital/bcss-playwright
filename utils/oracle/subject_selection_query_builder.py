@@ -1128,7 +1128,7 @@ class SubjectSelectionQueryBuilder:
                 " SELECT tkt.tk_type_id"
                 " FROM tk_type_t tkt "
                 f" WHERE tkt.tk_test_class_id {comparator} {kit_class_id} "
-                " ) " 
+                " ) "
             )
 
         except Exception:
