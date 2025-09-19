@@ -88,7 +88,6 @@ def test_scenario_9(page: Page) -> None:
         "subject age": "Between 60 and 72",
         "subject has unprocessed sspi updates": "No",
         "subject has user dob updates": "No",
-        # "subject hub code": "User's hub",
     }
     subject = Subject()
     user = User()
