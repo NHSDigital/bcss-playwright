@@ -45,6 +45,16 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         self.record_contact_with_patient_button = self.page.get_by_role(
             "button", name="Record Contact with Patient"
         )
+        self.amend_diagnosis_date_button = self.page.get_by_role(
+            "button", name="Amend Diagnosis Date"
+        )
+        self.advance_checkbox_v2 = self.page.get_by_role("checkbox")
+        self.subsequent_assessment_appointment_required_dropdown = (
+            self.page.get_by_role("combobox")
+        )
+        self.subsequent_assessment_appointment_required_button = self.page.get_by_role(
+            "button", name="Subsequent Assessment Appointment Required"
+        )
         self.suitable_for_radiological_test_button = self.page.get_by_role(
             "button", name="Suitable for Radiological Test"
         )
@@ -57,6 +67,12 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
             self.page.get_by_role(
                 "button", name="Waiting Decision to Proceed with Diagnostic Test"
             )
+        )
+        self.not_suitable_for_diagnostic_tests_button = self.page.get_by_role(
+            "button", name="Not Suitable for Diagnostic Tests"
+        )
+        self.cancel_diagnostic_test_button = self.page.get_by_role(
+            "button", name="Cancel Diagnostic Test"
         )
 
     def click_suitable_for_endoscopic_test_button(self) -> None:
@@ -93,15 +109,21 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
 
     def verify_latest_event_status_value(self, latest_event_status: str) -> None:
         """Verify that the latest event status value is visible."""
-        logging.info(f"Verifying subject has the status: {latest_event_status}")
+        logging.info(
+            f"[UI ASSERTION] Verifying subject has the status: {latest_event_status}"
+        )
         latest_event_status_cell = self.get_latest_event_status_cell(
             latest_event_status
         )
         try:
             expect(latest_event_status_cell).to_be_visible()
-            logging.info(f"Subject has the status: {latest_event_status}")
+            logging.info(
+                f"[UI ASSERTION COMPLETE] Subject has the status: {latest_event_status}"
+            )
         except Exception:
-            pytest.fail(f"Subject does not have the status: {latest_event_status}")
+            raise AssertionError(
+                f"[UI ASSERTION FAILED] Subject does not have the status: {latest_event_status}"
+            )
 
     def click_record_other_post_investigation_contact_button(self) -> None:
         """Click the 'Record other post-investigation contact' button."""
@@ -127,6 +149,28 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         """Selects the 'Advance FOBT' checkbox"""
         self.advance_checkbox.check()
 
+    def click_amend_diagnosis_date_button(self) -> None:
+        """Checks the 'Advance FOBT' checkbox and clicks the 'Amend Diagnosis Date' button."""
+        self.advance_checkbox_v2.check()
+        self.click(self.amend_diagnosis_date_button)
+
+    def click_and_select_subsequent_assessment_appointment_required(
+        self, option: str
+    ) -> None:
+        """
+        Click the 'Subsequent Assessment Appointment Required' button and select an option from the dropdown.
+        Args:
+            option (str): The option to select from the dropdown.
+            Must be one of:
+                - 'Previous attendance, further assessment required'
+                - 'Interpreter requirement not identified'
+                - 'SC interpreter DNA'
+        """
+        self.subsequent_assessment_appointment_required_dropdown.select_option(
+            label=option
+        )
+        self.safe_accept_dialog(self.subsequent_assessment_appointment_required_button)
+
     def click_suitable_for_radiological_test_button(self) -> None:
         """Click the 'Suitable for Radiological Test' button."""
         self.safe_accept_dialog(self.suitable_for_radiological_test_button)
@@ -148,7 +192,9 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         Enters today's date, selects 'CT Colonography' as the diagnostic test type,
         and clicks the 'Invite for Diagnostic Test' button.
         """
-        logging.info("[ADVANCE EPISODE] Selecting CT Colonography and inviting for diagnostic test")
+        logging.info(
+            "[ADVANCE EPISODE] Selecting CT Colonography and inviting for diagnostic test"
+        )
 
         # Step 1: Enter today's date
         today = date.today().strftime("%d/%m/%Y")
@@ -160,7 +206,9 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         logging.info("[ADVANCE EPISODE] Selected test type: CT Colonography")
 
         # Step 3: Click 'Invite for Diagnostic Test'
-        invite_button = self.page.get_by_role("button", name="Invite for Diagnostic Test >>")
+        invite_button = self.page.get_by_role(
+            "button", name="Invite for Diagnostic Test >>"
+        )
         self.safe_accept_dialog(invite_button)
 
         logging.info("[ADVANCE EPISODE] Invite for diagnostic test completed")
@@ -177,7 +225,9 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
             - Selects the outcome 'Close Episode - No Contact'
             - Clicks the save button
         """
-        logging.info("[CONTACT RECORD] Starting contact recording flow with outcome: Close Episode - No Contact")
+        logging.info(
+            "[CONTACT RECORD] Starting contact recording flow with outcome: Close Episode - No Contact"
+        )
 
         # Step 1: Click 'Record Contact with Patient' button
         self.page.get_by_role("button", name="Record Contact with Patient").click()
@@ -191,16 +241,28 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         self.page.locator("#UI_START_TIME").fill("09:00")
         self.page.locator("#UI_END_TIME").fill("09:10")
         self.page.locator("#UI_DURATION").fill("10")
-        logging.info("[CONTACT RECORD] Entered time details: 09:00–09:10, duration 10 mins")
+        logging.info(
+            "[CONTACT RECORD] Entered time details: 09:00–09:10, duration 10 mins"
+        )
 
         # Step 4: Enter note
         self.page.locator("#UI_COMMENT_ID").fill("automation test note")
         logging.info("[CONTACT RECORD] Entered note: automation test note")
 
         # Step 5: Select outcome
-        self.page.locator("#UI_OUTCOME").select_option(label="Close Episode - No Contact")
+        self.page.locator("#UI_OUTCOME").select_option(
+            label="Close Episode - No Contact"
+        )
         logging.info("[CONTACT RECORD] Selected outcome: Close Episode - No Contact")
 
         # Step 6: Click save
         self.page.locator("input[name='UI_BUTTON_SAVE']").click()
         logging.info("[CONTACT RECORD] Contact recording flow completed successfully")
+
+    def click_not_suitable_for_diagnostic_tests_button(self) -> None:
+        """Click the 'Not Suitable for Diagnostic Tests' button."""
+        self.safe_accept_dialog(self.not_suitable_for_diagnostic_tests_button)
+
+    def click_cancel_diagnostic_test_button(self) -> None:
+        """Click the 'Cancel Diagnostic Test' button."""
+        self.safe_accept_dialog(self.cancel_diagnostic_test_button)

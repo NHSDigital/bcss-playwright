@@ -1,7 +1,10 @@
 import logging
 from typing import Optional
 from classes.subject.pi_subject import PISubject
+from classes.subject.subject import Subject
+from classes.user.user import User
 from utils.oracle.oracle import OracleDB
+from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
 
 
 class SubjectRepository:
@@ -150,7 +153,7 @@ class SubjectRepository:
         )
         if df.empty:
             return None
-        return df.iloc[0]["gp_code"]
+        return df["gp_code"].iloc[0]
 
     def get_inactive_gp_practice(self) -> Optional[str]:
         """
@@ -168,7 +171,7 @@ class SubjectRepository:
         df = self.oracle_db.execute_query(query)
         if df.empty:
             return None
-        return df.iloc[0]["gp_code"]
+        return df["gp_code"].iloc[0]
 
     def get_latest_gp_practice_for_subject(self, nhs_number: str) -> Optional[str]:
         """
@@ -192,4 +195,33 @@ class SubjectRepository:
         df = self.oracle_db.execute_query(query, {"nhs_number": nhs_number})
         if df.empty:
             return None
-        return df.iloc[0]["gp_code"]
+        return df["gp_code"].iloc[0]
+
+    def get_matching_subject(
+        self, criteria: dict, subject: Subject, user: User
+    ) -> Subject:
+        """
+        Finds a subject in the DB matching the given criteria.
+        Args:
+            criteria (dict): The criteria you want the subject to match
+            subject (Subject): The subject class object. Can be populated or not, depends on the criteria
+            user (User): The user class object. Can be populated or not, depends on the criteria
+        Returns:
+            Subject: A populated Subject object with a subject that matches the provided criteria
+        Raises:
+            ValueError: If no subject matching the criteria was found.
+        """
+        builder = SubjectSelectionQueryBuilder()
+        query, bind_vars = builder.build_subject_selection_query(
+            criteria=criteria,
+            user=user,
+            subject=subject,
+            subjects_to_retrieve=1,
+        )
+        df = OracleDB().execute_query(query, bind_vars)
+        try:
+            df_row = df.iloc[0]
+            subject = Subject().from_dataframe_row(df_row)
+        except Exception:
+            raise ValueError("No subject found matching the given criteria")
+        return subject
