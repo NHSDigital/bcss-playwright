@@ -1784,12 +1784,26 @@ class SubjectSelectionQueryBuilder:
 
     def _handle_latest_test_in_latest_episode(self, which, xt, _):
         """Helper method for diagnostic test filtering"""
+        latest_episode_subquery = """
+            SELECT MAX(epx.subject_epis_id)
+            FROM ep_subject_episode_t epx
+            WHERE epx.screening_subject_id = ss.screening_subject_id
+        """
+
+        void_clause = (
+            "AND xtx.void = 'N'"
+            if which == WhichDiagnosticTest.LATEST_NOT_VOID_TEST_IN_LATEST_EPISODE
+            else ""
+        )
+
         self.sql_from.append(
             f""" AND {xt}.ext_test_id = (
-        SELECT MAX(xtx.ext_test_id) FROM external_tests_t xtx
-        WHERE xtx.screening_subject_id = ss.screening_subject_id
-        {'AND xtx.void = \'N\'' if which == WhichDiagnosticTest.LATEST_NOT_VOID_TEST_IN_LATEST_EPISODE else ''}
-        AND xtx.subject_epis_id = ep.subject_epis_id ) """
+                SELECT MAX(xtx.ext_test_id)
+                FROM external_tests_t xtx
+                WHERE xtx.screening_subject_id = ss.screening_subject_id
+                {void_clause}
+                AND xtx.subject_epis_id = ({latest_episode_subquery})
+            )"""
         )
 
     def _handle_earliest_test_in_latest_episode(self, which, xt, _):

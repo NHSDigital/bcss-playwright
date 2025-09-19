@@ -1,3 +1,4 @@
+from datetime import date
 from playwright.sync_api import Page, expect, Locator
 from pages.base_page import BasePage
 import logging
@@ -141,3 +142,65 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         self.safe_accept_dialog(
             self.waiting_decision_to_proceed_with_diagnostic_test_button
         )
+
+    def select_ct_colonography_and_invite(self) -> None:
+        """
+        Enters today's date, selects 'CT Colonography' as the diagnostic test type,
+        and clicks the 'Invite for Diagnostic Test' button.
+        """
+        logging.info("[ADVANCE EPISODE] Selecting CT Colonography and inviting for diagnostic test")
+
+        # Step 1: Enter today's date
+        today = date.today().strftime("%d/%m/%Y")
+        self.page.locator("#UI_APPT_DATE_38").fill(today)
+        logging.info(f"[ADVANCE EPISODE] Entered appointment date: {today}")
+
+        # Step 2: Select 'CT Colonography' from dropdown
+        self.page.locator("#UI_EXT_TEST_TYPE_38").select_option(label="CT Colonography")
+        logging.info("[ADVANCE EPISODE] Selected test type: CT Colonography")
+
+        # Step 3: Click 'Invite for Diagnostic Test'
+        invite_button = self.page.get_by_role("button", name="Invite for Diagnostic Test >>")
+        self.safe_accept_dialog(invite_button)
+
+        logging.info("[ADVANCE EPISODE] Invite for diagnostic test completed")
+
+    def record_contact_close_episode_no_contact(self) -> None:
+        """
+        Records contact with the subject and sets the outcome to 'Close Episode - No Contact'.
+
+        Steps:
+            - Clicks the 'Record Contact with Patient' button
+            - Selects 'To patient' as the direction
+            - Fills start time, end time, and duration
+            - Enters a note
+            - Selects the outcome 'Close Episode - No Contact'
+            - Clicks the save button
+        """
+        logging.info("[CONTACT RECORD] Starting contact recording flow with outcome: Close Episode - No Contact")
+
+        # Step 1: Click 'Record Contact with Patient' button
+        self.page.get_by_role("button", name="Record Contact with Patient").click()
+        logging.info("[CONTACT RECORD] Navigated to contact recording screen")
+
+        # Step 2: Select 'To patient' from direction dropdown
+        self.page.locator("#UI_DIRECTION").select_option(label="To patient")
+        logging.info("[CONTACT RECORD] Selected direction: To patient")
+
+        # Step 3: Enter time details
+        self.page.locator("#UI_START_TIME").fill("09:00")
+        self.page.locator("#UI_END_TIME").fill("09:10")
+        self.page.locator("#UI_DURATION").fill("10")
+        logging.info("[CONTACT RECORD] Entered time details: 09:00–09:10, duration 10 mins")
+
+        # Step 4: Enter note
+        self.page.locator("#UI_COMMENT_ID").fill("automation test note")
+        logging.info("[CONTACT RECORD] Entered note: automation test note")
+
+        # Step 5: Select outcome
+        self.page.locator("#UI_OUTCOME").select_option(label="Close Episode - No Contact")
+        logging.info("[CONTACT RECORD] Selected outcome: Close Episode - No Contact")
+
+        # Step 6: Click save
+        self.page.locator("input[name='UI_BUTTON_SAVE']").click()
+        logging.info("[CONTACT RECORD] Contact recording flow completed successfully")
