@@ -132,6 +132,32 @@ def book_appointments(page: Page, screening_centre: str, site: str) -> None:
         )
 
 
+def book_post_investigation_appointment(
+    page: Page, site: str, screening_practitioner_index: int
+) -> None:
+    """
+    Book a post-investigation appointment for a subject.
+    Sets the appointment date to today and the start time to '08:00'.
+    Args:
+        page (Page): The Playwright page object.
+        site (str): The name of the site.
+        screening_practitioner_index (int): The index of the screening practitioner to select.
+    """
+    book_appointments_page = BookAppointmentPage(page)
+    book_appointments_page.select_site_dropdown_option(
+        [
+            f"{site} (? km)",
+            f"{site} (? km) (attended)",
+        ]
+    )
+    book_appointments_page.select_screening_practitioner_dropdown_option(
+        screening_practitioner_index
+    )
+    book_appointments_page.enter_appointment_date(datetime.today())
+    book_appointments_page.enter_appointment_start_time("08:00")
+    book_appointments_page.click_save_button()
+
+
 class AppointmentAttendance:
     def __init__(self, page: Page):
         self.page = page

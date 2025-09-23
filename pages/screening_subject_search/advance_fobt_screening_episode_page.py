@@ -15,8 +15,7 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
             "button", name="Suitable for Endoscopic Test"
         )
         self.calendar_button = self.page.get_by_role("button", name="Calendar")
-        self.test_type_dropdown = self.page.locator("#UI_EXT_TEST_TYPE_2233")
-        self.test_type_dropdown_2 = self.page.locator("#UI_EXT_TEST_TYPE_4325")
+        self.test_type_dropdown = self.page.locator("[id^='UI_EXT_TEST_TYPE_']")
         self.advance_checkbox = self.page.get_by_label(
             "There are some events available which should only be used in exceptional circumstances. If you wish to see them, check this box"
         )
@@ -73,6 +72,14 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         self.cancel_diagnostic_test_button = self.page.get_by_role(
             "button", name="Cancel Diagnostic Test"
         )
+        self.waiting_decision_to_preceed_with_diagnostic_test_button = (
+            self.page.get_by_role(
+                "button", name="Waiting Decision to Proceed with Diagnostic Test"
+            )
+        )
+        self.post_investigation_appointment_required_button = self.page.get_by_role(
+            "button", name="Post-investigation Appointment Required"
+        )
 
     def click_suitable_for_endoscopic_test_button(self) -> None:
         """Click the 'Suitable for Endoscopic Test' button."""
@@ -85,10 +92,6 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
     def select_test_type_dropdown_option(self, text: str) -> None:
         """Select the test type from the dropdown."""
         self.test_type_dropdown.select_option(label=text)
-
-    def select_test_type_dropdown_option_2(self, text: str) -> None:
-        """Select the test type from the dropdown."""
-        self.test_type_dropdown_2.select_option(label=text)
 
     def click_invite_for_diagnostic_test_button(self) -> None:
         """Click the 'Invite for Diagnostic Test' button."""
@@ -193,3 +196,13 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
     def click_cancel_diagnostic_test_button(self) -> None:
         """Click the 'Cancel Diagnostic Test' button."""
         self.safe_accept_dialog(self.cancel_diagnostic_test_button)
+
+    def click_waiting_decision_to_preceed_with_diagnostic_test_button(self) -> None:
+        """Click the 'Waiting Decision to Proceed with Diagnostic Test' button."""
+        self.safe_accept_dialog(
+            self.waiting_decision_to_preceed_with_diagnostic_test_button
+        )
+
+    def click_post_investigation_appointment_required_button(self) -> None:
+        """Click the 'Post-investigation Appointment Required' button."""
+        self.safe_accept_dialog(self.post_investigation_appointment_required_button)
