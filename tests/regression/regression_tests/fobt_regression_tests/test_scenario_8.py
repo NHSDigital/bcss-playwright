@@ -304,7 +304,7 @@ def test_scenario_8(page: Page) -> None:
     # UserTools.user_login(page, "Hub Manager at BCS01")
 
     # # And I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
-    # TODO: LEAVE COMMENTED - is this needed? Subject is already at A172 DNA Diagnostic Test (line 279)
+    # NOTE LEAVE COMMENTED - is this needed? Subject is already at A172 DNA Diagnostic Test (line 279)
     # # Then my subject has been updated as follows:
     # batch_processing(
     #     page,
@@ -363,8 +363,6 @@ def test_scenario_8(page: Page) -> None:
     # And there is a "A397" letter batch for my subject with the exact title "Discharge from screening round - no contact (letter to patient)"
     # When I process the open "A397" letter batch for my subject
     # Then my subject has been updated as follows:
-    # 	| Latest event status | A391 Patient Discharge Letter Printed - No Patient Contact |
-    # 	And there is a "A391" letter batch for my subject with the exact title "Discharge from screening round - no contact (letter to GP)"
     batch_processing(
         page,
         "A397",
@@ -372,6 +370,7 @@ def test_scenario_8(page: Page) -> None:
         "A391 - Patient Discharge Letter Printed - No Patient Contact",
     )
 
+    # And there is a "A391" letter batch for my subject with the exact title "Discharge from screening round - no contact (letter to GP)"
     # When I process the open "A391 - Discharge from screening round - no contact (letter to GP)" letter batch for my subject
     batch_processing(
         page,
@@ -565,14 +564,17 @@ def test_scenario_8(page: Page) -> None:
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
     AdvanceFOBTScreeningEpisodePage(page).click_enter_diagnostic_test_outcome_button()
 
-    # And I select Outcome of Diagnostic Test "Refer Another Diagnostic Test" TODO: Add option to Enum
+    # And I select Outcome of Diagnostic Test "Refer Another Diagnostic Test"
     DiagnosticTestOutcomePage(page).select_test_outcome_option(
-        OutcomeOfDiagnosticTest.FAILED_TEST_REFER_ANOTHER
+        OutcomeOfDiagnosticTest.REFER_ANOTHER_DIAGNOSTIC_TEST
     )
+
     # # TODO: And I select Radiological or Endoscopic Referral value "Radiological"
     # # And I select Reason for Onward Referral value "Currently Unsuitable for Endoscopic Referral"
     # # And I set any onward referring clinician
-    # # And I save the Diagnostic Test Outcome
+    
+    # And I save the Diagnostic Test Outcome
+    DiagnosticTestOutcomePage(page).click_save_button()
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -632,11 +634,22 @@ def test_scenario_8(page: Page) -> None:
     # And I view the latest practitioner appointment in the subject's episode
     attendance.mark_as_attended_today()
 
-    # # Then my subject has been updated as follows: TODO: Why is this checked twice?
-    # # 	| Latest episode includes event status | A416 Post-investigation Appointment Attended |
-    # # 	And my subject has been updated as follows:
-    # # 	| Latest episode includes event status | A316 Post-investigation Appointment Attended                                        |
-    # # 	| Latest event status                  | A430 Post-investigation Appointment Attended - Diagnostic Result Letter not Printed |
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest episode includes event status": "A416 Post-investigation Appointment Attended",
+        },
+    )
+
+    # And my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest episode includes event status": "A316 Post-investigation Appointment Attended",
+            "latest event status": "A430 Post-investigation Appointment Attended - Diagnostic Result Letter not Printed",
+        },
+    )
 
     # And there is a "A430" letter batch for my subject with the exact title "Result Letters Following Post-investigation Appointment"
     # When I process the open "A430" letter batch for my subject
@@ -806,17 +819,31 @@ def test_scenario_8(page: Page) -> None:
     }
     subject_assertion(nhs_no, criteria)
 
-    # # TODO: When I select the advance episode option for "Record other post-investigation contact"
+    # When I select the advance episode option for "Record other post-investigation contact"
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_record_other_post_investigation_contact_button()
+
     # And I record contact with the subject with outcome "Post-investigation Appointment Not Required"
     ContactWithPatientPage(page).record_post_investigation_appointment_not_required()
 
-    # # Then my subject has been updated as follows: TODO: Why is this checked twice?
-    # # 	| Latest episode includes event status | A323 Post-investigation Appointment NOT Required |
     # # Then my subject has been updated as follows:
-    # # 	| Latest episode includes event status | A317 Post-investigation Contact Made                                     |
-    # # 	| Latest event status                  | A318 Post-investigation Appointment NOT Required - Result Letter Created |
-    # # 	And there is a "A318" letter batch for my subject with the exact title "Result Letters - No Post-investigation Appointment"
+    subject_assertion(
+        nhs_no,
+        {
+            "latest episode includes event status": "A323 Post-investigation Appointment NOT Required",
+        },
+    )
 
+    # # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest episode includes event status": "A317 Post-investigation Contact Made",
+            "latest event status": "A318 Post-investigation Appointment NOT Required - Result Letter Created",
+        },
+    )
+
+    # # And there is a "A318" letter batch for my subject with the exact title "Result Letters - No Post-investigation Appointment"
     # # When I process the open "A318" letter batch for my subject
     # # Then my subject has been updated as follows:
     batch_processing(

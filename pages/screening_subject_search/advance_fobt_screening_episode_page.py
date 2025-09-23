@@ -275,3 +275,8 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
     def click_post_investigation_appointment_required_button(self) -> None:
         """Click the 'Post-investigation Appointment Required' button."""
         self.safe_accept_dialog(self.post_investigation_appointment_required_button)
+
+    def click_record_other_post_investigation_contact_button(self) -> None:
+        """Click the 'Record other post-investigation contact' button."""
+        self.safe_accept_dialog(self.record_other_post_investigation_contact_button)
+
