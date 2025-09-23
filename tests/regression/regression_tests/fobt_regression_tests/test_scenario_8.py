@@ -3,6 +3,14 @@ import logging
 from datetime import datetime
 from playwright.sync_api import Page
 from pages.datasets.subject_datasets_page import SubjectDatasetsPage
+from pages.screening_practitioner_appointments.appointment_detail_page import (
+    AppointmentDetailPage,
+)
+from utils.calendar_picker import CalendarPicker
+from utils.datasets.investigation_datasets import (
+    get_default_endoscopy_information,
+    get_default_general_information,
+)
 from utils.oracle.subject_creation_util import CreateSubjectSteps
 from utils.user_tools import UserTools
 from utils.subject_assertion import subject_assertion
@@ -35,6 +43,17 @@ from utils.oracle.oracle import OracleDB
 from utils.oracle.subject_selector import SubjectSelector
 from classes.subject_selection_query_builder.subject_selection_criteria_key import (
     SubjectSelectionCriteriaKey as Key,
+)
+from pages.screening_subject_search.contact_with_patient_page import (
+    ContactWithPatientPage,
+)
+from pages.screening_subject_search.attend_diagnostic_test_page import (
+    AttendDiagnosticTestPage,
+)
+from utils.investigation_dataset import InvestigationDatasetCompletion
+from pages.screening_subject_search.diagnostic_test_outcome_page import (
+    DiagnosticTestOutcomePage,
+    OutcomeOfDiagnosticTest,
 )
 
 
@@ -118,14 +137,13 @@ def test_scenario_8(page: Page) -> None:
     user_details = UserTools.retrieve_user("Hub Manager at BCS01")
 
     criteria = {
-        Key.LATEST_EVENT_STATUS.description: "S9 Pre-invitation Sent",
-        Key.LATEST_EPISODE_KIT_CLASS.description: "FIT",
-        Key.LATEST_EPISODE_STARTED.description: "Within the last 6 months",
-        Key.LATEST_EPISODE_TYPE.description: "FOBT",
-        Key.SUBJECT_AGE.description: "Between 60 and 72",
-        # Key.SUBJECT_HAS_UNPROCESSED_SSPI_UPDATES.description: "No",
-        # Key.SUBJECT_HAS_USER_DOB_UPDATES.description: "No",
-        # Key.SUBJECT_HUB_CODE.description: user_details["hub_code"],
+        "latest event status": "S9 Pre-Invitation Sent",
+        "latest episode kit class": "FIT",
+        "latest episode started": "Within the last 6 months",
+        "latest episode type": "FOBT",
+        "subject age": "Between 60 and 72",
+        "subject has unprocessed sspi updates": "No",
+        "subject has user dob updates": "No",
     }
 
     nhs_no = SubjectSelector.get_subject_for_pre_invitation(criteria)
@@ -281,9 +299,9 @@ def test_scenario_8(page: Page) -> None:
     subject_assertion(nhs_no, criteria)
 
     # When I switch users to BCSS "England" as user role "Hub Manager"
-    LogoutPage(page).log_out(close_page=False)
-    BasePage(page).go_to_log_in_page()
-    UserTools.user_login(page, "Hub Manager at BCS01")
+    # LogoutPage(page).log_out(close_page=False)
+    # BasePage(page).go_to_log_in_page()
+    # UserTools.user_login(page, "Hub Manager at BCS01")
 
     # # And I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
     # TODO: LEAVE COMMENTED - is this needed? Subject is already at A172 DNA Diagnostic Test (line 279)
@@ -394,7 +412,11 @@ def test_scenario_8(page: Page) -> None:
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # 	And I reopen the subject's episode for "Reopen to Reschedule Diagnostic Test"
+    # And I reopen the subject's episode for "Reopen to Reschedule Diagnostic Test"
+    SubjectScreeningSummaryPage(page).click_reopen_fobt_screening_episode_button()
+    ReopenFOBTScreeningEpisodePage(
+        page
+    ).click_reopen_to_reschedule_diagnostic_test_button()
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -427,7 +449,11 @@ def test_scenario_8(page: Page) -> None:
     subject_assertion(nhs_no, criteria)
 
     # When I select the advance episode option for "Record Contact with Patient"
-    # 	And I record contact with the subject with outcome "Suitable for Radiological Test"
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_record_contact_with_patient_button()
+
+    # And I record contact with the subject with outcome "Suitable for Radiological Test"
+    ContactWithPatientPage(page).record_contact("Suitable for Radiological Test")
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -438,9 +464,16 @@ def test_scenario_8(page: Page) -> None:
     # When I view the advance episode options
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
 
-    # 	And I select Diagnostic Test Type "CT Colonography"
-    # 	And I enter a Diagnostic Test First Offered Appointment Date of "today"
-    # 	And I advance the subject's episode for "Invite for Diagnostic Test >>"
+    # And I select Diagnostic Test Type "CT Colonography"
+    AdvanceFOBTScreeningEpisodePage(page).select_test_type_dropdown_option(
+        "CT Colonography"
+    )
+    # And I enter a Diagnostic Test First Offered Appointment Date of "today"
+    AdvanceFOBTScreeningEpisodePage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+
+    # And I advance the subject's episode for "Invite for Diagnostic Test >>"
+    AdvanceFOBTScreeningEpisodePage(page).click_invite_for_diagnostic_test_button()
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -451,7 +484,14 @@ def test_scenario_8(page: Page) -> None:
     subject_assertion(nhs_no, criteria)
 
     # When I select the advance episode option for "Attend Diagnostic Test"
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_attend_diagnostic_test_button()
+
     # And I attend the subject's diagnostic test today
+    AttendDiagnosticTestPage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+    AttendDiagnosticTestPage(page).click_save_button()
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -466,42 +506,51 @@ def test_scenario_8(page: Page) -> None:
     SubjectScreeningSummaryPage(page).click_datasets_link()
     SubjectDatasetsPage(page).click_investigation_show_datasets()
 
-    # 	And I open all minimized sections on the dataset
-    # 	And I mark the Investigation Dataset as completed
-    # 	And I set the following fields and values within the Investigation Dataset for this subject:
-    # 	| Screening Site                         | (Pick first option)  |
-    # 	| Practitioner                           | (Pick first option)  |
-    # 	| Testing Clinician                      | (Pick first option)  |
-    # 	| Reporting Radiologist                  | (Pick second option) |
-    # 	| Fit for Subsequent Endoscopic Referral | Yes                  |
+    # TODO: And I set the following fields and values within the Investigation Dataset for this subject:
+    general_information = get_default_general_information()
+    endoscopy_information = get_default_endoscopy_information()
+    endoscopy_information["procedure type"] = "diagnostic"
+    # # 	| Screening Site                         | (Pick first option)  |
+    # # 	| Practitioner                           | (Pick first option)  |
+    # # 	| Testing Clinician                      | (Pick first option)  |
+    # # 	| Reporting Radiologist                  | (Pick second option) |
+    # # 	| Fit for Subsequent Endoscopic Referral | Yes                  |
 
-    # 	And I set the following fields and values within the Contrast, Tagging & Drug Information:
-    # 	| IV Buscopan Administered                  | No  |
-    # 	| Contraindicated                           | No  |
-    # 	| IV Contrast Administered                  | No  |
-    # 	| Tagging Agent Given                       | Yes |
-    # 	| Additional Bowel Preparation Administered | Yes |
+    # # 	And I set the following fields and values within the Contrast, Tagging & Drug Information:
+    # # 	| IV Buscopan Administered                  | No  |
+    # # 	| Contraindicated                           | No  |
+    # # 	| IV Contrast Administered                  | No  |
+    # # 	| Tagging Agent Given                       | Yes |
+    # # 	| Additional Bowel Preparation Administered | Yes |
 
-    # 	And I add the following "Tagging Agent Given" drugs and doses within the Investigation Dataset for this subject:
-    # 	| Gastrografin | 1 |
-    # 	And I add the following Additional Bowel Preparation drugs and values within the Investigation Dataset for this subject:
-    # 	| Picolax | 1 |
-    # 	And I set the following fields and values within the Radiology Information:
-    # 	| Examination Quality          | Good                |
-    # 	| Number of Scan Positions     | Dual                |
-    # 	| Outcome at time of procedure | Leave department    |
-    # 	| Late outcome                 | No complications    |
-    # 	| Segmental Inadequacy         | No                  |
-    # 	| Intracolonic Summary Code    | Cx Inadequate study |
-    # 	And I set the following radiology failure reasons within the Investigation Dataset for this subject:
-    # 	| No failure reasons |
-    # 	And I set the following fields and values within the Radiology Information:
-    # 	| Extracolonic Summary Code | E4 Potentially important new finding, requires further action |
-    # 	And I press the save Investigation Dataset button
-    # Then the Investigation Dataset result message, which I will cancel, is "Abnormal"
+    # # 	And I add the following "Tagging Agent Given" drugs and doses within the Investigation Dataset for this subject:
+    # # 	| Gastrografin | 1 |
+    # # 	And I add the following Additional Bowel Preparation drugs and values within the Investigation Dataset for this subject:
+    # # 	| Picolax | 1 |
+    # # 	And I set the following fields and values within the Radiology Information:
+    # # 	| Examination Quality          | Good                |
+    # # 	| Number of Scan Positions     | Dual                |
+    # # 	| Outcome at time of procedure | Leave department    |
+    # # 	| Late outcome                 | No complications    |
+    # # 	| Segmental Inadequacy         | No                  |
+    # # 	| Intracolonic Summary Code    | Cx Inadequate study |
+    # # 	And I set the following radiology failure reasons within the Investigation Dataset for this subject:
+    # # 	| No failure reasons |
+    # # 	And I set the following fields and values within the Radiology Information:
+    # # 	| Extracolonic Summary Code | E4 Potentially important new finding, requires further action |
+    # # 	And I press the save Investigation Dataset button
+    # # Then the Investigation Dataset result message, which I will cancel, is "Abnormal"
 
-    # When I press the save Investigation Dataset button
-    # 	And I press OK on my confirmation prompt
+    # And I open all minimized sections on the dataset
+    # TODO: And I mark the Investigation Dataset as completed
+    # # When I press the save Investigation Dataset button
+    # # And I press OK on my confirmation prompt
+    # InvestigationDatasetCompletion(page).complete_dataset_with_args(
+    #     general_information=general_information,
+    #     drug_information=drug_information,
+    #     endoscopy_information=endoscopy_information,
+    #     failure_information=failure_information,
+    # )
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -512,12 +561,18 @@ def test_scenario_8(page: Page) -> None:
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # 	And I select the advance episode option for "Enter Diagnostic Test Outcome"
-    # 	And I select Outcome of Diagnostic Test "Refer Another Diagnostic Test"
-    # 	And I select Radiological or Endoscopic Referral value "Radiological"
-    # 	And I select Reason for Onward Referral value "Currently Unsuitable for Endoscopic Referral"
-    # 	And I set any onward referring clinician
-    # 	And I save the Diagnostic Test Outcome
+    # And I select the advance episode option for "Enter Diagnostic Test Outcome"
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_enter_diagnostic_test_outcome_button()
+
+    # And I select Outcome of Diagnostic Test "Refer Another Diagnostic Test" TODO: Add option to Enum
+    DiagnosticTestOutcomePage(page).select_test_outcome_option(
+        OutcomeOfDiagnosticTest.FAILED_TEST_REFER_ANOTHER
+    )
+    # # TODO: And I select Radiological or Endoscopic Referral value "Radiological"
+    # # And I select Reason for Onward Referral value "Currently Unsuitable for Endoscopic Referral"
+    # # And I set any onward referring clinician
+    # # And I save the Diagnostic Test Outcome
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -525,7 +580,12 @@ def test_scenario_8(page: Page) -> None:
     }
     subject_assertion(nhs_no, criteria)
 
-    # When I advance the subject's episode for "Post-investigation Appointment Required"
+    # # When I advance the subject's episode for "Post-investigation Appointment Required"
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(
+        page
+    ).click_post_investigation_appointment_required_button()
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -536,9 +596,16 @@ def test_scenario_8(page: Page) -> None:
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # 	And I choose to book a practitioner clinic for my subject
-    # 	And I set the practitioner appointment date to "today"
-    # 	And I book the earliest available post investigation appointment on this date
+    # And I choose to book a practitioner clinic for my subject
+    SubjectScreeningSummaryPage(page).click_book_practitioner_clinic_button()
+
+    # And I set the practitioner appointment date to "today"
+    # And I book the earliest available post investigation appointment on this date
+    book_appointments(
+        page,
+        "BCS001 - Wolverhampton Bowel Cancer Screening Centre",
+        "The Royal Hospital (Wolverhampton)",
+    )
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -560,15 +627,16 @@ def test_scenario_8(page: Page) -> None:
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # 	And I view the event history for the subject's latest episode
-    # 	And I view the latest practitioner appointment in the subject's episode
-    # 	And I attend the subject's practitioner appointment "today"
+    # And I view the event history for the subject's latest episode
+    # And I attend the subject's practitioner appointment "today"
+    # And I view the latest practitioner appointment in the subject's episode
+    attendance.mark_as_attended_today()
 
-    # Then my subject has been updated as follows:
-    # 	| Latest episode includes event status | A416 Post-investigation Appointment Attended |
-    # 	And my subject has been updated as follows:
-    # 	| Latest episode includes event status | A316 Post-investigation Appointment Attended                                        |
-    # 	| Latest event status                  | A430 Post-investigation Appointment Attended - Diagnostic Result Letter not Printed |
+    # # Then my subject has been updated as follows: TODO: Why is this checked twice?
+    # # 	| Latest episode includes event status | A416 Post-investigation Appointment Attended |
+    # # 	And my subject has been updated as follows:
+    # # 	| Latest episode includes event status | A316 Post-investigation Appointment Attended                                        |
+    # # 	| Latest event status                  | A430 Post-investigation Appointment Attended - Diagnostic Result Letter not Printed |
 
     # And there is a "A430" letter batch for my subject with the exact title "Result Letters Following Post-investigation Appointment"
     # When I process the open "A430" letter batch for my subject
@@ -587,12 +655,12 @@ def test_scenario_8(page: Page) -> None:
     # And I view the advance episode options
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
 
-    # And I interrupt the subject's episode for "Redirect to DELETE the Latest Diagnostic Test Result"
-    # Then I get a confirmation prompt that "contains" "WARNING - This redirect will DELETE the following datasets if they exist:"
-    # And my confirmation prompt "contains" "Investigation"
-    # And my confirmation prompt "contains" "MDT"
-    # And my confirmation prompt "contains" "Cancer Audit"
-    # When I press OK on my confirmation prompt
+    # # TODO: And I interrupt the subject's episode for "Redirect to DELETE the Latest Diagnostic Test Result"
+    # # Then I get a confirmation prompt that "contains" "WARNING - This redirect will DELETE the following datasets if they exist:"
+    # # And my confirmation prompt "contains" "Investigation"
+    # # And my confirmation prompt "contains" "MDT"
+    # # And my confirmation prompt "contains" "Cancer Audit"
+    # # When I press OK on my confirmation prompt
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -607,7 +675,7 @@ def test_scenario_8(page: Page) -> None:
     # And I view the advance episode options
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
 
-    # 	And I interrupt the subject's episode for "Redirect to re-establish suitability for diagnostic test re:patient contact"
+    # # TODO: And I interrupt the subject's episode for "Redirect to re-establish suitability for diagnostic test re:patient contact"
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -617,7 +685,11 @@ def test_scenario_8(page: Page) -> None:
     subject_assertion(nhs_no, criteria)
 
     # When I select the advance episode option for "Record Contact with Patient"
-    # 	And I record contact with the subject with outcome "Suitable for Endoscopic Test"
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_record_contact_with_patient_button()
+
+    # And I record contact with the subject with outcome "Suitable for Endoscopic Test"
+    ContactWithPatientPage(page).record_contact("Suitable for Endoscopic Test")
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -628,9 +700,16 @@ def test_scenario_8(page: Page) -> None:
     # When I view the advance episode options
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
 
-    # 	And I select Diagnostic Test Type "Colonoscopy"
-    # 	And I enter a Diagnostic Test First Offered Appointment Date of "today"
-    # 	And I advance the subject's episode for "Invite for Diagnostic Test >>"
+    # And I select Diagnostic Test Type "Colonoscopy"
+    AdvanceFOBTScreeningEpisodePage(page).select_test_type_dropdown_option(
+        "Colonoscopy"
+    )
+    # And I enter a Diagnostic Test First Offered Appointment Date of "today"
+    AdvanceFOBTScreeningEpisodePage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+
+    # And I advance the subject's episode for "Invite for Diagnostic Test >>"
+    AdvanceFOBTScreeningEpisodePage(page).click_invite_for_diagnostic_test_button()
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -638,8 +717,13 @@ def test_scenario_8(page: Page) -> None:
     }
     subject_assertion(nhs_no, criteria)
 
-    # When I select the advance episode option for "Attend Diagnostic Test"
-    # 	And I attend the subject's diagnostic test today
+    # # When I select the advance episode option for "Attend Diagnostic Test"
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_attend_diagnostic_test_button()
+
+    # # And I attend the subject's diagnostic test today
+    attendance.mark_as_attended_today()
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -654,37 +738,36 @@ def test_scenario_8(page: Page) -> None:
     SubjectScreeningSummaryPage(page).click_datasets_link()
     SubjectDatasetsPage(page).click_investigation_show_datasets()
 
-    # 	And I open all minimized sections on the dataset
-    # 	And I mark the Investigation Dataset as completed
-    # 	And I add the following bowel preparation drugs and values within the Investigation Dataset for this subject:
-    # 	| Mannitol | 3 |
-    # 	And I set the following fields and values within the Investigation Dataset for this subject:
-    # 	| Screening Site               | (Pick first option) |
-    # 	| Practitioner                 | (Pick first option) |
-    # 	| Testing Clinician            | (Pick first option) |
-    # 	| Aspirant Endoscopist         | Not Present         |
-    # 	| Endoscope inserted           | Yes                 |
-    # 	| Procedure type               | Diagnostic          |
-    # 	| Bowel preparation quality    | Good                |
-    # 	| Comfort during examination   | No discomfort       |
-    # 	| Comfort during recovery      | No discomfort       |
-    # 	| Endoscopist defined extent   | Descending Colon    |
-    # 	| Scope imager used            | Yes                 |
-    # 	| Retroverted view             | No                  |
-    # 	| Start of intubation time     | 09:00               |
-    # 	| Start of extubation time     | 09:30               |
-    # 	| End time of procedure        | 10:00               |
-    # 	| Scope ID                     | Autotest            |
-    # 	| Insufflation                 | Air                 |
-    # 	| Outcome at time of procedure | Leave department    |
-    # 	| Late outcome                 | No complications    |
-    # 	And I set the following failure reasons within the Investigation Dataset for this subject:
-    # 	| Pain |
-    # 	And I press the save Investigation Dataset button
-    # Then the Investigation Dataset result message, which I will cancel, is "No Result"
-
-    # When I press the save Investigation Dataset button
-    # 	And I press OK on my confirmation prompt
+    # # 	TODO: And I open all minimized sections on the dataset
+    # # 	And I mark the Investigation Dataset as completed
+    # # 	And I add the following bowel preparation drugs and values within the Investigation Dataset for this subject:
+    # # 	| Mannitol | 3 |
+    # # 	And I set the following fields and values within the Investigation Dataset for this subject:
+    # # 	| Screening Site               | (Pick first option) |
+    # # 	| Practitioner                 | (Pick first option) |
+    # # 	| Testing Clinician            | (Pick first option) |
+    # # 	| Aspirant Endoscopist         | Not Present         |
+    # # 	| Endoscope inserted           | Yes                 |
+    # # 	| Procedure type               | Diagnostic          |
+    # # 	| Bowel preparation quality    | Good                |
+    # # 	| Comfort during examination   | No discomfort       |
+    # # 	| Comfort during recovery      | No discomfort       |
+    # # 	| Endoscopist defined extent   | Descending Colon    |
+    # # 	| Scope imager used            | Yes                 |
+    # # 	| Retroverted view             | No                  |
+    # # 	| Start of intubation time     | 09:00               |
+    # # 	| Start of extubation time     | 09:30               |
+    # # 	| End time of procedure        | 10:00               |
+    # # 	| Scope ID                     | Autotest            |
+    # # 	| Insufflation                 | Air                 |
+    # # 	| Outcome at time of procedure | Leave department    |
+    # # 	| Late outcome                 | No complications    |
+    # # 	And I set the following failure reasons within the Investigation Dataset for this subject:
+    # # 	| Pain |
+    # # 	And I press the save Investigation Dataset button
+    # # Then the Investigation Dataset result message, which I will cancel, is "No Result"
+    # # When I press the save Investigation Dataset button
+    # # 	And I press OK on my confirmation prompt
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -695,9 +778,16 @@ def test_scenario_8(page: Page) -> None:
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # 	And I select the advance episode option for "Enter Diagnostic Test Outcome"
-    # 	And I select Outcome of Diagnostic Test "Failed Test - Refer Another"
-    # 	And I save the Diagnostic Test Outcome
+    # And I select the advance episode option for "Enter Diagnostic Test Outcome"
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_enter_diagnostic_test_outcome_button()
+
+    # And I select Outcome of Diagnostic Test "Failed Test - Refer Another"
+    DiagnosticTestOutcomePage(page).select_test_outcome_option(
+        OutcomeOfDiagnosticTest.FAILED_TEST_REFER_ANOTHER
+    )
+    # And I save the Diagnostic Test Outcome
+    DiagnosticTestOutcomePage(page).click_save_button()
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -706,6 +796,9 @@ def test_scenario_8(page: Page) -> None:
     subject_assertion(nhs_no, criteria)
 
     # When I advance the subject's episode for "Other Post-investigation Contact Required"
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_other_post_investigation_button()
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -713,22 +806,34 @@ def test_scenario_8(page: Page) -> None:
     }
     subject_assertion(nhs_no, criteria)
 
-    # When I select the advance episode option for "Record other post-investigation contact"
-    # 	And I record contact with the subject with outcome "Post-investigation Appointment Not Required"
+    # # TODO: When I select the advance episode option for "Record other post-investigation contact"
+    # And I record contact with the subject with outcome "Post-investigation Appointment Not Required"
+    ContactWithPatientPage(page).record_post_investigation_appointment_not_required()
 
-    # Then my subject has been updated as follows:
-    # 	| Latest episode includes event status | A323 Post-investigation Appointment NOT Required |
-    # Then my subject has been updated as follows:
-    # 	| Latest episode includes event status | A317 Post-investigation Contact Made                                     |
-    # 	| Latest event status                  | A318 Post-investigation Appointment NOT Required - Result Letter Created |
-    # 	And there is a "A318" letter batch for my subject with the exact title "Result Letters - No Post-investigation Appointment"
+    # # Then my subject has been updated as follows: TODO: Why is this checked twice?
+    # # 	| Latest episode includes event status | A323 Post-investigation Appointment NOT Required |
+    # # Then my subject has been updated as follows:
+    # # 	| Latest episode includes event status | A317 Post-investigation Contact Made                                     |
+    # # 	| Latest event status                  | A318 Post-investigation Appointment NOT Required - Result Letter Created |
+    # # 	And there is a "A318" letter batch for my subject with the exact title "Result Letters - No Post-investigation Appointment"
 
-    # When I process the open "A318" letter batch for my subject
-    # Then my subject has been updated as follows:
-    # 	| Latest event status | A380 Failed Diagnostic Test - Refer Another |
+    # # When I process the open "A318" letter batch for my subject
+    # # Then my subject has been updated as follows:
+    batch_processing(
+        page,
+        "A318",
+        "Result Letters - No Post-investigation Appointment",
+        "A380 - Failed Diagnostic Test - Refer Another",
+    )
 
     # When I select the advance episode option for "Record Contact with Patient"
-    # 	And I record contact with the subject with outcome "Close Episode - No Contact"
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_record_contact_with_patient_button()
+
+    # And I record contact with the subject with outcome "Close Episode - No Contact"
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    advance_fobt_episode.click_record_contact_with_patient_button()
+    advance_fobt_episode.record_contact_close_episode_no_contact()
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -736,13 +841,21 @@ def test_scenario_8(page: Page) -> None:
     }
     subject_assertion(nhs_no, criteria)
 
-    # And there is a "A397" letter batch for my subject with the exact title "Discharge from screening round - no contact (letter to patient)"
-    # When I process the open "A397" letter batch for my subject
-    # Then my subject has been updated as follows:
-    # 	| Latest event status | A391 Patient Discharge Letter Printed - No Patient Contact |
+    # # And there is a "A397" letter batch for my subject with the exact title "Discharge from screening round - no contact (letter to patient)"
+    # # When I process the open "A397" letter batch for my subject
+    # # Then my subject has been updated as follows:
+    batch_processing(
+        page,
+        "A397",
+        "Discharge from screening round - no contact (letter to patient)",
+        "A391 - Patient Discharge Letter Printed - No Patient Contact",
+    )
+
+    # # TODO: How do I check this without batch processing?
     # And there is a "A391" letter batch for my subject with the exact title "Discharge from screening round - no contact (letter to GP)"
 
-    # When I receive an SSPI update to change their date of birth to "73" years old
+    # # When I receive an SSPI update to change their date of birth to "73" years old
+    SSPIChangeSteps().sspi_update_to_change_dob_received(nhs_no, 73)
 
     # Then my subject has been updated as follows:
     criteria = {
