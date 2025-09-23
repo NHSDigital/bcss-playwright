@@ -131,14 +131,12 @@ def test_scenario_10(page: Page) -> None:
         "subject has unprocessed sspi updates": "No",
         "subject has user dob updates": "No",
     }
-    subject = Subject()
-    user = User()
     builder = SubjectSelectionQueryBuilder()
 
     query, bind_vars = builder.build_subject_selection_query(
         criteria=criteria,
-        user=user,
-        subject=subject,
+        user=User(),
+        subject=Subject(),
         subjects_to_retrieve=1,
     )
 
@@ -164,9 +162,7 @@ def test_scenario_10(page: Page) -> None:
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
-        {
-            "latest event status": "S43 Kit Returned and Logged (Initial Test)",
-        },
+        {"latest event status": "S43 Kit Returned and Logged (Initial Test)"},
     )
 
     # When I read my subject's latest logged FIT kit as "ABNORMAL"
@@ -191,11 +187,12 @@ def test_scenario_10(page: Page) -> None:
     )
 
     # Then my subject has been updated as follows:
+    criteria = {
+        "latest event status": "A183 1st Colonoscopy Assessment Appointment Requested"
+    }
     subject_assertion(
         nhs_no,
-        {
-            "latest event status": "A183 1st Colonoscopy Assessment Appointment Requested",
-        },
+        criteria,
     )
 
     # And there is a "A183" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment"
