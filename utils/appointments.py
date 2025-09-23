@@ -112,8 +112,8 @@ def book_appointments(page: Page, screening_centre: str, site: str) -> None:
         current_month_displayed,
         book_appointments_page.appointment_cell_locators,
         [
-            book_appointments_page.available_background_colour,
-            book_appointments_page.some_available_background_colour,
+            book_appointments_page.appointment_fully_available_colour,
+            book_appointments_page.appointment_partially_available_colour,
         ],
     )
     page.wait_for_timeout(500)  # Wait for the appointments to load

@@ -16,7 +16,7 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         )
         self.calendar_button = self.page.get_by_role("button", name="Calendar")
         self.test_type_dropdown = self.page.locator("[id^='UI_EXT_TEST_TYPE_']")
-        self.advance_checkbox = self.page.get_by_label(
+        self.advance_checkbox_label = self.page.get_by_label(
             "There are some events available which should only be used in exceptional circumstances. If you wish to see them, check this box"
         )
         self.invite_for_diagnostic_test_button = self.page.get_by_role(
@@ -46,7 +46,7 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         self.amend_diagnosis_date_button = self.page.get_by_role(
             "button", name="Amend Diagnosis Date"
         )
-        self.advance_checkbox_v2 = self.page.get_by_role("checkbox")
+        self.advance_checkbox_label_v2 = self.page.get_by_role("checkbox")
         self.subsequent_assessment_appointment_required_dropdown = (
             self.page.get_by_role("combobox")
         )
@@ -71,11 +71,6 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         )
         self.cancel_diagnostic_test_button = self.page.get_by_role(
             "button", name="Cancel Diagnostic Test"
-        )
-        self.waiting_decision_to_preceed_with_diagnostic_test_button = (
-            self.page.get_by_role(
-                "button", name="Waiting Decision to Proceed with Diagnostic Test"
-            )
         )
         self.post_investigation_appointment_required_button = self.page.get_by_role(
             "button", name="Post-investigation Appointment Required"
@@ -149,11 +144,11 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
 
     def check_advance_checkbox(self) -> None:
         """Selects the 'Advance FOBT' checkbox"""
-        self.advance_checkbox.check()
+        self.advance_checkbox_label.check()
 
     def click_amend_diagnosis_date_button(self) -> None:
         """Checks the 'Advance FOBT' checkbox and clicks the 'Amend Diagnosis Date' button."""
-        self.advance_checkbox_v2.check()
+        self.advance_checkbox_label_v2.check()
         self.click(self.amend_diagnosis_date_button)
 
     def click_and_select_subsequent_assessment_appointment_required(
@@ -196,12 +191,6 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
     def click_cancel_diagnostic_test_button(self) -> None:
         """Click the 'Cancel Diagnostic Test' button."""
         self.safe_accept_dialog(self.cancel_diagnostic_test_button)
-
-    def click_waiting_decision_to_preceed_with_diagnostic_test_button(self) -> None:
-        """Click the 'Waiting Decision to Proceed with Diagnostic Test' button."""
-        self.safe_accept_dialog(
-            self.waiting_decision_to_preceed_with_diagnostic_test_button
-        )
 
     def click_post_investigation_appointment_required_button(self) -> None:
         """Click the 'Post-investigation Appointment Required' button."""

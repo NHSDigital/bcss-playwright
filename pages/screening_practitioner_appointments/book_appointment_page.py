@@ -23,8 +23,10 @@ class BookAppointmentPage(BasePage):
         self.screening_practitioner_dropdown = self.page.locator("#UI_NEW_PRACTITIONER")
 
         self.appointment_cell_locators = self.page.locator("input.twoColumnCalendar")
-        self.available_background_colour = "rgb(102, 255, 153)"
-        self.some_available_background_colour = "rgb(255, 220, 144)"
+        self.appointment_fully_available_colour = "rgb(102, 255, 153)"  # Mint Green
+        self.appointment_partially_available_colour = (
+            "rgb(255, 220, 144)"  # Peach Orange
+        )
         self.appointment_date_input = self.page.locator("#UI_NEW_APPT_DATE")
         self.appointment_time_start_time_input = self.page.locator(
             "#UI_NEW_APPT_TIME_FROM"

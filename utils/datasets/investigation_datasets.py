@@ -253,7 +253,7 @@ def get_default_endoscopy_information() -> dict:
     }
 
 
-def get_normal_smokescreen_information() -> tuple:
+def get_normal_smokescreen_information() -> tuple[dict, dict, dict, dict, dict]:
     """
     Returns a tuple containing default information for a normal smokescreen investigation dataset.
     This includes general information, drug information, endoscopy information,

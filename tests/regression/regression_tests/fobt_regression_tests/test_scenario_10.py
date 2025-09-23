@@ -300,7 +300,7 @@ def test_scenario_10(page: Page) -> None:
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
     AdvanceFOBTScreeningEpisodePage(
         page
-    ).click_waiting_decision_to_preceed_with_diagnostic_test_button()
+    ).click_waiting_decision_to_proceed_with_diagnostic_test()
 
     # Then my subject has been updated as follows:
     AdvanceFOBTScreeningEpisodePage(page).verify_latest_event_status_value(

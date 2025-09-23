@@ -151,7 +151,7 @@ class ContactWithPatientPage(BasePage):
 
     def verify_outcome_select_options(self, options: list) -> None:
         """
-        Verifies that the 'Outcome' dropwdown contains the expected options.
+        Verifies that the 'Outcome' dropdown contains the expected options.
         Args:
             options (list): A list containing all of the expected options in the dropdown.
         Raises:
