@@ -35,7 +35,7 @@ from pages.datasets.investigation_dataset_page import (
     YesNoOptions,
     InsufflationOptions,
     OutcomeAtTimeOfProcedureOptions,
-    LateOutcomeOptions,
+    RadiologyLateOutcomeOptions,
     InvestigationDatasetsPage,
     FailureReasonsOptions,
     CompletionProofOptions,
@@ -249,7 +249,7 @@ def get_default_endoscopy_information() -> dict:
         "scope id": "Autotest",
         "insufflation": InsufflationOptions.AIR,
         "outcome at time of procedure": OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
-        "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
+        "late outcome": RadiologyLateOutcomeOptions.NO_COMPLICATIONS,
     }
 
 

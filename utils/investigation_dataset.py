@@ -31,7 +31,7 @@ from pages.datasets.investigation_dataset_page import (
     YesNoOptions,
     InsufflationOptions,
     OutcomeAtTimeOfProcedureOptions,
-    LateOutcomeOptions,
+    RadiologyLateOutcomeOptions,
     CompletionProofOptions,
     FailureReasonsOptions,
     PolypClassificationOptions,
@@ -197,7 +197,7 @@ class InvestigationDatasetCompletion:
             OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
         )
         DatasetFieldUtil(self.page).populate_select_locator_for_field(
-            "Late outcome", LateOutcomeOptions.NO_COMPLICATIONS
+            "Late outcome", RadiologyLateOutcomeOptions.NO_COMPLICATIONS
         )
         self.investigation_datasets_pom.click_show_completion_proof_information()
         # Completion Proof Information
@@ -324,14 +324,19 @@ class InvestigationDatasetCompletion:
 
     def complete_dataset_with_args(
         self,
-        general_information: dict,
-        drug_information: dict,
-        endoscopy_information: dict,
-        failure_information: dict,
+        general_information: Optional[dict] = None,
+        drug_information: Optional[dict] = None,
+        endoscopy_information: Optional[dict] = None,
+        failure_information: Optional[dict] = None,
         completion_information: Optional[dict] = None,
         polyp_information: Optional[list] = None,
         polyp_intervention: Optional[list] = None,
         polyp_histology: Optional[list] = None,
+        contrast_tagging_and_drug: Optional[dict] = None,
+        tagging_agent_given_drug_information: Optional[dict] = None,
+        radiology_information: Optional[dict] = None,
+        extracolonic_summary_code: Optional[str] = None,
+        intracolonic_summary_code: Optional[str] = None,
     ) -> None:
         """This method completes the investigation dataset with the provided dictionaries.
         Args:
@@ -346,33 +351,18 @@ class InvestigationDatasetCompletion:
         """
         logging.info("Completing investigation dataset with the provided dictionaries")
         # Investigation Dataset
-        self.investigation_datasets_pom.select_site_lookup_option_index(
-            general_information["site"]
-        )
-        self.investigation_datasets_pom.select_practitioner_option_index(
-            general_information["practitioner"]
-        )
-        self.investigation_datasets_pom.select_testing_clinician_option_index(
-            general_information["testing clinician"]
-        )
-
-        if general_information["aspirant endoscopist"] is None:
-            InvestigationDatasetsPage(
-                self.page
-            ).check_aspirant_endoscopist_not_present()
-        else:
-            InvestigationDatasetsPage(
-                self.page
-            ).select_aspirant_endoscopist_option_index(
-                general_information["aspirant endoscopist"]
-            )
+        if general_information is not None:
+            logging.info("Filling out general information")
+            self.fill_out_general_information(general_information)
 
         # Drug Information
-        InvestigationDatasetsPage(self.page).click_show_drug_information()
-        self.fill_out_drug_information(drug_information)
+        if drug_information is not None:
+            InvestigationDatasetsPage(self.page).click_show_drug_information()
+            self.fill_out_drug_information(drug_information)
 
-        logging.info("Filling out endoscopy information")
-        self.fill_endoscopy_information(endoscopy_information)
+        if endoscopy_information:
+            logging.info("Filling out endoscopy information")
+            self.fill_endoscopy_information(endoscopy_information)
 
         # Completion Proof Information
         if completion_information is not None:
@@ -385,19 +375,127 @@ class InvestigationDatasetCompletion:
             )
 
         # Failure Information
-        logging.info("Filling out failure information")
-        self.investigation_datasets_pom.click_show_failure_information()
-        DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
-            self.failure_reasons_string,
-            "divFailureSection",
-            failure_information["failure reasons"],
-        )
+        if failure_information is not None:
+            logging.info("Filling out failure information")
+            self.investigation_datasets_pom.click_show_failure_information()
+            DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
+                self.failure_reasons_string,
+                "divFailureSection",
+                failure_information["failure reasons"],
+            )
 
         self.process_polyps(polyp_information, polyp_intervention, polyp_histology)
 
+        # Contrast, Tagging & Drug Information
+        if contrast_tagging_and_drug is not None:
+            logging.info("Filling out contrast, tagging & drug information")
+            self.fill_out_contrast_tagging_and_drug_information(
+                contrast_tagging_and_drug
+            )
+
+        if tagging_agent_given_drug_information is not None:
+            logging.info("Filling out tagging agent given drug information")
+            self.fill_out_tagging_agent_given_drug_information(
+                tagging_agent_given_drug_information
+            )
+
+            # Radiology Information
+        if radiology_information is not None:
+            logging.info("Filling out radiology information")
+            self.fill_out_radiology_information(radiology_information)
+
+        # Intracolonic Summary Code (if passed separately)
+        if intracolonic_summary_code is not None:
+            logging.info("Setting intracolonic summary code")
+            self.page.select_option(
+                "#UI_INTRACOLONIC_SUMMARY_CODE", intracolonic_summary_code
+            )
+
+        # Extracolonic Summary Code
+        if extracolonic_summary_code is not None:
+            logging.info("Setting extracolonic summary code")
+            self.page.select_option(
+                "#UI_EXTRACOLONIC_SUMMARY_CODE", extracolonic_summary_code
+            )
+
+        # Save the dataset
         logging.info("Saving the investigation dataset")
         self.investigation_datasets_pom.check_dataset_complete_checkbox()
         self.investigation_datasets_pom.click_save_dataset_button()
+
+    def fill_out_general_information(self, general_information: dict) -> None:
+        self.investigation_datasets_pom.select_site_lookup_option_index(
+            general_information["site"]
+        )
+        self.investigation_datasets_pom.select_practitioner_option_index(
+            general_information["practitioner"]
+        )
+        self.investigation_datasets_pom.select_testing_clinician_option_index(
+            general_information["testing clinician"]
+        )
+        if general_information["reporting radiologist"]:
+            InvestigationDatasetsPage(
+                self.page
+            ).select_reporting_radiologist_option_index(
+                general_information["reporting radiologist"]
+            )
+        if general_information["fit for subsequent endoscopic referral"]:
+            DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                "Fit for Subsequent Endoscopic Referral",
+                general_information["fit for subsequent endoscopic referral"],
+            )
+        if general_information["aspirant endoscopist"]:
+            if general_information["aspirant endoscopist"] is None:
+                InvestigationDatasetsPage(
+                    self.page
+                ).check_aspirant_endoscopist_not_present()
+            else:
+                InvestigationDatasetsPage(
+                    self.page
+                ).select_aspirant_endoscopist_option_index(
+                    general_information["aspirant endoscopist"]
+                )
+
+    def fill_out_contrast_tagging_and_drug_information(
+        self, contrast_tagging_and_drug: dict
+    ) -> None:
+        # Contrast Tagging & Drug Information
+        self.investigation_datasets_pom.click_show_contrast_tagging_and_drug_information()
+
+        # Use for loop and match-case for contrast tagging and drug fields
+        for key, value in contrast_tagging_and_drug.items():
+            match key:
+                case "iv buscopan administered":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "IV Buscopan Administered", value
+                    )
+                case "iv contrast administered":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "IV Contrast Administered", value
+                    )
+                case "tagging agent given":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Tagging Agent Given", value
+                    )
+                case "additional bowel preparation administered":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Additional Bowel Preparation Administered", value
+                    )
+                case "contraindicated":
+                    DatasetFieldUtil(
+                        self.page
+                    ).populate_select_locator_for_field_inside_div(
+                        "Contraindicated", "UI_BUSCOPAN_CONTRAINDICATED_ROW", value
+                    )
+                case k if k.startswith(("drug_type", "drug_dose")):
+                    # Extract all drug-related keys/values from the main dict
+                    drug_info = {
+                        dk: dv
+                        for dk, dv in contrast_tagging_and_drug.items()
+                        if dk.startswith(("drug_type", "drug_dose"))
+                    }
+                    # Call the existing drug filling method once
+                    self.fill_out_drug_information(drug_info)
 
     def fill_out_drug_information(self, drug_information: dict) -> None:
         """
@@ -432,6 +530,66 @@ class InvestigationDatasetCompletion:
                         )
                         self.page.fill(selector_template.format(index), value)
                     break
+
+    def fill_out_tagging_agent_given_drug_information(
+        self, drug_information: dict
+    ) -> None:
+        """
+        This method completes the tagging agent given drug information section of the investigation dataset.
+        Args:
+            drug_information (dict): A dictionary containing the drug types and dosages.
+        """
+        logging.info("Filling out tagging agent given drug information")
+
+        # Define mapping for each drug type/dose prefix and their selectors
+        drug_map = {
+            "drug_type": ("#UI_TAGGING_AGENT_GIVEN_DRUG{}", True),
+            "drug_dose": ("#UI_TAGGING_AGENT_GIVEN_DRUG_DOSE{}", False),
+        }
+
+        for key, value in drug_information.items():
+            for prefix, (selector_template, is_select) in drug_map.items():
+                if key.startswith(prefix):
+                    index = key[len(prefix) :]
+                    if is_select:
+                        logging.info(
+                            f"Adding {prefix.replace('_', ' ')} {index}: {to_enum_name_or_value(value)}"
+                        )
+                        self.page.select_option(selector_template.format(index), value)
+                    else:
+                        logging.info(
+                            f"Adding {prefix.replace('_', ' ')} {index}: {value}"
+                        )
+                        self.page.fill(selector_template.format(index), value)
+                    break
+
+    def fill_out_radiology_information(self, radiology_data: dict) -> None:
+        """
+        This method completes the Radiology Information section of the investigation dataset.
+        Args:
+            radiology_data (dict): A dictionary containing radiology field keys and their values.
+        """
+        logging.info("Filling out Radiology Information")
+
+        # Define mapping for each radiology field and its selector
+        radiology_map = {
+            "examination_quality": "#UI_EXAM_QUALITY",
+            "scan_position": "#UI_NUMBER_OF_SCAN_POSITIONS",
+            "procedure_outcome": "#UI_QA_OUTCOME",
+            "late_outcome": "#UI_LATE_OUTCOME",
+            "segmental_inadequacy": "#UI_SEGMENTAL_INADEQUACY",
+            "intracolonic_summary_code": "#UI_INTRACOLONIC_SUMMARY_CODE",
+        }
+
+        for key, value in radiology_data.items():
+            selector = radiology_map.get(key)
+            if selector:
+                logging.info(
+                    f"Setting {key.replace('_', ' ')}: {to_enum_name_or_value(value)}"
+                )
+                self.page.select_option(selector, value)
+            else:
+                logging.warning(f"Unknown radiology field: {key}")
 
     def process_polyps(
         self,

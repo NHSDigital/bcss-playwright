@@ -225,7 +225,9 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
             - Selects the outcome 'Close Episode - No Contact'
             - Clicks the save button
         """
-        logging.info("[CONTACT RECORD] Starting contact recording flow with outcome: Close Episode - No Contact")
+        logging.info(
+            "[CONTACT RECORD] Starting contact recording flow with outcome: Close Episode - No Contact"
+        )
 
         # Step 1: Click 'Record Contact with Patient' button
         # self.page.get_by_role("button", name="Record Contact with Patient").click()
@@ -263,7 +265,6 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         self.page.locator("input[name='UI_BUTTON_SAVE']").click()
         logging.info("[CONTACT RECORD] Contact recording flow completed successfully")
 
-
     def click_not_suitable_for_diagnostic_tests_button(self) -> None:
         """Click the 'Not Suitable for Diagnostic Tests' button."""
         self.safe_accept_dialog(self.not_suitable_for_diagnostic_tests_button)
@@ -275,8 +276,3 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
     def click_post_investigation_appointment_required_button(self) -> None:
         """Click the 'Post-investigation Appointment Required' button."""
         self.safe_accept_dialog(self.post_investigation_appointment_required_button)
-
-    def click_record_other_post_investigation_contact_button(self) -> None:
-        """Click the 'Record other post-investigation contact' button."""
-        self.safe_accept_dialog(self.record_other_post_investigation_contact_button)
-

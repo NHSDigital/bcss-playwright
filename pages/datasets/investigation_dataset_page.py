@@ -26,6 +26,12 @@ class InvestigationDatasetsPage(BasePage):
         self.testing_clinician_link = self.page.locator(
             "#UI_CONSULTANT_PIO_SELECT_LINK"
         )
+        self.reporting_radiologist_link = self.page.locator(
+            "#UI_REPORTING_CLINICIAN_PIO_SELECT_LINK"
+        )
+        self.show_contrast_tagging_and_drug_information = self.page.locator(
+            "#anchorContrastTaggingDrug"
+        )
         self.aspirant_endoscopist_link = self.page.locator(
             "#UI_ASPIRANT_ENDOSCOPIST_PIO_SELECT_LINK"
         )
@@ -172,6 +178,29 @@ class InvestigationDatasetsPage(BasePage):
         option_elements = select_locator.first.locator("option")
         option_elements.nth(option).wait_for(state="visible")
         self.click(option_elements.nth(option))
+
+    def select_reporting_radiologist_option_index(self, option: int) -> None:
+        """
+        This method is designed to select a reporting radiologist from the reporting radiologist options.
+        It clicks on the reporting radiologist link and selects the given option by index.
+
+        Args:
+            option (int): The index of the option to select from the reporting radiologist options.
+        """
+        self.click(self.reporting_radiologist_link)
+        select_locator = self.page.locator(self.visible_ui_results_string)
+        select_locator.first.wait_for(state="visible")
+        # Find all option elements inside the select and click the one at the given index
+        option_elements = select_locator.first.locator("option")
+        option_elements.nth(option).wait_for(state="visible")
+        self.click(option_elements.nth(option))
+
+    def click_show_contrast_tagging_and_drug_information(self) -> None:
+        """
+        This method is designed to click on the show contrast tagging and drug information link.
+        It clicks on the show contrast tagging and drug information link.
+        """
+        self.click(self.show_contrast_tagging_and_drug_information)
 
     def select_aspirant_endoscopist_option(self, option: str) -> None:
         """
@@ -1240,7 +1269,7 @@ class OutcomeAtTimeOfProcedureOptions(StrEnum):
     UNPLANNED_ADMISSION = "17147~Complications are mandatory"
 
 
-class LateOutcomeOptions(StrEnum):
+class RadiologyLateOutcomeOptions(StrEnum):
     """Enum for late outcome options"""
 
     NO_COMPLICATIONS = "17216~Complications are not required"
@@ -1487,6 +1516,65 @@ class SedationOptions(StrEnum):
     ASLEEP_BUT_RESPONDING_TO_NAME = "17326"
     ASLEEP_BUT_RESPONDING_TO_TOUCH = "17327"
     ASLEEP_AND_UNRESPONSIVE = "17328"
+
+
+class ExaminationQualityOptions(StrEnum):
+    """Enum for examination quality options"""
+
+    GOOD = "17016"
+    ADEQUATE_FAIR = "17017"
+    POOR = "17995~Enema down scope~204376"
+    NOT_REPORTED = "202140"
+
+
+class ScanPositionOptions(StrEnum):
+    """Enum for number of scan positions"""
+
+    SINGLE = "204373"
+    DUAL = "204374"
+    TRIPLE = "204375"
+    NOT_REPORTED = "202140"
+
+
+class ProcedureOutcomeOptions(StrEnum):
+    """Enum for outcome at time of procedure"""
+
+    LEAVE_DEPARTMENT = "17148~Complications are optional"
+    UNPLANNED_ADMISSION = "17147~Complications are mandatory"
+
+
+class SegmentalInadequacyOptions(StrEnum):
+    """Enum for segmental inadequacy"""
+
+    YES = "17058"
+    NO = "17059~~307113"
+
+
+class IntracolonicSummaryCodeOptions(StrEnum):
+    """Enum for intracolonic summary code"""
+
+    CX_INADEQUATE_STUDY = "203167~~204409,307112"
+    C1_NORMAL_OR_SMALL_POLYPS = "203168"
+    C2_POLYPS_6_9MM = "203169~~203178"
+    C3A_POLYPS_1_9MM = "203170~~203178"
+    C3B_POLYPS_GE_10MM = "203171~~203178"
+    C3C_INDETERMINATE_STRICTURE = "203172"
+    C4A_MANY_SMALL_POLYPS = "203173~~203178"
+    C4B_MANY_POLYPS_GE_10MM = "203174~~203178"
+    C5A_COLON_MASS_MALIGNANT = "203175~~203179"
+    C5B_NO_TUMOUR_ADDITIONAL = "203176~~203179"
+    NOT_REPORTED = "203177"
+
+
+class ExtracolonicSummaryCodeOptions(StrEnum):
+    """Enum for extracolonic summary code options"""
+
+    E1_NORMAL_VARIANT = "204382"
+    E2_INCIDENTAL_KNOWN = "204383"
+    E3_INCOMPLETE_CHARACTERISATION = "204384"
+    E4_IMPORTANT_REQUIRES_ACTION = "204385"
+    E5_SIGNIFICANT_NEW_FINDING = "204386"
+    NOT_REPORTED = "202140"
 
 
 # Registry of all known Enums to search when matching string values
