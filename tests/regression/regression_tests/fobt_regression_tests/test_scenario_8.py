@@ -17,6 +17,7 @@ from pages.datasets.investigation_dataset_page import (
     ProcedureOutcomeOptions,
     ScanPositionOptions,
     SegmentalInadequacyOptions,
+    IVConstantAdminsteredOptions,
 )
 from pages.datasets.subject_datasets_page import SubjectDatasetsPage
 from utils.user_tools import UserTools
@@ -505,7 +506,7 @@ def test_scenario_8(page: Page) -> None:
     contrast_tagging_and_drug = {
         "iv buscopan administered": CancerRadiologyYesNoOptions.NO,
         "contraindicated": YesNoOptions.NO,
-        "iv contrast administered": CancerRadiologyYesNoOptions.NO,
+        "iv contrast administered": IVConstantAdminsteredOptions.NO,
         "tagging agent given": TaggingAgentDrugAdministeredOptions.YES,
         "additional bowel preparation administered": CancerRadiologyYesNoOptions.YES,
         "drug_type1": DrugTypeOptions.PICOLAX,
@@ -542,8 +543,8 @@ def test_scenario_8(page: Page) -> None:
     # # And I press OK on my confirmation prompt
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
-        tagging_agent_given_drug_information=tagging_agent_given_drug_information,
         contrast_tagging_and_drug=contrast_tagging_and_drug,
+        tagging_agent_given_drug_information=tagging_agent_given_drug_information,
         radiology_information=radiology_information,
     )
 

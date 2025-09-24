@@ -486,49 +486,46 @@ class InvestigationDatasetCompletion:
         logging.info("🧪 Filling out Contrast, Tagging & Drug Information")
         self.investigation_datasets_pom.click_show_contrast_tagging_and_drug_information()
 
-        field_map = {
-            "iv buscopan administered": "#UI_BUSCOPAN_ADMINISTERED",
-            "iv contrast administered": "#UI_CONTRAST_ADMINISTERED",
-            "tagging agent given": "#UI_TAGGING_AGENT_GIVEN_DRUGS_ADMINISTERED",
-            "additional bowel preparation administered": "#UI_ADDITIONAL_BOWEL_PREPARATION_ADMINISTERED",
-            "contraindicated": "#UI_BUSCOPAN_CONTRAINDICATED",
-        }
-        normalized_map = {k.strip().lower(): v for k, v in field_map.items()}
-
+        # Use for loop and match-case for endoscopy_information fields
         for key, value in contrast_tagging_and_drug.items():
-            normalized_key = key.strip().lower()
-
-            if normalized_key in normalized_map:
-                selector = normalized_map[normalized_key]
-
-                if normalized_key == "tagging agent given":
-                    logging.info(
-                        "🔍 Waiting for 'Tagging Agent Given' dropdown to become visible..."
+            match key:
+                case "iv buscopan administered":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "IV Buscopan Administered", value
                     )
-                    self.page.locator(selector).wait_for(state="visible")
-                    options = self.page.locator(selector + " option").all_inner_texts()
-                    logging.info(
-                        f"🧾 Options available in 'Tagging Agent Given': {options}"
+                case "Contraindicated":
+                    DatasetFieldUtil(
+                        self.page
+                    ).populate_select_locator_for_field_inside_div(
+                        "contraindicated", "UI_BUSCOPAN_CONTRAINDICATED_ROW", value
                     )
-                    logging.info(
-                        f"✅ Dropdown visible. Selecting value: {to_enum_name_or_value(value)}"
+                case "iv contrast administered":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "IV Contrast Administered", value
                     )
-                else:
-                    logging.info(f"Setting {key}: {to_enum_name_or_value(value)}")
-
-                self.page.select_option(selector, value)
-
-            elif normalized_key.startswith(("drug_type", "drug_dose")):
-                drug_info = {
-                    dk: dv
-                    for dk, dv in contrast_tagging_and_drug.items()
-                    if dk.strip().lower().startswith(("drug_type", "drug_dose"))
-                }
-                self.fill_out_drug_information(drug_info)
-                break
-
-            else:
-                logging.warning(f"⚠️ Unknown contrast field: {key}")
+                case "reason":
+                    DatasetFieldUtil(
+                        self.page
+                    ).populate_select_locator_for_field_inside_div(
+                        "Reason", "UI_CONTRAST_ADMINISTERED_REASON_ROW", value
+                    )
+                case "tagging agent given":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Tagging Agent Given", value
+                    )
+                case "additional bowel preparation administered":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Additional Bowel Preparation Administered", value
+                    )
+                case k if k.startswith(("drug_type", "drug_dose")):
+                    # Extract all drug-related keys/values from the main dict
+                    drug_info = {
+                        dk: dv
+                        for dk, dv in contrast_tagging_and_drug.items()
+                        if dk.startswith(("drug_type", "drug_dose"))
+                    }
+                    # Call the existing drug filling method once
+                    self.fill_out_drug_information(drug_info)
 
     def fill_out_drug_information(self, drug_information: dict) -> None:
         """
