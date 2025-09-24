@@ -424,6 +424,23 @@ class InvestigationDatasetCompletion:
         self.investigation_datasets_pom.click_save_dataset_button()
 
     def fill_out_general_information(self, general_information: dict) -> None:
+        """
+        Populates the General Information section of the Investigation Dataset form.
+
+        This method fills in site, practitioner, clinician, and radiologist details,
+        as well as referral fitness and aspirant endoscopist status. It gracefully handles
+        optional fields and skips any that are not provided in the input dictionary.
+
+        Args:
+            general_information (dict): A dictionary containing general dataset fields.
+                Expected keys include:
+                    - "site" (int): Index for site lookup dropdown.
+                    - "practitioner" (int): Index for practitioner dropdown.
+                    - "testing clinician" (int): Index for testing clinician dropdown.
+                    - "reporting radiologist" (Optional[int]): Index for radiologist dropdown.
+                    - "fit for subsequent endoscopic referral" (Optional[str]): Enum value for referral fitness.
+                    - "aspirant endoscopist" (Optional[int or None]): Index for aspirant dropdown, or None to mark absence.
+        """
         self.investigation_datasets_pom.select_site_lookup_option_index(
             general_information["site"]
         )
@@ -433,28 +450,33 @@ class InvestigationDatasetCompletion:
         self.investigation_datasets_pom.select_testing_clinician_option_index(
             general_information["testing clinician"]
         )
-        if general_information["reporting radiologist"]:
+
+        if general_information.get("reporting radiologist") is not None:
             InvestigationDatasetsPage(
                 self.page
             ).select_reporting_radiologist_option_index(
                 general_information["reporting radiologist"]
             )
-        if general_information["fit for subsequent endoscopic referral"]:
+
+        if (
+            general_information.get("fit for subsequent endoscopic referral")
+            is not None
+        ):
             DatasetFieldUtil(self.page).populate_select_locator_for_field(
                 "Fit for Subsequent Endoscopic Referral",
                 general_information["fit for subsequent endoscopic referral"],
             )
-        if general_information["aspirant endoscopist"]:
-            if general_information["aspirant endoscopist"] is None:
+
+        if "aspirant endoscopist" in general_information:
+            aspirant = general_information["aspirant endoscopist"]
+            if aspirant is None:
                 InvestigationDatasetsPage(
                     self.page
                 ).check_aspirant_endoscopist_not_present()
             else:
                 InvestigationDatasetsPage(
                     self.page
-                ).select_aspirant_endoscopist_option_index(
-                    general_information["aspirant endoscopist"]
-                )
+                ).select_aspirant_endoscopist_option_index(aspirant)
 
     def fill_out_contrast_tagging_and_drug_information(
         self, contrast_tagging_and_drug: dict
@@ -537,11 +559,25 @@ class InvestigationDatasetCompletion:
         """
         This method completes the tagging agent given drug information section of the investigation dataset.
         Args:
-            drug_information (dict): A dictionary containing the drug types and dosages.
+            drug_information (dict): A dictionary containing the drug types, dosages, and tagging agent status.
+                Expected keys:
+                    - "tagging agent given": Enum value for tagging agent administered (e.g. YES/NO)
+                    - "drug_type{n}": Enum value for drug type at index n
+                    - "drug_dose{n}": String value for drug dose at index n
         """
         logging.info("Filling out tagging agent given drug information")
 
-        # Define mapping for each drug type/dose prefix and their selectors
+        # Handle tagging agent administered status
+        if "tagging agent given" in drug_information:
+            logging.info(
+                f"Setting tagging agent given: {to_enum_name_or_value(drug_information['tagging agent given'])}"
+            )
+            self.page.select_option(
+                "#UI_TAGGING_AGENT_GIVEN_DRUGS_ADMINISTERED",
+                drug_information["tagging agent given"],
+            )
+
+        # Define mapping for drug type/dose fields
         drug_map = {
             "drug_type": ("#UI_TAGGING_AGENT_GIVEN_DRUG{}", True),
             "drug_dose": ("#UI_TAGGING_AGENT_GIVEN_DRUG_DOSE{}", False),

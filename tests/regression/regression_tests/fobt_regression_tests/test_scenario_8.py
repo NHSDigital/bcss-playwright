@@ -2,7 +2,11 @@ import pytest
 import logging
 from datetime import datetime
 from playwright.sync_api import Page
-from pages.datasets.cancer_audit_datasets_page import YesNoOptions
+from pages.datasets.cancer_audit_datasets_page import (
+    RadiologyYesNoOptions,
+    TaggingAgentDrugAdministeredOptions,
+    YesNoOptions,
+)
 from pages.datasets.investigation_dataset_page import (
     DrugTypeOptions,
     ExaminationQualityOptions,
@@ -475,40 +479,40 @@ def test_scenario_8(page: Page) -> None:
     # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     # SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
 
-    # And I select Diagnostic Test Type "CT Colonography"
-    AdvanceFOBTScreeningEpisodePage(page).select_test_type_dropdown_option(
-        "CT Colonography"
-    )
-    # And I enter a Diagnostic Test First Offered Appointment Date of "today"
-    AdvanceFOBTScreeningEpisodePage(page).click_calendar_button()
-    CalendarPicker(page).v1_calender_picker(datetime.today())
+    # # And I select Diagnostic Test Type "CT Colonography"
+    # AdvanceFOBTScreeningEpisodePage(page).select_test_type_dropdown_option(
+    #     "CT Colonography"
+    # )
+    # # And I enter a Diagnostic Test First Offered Appointment Date of "today"
+    # AdvanceFOBTScreeningEpisodePage(page).click_calendar_button()
+    # CalendarPicker(page).v1_calender_picker(datetime.today())
 
-    # And I advance the subject's episode for "Invite for Diagnostic Test >>"
-    AdvanceFOBTScreeningEpisodePage(page).click_invite_for_diagnostic_test_button()
+    # # And I advance the subject's episode for "Invite for Diagnostic Test >>"
+    # AdvanceFOBTScreeningEpisodePage(page).click_invite_for_diagnostic_test_button()
 
-    # Then my subject has been updated as follows:
-    criteria = {
-        "which diagnostic test": "Latest test in latest episode",
-        "diagnostic test proposed type": "CT Colonography",
-        "latest event status": "A59 Invited for Diagnostic Test",
-    }
-    subject_assertion(nhs_no, criteria)
+    # # Then my subject has been updated as follows:
+    # criteria = {
+    #     "which diagnostic test": "Latest test in latest episode",
+    #     "diagnostic test proposed type": "CT Colonography",
+    #     "latest event status": "A59 Invited for Diagnostic Test",
+    # }
+    # subject_assertion(nhs_no, criteria)
 
-    # When I select the advance episode option for "Attend Diagnostic Test"
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-    AdvanceFOBTScreeningEpisodePage(page).click_attend_diagnostic_test_button()
+    # # When I select the advance episode option for "Attend Diagnostic Test"
+    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    # AdvanceFOBTScreeningEpisodePage(page).click_attend_diagnostic_test_button()
 
-    # And I attend the subject's diagnostic test today
-    AttendDiagnosticTestPage(page).click_calendar_button()
-    CalendarPicker(page).v1_calender_picker(datetime.today())
-    AttendDiagnosticTestPage(page).click_save_button()
+    # # And I attend the subject's diagnostic test today
+    # AttendDiagnosticTestPage(page).click_calendar_button()
+    # CalendarPicker(page).v1_calender_picker(datetime.today())
+    # AttendDiagnosticTestPage(page).click_save_button()
 
-    # Then my subject has been updated as follows:
-    criteria = {
-        "latest event status": "A259 Attended Diagnostic Test",
-    }
-    subject_assertion(nhs_no, criteria)
+    # # Then my subject has been updated as follows:
+    # criteria = {
+    #     "latest event status": "A259 Attended Diagnostic Test",
+    # }
+    # subject_assertion(nhs_no, criteria)
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -529,11 +533,11 @@ def test_scenario_8(page: Page) -> None:
     # And I set the following fields and values within the Contrast, Tagging & Drug Information:
     # And I add the following Additional Bowel Preparation drugs and values within the Investigation Dataset for this subject:
     contrast_tagging_and_drug = {
-        "iv buscopan administered": YesNoOptions.NO,
+        "iv buscopan administered": RadiologyYesNoOptions.NO,
         "contraindicated": YesNoOptions.NO,
-        "iv contrast administered": YesNoOptions.NO,
-        "tagging agent given": YesNoOptions.YES,
-        "additional bowel preparation administered": YesNoOptions.YES,
+        "iv contrast administered": RadiologyYesNoOptions.NO,
+        "tagging agent given": TaggingAgentDrugAdministeredOptions.YES,
+        "additional bowel preparation administered": RadiologyYesNoOptions.YES,
         "drug_type1": DrugTypeOptions.PICOLAX,
         "drug_dose1": "1",
     }

@@ -193,6 +193,22 @@ class YesNoOptions(StrEnum):
     NO = "17059"
 
 
+class RadiologyYesNoOptions(StrEnum):
+    """Enum for Yes/No options specific to Radiology fields"""
+
+    YES = "17058~~204365"
+    NO = "17059~~204366"
+    NOT_REPORTED = "202140"
+
+
+class TaggingAgentDrugAdministeredOptions(StrEnum):
+    """Enum for Tagging Agent Given Drugs Administered"""
+
+    YES = "17058~~204368"
+    NO = "17059"
+    NOT_REPORTED = "202140"
+
+
 class MetastasesPresentOptions(StrEnum):
     """Enum for Metastases Present options."""
 
