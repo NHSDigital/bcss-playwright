@@ -1577,6 +1577,12 @@ class ExtracolonicSummaryCodeOptions(StrEnum):
     NOT_REPORTED = "202140"
 
 
+class TaggingAgentDrugAdministeredOptions(StrEnum):
+    YES = "17058~~204368"
+    NO = "17059"
+    NOT_REPORTED = "202140"
+
+
 # Registry of all known Enums to search when matching string values
 ALL_ENUMS: List[type[Enum]] = [
     obj

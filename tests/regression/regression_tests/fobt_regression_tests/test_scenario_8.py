@@ -1,9 +1,10 @@
 import pytest
 import logging
-from datetime import datetime
 from playwright.sync_api import Page
 from pages.datasets.cancer_audit_datasets_page import (
-    RadiologyYesNoOptions,
+    CancerRadiologyYesNoOptions,
+)
+from pages.datasets.investigation_dataset_page import (
     TaggingAgentDrugAdministeredOptions,
     YesNoOptions,
 )
@@ -18,52 +19,21 @@ from pages.datasets.investigation_dataset_page import (
     SegmentalInadequacyOptions,
 )
 from pages.datasets.subject_datasets_page import SubjectDatasetsPage
-from pages.screening_practitioner_appointments.appointment_detail_page import (
-    AppointmentDetailPage,
-)
-from utils.calendar_picker import CalendarPicker
-from utils.datasets.investigation_datasets import (
-    get_default_endoscopy_information,
-    get_default_general_information,
-)
-from utils.oracle.subject_creation_util import CreateSubjectSteps
 from utils.user_tools import UserTools
 from utils.subject_assertion import subject_assertion
-from utils.call_and_recall_utils import CallAndRecallUtils
 from utils import screening_subject_page_searcher
-from utils.batch_processing import batch_processing
-from utils.fit_kit import FitKitLogged, FitKitGeneration
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
-from utils.appointments import book_appointments
 from pages.logout.log_out_page import LogoutPage
 from pages.base_page import BasePage
 from pages.screening_subject_search.advance_fobt_screening_episode_page import (
     AdvanceFOBTScreeningEpisodePage,
 )
-from pages.screening_subject_search.record_diagnosis_date_page import (
-    RecordDiagnosisDatePage,
-)
 from utils.appointments import AppointmentAttendance
 from pages.datasets.colonoscopy_dataset_page import (
     ColonoscopyDatasetsPage,
     FitForColonoscopySspOptions,
-)
-from utils.sspi_change_steps import SSPIChangeSteps
-from pages.screening_subject_search.reopen_fobt_screening_episode_page import (
-    ReopenFOBTScreeningEpisodePage,
-)
-from utils.oracle.oracle import OracleDB
-from utils.oracle.subject_selector import SubjectSelector
-from classes.subject_selection_query_builder.subject_selection_criteria_key import (
-    SubjectSelectionCriteriaKey as Key,
-)
-from pages.screening_subject_search.contact_with_patient_page import (
-    ContactWithPatientPage,
-)
-from pages.screening_subject_search.attend_diagnostic_test_page import (
-    AttendDiagnosticTestPage,
 )
 from utils.investigation_dataset import InvestigationDatasetCompletion
 from pages.screening_subject_search.diagnostic_test_outcome_page import (
@@ -533,11 +503,11 @@ def test_scenario_8(page: Page) -> None:
     # And I set the following fields and values within the Contrast, Tagging & Drug Information:
     # And I add the following Additional Bowel Preparation drugs and values within the Investigation Dataset for this subject:
     contrast_tagging_and_drug = {
-        "iv buscopan administered": RadiologyYesNoOptions.NO,
+        "iv buscopan administered": CancerRadiologyYesNoOptions.NO,
         "contraindicated": YesNoOptions.NO,
-        "iv contrast administered": RadiologyYesNoOptions.NO,
+        "iv contrast administered": CancerRadiologyYesNoOptions.NO,
         "tagging agent given": TaggingAgentDrugAdministeredOptions.YES,
-        "additional bowel preparation administered": RadiologyYesNoOptions.YES,
+        "additional bowel preparation administered": CancerRadiologyYesNoOptions.YES,
         "drug_type1": DrugTypeOptions.PICOLAX,
         "drug_dose1": "1",
     }
