@@ -32,6 +32,7 @@ class InvestigationDatasetsPage(BasePage):
         self.show_contrast_tagging_and_drug_information = self.page.locator(
             "#anchorContrastTaggingDrug"
         )
+        self.show_radiology_information = self.page.locator("#anchorRadiology")
         self.aspirant_endoscopist_link = self.page.locator(
             "#UI_ASPIRANT_ENDOSCOPIST_PIO_SELECT_LINK"
         )
@@ -201,6 +202,13 @@ class InvestigationDatasetsPage(BasePage):
         It clicks on the show contrast tagging and drug information link.
         """
         self.click(self.show_contrast_tagging_and_drug_information)
+
+    def click_show_radiology_information(self) -> None:
+        """
+        This method is designed to click on the show radiology information link.
+        It clicks on the show radiology information link.
+        """
+        self.click(self.show_radiology_information)
 
     def select_aspirant_endoscopist_option(self, option: str) -> None:
         """
@@ -1187,7 +1195,7 @@ class DrugTypeOptions(StrEnum):
     MOVIPREP = "200536~Sachet(s)"
     CITRAMAG = "200538~Sachet(s)"
     MANNITOL = "200539~Litre(s)"
-    GASTROGRAFIN = "200540~Mls Solution"
+    GASTROGRAFIN = "200540~Mls Solution~204334"
     PHOSPHATE_ENEMA = "200528~Sachet(s)"
     MICROLAX_ENEMA = "200529~Sachet(s)"
     OSMOSPREP = "203063~Tablet(s)"

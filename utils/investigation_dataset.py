@@ -340,16 +340,23 @@ class InvestigationDatasetCompletion:
         extracolonic_summary_code: Optional[str] = None,
         intracolonic_summary_code: Optional[str] = None,
     ) -> None:
-        """This method completes the investigation dataset with the provided dictionaries.
+        """
+        Completes the investigation dataset using the provided dictionaries for each section.
+
         Args:
-            general_information (dict): A dictionary containing the general information to be filled in the form.
-            drug_information (dict): A dictionary containing the drug information to be filled in the form.
-            endoscopy_information (dict): A dictionary containing the endoscopy information to be filled in the form.
-            failure_information (dict): A dictionary containing the failure information to be filled in the form.
-            completion_information (Optional[dict]): An optional  dictionary containing the completion information to be filled in the form.
-            polyp_information (Optional[list]): An optional list containing the polyp information to be filled in the form.
-            polyp_intervention (Optional[list]): An optional list containing the polyp intervention to be filled in the form.
-            polyp_histology (Optional[list]): An optional list containing the polyp histology to be filled in the form.
+            general_information (Optional[dict]): General dataset fields (site, practitioner, clinician, etc.).
+            drug_information (Optional[dict]): Drug types and dosages for the main drug section.
+            endoscopy_information (Optional[dict]): Endoscopy procedure details and related fields.
+            failure_information (Optional[dict]): Failure reasons and related information.
+            completion_information (Optional[dict]): Completion proof parameters.
+            polyp_information (Optional[list[dict]]): List of polyp information dictionaries.
+            polyp_intervention (Optional[list[dict] or list[list[dict]]]): List of interventions per polyp, or lists of interventions for each polyp.
+            polyp_histology (Optional[list[dict]]): List of polyp histology dictionaries.
+            contrast_tagging_and_drug (Optional[dict]): Contrast, tagging agent, and drug information.
+            tagging_agent_given_drug_information (Optional[dict]): Tagging agent drug types and doses.
+            radiology_information (Optional[dict]): Radiology section fields.
+            extracolonic_summary_code (Optional[str]): Extracolonic summary code value.
+            intracolonic_summary_code (Optional[str]): Intracolonic summary code value.
         """
         logging.info("Completing investigation dataset with the provided dictionaries")
         # Investigation Dataset
@@ -614,6 +621,8 @@ class InvestigationDatasetCompletion:
             radiology_data (dict): A dictionary containing radiology field keys and their values.
         """
         logging.info("Filling out Radiology Information")
+
+        self.investigation_datasets_pom.click_show_radiology_information()
 
         # Define mapping for each radiology field and its selector
         radiology_map = {
