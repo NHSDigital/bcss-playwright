@@ -58,6 +58,9 @@ class InvestigationDatasetsPage(BasePage):
             "#anchorCompletionProof"
         )
         self.show_failure_information_details = self.page.locator("#anchorFailure")
+        self.show_radiology_failure_information_details = self.page.locator(
+            "#anchorRadiologyFailure"
+        )
         self.add_polyp_button = self.page.get_by_role("button", name="Add Polyp")
         self.polyp1_add_intervention_button = self.page.get_by_role(
             "link", name=self.add_intervention_string
@@ -211,6 +214,13 @@ class InvestigationDatasetsPage(BasePage):
         """
         self.click(self.show_radiology_information)
 
+    def click_show_radiology_failure_information(self) -> None:
+        """
+        This method is designed to click on the show radiology failure information link.
+        It clicks on the show radiology failure information link.
+        """
+        self.click(self.show_radiology_failure_information_details)
+
     def select_aspirant_endoscopist_option(self, option: str) -> None:
         """
         This method is designed to select an aspirant endoscopist from the aspirant endoscopist options.
@@ -259,8 +269,9 @@ class InvestigationDatasetsPage(BasePage):
         This method is designed to click on the show suspected findings details link.
         It clicks on the show suspected findings details link.
         """
-        logging.info("[DEBUG] Clicking on Show Suspected Findings Details") 
-        self.click(self.show_suspected_findings)
+        logging.info("[DEBUG] Clicking on Show Suspected Findings Details")
+        self.page.wait_for_timeout(1000)
+        self.show_suspected_findings.click()
 
     def select_drug_type_option1(self, option: str) -> None:
         """

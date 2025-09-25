@@ -41,6 +41,8 @@ from utils.investigation_dataset import InvestigationDatasetCompletion
 from pages.screening_subject_search.diagnostic_test_outcome_page import (
     DiagnosticTestOutcomePage,
     OutcomeOfDiagnosticTest,
+    ReasonForOnwardReferral,
+    ReferralProcedureType,
 )
 
 
@@ -394,9 +396,9 @@ def test_scenario_8(page: Page) -> None:
     #     "surveillance due date reason": "Unchanged",
     # }
     # subject_assertion(nhs_no, criteria)
-    nhs_no = "9668188616"
+
     # When I view the subject
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
     # # And I reopen the subject's episode for "Reopen to Reschedule Diagnostic Test"
     # SubjectScreeningSummaryPage(page).click_reopen_fobt_screening_episode_button()
@@ -487,95 +489,102 @@ def test_scenario_8(page: Page) -> None:
     # subject_assertion(nhs_no, criteria)
 
     # When I view the subject
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # And I edit the Investigation Dataset for this subject
-    SubjectScreeningSummaryPage(page).click_datasets_link()
-    SubjectDatasetsPage(page).click_investigation_show_datasets()
+    # # And I edit the Investigation Dataset for this subject
+    # SubjectScreeningSummaryPage(page).click_datasets_link()
+    # SubjectDatasetsPage(page).click_investigation_show_datasets()
 
-    # And I set the following fields and values within the Investigation Dataset for this subject:
-    general_information = {
-        "site": 1,
-        "practitioner": 1,
-        "testing clinician": 1,
-        "reporting radiologist": 2,
-        "fit for subsequent endoscopic referral": YesNoOptions.YES,
-    }
+    # # And I set the following fields and values within the Investigation Dataset for this subject:
+    # general_information = {
+    #     "site": 1,
+    #     "practitioner": 1,
+    #     "testing clinician": 1,
+    #     "reporting radiologist": 2,
+    #     "fit for subsequent endoscopic referral": YesNoOptions.YES,
+    # }
 
-    # And I set the following fields and values within the Contrast, Tagging & Drug Information:
-    # And I add the following Additional Bowel Preparation drugs and values within the Investigation Dataset for this subject:
-    contrast_tagging_and_drug = {
-        "iv buscopan administered": CancerRadiologyYesNoOptions.NO,
-        "contraindicated": YesNoOptions.NO,
-        "iv contrast administered": IVConstantAdministeredOptions.NO,
-        "tagging agent given": TaggingAgentDrugAdministeredOptions.YES,
-        "additional bowel preparation administered": AdditionalBowelPrepAdministeredOptions.YES,
-        "drug_type1": DrugTypeOptions.PICOLAX,
-        "drug_dose1": "1",
-    }
+    # # And I set the following fields and values within the Contrast, Tagging & Drug Information:
+    # # And I add the following Additional Bowel Preparation drugs and values within the Investigation Dataset for this subject:
+    # contrast_tagging_and_drug = {
+    #     "iv buscopan administered": CancerRadiologyYesNoOptions.NO,
+    #     "contraindicated": YesNoOptions.NO,
+    #     "iv contrast administered": IVConstantAdministeredOptions.NO,
+    #     "tagging agent given": TaggingAgentDrugAdministeredOptions.YES,
+    #     "additional bowel preparation administered": AdditionalBowelPrepAdministeredOptions.YES,
+    #     "drug_type1": DrugTypeOptions.PICOLAX,
+    #     "drug_dose1": "1",
+    # }
 
-    # And I add the following "Tagging Agent Given" drugs and doses within the Investigation Dataset for this subject:
-    # 	| Gastrografin | 1 |
-    tagging_agent_given_drug_information = {
-        "drug_type1": DrugTypeOptions.GASTROGRAFIN,
-        "drug_dose1": "1",
-    }
+    # # And I add the following "Tagging Agent Given" drugs and doses within the Investigation Dataset for this subject:
+    # # 	| Gastrografin | 1 |
+    # tagging_agent_given_drug_information = {
+    #     "drug_type1": DrugTypeOptions.GASTROGRAFIN,
+    #     "drug_dose1": "1",
+    # }
 
-    # 	And I set the following fields and values within the Radiology Information:
-    # 	And I set the following fields and values within the Radiology Information:
-    radiology_information = {
-        "examination_quality": ExaminationQualityOptions.GOOD,
-        "scan_position": ScanPositionOptions.DUAL,
-        "procedure_outcome": ProcedureOutcomeOptions.LEAVE_DEPARTMENT,
-        "late_outcome": RadiologyLateOutcomeOptions.NO_COMPLICATIONS,
-        "segmental_inadequacy": SegmentalInadequacyOptions.NO,
-        "intracolonic_summary_code": IntracolonicSummaryCodeOptions.CX_INADEQUATE_STUDY,
-        "extracolonic_summary_code": ExtracolonicSummaryCodeOptions.E4_IMPORTANT_REQUIRES_ACTION,
-    }
+    # # 	And I set the following fields and values within the Radiology Information:
+    # # 	And I set the following fields and values within the Radiology Information:
+    # radiology_information = {
+    #     "examination_quality": ExaminationQualityOptions.GOOD,
+    #     "scan_position": ScanPositionOptions.DUAL,
+    #     "procedure_outcome": ProcedureOutcomeOptions.LEAVE_DEPARTMENT,
+    #     "late_outcome": RadiologyLateOutcomeOptions.NO_COMPLICATIONS,
+    #     "segmental_inadequacy": SegmentalInadequacyOptions.NO,
+    #     "intracolonic_summary_code": IntracolonicSummaryCodeOptions.CX_INADEQUATE_STUDY,
+    # }
 
-    suspected_findings = {
-        "extracolonic summary code": ExtracolonicSummaryCodeOptions.E4_IMPORTANT_REQUIRES_ACTION,
-    }
+    # suspected_findings = {
+    #     "extracolonic summary code": ExtracolonicSummaryCodeOptions.E4_IMPORTANT_REQUIRES_ACTION,
+    # }
 
     # # And I set the following radiology failure reasons within the Investigation Dataset for this subject:
     # # 	| No failure reasons | NOTE - this can be left as default - there is only one option
 
+    # # And I open all minimized sections on the dataset
+    # # And I mark the Investigation Dataset as completed
+    # # # When I press the save Investigation Dataset button
+    # # # And I press OK on my confirmation prompt
+    # InvestigationDatasetCompletion(page).complete_dataset_with_args(
+    #     general_information=general_information,
+    #     contrast_tagging_and_drug=contrast_tagging_and_drug,
+    #     tagging_agent_given_drug_information=tagging_agent_given_drug_information,
+    #     radiology_information=radiology_information,
+    #     suspected_findings = suspected_findings,
+    # )
 
-    # And I open all minimized sections on the dataset
-    # And I mark the Investigation Dataset as completed
-    # # When I press the save Investigation Dataset button
-    # # And I press OK on my confirmation prompt
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        general_information=general_information,
-        contrast_tagging_and_drug=contrast_tagging_and_drug,
-        tagging_agent_given_drug_information=tagging_agent_given_drug_information,
-        radiology_information=radiology_information,
-        suspected_findings = suspected_findings,
-    )
-
-    # Then my subject has been updated as follows:
-    # TODO: For this assertion I'm getting:
-    # [ASSERTION MISMATCH] Key: 'latest episode accumulated result' | Expected: 'Abnormal' | Actual: '<missing>'
+    # # Then my subject has been updated as follows:
     # criteria = {
     #     "latest episode accumulated result": "Abnormal",
     # }
     # subject_assertion(nhs_no, criteria)
 
-    # # When I view the subject
-    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    nhs_no = "9668188616"  # TODO: Remove when subject search is re-added
 
-    # # And I select the advance episode option for "Enter Diagnostic Test Outcome"
-    # SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-    # AdvanceFOBTScreeningEpisodePage(page).click_enter_diagnostic_test_outcome_button()
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # # And I select Outcome of Diagnostic Test "Refer Another Diagnostic Test"
-    # DiagnosticTestOutcomePage(page).select_test_outcome_option(
-    #     OutcomeOfDiagnosticTest.REFER_ANOTHER_DIAGNOSTIC_TEST
-    # )
+    # And I select the advance episode option for "Enter Diagnostic Test Outcome"
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_enter_diagnostic_test_outcome_button()
 
-    # # # TODO: And I select Radiological or Endoscopic Referral value "Radiological"
-    # # # And I select Reason for Onward Referral value "Currently Unsuitable for Endoscopic Referral"
-    # # # And I set any onward referring clinician
+    # And I select Outcome of Diagnostic Test "Refer Another Diagnostic Test"
+    DiagnosticTestOutcomePage(page).select_test_outcome_option(
+        OutcomeOfDiagnosticTest.REFER_ANOTHER_DIAGNOSTIC_TEST
+    )
+
+    # And I select Radiological or Endoscopic Referral value "Radiological"
+    DiagnosticTestOutcomePage(page).select_referral_procedure_type(
+        ReferralProcedureType.RADIOLOGICAL
+    )
+
+    # And I select Reason for Onward Referral value "Currently Unsuitable for Endoscopic Referral"
+    DiagnosticTestOutcomePage(page).select_reason_for_onward_referral(
+        ReasonForOnwardReferral.CURRENTLY_UNSUITABLE_FOR_ENDOSCOPIC_REFERRAL
+    )
+
+    # And I set any onward referring clinician TODO: This step is not selecting a clinician so needs to be fixed
+    DiagnosticTestOutcomePage(page).select_first_valid_onward_referral_consultant()
 
     # # And I save the Diagnostic Test Outcome
     # DiagnosticTestOutcomePage(page).click_save_button()
@@ -586,7 +595,7 @@ def test_scenario_8(page: Page) -> None:
     # }
     # subject_assertion(nhs_no, criteria)
 
-    # # # When I advance the subject's episode for "Post-investigation Appointment Required"
+    # # When I advance the subject's episode for "Post-investigation Appointment Required"
     # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     # SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
     # AdvanceFOBTScreeningEpisodePage(

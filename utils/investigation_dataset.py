@@ -422,7 +422,7 @@ class InvestigationDatasetCompletion:
                 "#UI_INTRACOLONIC_SUMMARY_CODE", intracolonic_summary_code
             )
 
-        # Suspected Fndings
+        # Suspected Findings
         if suspected_findings is not None:
             logging.info("Filling out suspected findings")
             self.fill_out_suspected_findings(suspected_findings)
@@ -433,19 +433,23 @@ class InvestigationDatasetCompletion:
         self.investigation_datasets_pom.click_save_dataset_button()
 
     def fill_out_suspected_findings(self, suspected_findings: dict) -> None:
-        """ """
-        self.investigation_datasets_pom.click_show_suspected_findings_details()
-
-        if suspected_findings["extracolonic summary code"]:
-            dropdown = self.page.locator("#UI_EXTRACOLONIC_SUMMARY_CODE")
-            dropdown.wait_for(state="visible")
-            self.page.wait_for_function(
-                "document.querySelector('#UI_EXTRACOLONIC_SUMMARY_CODE').options.length > 1"
-            )
-
-            dropdown.select_option(
-                value=suspected_findings["extracolonic summary code"]
-            )
+        """
+        Populates the Suspected Findings section of the Investigation Dataset form.
+        """
+        logging.info("Starting fill_out_suspected_findings")
+        try:
+            logging.info("About to click suspected findings details")
+            self.investigation_datasets_pom.click_show_suspected_findings_details()
+            logging.info("Clicked suspected findings details successfully")
+        except Exception as e:
+            logging.error(f"Error clicking on Show Suspected Findings Details: {e}")
+            raise
+        for key, value in suspected_findings.items():
+            match key:
+                case "extracolonic summary code":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Extracolonic Summary Code", value
+                    )
 
     def fill_out_general_information(self, general_information: dict) -> None:
         """
@@ -638,7 +642,7 @@ class InvestigationDatasetCompletion:
         logging.info("Filling out Radiology Information")
 
         self.investigation_datasets_pom.click_show_radiology_information()
-
+        self.investigation_datasets_pom.click_show_radiology_failure_information()
         # Define mapping for each radiology field and its selector
         radiology_map = {
             "examination_quality": "#UI_EXAM_QUALITY",
