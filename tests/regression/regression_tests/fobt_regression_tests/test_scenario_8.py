@@ -533,6 +533,10 @@ def test_scenario_8(page: Page) -> None:
         "extracolonic_summary_code": ExtracolonicSummaryCodeOptions.E4_IMPORTANT_REQUIRES_ACTION,
     }
 
+    suspected_findings = {
+        "extracolonic summary code": ExtracolonicSummaryCodeOptions.E4_IMPORTANT_REQUIRES_ACTION,
+    }
+
     # # And I set the following radiology failure reasons within the Investigation Dataset for this subject:
     # # 	| No failure reasons | NOTE - this can be left as default - there is only one option
 
@@ -546,6 +550,7 @@ def test_scenario_8(page: Page) -> None:
         contrast_tagging_and_drug=contrast_tagging_and_drug,
         tagging_agent_given_drug_information=tagging_agent_given_drug_information,
         radiology_information=radiology_information,
+        suspected_findings = suspected_findings,
     )
 
     # Then my subject has been updated as follows:

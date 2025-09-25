@@ -337,6 +337,7 @@ class InvestigationDatasetCompletion:
         contrast_tagging_and_drug: Optional[dict] = None,
         tagging_agent_given_drug_information: Optional[dict] = None,
         radiology_information: Optional[dict] = None,
+        suspected_findings: Optional[dict] = None,
         extracolonic_summary_code: Optional[str] = None,
         intracolonic_summary_code: Optional[str] = None,
     ) -> None:
@@ -355,6 +356,7 @@ class InvestigationDatasetCompletion:
             contrast_tagging_and_drug (Optional[dict]): Contrast, tagging agent, and drug information.
             tagging_agent_given_drug_information (Optional[dict]): Tagging agent drug types and doses.
             radiology_information (Optional[dict]): Radiology section fields.
+            suspected_findings (Optional[dict])
             extracolonic_summary_code (Optional[str]): Extracolonic summary code value.
             intracolonic_summary_code (Optional[str]): Intracolonic summary code value.
         """
@@ -420,20 +422,30 @@ class InvestigationDatasetCompletion:
                 "#UI_INTRACOLONIC_SUMMARY_CODE", intracolonic_summary_code
             )
 
-        # Extracolonic Summary Code
-        if radiology_information["extracolonic_summary_code"]:
-            self.investigation_datasets_pom.click_show_suspected_findings_details()
-
-            dropdown = self.page.locator("#UI_EXTRACOLONIC_SUMMARY_CODE")
-            dropdown.wait_for(state="visible")
-            self.page.wait_for_function("document.querySelector('#UI_EXTRACOLONIC_SUMMARY_CODE').options.length > 1")
-
-            dropdown.select_option(value=radiology_information["extracolonic_summary_code"])
+        # Suspected Fndings
+        if suspected_findings is not None:
+            logging.info("Filling out suspected findings")
+            self.fill_out_suspected_findings(suspected_findings)
 
         # Save the dataset
         logging.info("Saving the investigation dataset")
         self.investigation_datasets_pom.check_dataset_complete_checkbox()
         self.investigation_datasets_pom.click_save_dataset_button()
+
+    def fill_out_suspected_findings(self, suspected_findings: dict) -> None:
+        """ """
+        self.investigation_datasets_pom.click_show_suspected_findings_details()
+
+        if suspected_findings["extracolonic summary code"]:
+            dropdown = self.page.locator("#UI_EXTRACOLONIC_SUMMARY_CODE")
+            dropdown.wait_for(state="visible")
+            self.page.wait_for_function(
+                "document.querySelector('#UI_EXTRACOLONIC_SUMMARY_CODE').options.length > 1"
+            )
+
+            dropdown.select_option(
+                value=suspected_findings["extracolonic summary code"]
+            )
 
     def fill_out_general_information(self, general_information: dict) -> None:
         """
