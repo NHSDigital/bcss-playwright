@@ -1579,16 +1579,24 @@ class ExtracolonicSummaryCodeOptions(StrEnum):
 
 class TaggingAgentDrugAdministeredOptions(StrEnum):
     """Enum for tagging agent drug administered options"""
+
     YES = "17058~~204368"
     NO = "17059"
     NOT_REPORTED = "202140"
 
-class IVConstantAdminsteredOptions(StrEnum):
+
+class AdditionalBowelPrepAdministeredOptions(str, Enum):
+    YES = "17058~~204414"
+    NO = "17059"
+    NOT_REPORTED = "202140"
+
+
+class IVConstantAdministeredOptions(StrEnum):
     """Enum for iv constant administered options"""
+
     YES = "17058~~204367"
     NO = "17059~~204334"
     NOT_REPORTED = "202140"
-
 
 
 # Registry of all known Enums to search when matching string values

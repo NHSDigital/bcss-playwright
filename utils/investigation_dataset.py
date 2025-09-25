@@ -493,7 +493,7 @@ class InvestigationDatasetCompletion:
                     DatasetFieldUtil(self.page).populate_select_locator_for_field(
                         "IV Buscopan Administered", value
                     )
-                case "Contraindicated":
+                case "contraindicated":
                     DatasetFieldUtil(
                         self.page
                     ).populate_select_locator_for_field_inside_div(
