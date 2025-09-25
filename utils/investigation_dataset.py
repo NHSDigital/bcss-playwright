@@ -422,10 +422,14 @@ class InvestigationDatasetCompletion:
 
         # Extracolonic Summary Code
         if extracolonic_summary_code is not None:
-            logging.info("Setting extracolonic summary code")
-            self.page.select_option(
-                "#UI_EXTRACOLONIC_SUMMARY_CODE", extracolonic_summary_code
-            )
+            self.investigation_datasets_pom.click_show_suspected_findings_details()
+
+            dropdown = self.page.locator("#UI_EXTRACOLONIC_SUMMARY_CODE")
+            dropdown.wait_for(state="visible")
+            self.page.wait_for_function("document.querySelector('#UI_EXTRACOLONIC_SUMMARY_CODE').options.length > 1")
+
+            dropdown.select_option(value=extracolonic_summary_code)
+
 
         # Save the dataset
         logging.info("Saving the investigation dataset")
@@ -632,6 +636,7 @@ class InvestigationDatasetCompletion:
             "late_outcome": "#UI_LATE_OUTCOME",
             "segmental_inadequacy": "#UI_SEGMENTAL_INADEQUACY",
             "intracolonic_summary_code": "#UI_INTRACOLONIC_SUMMARY_CODE",
+            "extracolonic_summary_code": "#UI_EXTRACOLONIC_SUMMARY_CODE",
         }
 
         for key, value in radiology_data.items():

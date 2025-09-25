@@ -40,6 +40,7 @@ class InvestigationDatasetsPage(BasePage):
             "#UI_ASPIRANT_ENDOSCOPIST_NR"
         )
         self.show_drug_information_detail = self.page.locator("#anchorDrug")
+        self.show_suspected_findings = self.page.locator("#anchorRadiologyFindings")
         self.drug_type_option1 = self.page.locator("#UI_BOWEL_PREP_DRUG1")
         self.drug_type_dose1 = self.page.locator("#UI_BOWEL_PREP_DRUG_DOSE1")
         self.show_endoscopy_information_details = self.page.locator(
@@ -252,6 +253,13 @@ class InvestigationDatasetsPage(BasePage):
         It clicks on the show drug information link.
         """
         self.click(self.show_drug_information_detail)
+
+    def click_show_suspected_findings_details(self) -> None:
+        """
+        This method is designed to click on the show suspected findings details link.
+        It clicks on the show suspected findings details link.
+        """
+        self.click(self.show_suspected_findings)
 
     def select_drug_type_option1(self, option: str) -> None:
         """
