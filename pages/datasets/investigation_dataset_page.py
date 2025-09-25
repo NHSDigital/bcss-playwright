@@ -259,6 +259,7 @@ class InvestigationDatasetsPage(BasePage):
         This method is designed to click on the show suspected findings details link.
         It clicks on the show suspected findings details link.
         """
+        logging.info("[DEBUG] Clicking on Show Suspected Findings Details") 
         self.click(self.show_suspected_findings)
 
     def select_drug_type_option1(self, option: str) -> None:

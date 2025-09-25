@@ -421,15 +421,14 @@ class InvestigationDatasetCompletion:
             )
 
         # Extracolonic Summary Code
-        if extracolonic_summary_code is not None:
+        if radiology_information["extracolonic_summary_code"]:
             self.investigation_datasets_pom.click_show_suspected_findings_details()
 
             dropdown = self.page.locator("#UI_EXTRACOLONIC_SUMMARY_CODE")
             dropdown.wait_for(state="visible")
             self.page.wait_for_function("document.querySelector('#UI_EXTRACOLONIC_SUMMARY_CODE').options.length > 1")
 
-            dropdown.select_option(value=extracolonic_summary_code)
-
+            dropdown.select_option(value=radiology_information["extracolonic_summary_code"])
 
         # Save the dataset
         logging.info("Saving the investigation dataset")
