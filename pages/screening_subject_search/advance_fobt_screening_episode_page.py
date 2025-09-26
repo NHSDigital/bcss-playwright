@@ -1,7 +1,8 @@
 from datetime import date
-from playwright.sync_api import Page, expect, Locator
+from playwright.sync_api import Page, expect, Locator, Dialog
 from pages.base_page import BasePage
 import logging
+from typing import List
 import pytest
 
 
@@ -75,6 +76,12 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         )
         self.post_investigation_appointment_required_button = self.page.get_by_role(
             "button", name="Post-investigation Appointment Required"
+        )
+        self.redirect_to_delete_the_latest_diagnostic_test_result_button = (
+            self.page.get_by_role("button", name="Redirect to DELETE the Latest")
+        )
+        self.redirect_to_reestablish_suitability_for_diagnostic_test_repatient_contact = self.page.get_by_role(
+            "button", name="Redirect to re-establish"
         )
 
     def click_suitable_for_endoscopic_test_button(self) -> None:
@@ -151,6 +158,10 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         """Checks the 'Advance FOBT' checkbox and clicks the 'Amend Diagnosis Date' button."""
         self.advance_checkbox_label_v2.check()
         self.click(self.amend_diagnosis_date_button)
+
+    def check_exception_circumstances_checkbox(self) -> None:
+        """Checks the 'Exceptional circumstances' checkbox"""
+        self.advance_checkbox_label_v2.check()
 
     def click_and_select_subsequent_assessment_appointment_required(
         self, option: str
@@ -239,6 +250,7 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         logging.info("[CONTACT RECORD] Selected direction and contact type")
 
         # Step 3: Pick calendar date
+        # TODO: Change this to use calendar picker util and datetime.today()
         self.page.get_by_role("button", name="Calendar").click()
         self.page.get_by_role("cell", name="19", exact=True).click()
         logging.info("[CONTACT RECORD] Selected calendar date: 19")
@@ -276,3 +288,57 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
     def click_post_investigation_appointment_required_button(self) -> None:
         """Click the 'Post-investigation Appointment Required' button."""
         self.safe_accept_dialog(self.post_investigation_appointment_required_button)
+
+    def click_redirect_to_delete_the_latest_diagnostic_test_result_button(
+        self, messages_to_assert: List[str]
+    ) -> None:
+        """
+        Click the 'Redirect to DELETE the Latest Diagnostic Test Result' button, handle both dialogs.
+        Args:
+            messages_to_assert (List[str]): List of messages to assert in the second dialog.
+        """
+
+        # Handler for the first dialog: accept it
+        def handle_first_dialog(dialog: Dialog) -> None:
+            """Handle the first dialog by accepting it."""
+            logging.info(f"[DIALOG 1] Message: {dialog.message}")
+            dialog.accept()
+            logging.info("[DIALOG 1] First dialog accepted.")
+
+            # Handler for the second dialog: assert text and accept/dismiss as needed
+            def handle_second_dialog(dialog: Dialog) -> None:
+                """
+                Handle the second dialog by asserting its text and accepting it.
+                Checks for specific warning messages passed in through messages_to_assert.
+                Raises:
+                    AssertionError: If the dialog text does not contain expected messages.
+                """
+                logging.info(f"[DIALOG 2] Message: {dialog.message}")
+                actual_text = dialog.message
+                for message in messages_to_assert:
+                    logging.info(
+                        f"[UI ASSERTION] Verifying dialog contains: '{message}'"
+                    )
+                    assert (
+                        message in actual_text
+                    ), f"Expected dialog to contain '{message}', but got '{actual_text}'"
+                    logging.info(
+                        f"[UI ASSERTIONS COMPLETE]: '{message}' found in dialog text."
+                    )
+                dialog.accept()
+                logging.info("[DIALOG 2] Second dialog asserted and accepted.")
+
+            self.page.once("dialog", handle_second_dialog)
+
+        self.page.once("dialog", handle_first_dialog)
+
+        # Click the button to trigger dialogs
+        self.click(self.redirect_to_delete_the_latest_diagnostic_test_result_button)
+
+    def click_redirect_to_reestablish_suitability_for_diagnostic_test_repatient_contact(
+        self,
+    ) -> None:
+        """Click the 'Redirect to re-establish suitability for diagnostic test - repatient contact' button."""
+        self.safe_accept_dialog(
+            self.redirect_to_reestablish_suitability_for_diagnostic_test_repatient_contact
+        )

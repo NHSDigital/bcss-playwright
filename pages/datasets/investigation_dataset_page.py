@@ -1297,7 +1297,7 @@ class OutcomeAtTimeOfProcedureOptions(StrEnum):
     UNPLANNED_ADMISSION = "17147~Complications are mandatory"
 
 
-class RadiologyLateOutcomeOptions(StrEnum):
+class LateOutcomeOptions(StrEnum):
     """Enum for late outcome options"""
 
     NO_COMPLICATIONS = "17216~Complications are not required"

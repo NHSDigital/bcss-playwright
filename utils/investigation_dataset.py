@@ -33,7 +33,7 @@ from pages.datasets.investigation_dataset_page import (
     YesNoOptions,
     InsufflationOptions,
     OutcomeAtTimeOfProcedureOptions,
-    RadiologyLateOutcomeOptions,
+    LateOutcomeOptions,
     CompletionProofOptions,
     FailureReasonsOptions,
     PolypClassificationOptions,
@@ -199,7 +199,7 @@ class InvestigationDatasetCompletion:
             OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
         )
         DatasetFieldUtil(self.page).populate_select_locator_for_field(
-            "Late outcome", RadiologyLateOutcomeOptions.NO_COMPLICATIONS
+            "Late outcome", LateOutcomeOptions.NO_COMPLICATIONS
         )
         self.investigation_datasets_pom.click_show_completion_proof_information()
         # Completion Proof Information
@@ -338,8 +338,6 @@ class InvestigationDatasetCompletion:
         tagging_agent_given_drug_information: Optional[dict] = None,
         radiology_information: Optional[dict] = None,
         suspected_findings: Optional[dict] = None,
-        extracolonic_summary_code: Optional[str] = None,
-        intracolonic_summary_code: Optional[str] = None,
     ) -> None:
         """
         Completes the investigation dataset using the provided dictionaries for each section.
@@ -356,9 +354,7 @@ class InvestigationDatasetCompletion:
             contrast_tagging_and_drug (Optional[dict]): Contrast, tagging agent, and drug information.
             tagging_agent_given_drug_information (Optional[dict]): Tagging agent drug types and doses.
             radiology_information (Optional[dict]): Radiology section fields.
-            suspected_findings (Optional[dict])
-            extracolonic_summary_code (Optional[str]): Extracolonic summary code value.
-            intracolonic_summary_code (Optional[str]): Intracolonic summary code value.
+            suspected_findings (Optional[dict]): Suspected findings section fields
         """
         logging.info("Completing investigation dataset with the provided dictionaries")
         # Investigation Dataset
@@ -414,13 +410,6 @@ class InvestigationDatasetCompletion:
         if radiology_information is not None:
             logging.info("Filling out radiology information")
             self.fill_out_radiology_information(radiology_information)
-
-        # Intracolonic Summary Code (if passed separately)
-        if intracolonic_summary_code is not None:
-            logging.info("Setting intracolonic summary code")
-            self.page.select_option(
-                "#UI_INTRACOLONIC_SUMMARY_CODE", intracolonic_summary_code
-            )
 
         # Suspected Findings
         if suspected_findings is not None:
@@ -643,26 +632,38 @@ class InvestigationDatasetCompletion:
 
         self.investigation_datasets_pom.click_show_radiology_information()
         self.investigation_datasets_pom.click_show_radiology_failure_information()
-        # Define mapping for each radiology field and its selector
-        radiology_map = {
-            "examination_quality": "#UI_EXAM_QUALITY",
-            "scan_position": "#UI_NUMBER_OF_SCAN_POSITIONS",
-            "procedure_outcome": "#UI_QA_OUTCOME",
-            "late_outcome": "#UI_LATE_OUTCOME",
-            "segmental_inadequacy": "#UI_SEGMENTAL_INADEQUACY",
-            "intracolonic_summary_code": "#UI_INTRACOLONIC_SUMMARY_CODE",
-            "extracolonic_summary_code": "#UI_EXTRACOLONIC_SUMMARY_CODE",
-        }
 
+        # Use for loop and match-case for radiology data fields
         for key, value in radiology_data.items():
-            selector = radiology_map.get(key)
-            if selector:
-                logging.info(
-                    f"Setting {key.replace('_', ' ')}: {to_enum_name_or_value(value)}"
-                )
-                self.page.select_option(selector, value)
-            else:
-                logging.warning(f"Unknown radiology field: {key}")
+            match key:
+                case "examination quality":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Examination Quality", value
+                    )
+                case "scan position":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Number of Scan Positions", value
+                    )
+                case "procedure outcome":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Outcome at time of procedure", value
+                    )
+                case "late outcome":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Late Outcome", value
+                    )
+                case "segmental inadequacy":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Segmental Inadequacy", value
+                    )
+                case "intracolonic summary code":
+                    DatasetFieldUtil(
+                        self.page
+                    ).populate_select_locator_for_field_inside_div(
+                        "Intracolonic Summary Code",
+                        "divIntracolonicSummaryCode",
+                        value,
+                    )
 
     def process_polyps(
         self,

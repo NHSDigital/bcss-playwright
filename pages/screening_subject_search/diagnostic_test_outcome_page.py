@@ -31,6 +31,10 @@ class DiagnosticTestOutcomePage(BasePage):
             "#UI_REFERRAL_PROCEDURE_TYPE"
         )
         self.reason_for_onward_referral_dropdown = self.page.locator("#UI_COMPLETE_ID")
+        self.visible_ui_results_string = 'select[id^="UI_RESULTS_"]:visible'
+        self.onward_referring_clinician_lookup_link = self.page.locator(
+            "#UI_CONSULTANT_PIO_SELECT_LINK"
+        )
 
     def verify_diagnostic_test_outcome(self, outcome_name: str) -> None:
         """
@@ -63,24 +67,15 @@ class DiagnosticTestOutcomePage(BasePage):
         self.reason_for_onward_referral_dropdown.wait_for(state="visible")
         self.reason_for_onward_referral_dropdown.select_option(value=value)
 
-    def select_first_valid_onward_referral_consultant(self) -> None:
+    def select_valid_onward_referral_consultant_index(self, option: int) -> None:
         """Selects the first valid consultant from the lookup dropdown inside the iframe."""
-        self.page.locator("#UI_CONSULTANT_PIO_SELECT_LINK").click()
-
-        self.consultant_lookup_dropdown = self.page.frame_locator(
-            "#UI_POPUP_wqggdxgaifr"
-        ).locator("#UI_RESULTS_cgywrngg")
-
-        self.consultant_lookup_dropdown.wait_for(state="visible")
-
-        options = self.consultant_lookup_dropdown.locator("option").all()
-        for option in options:
-            value = option.get_attribute("value")
-            if value:
-                self.consultant_lookup_dropdown.click()  # Focus the dropdown
-                self.consultant_lookup_dropdown.select_option(value=value)
-                logging.info(f"Selected consultant with value: {value}")
-                break
+        self.click(self.onward_referring_clinician_lookup_link)
+        select_locator = self.page.locator(self.visible_ui_results_string)
+        select_locator.first.wait_for(state="visible")
+        # Find all option elements inside the select and click the one at the given index
+        option_elements = select_locator.first.locator("option")
+        option_elements.nth(option).wait_for(state="visible")
+        self.click(option_elements.nth(option))
 
 
 class OutcomeOfDiagnosticTest(StrEnum):
