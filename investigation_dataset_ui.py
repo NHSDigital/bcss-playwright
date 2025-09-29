@@ -1,6 +1,5 @@
 import json
 import streamlit as st
-from datetime import datetime
 from typing import Any, Optional, List
 from enum import Enum
 from pages.datasets.investigation_dataset_page import (
@@ -90,6 +89,23 @@ ENUM_MAP = {
 
 
 # --- Utility pretty-print functions ---
+def is_python_datetime_expr(val: str) -> bool:
+    """
+    Returns True if val looks like a Python datetime/timedelta expression.
+    Args:
+        val (str): The value to check.
+    Returns:
+        bool: True if val looks like a datetime/timedelta expression, False otherwise.
+    """
+    if not isinstance(val, str):
+        return False
+    return (
+        val.startswith("datetime.today()")
+        or val.startswith("datetime(")
+        or "timedelta(" in val
+    )
+
+
 def pretty_dict(d: dict, indent: int = 4) -> str:
     """
     Pretty-print a dictionary with indentation.
@@ -110,7 +126,10 @@ def pretty_dict(d: dict, indent: int = 4) -> str:
         elif isinstance(v, list):
             val = pretty_list(v, indent + 4).replace("\n", "\n" + pad)
         elif isinstance(v, str):
-            val = f'"{v}"'
+            if is_python_datetime_expr(v):
+                val = v
+            else:
+                val = f'"{v}"'
         else:
             val = str(v)
         inner.append(f"{key_str}: {val}")
@@ -137,7 +156,10 @@ def pretty_list(items: list, indent: int = 4) -> str:
         elif isinstance(x, Enum):
             inner.append(f"{x.__class__.__name__}.{x.name}")
         elif isinstance(x, str):
-            inner.append(f'"{x}"')
+            if is_python_datetime_expr(x):
+                inner.append(x)
+            else:
+                inner.append(f'"{x}"')
         else:
             inner.append(str(x))
     joined = (",\n" + pad).join(inner)
@@ -162,10 +184,57 @@ def get_enums_used(fields: list) -> set:
     return enums
 
 
+# --- Render Helper Functions ---
+def _is_condition_met(field: dict, idx: Optional[int | str]) -> bool:
+    """
+    Check if the condition for a conditional field is met.
+    Args:
+        field (dict): The field definition.
+        idx (int | str, optional): Index for repeated fields (e.g., polyp number).
+    Returns:
+        bool: True if the condition is met, False otherwise.
+    """
+    cond = field["conditional_on"]
+    cond_field = cond["field"]
+    cond_field_key = f"{cond_field}_{idx}" if idx is not None else cond_field
+    cond_val = st.session_state.get(cond_field_key)
+    if cond_val is None:
+        cond_val = st.session_state.get(cond_field)
+    expected_val = cond["value"]
+    if isinstance(cond_val, Enum):
+        cond_val_str = f"{cond_val.__class__.__name__}.{cond_val.name}"
+    else:
+        cond_val_str = str(cond_val)
+    return cond_val_str == expected_val or cond_val == expected_val
+
+
+def _render_selectbox_field(
+    key: str, desc: str, optional: bool, widget_key: str, field: dict, options: list
+) -> Any:
+    """
+    Render a selectbox field with given options.
+    Args:
+        key (str): The field key.
+        desc (str): The field description.
+        optional (bool): Whether the field is optional.
+        widget_key (str): The widget key.
+        field (dict): The field definition.
+        options (list): The list of options for the selectbox.
+    Returns:
+        Any: The selected option, or None if not applicable.
+    """
+    if not handle_optional(optional, key, desc, widget_key):
+        return None
+    default = field.get("default", options[0])
+    return st.selectbox(
+        f"{key} ({desc})", options, index=options.index(default), key=widget_key
+    )
+
+
 # --- Render Fields ---
 def render_field(field: dict, idx: Optional[int | str] = None) -> Any:
     """
-    Render a single field based on its definition using match-case.
+    Render a single field based on its definition.
     Args:
         field (dict): The field definition.
         idx (int | str, optional): Index for repeated fields (e.g., polyp number).
@@ -180,15 +249,7 @@ def render_field(field: dict, idx: Optional[int | str] = None) -> Any:
 
     # Handle conditional fields
     if "conditional_on" in field:
-        cond = field["conditional_on"]
-        cond_val = st.session_state.get(cond["field"])
-        expected_val = cond["value"]
-        # Support both Enum and string comparison
-        if isinstance(cond_val, Enum):
-            cond_val_str = f"{cond_val.__class__.__name__}.{cond_val.name}"
-        else:
-            cond_val_str = str(cond_val)
-        if cond_val_str != expected_val and cond_val != expected_val:
+        if not _is_condition_met(field, idx):
             return None
 
     match field_type:
@@ -200,27 +261,19 @@ def render_field(field: dict, idx: Optional[int | str] = None) -> Any:
             return render_integer_or_none_field(key, desc, optional, widget_key, field)
         case "float":
             return render_float_field(key, desc, optional, widget_key, field)
-        case "date":
+        case "date" | "datetime":
             return render_date_field(key, desc, optional, widget_key, field)
         case t if t in ENUM_MAP:
             return render_enum_field(key, desc, optional, widget_key, field)
         case "bool":
             return render_bool_field(key, desc, optional, widget_key, field)
         case "yes_no":
-            if not handle_optional(optional, key, desc, widget_key):
-                return None
-            options = ["yes", "no"]
-            default = field.get("default", options[0])
-            return st.selectbox(
-                f"{key} ({desc})", options, index=options.index(default), key=widget_key
+            return _render_selectbox_field(
+                key, desc, optional, widget_key, field, ["yes", "no"]
             )
         case "therapeutic_diagnostic":
-            if not handle_optional(optional, key, desc, widget_key):
-                return None
-            options = ["therapeutic", "diagnostic"]
-            default = field.get("default", options[0])
-            return st.selectbox(
-                f"{key} ({desc})", options, index=options.index(default), key=widget_key
+            return _render_selectbox_field(
+                key, desc, optional, widget_key, field, ["therapeutic", "diagnostic"]
             )
         case "time":
             if not handle_optional(optional, key, desc, widget_key):
@@ -354,9 +407,11 @@ def render_float_field(
 
 def render_date_field(
     key: str, desc: str, optional: bool, widget_key: str, field: dict
-) -> Optional[datetime]:
+) -> Optional[str]:
     """
-    Render a date field.
+    Render a date field with quick-select options for Today, Yesterday, or a custom date.
+    If a quick-select is chosen, returns a string representing the Python expression (e.g., 'datetime.today()').
+    If a custom date is chosen, returns a string 'datetime(year, month, day)'.
     Args:
         key (str): The field key.
         desc (str): The field description.
@@ -368,11 +423,30 @@ def render_date_field(
     """
     if not handle_optional(optional, key, desc, widget_key):
         return None
-    default = field.get("default", None)
-    val = st.date_input(f"{key} ({desc})", value=default, key=widget_key)
-    if val is not None:
-        return datetime(val.year, val.month, val.day)
-    return None
+
+    quick_options = {
+        "Custom date": None,
+        "Today": "datetime.today()",
+        "Yesterday": "datetime.today() - timedelta(days=1)",
+        "Tomorrow": "datetime.today() + timedelta(days=1)",
+    }
+
+    quick_choice = st.selectbox(
+        f"{key} ({desc}) - Quick select",
+        list(quick_options.keys()),
+        key=f"{widget_key}_quickselect",
+    )
+
+    if quick_choice == "Custom date":
+        default = field.get("default", None)
+        val = st.date_input(f"{key} ({desc})", value=default, key=widget_key)
+        if val is not None:
+            # Return as Python code string
+            return f"datetime({val.year}, {val.month}, {val.day})"
+        return None
+    else:
+        # Return the Python expression string for quick-selects
+        return quick_options[quick_choice]
 
 
 def render_enum_field(

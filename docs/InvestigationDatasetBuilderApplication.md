@@ -22,6 +22,7 @@ This application is a Streamlit-based tool for interactively building investigat
     - [Editing or Removing Sections and Fields](#editing-or-removing-sections-and-fields)
     - [Purpose of "groups" and "fields"](#purpose-of-groups-and-fields)
     - [Adding New `Enum` Types](#adding-new-enum-types)
+    - [Adding Custom Types](#adding-custom-types)
     - [Available Section Renderers](#available-section-renderers)
     - [Troubleshooting](#troubleshooting)
   - [Example Section Entry in `dataset_fields.json`](#example-section-entry-in-dataset_fieldsjson)
@@ -104,7 +105,8 @@ Each field in the JSON can use the following options:
   - `"therapeutic_diagnostic"`: Dropdown with "therapeutic" and "diagnostic".
   - `"time"`: Time input in HH:MM format.
   - `"multiselect"`: Multi-select dropdown (requires `"options"`).
-  - `Enum` type name (e.g., `"DrugTypeOptions"`, `"YesNoOptions"`): Dropdown with `enum` values.<br>
+  - `Enum` type name (e.g., `"DrugTypeOptions"`, `"YesNoOptions"`): Dropdown with `enum` values.
+  - **Custom types**: See [Adding Custom Types](#adding-custom-types) below.<br>
 
 - `"description"`:<br>
   A clear description of the field, shown in the UI.
@@ -306,6 +308,44 @@ If you add new `Enum` types to `pages.datasets.investigation_dataset_page`, you 
   ```
 
 - Use the `Enum` type name in the `"type"` field of any relevant field in `dataset_fields.json`.
+
+---
+
+### Adding Custom Types
+
+You can add custom types for fields that do not fit the standard types or enums.  
+Examples include `"yes_no"` and `"therapeutic_diagnostic"`, which are handled as special dropdowns in the UI.
+
+**To add a custom type:**
+
+1. Choose a unique string for `"type"` (e.g., `"yes_no"`, `"therapeutic_diagnostic"`).
+2. In your JSON field definition, set `"type"` to this string.
+3. Ensure your `render_field` function in `investigation_dataset_ui.py` has a case for your custom type, rendering the appropriate widget (usually a dropdown/selectbox).
+   - For `"yes_no"`, the UI will show a dropdown with "yes" and "no".
+   - For `"therapeutic_diagnostic"`, the UI will show a dropdown with "therapeutic" and "diagnostic".
+4. You can add more custom types by extending the `render_field` function with new cases in the `match-case` or `if` dispatch.
+
+**Example:**
+
+`dataset_fields.json`:
+
+```json
+{
+  "key": "procedure type",
+  "type": "therapeutic_diagnostic",
+  "description": "If it was a procedure or diagnostic testing",
+  "optional": false
+}
+```
+
+`investigation_dataset_ui.py`, `render_field`:
+
+```python
+case "therapeutic_diagnostic":
+    return _render_selectbox_field(
+        key, desc, optional, widget_key, field, ["therapeutic", "diagnostic"]
+    )
+```
 
 ---
 
