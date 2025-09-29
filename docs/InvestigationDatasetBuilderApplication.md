@@ -36,8 +36,9 @@ This application is a Streamlit-based tool for interactively building investigat
 Before running the application, ensure you have the following:
 
 - Python 3.10 or later installed.
-- All required Python packages installed (see `requirements.txt`).
-- The file `investigation_dataset_ui_app/dataset_fields.json` present and correctly formatted.
+- **It is strongly recommended to use a Python virtual environment.**  
+  To create and activate a virtual environment, follow the steps in the [README](../README.md#2-set-up-a-virtual-environment-recommended).
+- All required Python packages installed. This can be done with `pip install -r requirements.txt` or `pip install -r ./requirements.txt`.
 
 ---
 
