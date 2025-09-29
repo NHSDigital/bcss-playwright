@@ -313,7 +313,7 @@ If you add new `Enum` types to `pages.datasets.investigation_dataset_page`, you 
 
 ### Adding Custom Types
 
-You can add custom types for fields that do not fit the standard types or enums.  
+You can add custom types for fields that do not fit the standard types or enums.<br>
 Examples include `"yes_no"` and `"therapeutic_diagnostic"`, which are handled as special dropdowns in the UI.
 
 **To add a custom type:**
