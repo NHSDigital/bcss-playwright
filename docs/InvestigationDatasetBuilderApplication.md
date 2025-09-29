@@ -1,6 +1,6 @@
 # Investigation Dataset Builder Application
 
-This application is a Streamlit-based tool for interactively building investigation dataset definitions for use with the `complete_dataset_with_args` method in the `InvestigationDatasetCompletion` class. It allows users to select and configure dataset sections, fill in fields, and copy the resulting Python code (including necessary Enum imports) for use in their tests.
+This application is a Streamlit-based tool for interactively building investigation dataset definitions for use with the `complete_dataset_with_args` method in the `InvestigationDatasetCompletion` class. It allows users to select and configure dataset sections, fill in fields, and copy the resulting Python code (including necessary `Enum` imports) for use in their tests.
 
 ---
 
@@ -21,7 +21,7 @@ This application is a Streamlit-based tool for interactively building investigat
     - [Registering a Section Renderer](#registering-a-section-renderer)
     - [Editing or Removing Sections and Fields](#editing-or-removing-sections-and-fields)
     - [Purpose of "groups" and "fields"](#purpose-of-groups-and-fields)
-    - [Adding New Enum Types](#adding-new-enum-types)
+    - [Adding New `Enum` Types](#adding-new-enum-types)
     - [Available Section Renderers](#available-section-renderers)
     - [Troubleshooting](#troubleshooting)
   - [Example Section Entry in `dataset_fields.json`](#example-section-entry-in-dataset_fieldsjson)
@@ -65,7 +65,7 @@ Before running the application, ensure you have the following:
 
 - As you fill in fields, the **output code block** at the bottom of each section updates in real time.
 - This code block includes:
-  - The necessary Enum imports for the section.
+  - The necessary `Enum` imports for the section.
   - The Python dictionary representing your filled section.
 - To use this output:
   - Select the whole code block manually and copy it, or use the copy button if available.
@@ -77,7 +77,7 @@ Before running the application, ensure you have the following:
 
 ### Overview of `dataset_fields.json`
 
-The file `investigation_dataset_ui_app/dataset_fields.json` defines all available sections and their fields, including types, descriptions, and options.  
+The file `investigation_dataset_ui_app/dataset_fields.json` defines all available sections and their fields, including types, descriptions, and options.<br>
 Each section is a JSON object with either a `"fields"` array (for normal sections) or a `"groups"` array (for drug sections).
 
 ---
@@ -86,12 +86,12 @@ Each section is a JSON object with either a `"fields"` array (for normal section
 
 Each field in the JSON can use the following options:
 
-- `"key"`:  
-  The unique identifier for the field.  
+- `"key"`:<br>
+  The unique identifier for the field.<br>
   Example: `"site"`, `"drug_typeX"`, `"drug_doseX"`
 
-- `"type"`:  
-  The type of the field.  
+- `"type"`:<br>
+  The type of the field.<br>
   Allowed values:
   - `"string"`: Free text input.
   - `"integer"`: Integer input.
@@ -103,31 +103,31 @@ Each field in the JSON can use the following options:
   - `"therapeutic_diagnostic"`: Dropdown with "therapeutic" and "diagnostic".
   - `"time"`: Time input in HH:MM format.
   - `"multiselect"`: Multi-select dropdown (requires `"options"`).
-  - Enum type name (e.g., `"DrugTypeOptions"`, `"YesNoOptions"`): Dropdown with enum values.
+  - `Enum` type name (e.g., `"DrugTypeOptions"`, `"YesNoOptions"`): Dropdown with `enum` values.<br>
 
-- `"description"`:  
+- `"description"`:<br>
   A clear description of the field, shown in the UI.
 
-- `"optional"`:  
-  `true` or `false`.  
+- `"optional"`:<br>
+  `true` or `false`.<br>
   If `true`, the field is optional and can be toggled with a checkbox.
 
-- `"range"`:  
-  For numeric fields, specifies allowed values.  
+- `"range"`:<br>
+  For numeric fields, specifies allowed values.<br>
   Example: `"range": [-1, 10]`
 
-- `"default"`:  
+- `"default"`:<br>
   The default value for the field.
 
-- `"options"`:  
+- `"options"`:<br>
   For `"multiselect"` fields, a list of allowed values.
 
-- `"multiple"`:  
+- `"multiple"`:<br>
   For drug fields, set to `true` to allow multiple entries (used with `"key": "drug_typeX"` and `"drug_doseX"`).
 
-- `"conditional_on"`:  
-  Used for conditional fields.  
-  Example:  
+- `"conditional_on"`:<br>
+  Used for conditional fields.<br>
+  Example:<br>
 
   ```json
   "conditional_on": {
@@ -138,11 +138,11 @@ Each field in the JSON can use the following options:
 
   The field will only be shown if the referenced field matches the value.
 
-- `"list"`:  
-  If present and true, indicates the section is a list of entries (e.g., polyp_information).
+- `"list"`:<br>
+  If present and true, indicates the section is a list of entries (e.g., `polyp_information`).
 
-- `"nested_list"`:  
-  If present and true, indicates the section is a nested list (e.g., polyp_intervention).
+- `"nested_list"`:<br>
+  If present and true, indicates the section is a nested list (e.g., `polyp_intervention`).
 
 ---
 
@@ -185,10 +185,10 @@ Each field in the JSON can use the following options:
 
 5. Save the file.
 
-6. **Add the section to the sidebar:**  
+6. **Add the section to the sidebar:**<br>
    Add the section name to the `SECTIONS` list in `investigation_dataset_ui.py`.
 
-7. **Register the section renderer:**  
+7. **Register the section renderer:**<br>
    Add the section to the `SECTION_RENDERERS` dictionary in `investigation_dataset_ui.py`, using `show_drug_group_section_with_imports` as the renderer:
 
     ```python
@@ -227,10 +227,10 @@ Each field in the JSON can use the following options:
 
 5. Save the file.
 
-6. **Add the section to the sidebar:**  
+6. **Add the section to the sidebar:**<br>
    Add the section name to the `SECTIONS` list in `investigation_dataset_ui.py`.
 
-7. **Register the section renderer:**  
+7. **Register the section renderer:**<br>
    Add the section to the `SECTION_RENDERERS` dictionary in `investigation_dataset_ui.py`, using `show_section_with_imports` as the renderer:
 
    ```python
@@ -245,7 +245,7 @@ Each field in the JSON can use the following options:
 
 ### Registering a Section Renderer
 
-Whenever you add a new section, you must register it in the `SECTION_RENDERERS` dictionary in `investigation_dataset_ui.py`.  
+Whenever you add a new section, you must register it in the `SECTION_RENDERERS` dictionary in `investigation_dataset_ui.py`.<br>
 This dictionary maps section names to the appropriate rendering function.
 
 - For normal sections, use `show_section_with_imports`.
@@ -267,35 +267,35 @@ SECTION_RENDERERS = {
 
 ### Editing or Removing Sections and Fields
 
-- **To edit a field or section:**  
-  Find the relevant field or section and update its properties (e.g., `"description"`, `"type"`, `"optional"`, etc.).  
+- **To edit a field or section:**<br>
+  Find the relevant field or section and update its properties (e.g., `"description"`, `"type"`, `"optional"`, etc.).<br>
   Save the file and reload the app.
 
-- **To remove a field or section:**  
-  Delete the field object from the `"fields"` array or the section object from the root.  
-  Save the file and reload the app.
+- **To remove a field or section:**<br>
+  Delete the field object from the `"fields"` array or the section object from the root.<br>
+  Save the file and reload the app.<br>
   Remove the section from `SECTIONS` and `SECTION_RENDERERS` if you want to fully remove it from the UI.
 
 ---
 
 ### Purpose of "groups" and "fields"
 
-- **"fields"**:  
-  Used for normal sections and for single-entry fields in drug sections.  
+- **"fields"**:<br>
+  Used for normal sections and for single-entry fields in drug sections.<br>
   Each field in `"fields"` is rendered as a single input in the UI.
 
-- **"groups"**:  
-  Used for sections that allow multiple drug entries (e.g., Drug Information, Tagging Agent Given Drug Information, Contrast Tagging and Drug).  
-  Each group contains a `"label"` and a `"fields"` array.  
+- **"groups"**:<br>
+  Used for sections that allow multiple drug entries (e.g., Drug Information, Tagging Agent Given Drug Information, Contrast Tagging and Drug).<br>
+  Each group contains a `"label"` and a `"fields"` array.<br>
   Fields with `"key": "drug_typeX"` and `"drug_doseX"` and `"multiple": true` are rendered as repeated entries, with the user specifying how many drugs to enter.
 
 ---
 
-### Adding New Enum Types
+### Adding New `Enum` Types
 
-If you add new Enum types to `pages.datasets.investigation_dataset_page`, you must also:
+If you add new `Enum` types to `pages.datasets.investigation_dataset_page`, you must also:
 
-- Add the Enum to the `ENUM_MAP` in `investigation_dataset_ui.py`:
+- Add the `Enum` to the `ENUM_MAP` in `investigation_dataset_ui.py`:
 
   ```python
   ENUM_MAP = {
@@ -304,29 +304,29 @@ If you add new Enum types to `pages.datasets.investigation_dataset_page`, you mu
   }
   ```
 
-- Use the Enum type name in the `"type"` field of any relevant field in `dataset_fields.json`.
+- Use the `Enum` type name in the `"type"` field of any relevant field in `dataset_fields.json`.
 
 ---
 
 ### Available Section Renderers
 
-There are several renderers available for displaying sections in the UI.  
+There are several renderers available for displaying sections in the UI.<br>
 Choose the appropriate renderer based on the section's structure:
 
-- **show_section_with_imports**  
-  Use for standard sections that only have a `"fields"` array.  
+- **show_section_with_imports**<br>
+  Use for standard sections that only have a `"fields"` array.<br>
   Renders all fields and outputs the code block with necessary imports.
 
-- **show_drug_group_section_with_imports**  
-  Use for sections that contain drug groups (i.e., have a `"groups"` array).  
+- **show_drug_group_section_with_imports**<br>
+  Use for sections that contain drug groups (i.e., have a `"groups"` array).<br>
   Renders each drug group, allows multiple entries, and outputs the code block with necessary imports.
 
-- **show_polyp_information_and_intervention_and_histology**  
-  Use for the polyp section, which is a complex/nested structure.  
+- **show_polyp_information_and_intervention_and_histology**<br>
+  Use for the polyp section, which is a complex/nested structure.<br>
   Outputs code blocks for polyp information, interventions, and histology, along with necessary imports.
 
-- **Custom Renderers**  
-  For any section with unique requirements, you can create a custom renderer function and register it in `SECTION_RENDERERS`.  
+- **Custom Renderers**<br>
+  For any section with unique requirements, you can create a custom renderer function and register it in `SECTION_RENDERERS`.<br>
   If your renderer does not accept a section name argument, wrap it in a lambda:
 
   ```python
@@ -346,11 +346,11 @@ Choose the appropriate renderer based on the section's structure:
   - Check for typos in the field definition.
   - Ensure conditional fields have correct `"conditional_on"` logic.
 
-- **Enum import is missing in the output:**
+- **`Enum` import is missing in the output:**
   - Ensure the field `"type"` matches an entry in `ENUM_MAP`.
 
 - **App does not reload changes:**
-  - Save your changes and refresh the Streamlit app in your browser.
+  - Save your changes and refresh the `Streamlit` app in your browser.
 
 - **Copy to clipboard does not work:**
   - Some browsers may not support auto-copy. Manually select and copy the code from the code block.
@@ -392,7 +392,7 @@ Choose the appropriate renderer based on the section's structure:
 - **All configuration is driven by `dataset_fields.json`.**
 - **Descriptions, types, and options are fully customizable.**
 - **No code changes are needed for most updates—just edit the JSON file.**
-- **For new Enum types, add them to both the Python code and the JSON.**
+- **For new `Enum` types, add them to both the Python code and the JSON.**
 - **For conditional fields, use the `"conditional_on"` property.**
 - **Use `"groups"` for repeated drug entries, and `"fields"` for single-entry fields.**
 - **Register new sections in both `SECTIONS` and `SECTION_RENDERERS`.**
