@@ -36,7 +36,7 @@ This application is a Streamlit-based tool for interactively building investigat
 Before running the application, ensure you have the following:
 
 - Python 3.10 or later installed.
-- **It is strongly recommended to use a Python virtual environment.**  
+- **It is strongly recommended to use a Python virtual environment.**<br>
   To create and activate a virtual environment, follow the steps in the [README](../README.md#2-set-up-a-virtual-environment-recommended).
 - All required Python packages installed. This can be done with `pip install -r requirements.txt` or `pip install -r ./requirements.txt`.
 
