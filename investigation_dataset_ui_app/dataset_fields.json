@@ -459,7 +459,7 @@
     ],
     "groups": [
       {
-        "label": "Additional Bowel Preparation Administere Drugs",
+        "label": "Additional Bowel Preparation Administered Drugs",
         "fields": [
           {
             "key": "drug_typeX",
