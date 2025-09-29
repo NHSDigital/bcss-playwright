@@ -30,7 +30,23 @@ from pages.datasets.investigation_dataset_page import (
     PolypReasonLeftInSituOptions,
     AntibioticsAdministeredDrugTypeOptions,
     OtherDrugsAdministeredDrugTypeOptions,
+    IVContrastAdministeredOptions,
+    TaggingAgentDrugAdministeredOptions,
+    AdditionalBowelPrepAdministeredOptions,
+    IVBuscopanAdministeredOptions,
+    ExaminationQualityOptions,
+    ScanPositionOptions,
+    ProcedureOutcomeOptions,
+    SegmentalInadequacyOptions,
+    IntracolonicSummaryCodeOptions,
+    ExtracolonicSummaryCodeOptions,
 )
+
+
+# --- Constants ---
+enum_import_string = "from pages.datasets.investigation_dataset_page import (\n    "
+new_indented_line_string = ",\n    "
+
 
 # --- Enum mapping ---
 ENUM_MAP = {
@@ -60,6 +76,16 @@ ENUM_MAP = {
     "PolypReasonLeftInSituOptions": PolypReasonLeftInSituOptions,
     "AntibioticsAdministeredDrugTypeOptions": AntibioticsAdministeredDrugTypeOptions,
     "OtherDrugsAdministeredDrugTypeOptions": OtherDrugsAdministeredDrugTypeOptions,
+    "IVContrastAdministeredOptions": IVContrastAdministeredOptions,
+    "TaggingAgentDrugAdministeredOptions": TaggingAgentDrugAdministeredOptions,
+    "AdditionalBowelPrepAdministeredOptions": AdditionalBowelPrepAdministeredOptions,
+    "IVBuscopanAdministeredOptions": IVBuscopanAdministeredOptions,
+    "ExaminationQualityOptions": ExaminationQualityOptions,
+    "ScanPositionOptions": ScanPositionOptions,
+    "ProcedureOutcomeOptions": ProcedureOutcomeOptions,
+    "SegmentalInadequacyOptions": SegmentalInadequacyOptions,
+    "IntracolonicSummaryCodeOptions": IntracolonicSummaryCodeOptions,
+    "ExtracolonicSummaryCodeOptions": ExtracolonicSummaryCodeOptions,
 }
 
 
@@ -122,31 +148,21 @@ def pretty_list(items: list, indent: int = 4) -> str:
 with open("investigation_dataset_ui_app/dataset_fields.json", "r") as f:
     FIELD_DEFS = json.load(f)
 
-# --- Section names ---
-SECTIONS = [
-    "general_information",
-    "drug_information",
-    "endoscopy_information",
-    "completion_information",
-    "failure_information",
-    "polyp_information_and_intervention_and_histology",
-]
 
-SECTION_LABELS = {
-    "general_information": "General Information",
-    "drug_information": "Drug Information",
-    "endoscopy_information": "Endoscopy Information",
-    "completion_information": "Completion Information",
-    "failure_information": "Failure Information",
-    "polyp_information_and_intervention_and_histology": "Polyp Information, Intervention & Histology",
-}
-
-# --- Main section selection ---
-st.set_page_config(page_title="Investigation Dataset Builder", layout="wide")
-st.sidebar.title("Sections")
-section = st.sidebar.radio("Jump to", [SECTION_LABELS[s] for s in SECTIONS])
+# -- Get Enums used in dictionaries ---
+def get_enums_used(fields: list) -> set:
+    """
+    Return a set of Enum class names used in the given fields.
+    """
+    enums = set()
+    for field in fields:
+        field_type = field.get("type")
+        if field_type in ENUM_MAP:
+            enums.add(field_type)
+    return enums
 
 
+# --- Render Fields ---
 def render_field(field: dict, idx: Optional[int | str] = None) -> Any:
     """
     Render a single field based on its definition using match-case.
@@ -162,14 +178,19 @@ def render_field(field: dict, idx: Optional[int | str] = None) -> Any:
     field_type = field["type"]
     widget_key = f"{key}_{idx}" if idx is not None else key
 
-    # Handle conditional fields (shown only if another field has a specific value)
+    # Handle conditional fields
     if "conditional_on" in field:
         cond = field["conditional_on"]
         cond_val = st.session_state.get(cond["field"])
-        if cond_val != cond["value"]:
+        expected_val = cond["value"]
+        # Support both Enum and string comparison
+        if isinstance(cond_val, Enum):
+            cond_val_str = f"{cond_val.__class__.__name__}.{cond_val.name}"
+        else:
+            cond_val_str = str(cond_val)
+        if cond_val_str != expected_val and cond_val != expected_val:
             return None
 
-    # Delegate to specialized renderers
     match field_type:
         case "string":
             return render_string_field(key, desc, optional, widget_key, field)
@@ -181,10 +202,33 @@ def render_field(field: dict, idx: Optional[int | str] = None) -> Any:
             return render_float_field(key, desc, optional, widget_key, field)
         case "date":
             return render_date_field(key, desc, optional, widget_key, field)
-        case "enum":
+        case t if t in ENUM_MAP:
             return render_enum_field(key, desc, optional, widget_key, field)
         case "bool":
             return render_bool_field(key, desc, optional, widget_key, field)
+        case "yes_no":
+            if not handle_optional(optional, key, desc, widget_key):
+                return None
+            options = ["yes", "no"]
+            default = field.get("default", options[0])
+            return st.selectbox(
+                f"{key} ({desc})", options, index=options.index(default), key=widget_key
+            )
+        case "therapeutic_diagnostic":
+            if not handle_optional(optional, key, desc, widget_key):
+                return None
+            options = ["therapeutic", "diagnostic"]
+            default = field.get("default", options[0])
+            return st.selectbox(
+                f"{key} ({desc})", options, index=options.index(default), key=widget_key
+            )
+        case "time":
+            if not handle_optional(optional, key, desc, widget_key):
+                return None
+            default = field.get("default", "07:00")
+            return st.text_input(
+                f"{key} ({desc}) (HH:MM)", value=default, key=widget_key
+            )
         case "multiselect":
             return render_multiselect_field(key, desc, optional, widget_key, field)
         case _:
@@ -347,10 +391,15 @@ def render_enum_field(
     """
     if not handle_optional(optional, key, desc, widget_key):
         return None
-    options = field["options"]
+    enum_class = ENUM_MAP[field["type"]]
+    options = list(enum_class)
     default = field.get("default", options[0])
     return st.selectbox(
-        f"{key} ({desc})", options, index=options.index(default), key=widget_key
+        f"{key} ({desc})",
+        options,
+        format_func=lambda x: x.name,
+        index=options.index(default),
+        key=widget_key,
     )
 
 
@@ -395,9 +444,9 @@ def render_multiselect_field(
     return st.multiselect(f"{key} ({desc})", options, default=default, key=widget_key)
 
 
-def show_section(section_name: str) -> None:
+def show_section_with_imports(section_name: str) -> None:
     """
-    Show a section of the form based on its name.
+    Render a section with fields and display the corresponding Python code with necessary imports.
     Args:
         section_name (str): The name of the section to show.
     """
@@ -408,69 +457,125 @@ def show_section(section_name: str) -> None:
         val = render_field(field)
         if val is not None:
             result[field["key"]] = val
-    st.code(f"{section_name} = {pretty_dict(result)}", language="python")
-
-
-def show_drug_information() -> None:
-    """
-    Show the Drug Information section, allowing multiple entries for each drug group.
-    """
-    st.header(SECTION_LABELS["drug_information"])
-    drug_groups = FIELD_DEFS["drug_information"]["groups"]
-    result = {}
-
-    for group in drug_groups:
-        st.subheader(group["label"])
-        count = st.number_input(
-            f"Number of {group['label'].lower()}",
-            min_value=0,
-            max_value=20,
-            value=0,
-            step=1,
-            key=f"count_{group['label']}",
+    enums = get_enums_used(section["fields"])
+    if enums:
+        import_block = (
+            enum_import_string + new_indented_line_string.join(sorted(enums)) + "\n)\n"
         )
-        fields = group["fields"]
-        for i in range(1, count + 1):
-            col1, col2 = st.columns([2, 1])
-            # Assume first field is type, second is dose
-            type_field = fields[0]
-            dose_field = fields[1]
+    else:
+        import_block = ""
+    st.code(f"{import_block}{section_name} = {pretty_dict(result)}", language="python")
 
-            with col1:
-                if type_field["type"] in ENUM_MAP:
-                    dtype = st.selectbox(
-                        f"{type_field['description']} {i}",
-                        [""] + list(ENUM_MAP[type_field["type"]]),
-                        format_func=lambda e: "—" if e == "" else e.name,
-                        key=f"{type_field['key'].replace('X', str(i))}",
-                    )
-                else:
-                    dtype = st.text_input(
-                        f"{type_field['description']} {i}",
-                        key=f"{type_field['key'].replace('X', str(i))}",
-                    )
-            with col2:
-                ddose = st.text_input(
-                    f"{dose_field['description']} {i}",
-                    key=f"{dose_field['key'].replace('X', str(i))}",
-                )
-            # Only add if either field is filled
-            if dtype != "" or ddose.strip() != "":
-                result[type_field["key"].replace("X", str(i))] = dtype
-                result[dose_field["key"].replace("X", str(i))] = ddose
 
-    st.code(f"drug_information = {pretty_dict(result)}", language="python")
+def show_drug_group_section_with_imports(section_name: str) -> None:
+    """
+    Render a section with drug groups allowing multiple entries and display the corresponding Python code with necessary imports.
+    Args:
+        section_name (str): The name of the section to show.
+    """
+    st.header(SECTION_LABELS[section_name])
+    section = FIELD_DEFS[section_name]
+    result = {}
+    all_fields = []
+
+    if "fields" in section:
+        all_fields.extend(section["fields"])
+        _render_single_entry_fields(section["fields"], result)
+
+    if "groups" in section:
+        for group in section["groups"]:
+            all_fields.extend(group["fields"])
+            _render_drug_group(section_name, group, result)
+
+    enums = get_enums_used(all_fields)
+    if enums:
+        import_block = (
+            enum_import_string + new_indented_line_string.join(sorted(enums)) + "\n)\n"
+        )
+    else:
+        import_block = ""
+    st.code(f"{import_block}{section_name} = {pretty_dict(result)}", language="python")
+
+
+def _render_single_entry_fields(fields: list, result: dict) -> None:
+    """
+    Render single-entry fields and update the result dictionary.
+    Args:
+        fields (list): List of field definitions.
+        result (dict): The result dictionary to update.
+    """
+    for field in fields:
+        val = render_field(field)
+        if val is not None:
+            result[field["key"]] = val
+
+
+def _render_drug_group(section_name: str, group: dict, result: dict) -> None:
+    """
+    Render a drug group allowing multiple entries and update the result dictionary.
+    Args:
+        section_name (str): The name of the section.
+        group (dict): The drug group definition.
+        result (dict): The result dictionary to update.
+    """
+    st.subheader(group["label"])
+    count = st.number_input(
+        f"Number of {group['label'].lower()}",
+        min_value=0,
+        max_value=20,
+        value=0,
+        step=1,
+        key=f"count_{section_name}_{group['label']}",
+    )
+    fields = group["fields"]
+    for i in range(1, count + 1):
+        _render_drug_entry(fields, i, result)
+
+
+def _render_drug_entry(fields: list, index: int, result: dict) -> None:
+    """
+    Render a single drug entry with type and dose fields side by side.
+    Args:
+        fields (list): List of field definitions for the drug entry.
+        index (int): The index of the drug entry (1-based).
+        result (dict): The result dictionary to update.
+    """
+    col1, col2 = st.columns([2, 1])
+    type_field = fields[0].copy()
+    dose_field = fields[1].copy()
+    type_field["key"] = type_field["key"].replace("X", str(index))
+    type_field["optional"] = False
+    dose_field["key"] = dose_field["key"].replace("X", str(index))
+    dose_field["optional"] = False
+    with col1:
+        dtype = render_field(type_field)
+    with col2:
+        ddose = render_field(dose_field)
+    if dtype != "" or (isinstance(ddose, str) and ddose.strip() != ""):
+        result[type_field["key"]] = dtype
+        result[dose_field["key"]] = ddose
 
 
 def show_polyp_information_and_intervention_and_histology() -> None:
     """
     Show the Polyp Information, Intervention & Histology section, allowing multiple polyps and interventions.
     Each polyp can have multiple interventions and optional histology.
+    Also outputs necessary Enum imports.
     """
     st.header(SECTION_LABELS["polyp_information_and_intervention_and_histology"])
     polyp_info_fields = FIELD_DEFS["polyp_information"]["fields"]
     polyp_intervention_fields = FIELD_DEFS["polyp_intervention"]["fields"]
     polyp_histology_fields = FIELD_DEFS["polyp_histology"]["fields"]
+
+    # Collect all fields for import analysis
+    all_fields = polyp_info_fields + polyp_intervention_fields + polyp_histology_fields
+    enums = get_enums_used(all_fields)
+    if enums:
+        import_block = (
+            enum_import_string + new_indented_line_string.join(sorted(enums)) + "\n)\n"
+        )
+    else:
+        import_block = ""
 
     num_polyps = st.number_input(
         "Number of polyps", min_value=0, max_value=20, value=1, step=1
@@ -486,11 +591,18 @@ def show_polyp_information_and_intervention_and_histology() -> None:
         polyp_histology.append(_render_histology(polyp_histology_fields, pi))
 
     st.markdown("#### Output")
-    st.code(f"polyp_information = {pretty_list(polyp_information)}", language="python")
     st.code(
-        f"polyp_intervention = {pretty_list(polyp_intervention)}", language="python"
+        f"{import_block}polyp_information = {pretty_list(polyp_information)}",
+        language="python",
     )
-    st.code(f"polyp_histology = {pretty_list(polyp_histology)}", language="python")
+    st.code(
+        f"polyp_intervention = {pretty_list(polyp_intervention)}",
+        language="python",
+    )
+    st.code(
+        f"polyp_histology = {pretty_list(polyp_histology)}",
+        language="python",
+    )
 
 
 def _render_polyp_info(fields: list, pi: int) -> dict:
@@ -566,16 +678,55 @@ def _render_histology(fields: list, pi: int) -> dict:
     return hist_dict
 
 
-# --- Main page logic ---
-if section == SECTION_LABELS["general_information"]:
-    show_section("general_information")
-elif section == SECTION_LABELS["drug_information"]:
-    show_drug_information()
-elif section == SECTION_LABELS["endoscopy_information"]:
-    show_section("endoscopy_information")
-elif section == SECTION_LABELS["completion_information"]:
-    show_section("completion_information")
-elif section == SECTION_LABELS["failure_information"]:
-    show_section("failure_information")
-elif section == SECTION_LABELS["polyp_information_and_intervention_and_histology"]:
-    show_polyp_information_and_intervention_and_histology()
+# --- Section names ---
+SECTIONS = [
+    "general_information",
+    "drug_information",
+    "endoscopy_information",
+    "completion_information",
+    "failure_information",
+    "polyp_information_and_intervention_and_histology",
+    "contrast_tagging_and_drug",
+    "tagging_agent_given_drug_information",
+    "radiology_information",
+    "suspected_findings",
+]
+
+SECTION_LABELS = {
+    "general_information": "General Information",
+    "drug_information": "Drug Information",
+    "endoscopy_information": "Endoscopy Information",
+    "completion_information": "Completion Information",
+    "failure_information": "Failure Information",
+    "polyp_information_and_intervention_and_histology": "Polyp Information, Intervention & Histology",
+    "contrast_tagging_and_drug": "Contrast Tagging and Drug",
+    "tagging_agent_given_drug_information": "Tagging Agent Given Drug Information",
+    "radiology_information": "Radiology Information",
+    "suspected_findings": "Suspected Findings",
+}
+
+# --- Main section selection ---
+st.set_page_config(page_title="Investigation Dataset Builder", layout="wide")
+st.sidebar.title("Sections")
+section = st.sidebar.radio("Jump to", [SECTION_LABELS[s] for s in SECTIONS])
+
+# Render the selected section
+SECTION_RENDERERS = {
+    "general_information": show_section_with_imports,
+    "drug_information": show_drug_group_section_with_imports,
+    "endoscopy_information": show_section_with_imports,
+    "completion_information": show_section_with_imports,
+    "failure_information": show_section_with_imports,
+    "polyp_information_and_intervention_and_histology": lambda _: show_polyp_information_and_intervention_and_histology(),  # If you want imports here, update similarly
+    "contrast_tagging_and_drug": show_drug_group_section_with_imports,
+    "tagging_agent_given_drug_information": show_drug_group_section_with_imports,
+    "radiology_information": show_section_with_imports,
+    "suspected_findings": show_section_with_imports,
+}
+
+selected_key = next(k for k, v in SECTION_LABELS.items() if v == section)
+renderer = SECTION_RENDERERS.get(selected_key)
+if renderer:
+    renderer(selected_key)
+else:
+    st.warning("Unknown section selected.")
