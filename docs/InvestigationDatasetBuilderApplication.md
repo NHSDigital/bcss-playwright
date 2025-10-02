@@ -9,6 +9,7 @@ This application is a Streamlit-based tool for interactively building investigat
 - [Investigation Dataset Builder Application](#investigation-dataset-builder-application)
   - [Table of Contents](#table-of-contents)
   - [How to Use the Application](#how-to-use-the-application)
+    - [What this can be used for](#what-this-can-be-used-for)
     - [Pre-requisites](#pre-requisites)
     - [Launching the App](#launching-the-app)
     - [Selecting and Filling Sections](#selecting-and-filling-sections)
@@ -31,6 +32,14 @@ This application is a Streamlit-based tool for interactively building investigat
 ---
 
 ## How to Use the Application
+
+### What this can be used for
+
+This application can be used to create the necessary dictionaries in order to populate an investigation dataset<br>
+During the conversion on the automation tests from selenium to playwright it can be used for the following feature file steps (There are more but these are just examples):
+
+- And I add the following bowel preparation drugs and values within the Investigation Dataset for this subject:
+- And I set the following fields and values within the Investigation Dataset for this subject:
 
 ### Pre-requisites
 

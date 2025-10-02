@@ -571,7 +571,7 @@ class InvestigationDatasetsPage(BasePage):
         """
         return self.edit_dataset_button.is_visible()
 
-    def is_dataset_section_present(self, dataset_section_name: str) -> bool | None:
+    def is_dataset_section_present(self, dataset_section_name: str) -> Optional[bool]:
         """
         Checks if a section of the investigation dataset is present
         Args:
@@ -600,7 +600,7 @@ class InvestigationDatasetsPage(BasePage):
         logging.info(f"Dataset section '{dataset_section_name}' not found.")
         return False
 
-    def get_dataset_section(self, dataset_section_name: str) -> Locator | None:
+    def get_dataset_section(self, dataset_section_name: str) -> Optional[Locator]:
         """
         Retrieves a dataset section by matching its header text.
         Only returns the locator if the section is visible.
@@ -609,7 +609,7 @@ class InvestigationDatasetsPage(BasePage):
         Args:
             dataset_section_name (str): The name of the dataset section to locate.
         Returns:
-            Locator | None: A Playwright Locator for the matching section if visible, or None if not found or not visible.
+            Optioanl[Locator]: A Playwright Locator for the matching section if visible, or None if not found or not visible.
         """
         logging.info(f"START: Looking for section '{dataset_section_name}'")
 
@@ -678,7 +678,7 @@ class InvestigationDatasetsPage(BasePage):
 
     def get_dataset_subsection(
         self, dataset_section_name: str, dataset_subsection_name: str
-    ) -> Locator | None:
+    ) -> Optional[Locator]:
         """
         Retrieves a specific subsection within a dataset section by matching the subsection's header text.
         The method first searches through elements with the `.DatasetSubSection` class.
@@ -687,7 +687,7 @@ class InvestigationDatasetsPage(BasePage):
             dataset_section_name (str): The name of the dataset section that contains the subsection.
             dataset_subsection_name (str): The name of the subsection to locate.
         Returns:
-            Locator | None: A Playwright Locator for the found subsection, or None if not found.
+            Optional[Locator]: A Playwright Locator for the found subsection, or None if not found.
         Raises:
             ValueError: If the specified dataset section cannot be found.
         """
@@ -735,17 +735,17 @@ class InvestigationDatasetsPage(BasePage):
     def are_fields_on_page(
         self,
         section_name: str,
-        subsection_name: str | None,
+        subsection_name: Optional[str],
         field_names: list[str],
-        visible: bool | None = None,
+        visible: Optional[bool] = None,
     ) -> bool:
         """
         Checks if the given fields are present in a section or subsection, with optional visibility checks.
         Args:
             section_name (str): The name of the dataset section.
-            subsection_name (str | None): The name of the subsection, if any.
+            subsection_name (Optional[str]): The name of the subsection, if any.
             field_names (list[str]): List of field labels to check.
-            visible (bool | None):
+            visible (Optional[bool]):
                 - True → fields must be visible
                 - False → fields must be not visible
                 - None → visibility doesn't matter (just check presence)
