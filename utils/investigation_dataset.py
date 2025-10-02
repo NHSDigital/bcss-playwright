@@ -83,6 +83,7 @@ class InvestigationDatasetCompletion:
         self.polyp_access_string = "Polyp Access"
         self.failure_reasons_string = "Failure Reasons"
         self.excision_technique_string = "Excision Technique"
+        self.outcome_at_time_of_procedure_string = "Outcome at time of procedure"
 
         self.investigation_datasets_pom = InvestigationDatasetsPage(self.page)
 
@@ -195,7 +196,7 @@ class InvestigationDatasetCompletion:
             "Insufflation", InsufflationOptions.AIR
         )
         DatasetFieldUtil(self.page).populate_select_locator_for_field(
-            "Outcome at time of procedure",
+            self.outcome_at_time_of_procedure_string,
             OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
         )
         DatasetFieldUtil(self.page).populate_select_locator_for_field(
@@ -647,6 +648,7 @@ class InvestigationDatasetCompletion:
                 case "procedure outcome":
                     DatasetFieldUtil(self.page).populate_select_locator_for_field(
                         "Outcome at time of procedure", value
+                        self.outcome_at_time_of_procedure_string, value
                     )
                 case "late outcome":
                     DatasetFieldUtil(self.page).populate_select_locator_for_field(
@@ -786,7 +788,7 @@ class InvestigationDatasetCompletion:
                     )
                 case "outcome at time of procedure":
                     DatasetFieldUtil(self.page).populate_select_locator_for_field(
-                        "Outcome at time of procedure", value
+                        self.outcome_at_time_of_procedure_string, value
                     )
                 case "late outcome":
                     DatasetFieldUtil(self.page).populate_select_locator_for_field(
