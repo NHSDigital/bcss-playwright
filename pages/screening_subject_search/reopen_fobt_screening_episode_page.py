@@ -51,8 +51,7 @@ class ReopenFOBTScreeningEpisodePage(BasePage):
         self.safe_accept_dialog(
             self.reopen_to_confirm_diagnostic_test_result_and_outcome_button
         )
-    
+
     def click_reopen_to_reschedule_diagnostic_test_button(self) -> None:
         """Click the 'Reopen to Reschedule Diagnostic Test' button."""
         self.safe_accept_dialog(self.reopen_to_reschedule_diagnostic_test_button)
-
