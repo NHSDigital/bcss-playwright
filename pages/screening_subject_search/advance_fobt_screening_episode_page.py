@@ -1,9 +1,9 @@
-from datetime import date
+from datetime import date, datetime
 from playwright.sync_api import Page, expect, Locator, Dialog
 from pages.base_page import BasePage
 import logging
 from typing import List
-import pytest
+from utils.calendar_picker import CalendarPicker
 
 
 class AdvanceFOBTScreeningEpisodePage(BasePage):
@@ -240,40 +240,40 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
             "[CONTACT RECORD] Starting contact recording flow with outcome: Close Episode - No Contact"
         )
 
-        # Step 1: Click 'Record Contact with Patient' button
-        # self.page.get_by_role("button", name="Record Contact with Patient").click()
-        # logging.info("[CONTACT RECORD] Navigated to contact recording screen")
-
-        # Step 2: Select direction and contact type
+        # Step 1: Select direction and contact type
         self.page.get_by_label("Contact Direction").select_option("20159")
         self.page.get_by_label("Contact made between patient").select_option("1171")
         logging.info("[CONTACT RECORD] Selected direction and contact type")
 
-        # Step 3: Pick calendar date
-        # TODO: Change this to use calendar picker util and datetime.today()
-        self.page.get_by_role("button", name="Calendar").click()
-        self.page.get_by_role("cell", name="19", exact=True).click()
-        logging.info("[CONTACT RECORD] Selected calendar date: 19")
+        # Step 2: Pick calendar date using V1 calendar picker
+        calendar_picker = CalendarPicker(self.page)
+        today = datetime.today()
+        calendar_picker.calendar_picker_ddmmyyyy(
+            today, self.page.locator("#UI_CALL_DATE")
+        )
+        logging.info(
+            f"[CONTACT RECORD] Selected calendar date: {today.strftime('%d/%m/%Y')}"
+        )
 
-        # Step 4: Enter time details
+        # Step 3: Enter time details
         self.page.locator("#UI_START_TIME").fill("08:00")
         self.page.locator("#UI_END_TIME").fill("08:10")
         self.page.locator("#UI_DURATION").fill("10")
         logging.info("[CONTACT RECORD] Entered time details: 08:00–08:10")
 
-        # Step 5: Enter note
+        # Step 4: Enter note
         self.page.get_by_text("(up to 500 char)").fill("Automation test record")
         logging.info("[CONTACT RECORD] Entered note: Automation test record")
 
-        # Step 6: Select 'Patient Contacted' as 'No'
+        # Step 5: Select 'Patient Contacted' as 'No'
         self.page.get_by_label("Patient Contacted").select_option("N")
         logging.info("[CONTACT RECORD] Selected 'Patient Contacted': No")
 
-        # Step 7: Select outcome
+        # Step 6: Select outcome
         self.page.get_by_label("Outcome").select_option("20202")
         logging.info("[CONTACT RECORD] Selected outcome: Close Episode - No Contact")
 
-        # Step 8: Click save
+        # Step 7: Click save
         self.page.locator("input[name='UI_BUTTON_SAVE']").click()
         logging.info("[CONTACT RECORD] Contact recording flow completed successfully")
 

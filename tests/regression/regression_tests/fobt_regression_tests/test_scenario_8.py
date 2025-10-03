@@ -73,7 +73,6 @@ from pages.screening_subject_search.diagnostic_test_outcome_page import (
 )
 
 
-@pytest.mark.wip
 @pytest.mark.usefixtures("setup_org_and_appointments")
 @pytest.mark.vpn_required
 @pytest.mark.regression
@@ -133,7 +132,6 @@ def test_scenario_8(page: Page) -> None:
     > Check recall [SSCL14a(A351)]
     """
 
-    summary_page = SubjectScreeningSummaryPage(page)
     attendance = AppointmentAttendance(page)
     dataset = ColonoscopyDatasetsPage(page)
     ssp_options = FitForColonoscopySspOptions
@@ -150,8 +148,6 @@ def test_scenario_8(page: Page) -> None:
         raise ValueError("User cannot be assigned to a UserRoleType")
 
     # And there is a subject who meets the following criteria:
-    user_details = UserTools.retrieve_user("Hub Manager at BCS01")
-
     criteria = {
         "latest event status": "S9 Pre-Invitation Sent",
         "latest episode kit class": "FIT",
@@ -320,7 +316,7 @@ def test_scenario_8(page: Page) -> None:
     UserTools.user_login(page, "Hub Manager at BCS01")
 
     # And I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
-    # NOTE LEAVE COMMENTED - is this needed? Subject is already at A172 DNA Diagnostic Test (line 279)
+    # NOTE LEAVE COMMENTED - Subject is already at A172 DNA Diagnostic Test (line 313)
     # Then my subject has been updated as follows:
     # batch_processing(
     #     page,
@@ -845,7 +841,7 @@ def test_scenario_8(page: Page) -> None:
     }
 
     # 	And I mark the Investigation Dataset as completed
-    # 	And I press the save Investigation Dataset butto
+    # 	And I press the save Investigation Dataset button
     # When I press the save Investigation Dataset button
     # 	And I press OK on my confirmation prompt
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
@@ -946,7 +942,7 @@ def test_scenario_8(page: Page) -> None:
 
     # Then my subject has been updated as follows:
     criteria = {
-        "latest event status": "A397 Discharged  from Screening Round - No Patient Contact",
+        "latest event status": "A397 Discharged from Screening Round - No Patient Contact",
     }
     subject_assertion(nhs_no, criteria)
 
