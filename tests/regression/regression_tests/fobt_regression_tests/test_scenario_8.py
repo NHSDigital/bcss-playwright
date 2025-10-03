@@ -18,7 +18,7 @@ from pages.datasets.investigation_dataset_page import (
     ProcedureOutcomeOptions,
     ScanPositionOptions,
     SegmentalInadequacyOptions,
-    IVConstantAdministeredOptions,
+    IVContrastAdministeredOptions,
     FailureReasonsOptions,
     InvestigationDatasetsPage,
 )
@@ -536,7 +536,7 @@ def test_scenario_8(page: Page) -> None:
     contrast_tagging_and_drug = {
         "iv buscopan administered": CancerRadiologyYesNoOptions.NO,
         "contraindicated": YesNoOptions.NO,
-        "iv contrast administered": IVConstantAdministeredOptions.NO,
+        "iv contrast administered": IVContrastAdministeredOptions.NO,
         "tagging agent given": TaggingAgentDrugAdministeredOptions.YES,
         "additional bowel preparation administered": AdditionalBowelPrepAdministeredOptions.YES,
         "drug_type1": DrugTypeOptions.PICOLAX,

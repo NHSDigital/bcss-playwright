@@ -647,7 +647,6 @@ class InvestigationDatasetCompletion:
                     )
                 case "procedure outcome":
                     DatasetFieldUtil(self.page).populate_select_locator_for_field(
-                        "Outcome at time of procedure", value
                         self.outcome_at_time_of_procedure_string, value
                     )
                 case "late outcome":
