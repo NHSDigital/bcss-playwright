@@ -1,6 +1,7 @@
 import pytest
 import logging
 from playwright.sync_api import Page
+from classes.user.user_role_type import UserRoleType
 from pages.datasets.cancer_audit_datasets_page import (
     CancerRadiologyYesNoOptions,
 )
@@ -169,34 +170,11 @@ def test_scenario_8(page: Page) -> None:
 
     # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
     # When I process the open "S9" letter batch for my subject
-    # Then my subject has been updated as follows:
-    batch_processing(
-        page,
-        "S9",
-        "Invitation & Test Kit (FIT)",
-        "S10 - Invitation & Test Kit Sent",
-        True,
-    )
-
     # When I log my subject's latest unlogged FIT kit
-    fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
-    sample_date = datetime.now()
-    FitKitLogged().log_fit_kits(page, fit_kit, sample_date)
-
-    # Then my subject has been updated as follows:
-    criteria = {
-        "latest event status": "S43 Kit Returned and Logged (Initial Test)",
-    }
-    subject_assertion(nhs_no, criteria)
-
     # When I read my subject's latest logged FIT kit as "ABNORMAL"
-    FitKitLogged().read_latest_logged_kit(user_role, 2, fit_kit, "ABNORMAL")
-
     # Then my subject has been updated as follows:
-    criteria = {
-        "latest event status": "A8 Abnormal",
-    }
-    subject_assertion(nhs_no, criteria)
+    process_initial_invitation_and_fit_kit(page, nhs_no, user_role)
+
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
@@ -206,40 +184,10 @@ def test_scenario_8(page: Page) -> None:
     # And I select "BCS001" as the screening centre where the practitioner appointment will be held
     # And I set the practitioner appointment date to "today"
     # And I book the "earliest" available practitioner appointment on this date
-    book_appointments(
-        page,
-        "BCS001 - Wolverhampton Bowel Cancer Screening Centre",
-        "The Royal Hospital (Wolverhampton)",
-    )
-
-    # Then my subject has been updated as follows:
-    criteria = {
-        "latest event status": "A183 1st Colonoscopy Assessment Appointment Requested",
-    }
-    subject_assertion(nhs_no, criteria)
-
-    # And there is a "A183" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment"
-    # When I process the open "A183 - Practitioner Clinic 1st Appointment" letter batch for my subject
-    # Then my subject has been updated as follows:
-    batch_processing(
-        page,
-        "A183",
-        "Practitioner Clinic 1st Appointment",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
-    )
-
-    # And there is a "A183" letter batch for my subject with the exact title "GP Result (Abnormal)"
-    batch_processing(
-        page,
-        "A183",
-        "GP Result (Abnormal)",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
-    )
+    book_practitioner_clinic_and_process_letters(page, nhs_no)
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
-    LogoutPage(page).log_out(close_page=False)
-    BasePage(page).go_to_log_in_page()
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
+    switch_to_screening_centre_manager(page)
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -315,20 +263,20 @@ def test_scenario_8(page: Page) -> None:
     BasePage(page).go_to_log_in_page()
     UserTools.user_login(page, "Hub Manager at BCS01")
 
-    # And I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
-    # NOTE LEAVE COMMENTED - Subject is already at A172 DNA Diagnostic Test (line 313)
-    # Then my subject has been updated as follows:
-    # batch_processing(
-    #     page,
-    #     "A183",
-    #     "GP Result (Abnormal)",
-    #     "A172 - DNA Diagnostic Test",
-    # )
-    # criteria = {
-    #     "latest episode includes event status": "A167 GP Abnormal FOBT Result Sent",
-    #     "latest episode accumulated result": "No Result",
-    # }
-    # subject_assertion(nhs_no, criteria)
+    # # And I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
+    # # NOTE LEAVE COMMENTED - Subject is already at A172 DNA Diagnostic Test (line 313)
+    # # Then my subject has been updated as follows:
+    # # batch_processing(
+    # #     page,
+    # #     "A183",
+    # #     "GP Result (Abnormal)",
+    # #     "A172 - DNA Diagnostic Test",
+    # # )
+    # # criteria = {
+    # #     "latest episode includes event status": "A167 GP Abnormal FOBT Result Sent",
+    # #     "latest episode accumulated result": "No Result",
+    # # }
+    # # subject_assertion(nhs_no, criteria)
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
     LogoutPage(page).log_out(close_page=False)
@@ -424,7 +372,7 @@ def test_scenario_8(page: Page) -> None:
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
     # And I reopen the subject's episode for "Reopen to Reschedule Diagnostic Test"
-    # SubjectScreeningSummaryPage(page).click_reopen_fobt_screening_episode_button()
+    SubjectScreeningSummaryPage(page).click_reopen_fobt_screening_episode_button()
     ReopenFOBTScreeningEpisodePage(
         page
     ).click_reopen_to_reschedule_diagnostic_test_button()
@@ -1004,3 +952,87 @@ def test_scenario_8(page: Page) -> None:
         "surveillance due date reason": "Unchanged",
     }
     subject_assertion(nhs_no, criteria, user_role)
+
+
+# Helper functions
+def process_initial_invitation_and_fit_kit(
+    page: Page, nhs_no: str, user_role: UserRoleType
+) -> None:
+    """
+    Processes the initial invitation and FIT kit flow:
+    - Processes S9 batch
+    - Logs FIT kit
+    - Reads kit as ABNORMAL
+    - Asserts subject status updates
+    """
+    batch_processing(
+        page,
+        "S9",
+        "Invitation & Test Kit (FIT)",
+        "S10 - Invitation & Test Kit Sent",
+        True,
+    )
+
+    fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
+    sample_date = datetime.now()
+    FitKitLogged().log_fit_kits(page, fit_kit, sample_date)
+
+    subject_assertion(
+        nhs_no, {"latest event status": "S43 Kit Returned and Logged (Initial Test)"}
+    )
+
+    FitKitLogged().read_latest_logged_kit(user_role, 2, fit_kit, "ABNORMAL")
+    subject_assertion(nhs_no, {"latest event status": "A8 Abnormal"})
+
+    criteria = {
+        "latest event status": "A8 Abnormal",
+    }
+    subject_assertion(nhs_no, criteria)
+
+
+def book_practitioner_clinic_and_process_letters(page: Page, nhs_no: str) -> None:
+    """
+    Books practitioner clinic and processes A183 letters:
+    - Navigates to subject
+    - Books appointment
+    - Processes both A183 letter batches
+    - Asserts subject status
+    """
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    SubjectScreeningSummaryPage(page).click_book_practitioner_clinic_button()
+
+    book_appointments(
+        page,
+        "BCS001 - Wolverhampton Bowel Cancer Screening Centre",
+        "The Royal Hospital (Wolverhampton)",
+    )
+
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A183 1st Colonoscopy Assessment Appointment Requested"
+        },
+    )
+
+    batch_processing(
+        page,
+        "A183",
+        "Practitioner Clinic 1st Appointment",
+        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+    batch_processing(
+        page,
+        "A183",
+        "GP Result (Abnormal)",
+        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+
+def switch_to_screening_centre_manager(page: Page) -> None:
+    """
+    Logs out and switches to Screening Centre Manager at BCS001
+    """
+    LogoutPage(page).log_out(close_page=False)
+    BasePage(page).go_to_log_in_page()
+    UserTools.user_login(page, "Screening Centre Manager at BCS001")
