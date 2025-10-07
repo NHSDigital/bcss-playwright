@@ -133,7 +133,7 @@ def book_appointments(page: Page, screening_centre: str, site: str) -> None:
 
 
 def book_post_investigation_appointment(
-    page: Page, site: str, screening_practitioner_index: int
+    page: Page, site: str, screening_practitioner_index: int, appointment_start_time: str = "08:00"
 ) -> None:
     """
     Book a post-investigation appointment for a subject.
@@ -154,7 +154,7 @@ def book_post_investigation_appointment(
         screening_practitioner_index
     )
     book_appointments_page.enter_appointment_date(datetime.today())
-    book_appointments_page.enter_appointment_start_time("08:00")
+    book_appointments_page.enter_appointment_start_time(appointment_start_time)
     book_appointments_page.click_save_button()
 
 

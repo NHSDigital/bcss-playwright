@@ -55,7 +55,6 @@ from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
 from pages.logout.log_out_page import LogoutPage
-from pages.base_page import BasePage
 from pages.screening_subject_search.advance_fobt_screening_episode_page import (
     AdvanceFOBTScreeningEpisodePage,
 )
@@ -172,11 +171,11 @@ def test_scenario_8(page: Page) -> None:
     # When I process the open "S9" letter batch for my subject
     # Then my subject has been updated as follows:
     batch_processing(
-        page,
-        "S9",
-        "Invitation & Test Kit (FIT)",
-        "S10 - Invitation & Test Kit Sent",
-        True,
+        page=page,
+        batch_type="S9",
+        batch_description="Invitation & Test Kit (FIT)",
+        latest_event_status="S10 - Invitation & Test Kit Sent",
+        run_timed_events=True,
     )
 
     # When I log my subject's latest unlogged FIT kit
@@ -223,22 +222,22 @@ def test_scenario_8(page: Page) -> None:
     # When I process the open "A183 - Practitioner Clinic 1st Appointment" letter batch for my subject
     # Then my subject has been updated as follows:
     batch_processing(
-        page,
-        "A183",
-        "Practitioner Clinic 1st Appointment",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+        page=page,
+        batch_type="A183",
+        batch_description="Practitioner Clinic 1st Appointment",
+        latest_event_status="A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
     )
 
     # And there is a "A183" letter batch for my subject with the exact title "GP Result (Abnormal)"
     batch_processing(
-        page,
-        "A183",
-        "GP Result (Abnormal)",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+        page=page,
+        batch_type="A183",
+        batch_description="GP Result (Abnormal)",
+        latest_event_status="A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
     )
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
-    switch_user(page, "Screening Centre Manager")
+    UserTools.switch_user(page, "Screening Centre Manager")
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -310,7 +309,7 @@ def test_scenario_8(page: Page) -> None:
     subject_assertion(nhs_no, criteria)
 
     # When I switch users to BCSS "England" as user role "Hub Manager"
-    switch_user(page, "Hub Manager", "BCS01")
+    UserTools.switch_user(page, "Hub Manager", "BCS01")
 
     # And I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
     # NOTE LEAVE COMMENTED - Subject is already at A172 DNA Diagnostic Test (line 313)
@@ -328,7 +327,9 @@ def test_scenario_8(page: Page) -> None:
     # subject_assertion(nhs_no, criteria)
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager" (and remember session)
-    user_role = switch_user(page, "Screening Centre Manager", remember_user=True)
+    user_role = UserTools.switch_user(
+        page, "Screening Centre Manager", remember_user=True
+    )
 
     # And I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -371,19 +372,19 @@ def test_scenario_8(page: Page) -> None:
     # When I process the open "A397" letter batch for my subject
     # Then my subject has been updated as follows:
     batch_processing(
-        page,
-        "A397",
-        "Discharge from screening round - no contact (letter to patient)",
-        "A391 - Patient Discharge Letter Printed - No Patient Contact",
+        page=page,
+        batch_type="A397",
+        batch_description="Discharge from screening round - no contact (letter to patient)",
+        latest_event_status="A391 - Patient Discharge Letter Printed - No Patient Contact",
     )
 
     # And there is a "A391" letter batch for my subject with the exact title "Discharge from screening round - no contact (letter to GP)"
     # When I process the open "A391 - Discharge from screening round - no contact (letter to GP)" letter batch for my subject
     batch_processing(
-        page,
-        "A391",
-        "Discharge from screening round - no contact (letter to GP)",
-        "A351 - GP Discharge Letter Printed - No Patient Contact",
+        page=page,
+        batch_type="A391",
+        batch_description="Discharge from screening round - no contact (letter to GP)",
+        latest_event_status="A351 - GP Discharge Letter Printed - No Patient Contact",
     )
 
     # Then my subject has been updated as follows:
@@ -419,7 +420,7 @@ def test_scenario_8(page: Page) -> None:
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
     # And I reopen the subject's episode for "Reopen to Reschedule Diagnostic Test"
-    # SubjectScreeningSummaryPage(page).click_reopen_fobt_screening_episode_button()
+    SubjectScreeningSummaryPage(page).click_reopen_fobt_screening_episode_button()
     ReopenFOBTScreeningEpisodePage(
         page
     ).click_reopen_to_reschedule_diagnostic_test_button()
@@ -632,7 +633,9 @@ def test_scenario_8(page: Page) -> None:
 
     # And I set the practitioner appointment date to "today"
     # And I book the earliest available post investigation appointment on this date
-    book_post_investigation_appointment(page, "The Royal Hospital (Wolverhampton)", 1)
+    book_post_investigation_appointment(
+        page, "The Royal Hospital (Wolverhampton)", 1, "12:00"
+    )
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -645,10 +648,10 @@ def test_scenario_8(page: Page) -> None:
     # Then my subject has been updated as follows:
     # 	| Latest event status | A415 Post-investigation Appointment Invitation Letter Printed |
     batch_processing(
-        page,
-        "A410",
-        "Post-Investigation Appointment Invitation Letter",
-        "A415 - Post-investigation Appointment Invitation Letter Printed",
+        page=page,
+        batch_type="A410",
+        batch_description="Post-Investigation Appointment Invitation Letter",
+        latest_event_status="A415 - Post-investigation Appointment Invitation Letter Printed",
     )
 
     # When I view the subject
@@ -681,10 +684,10 @@ def test_scenario_8(page: Page) -> None:
     # Then my subject has been updated as follows:
     # 	| Latest event status | A395 Refer Another Diagnostic Test |
     batch_processing(
-        page,
-        "A430",
-        "Result Letters Following Post-investigation Appointment",
-        "A395 - Refer Another Diagnostic Test",
+        page=page,
+        batch_type="A430",
+        batch_description="Result Letters Following Post-investigation Appointment",
+        latest_event_status="A395 - Refer Another Diagnostic Test",
     )
 
     # When I view the subject
@@ -919,10 +922,10 @@ def test_scenario_8(page: Page) -> None:
     # # When I process the open "A318" letter batch for my subject
     # # Then my subject has been updated as follows:
     batch_processing(
-        page,
-        "A318",
-        "Result Letters - No Post-investigation Appointment",
-        "A380 - Failed Diagnostic Test - Refer Another",
+        page=page,
+        batch_type="A318",
+        batch_description="Result Letters - No Post-investigation Appointment",
+        latest_event_status="A380 - Failed Diagnostic Test - Refer Another",
     )
 
     # When I view the subject
@@ -945,10 +948,10 @@ def test_scenario_8(page: Page) -> None:
     # # When I process the open "A397" letter batch for my subject
     # # Then my subject has been updated as follows:
     batch_processing(
-        page,
-        "A397",
-        "Discharge from screening round - no contact (letter to patient)",
-        "A391 - Patient Discharge Letter Printed - No Patient Contact",
+        page=page,
+        batch_type="A397",
+        batch_description="Discharge from screening round - no contact (letter to patient)",
+        latest_event_status="A391 - Patient Discharge Letter Printed - No Patient Contact",
     )
 
     # # When I receive an SSPI update to change their date of birth to "73" years old
@@ -963,10 +966,10 @@ def test_scenario_8(page: Page) -> None:
     # And there is a "A391" letter batch for my subject with the exact title "Discharge from screening round - no contact (letter to GP)"
     # When I process the open "A391 - Discharge from screening round - no contact (letter to GP)" letter batch for my subject
     batch_processing(
-        page,
-        "A391",
-        "Discharge from screening round - no contact (letter to GP)",
-        "A351 - GP Discharge Letter Printed - No Patient Contact",
+        page=page,
+        batch_type="A391",
+        batch_description="Discharge from screening round - no contact (letter to GP)",
+        latest_event_status="A351 - GP Discharge Letter Printed - No Patient Contact",
     )
 
     # Then my subject has been updated as follows:
@@ -1000,20 +1003,4 @@ def test_scenario_8(page: Page) -> None:
     }
     subject_assertion(nhs_no, criteria, user_role)
 
-
-# Helper Methods
-def switch_user(
-    page, role: str, bcss_code: str = "BCS001", remember_user: bool = False
-):
-    """
-    Logs out the current user, navigates to the login page, and logs in as the specified role.
-
-    Args:
-        page: Playwright page object.
-        role (str): The user role to log in as (e.g., "Screening Centre Manager").
-        bcss_code (str): The BCSS code to use in the login string (default is "BCS001").
-        remember_user (bool): Whether to remember the user session (default is False).
-    """
-    LogoutPage(page).log_out(close_page=False)
-    BasePage(page).go_to_log_in_page()
-    return UserTools.user_login(page, f"{role} at {bcss_code}", remember_user)
+    LogoutPage(page).log_out()
