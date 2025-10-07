@@ -180,23 +180,28 @@ def test_scenario_8(page: Page) -> None:
 
     # When I log my subject's latest unlogged FIT kit
     fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
-    sample_date = datetime.now()
-    FitKitLogged().log_fit_kits(page, fit_kit, sample_date)
+    FitKitLogged().log_fit_kits(page, fit_kit, datetime.now())
 
     # Then my subject has been updated as follows:
-    criteria = {
-        "latest event status": "S43 Kit Returned and Logged (Initial Test)",
-    }
-    subject_assertion(nhs_no, criteria)
+
+    subject_assertion(
+        nhs_no,
+        criteria={
+            "latest event status": "S43 Kit Returned and Logged (Initial Test)",
+        },
+    )
 
     # When I read my subject's latest logged FIT kit as "ABNORMAL"
     FitKitLogged().read_latest_logged_kit(user_role, 2, fit_kit, "ABNORMAL")
 
     # Then my subject has been updated as follows:
-    criteria = {
-        "latest event status": "A8 Abnormal",
-    }
-    subject_assertion(nhs_no, criteria)
+
+    subject_assertion(
+        nhs_no,
+        criteria={
+            "latest event status": "A8 Abnormal",
+        },
+    )
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
@@ -248,10 +253,12 @@ def test_scenario_8(page: Page) -> None:
     attendance.mark_as_attended_yesterday()
 
     # Then my subject has been updated as follows:
-    criteria = {
-        "latest event status": "J10 Attended Colonoscopy Assessment Appointment",
-    }
-    subject_assertion(nhs_no, criteria)
+    subject_assertion(
+        nhs_no,
+        criteria={
+            "latest event status": "J10 Attended Colonoscopy Assessment Appointment",
+        },
+    )
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -303,10 +310,12 @@ def test_scenario_8(page: Page) -> None:
     attendance.mark_diagnostic_test_as_dna()
 
     # Then my subject has been updated as follows:
-    criteria = {
-        "latest event status": "A172 DNA Diagnostic Test",
-    }
-    subject_assertion(nhs_no, criteria)
+    subject_assertion(
+        nhs_no,
+        criteria={
+            "latest event status": "A172 DNA Diagnostic Test",
+        },
+    )
 
     # When I switch users to BCSS "England" as user role "Hub Manager"
     UserTools.switch_user(page, "Hub Manager", "BCS01")
@@ -363,10 +372,12 @@ def test_scenario_8(page: Page) -> None:
     advance_fobt_episode.record_contact_close_episode_no_contact()
 
     # Then my subject has been updated as follows:
-    criteria = {
-        "latest event status": "A397 Discharged  from Screening Round - No Patient Contact",
-    }
-    subject_assertion(nhs_no, criteria)
+    subject_assertion(
+        nhs_no,
+        criteria={
+            "latest event status": "A397 Discharged  from Screening Round - No Patient Contact",
+        },
+    )
 
     # And there is a "A397" letter batch for my subject with the exact title "Discharge from screening round - no contact (letter to patient)"
     # When I process the open "A397" letter batch for my subject
@@ -463,10 +474,13 @@ def test_scenario_8(page: Page) -> None:
     ContactWithPatientPage(page).record_contact("Suitable for Radiological Test")
 
     # Then my subject has been updated as follows:
-    criteria = {
-        "latest event status": "A100 Suitable for Radiological Test",
-    }
-    subject_assertion(nhs_no, criteria)
+
+    subject_assertion(
+        nhs_no,
+        criteria={
+            "latest event status": "A100 Suitable for Radiological Test",
+        },
+    )
 
     # When I view the advance episode options
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -502,10 +516,12 @@ def test_scenario_8(page: Page) -> None:
     AttendDiagnosticTestPage(page).click_save_button()
 
     # Then my subject has been updated as follows:
-    criteria = {
-        "latest event status": "A259 Attended Diagnostic Test",
-    }
-    subject_assertion(nhs_no, criteria)
+    subject_assertion(
+        nhs_no,
+        criteria={
+            "latest event status": "A259 Attended Diagnostic Test",
+        },
+    )
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -775,10 +791,12 @@ def test_scenario_8(page: Page) -> None:
     AdvanceFOBTScreeningEpisodePage(page).click_invite_for_diagnostic_test_button()
 
     # Then my subject has been updated as follows:
-    criteria = {
-        "latest event status": "A59 Invited for Diagnostic Test",
-    }
-    subject_assertion(nhs_no, criteria)
+    subject_assertion(
+        nhs_no,
+        criteria={
+            "latest event status": "A59 Invited for Diagnostic Test",
+        },
+    )
 
     # When I select the advance episode option for "Attend Diagnostic Test"
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -791,10 +809,12 @@ def test_scenario_8(page: Page) -> None:
     AttendDiagnosticTestPage(page).click_save_button()
 
     # Then my subject has been updated as follows:
-    criteria = {
-        "latest event status": "A259 Attended Diagnostic Test",
-    }
-    subject_assertion(nhs_no, criteria)
+    subject_assertion(
+        nhs_no,
+        criteria={
+            "latest event status": "A259 Attended Diagnostic Test",
+        },
+    )
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
