@@ -83,6 +83,29 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         self.redirect_to_reestablish_suitability_for_diagnostic_test_repatient_contact = self.page.get_by_role(
             "button", name="Redirect to re-establish"
         )
+        # Contact recording locators
+        self.contact_direction_dropdown = self.page.get_by_label("Contact Direction")
+        self.contact_type_dropdown = self.page.get_by_label(
+            "Contact made between patient"
+        )
+        self.call_date_input = self.page.locator("#UI_CALL_DATE")
+        self.start_time_input = self.page.locator("#UI_START_TIME")
+        self.end_time_input = self.page.locator("#UI_END_TIME")
+        self.duration_input = self.page.locator("#UI_DURATION")
+        self.note_input = self.page.get_by_text("(up to 500 char)")
+        self.patient_contacted_dropdown = self.page.get_by_label("Patient Contacted")
+        self.outcome_dropdown = self.page.get_by_label("Outcome")
+        self.save_button = self.page.locator("input[name='UI_BUTTON_SAVE']")
+        # CT Colonography invitation locators
+        self.ct_colonography_appointment_date_input = self.page.locator(
+            "#UI_APPT_DATE_38"
+        )
+        self.ct_colonography_test_type_dropdown = self.page.locator(
+            "#UI_EXT_TEST_TYPE_38"
+        )
+        self.invite_for_diagnostic_test_button = self.page.get_by_role(
+            "button", name="Invite for Diagnostic Test >>"
+        )
 
     def click_suitable_for_endoscopic_test_button(self) -> None:
         """Click the 'Suitable for Endoscopic Test' button."""
@@ -207,19 +230,15 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
 
         # Step 1: Enter today's date
         today = date.today().strftime("%d/%m/%Y")
-        self.page.locator("#UI_APPT_DATE_38").fill(today)
+        self.ct_colonography_appointment_date_input.fill(today)
         logging.info(f"[ADVANCE EPISODE] Entered appointment date: {today}")
 
         # Step 2: Select 'CT Colonography' from dropdown
-        self.page.locator("#UI_EXT_TEST_TYPE_38").select_option(label="CT Colonography")
+        self.ct_colonography_test_type_dropdown.select_option(label="CT Colonography")
         logging.info("[ADVANCE EPISODE] Selected test type: CT Colonography")
 
         # Step 3: Click 'Invite for Diagnostic Test'
-        invite_button = self.page.get_by_role(
-            "button", name="Invite for Diagnostic Test >>"
-        )
-        self.safe_accept_dialog(invite_button)
-
+        self.safe_accept_dialog(self.invite_for_diagnostic_test_button)
         logging.info("[ADVANCE EPISODE] Invite for diagnostic test completed")
 
     def record_contact_close_episode_no_contact(self) -> None:
@@ -241,40 +260,38 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         )
 
         # Step 1: Select direction and contact type
-        self.page.get_by_label("Contact Direction").select_option("20159")
-        self.page.get_by_label("Contact made between patient").select_option("1171")
+        self.contact_direction_dropdown.select_option("20159")
+        self.contact_type_dropdown.select_option("1171")
         logging.info("[CONTACT RECORD] Selected direction and contact type")
 
         # Step 2: Pick calendar date using V1 calendar picker
         calendar_picker = CalendarPicker(self.page)
         today = datetime.today()
-        calendar_picker.calendar_picker_ddmmyyyy(
-            today, self.page.locator("#UI_CALL_DATE")
-        )
+        calendar_picker.calendar_picker_ddmmyyyy(today, self.call_date_input)
         logging.info(
             f"[CONTACT RECORD] Selected calendar date: {today.strftime('%d/%m/%Y')}"
         )
 
         # Step 3: Enter time details
-        self.page.locator("#UI_START_TIME").fill("08:00")
-        self.page.locator("#UI_END_TIME").fill("08:10")
-        self.page.locator("#UI_DURATION").fill("10")
+        self.start_time_input.fill("08:00")
+        self.end_time_input.fill("08:10")
+        self.duration_input.fill("10")
         logging.info("[CONTACT RECORD] Entered time details: 08:00–08:10")
 
         # Step 4: Enter note
-        self.page.get_by_text("(up to 500 char)").fill("Automation test record")
+        self.note_input.fill("Automation test record")
         logging.info("[CONTACT RECORD] Entered note: Automation test record")
 
         # Step 5: Select 'Patient Contacted' as 'No'
-        self.page.get_by_label("Patient Contacted").select_option("N")
+        self.patient_contacted_dropdown.select_option("N")
         logging.info("[CONTACT RECORD] Selected 'Patient Contacted': No")
 
         # Step 6: Select outcome
-        self.page.get_by_label("Outcome").select_option("20202")
+        self.outcome_dropdown.select_option("20202")
         logging.info("[CONTACT RECORD] Selected outcome: Close Episode - No Contact")
 
         # Step 7: Click save
-        self.page.locator("input[name='UI_BUTTON_SAVE']").click()
+        self.click(self.save_button)
         logging.info("[CONTACT RECORD] Contact recording flow completed successfully")
 
     def click_not_suitable_for_diagnostic_tests_button(self) -> None:

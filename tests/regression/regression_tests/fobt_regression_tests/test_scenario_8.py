@@ -1,11 +1,9 @@
 import pytest
 import logging
 from playwright.sync_api import Page
-from pages.datasets.cancer_audit_datasets_page import (
-    CancerRadiologyYesNoOptions,
-)
 from pages.datasets.investigation_dataset_page import (
     AdditionalBowelPrepAdministeredOptions,
+    IVBuscopanAdministeredOptions,
     TaggingAgentDrugAdministeredOptions,
     YesNoOptions,
 )
@@ -72,7 +70,6 @@ from pages.screening_subject_search.diagnostic_test_outcome_page import (
 )
 
 
-@pytest.mark.wip
 @pytest.mark.usefixtures("setup_org_and_appointments")
 @pytest.mark.vpn_required
 @pytest.mark.regression
@@ -542,7 +539,7 @@ def test_scenario_8(page: Page) -> None:
     # And I set the following fields and values within the Contrast, Tagging & Drug Information:
     # And I add the following Additional Bowel Preparation drugs and values within the Investigation Dataset for this subject:
     contrast_tagging_and_drug = {
-        "iv buscopan administered": CancerRadiologyYesNoOptions.NO,
+        "iv buscopan administered": IVBuscopanAdministeredOptions.NO,
         "contraindicated": YesNoOptions.NO,
         "iv contrast administered": IVContrastAdministeredOptions.NO,
         "tagging agent given": TaggingAgentDrugAdministeredOptions.YES,
