@@ -1,7 +1,6 @@
 import pytest
 import logging
 from playwright.sync_api import Page
-from classes.user.user_role_type import UserRoleType
 from pages.datasets.cancer_audit_datasets_page import (
     CancerRadiologyYesNoOptions,
 )
@@ -149,412 +148,481 @@ def test_scenario_8(page: Page) -> None:
     if user_role is None:
         raise ValueError("User cannot be assigned to a UserRoleType")
 
-    # # And there is a subject who meets the following criteria:
-    # criteria = {
-    #     "latest event status": "S9 Pre-Invitation Sent",
-    #     "latest episode kit class": "FIT",
-    #     "latest episode started": "Within the last 6 months",
-    #     "latest episode type": "FOBT",
-    #     "subject age": "Between 60 and 72",
-    #     "subject has unprocessed sspi updates": "No",
-    #     "subject has user dob updates": "No",
-    # }
+    # And there is a subject who meets the following criteria:
+    criteria = {
+        "latest event status": "S9 Pre-Invitation Sent",
+        "latest episode kit class": "FIT",
+        "latest episode started": "Within the last 6 months",
+        "latest episode type": "FOBT",
+        "subject age": "Between 60 and 72",
+        "subject has unprocessed sspi updates": "No",
+        "subject has user dob updates": "No",
+    }
 
-    # nhs_no = SubjectSelector.get_subject_for_pre_invitation(criteria)
-    # subject_assertion(nhs_no, criteria)
+    nhs_no = SubjectSelector.get_subject_for_pre_invitation(criteria)
+    subject_assertion(nhs_no, criteria)
 
-    # # Then Comment: NHS number
-    # logging.info(f"[SUBJECT FOUND] NHS number: {nhs_no}")
+    # Then Comment: NHS number
+    logging.info(f"[SUBJECT FOUND] NHS number: {nhs_no}")
 
-    # # When I run Timed Events for my subject
-    # OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
+    # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
 
-    # # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
-    # # When I process the open "S9" letter batch for my subject
-    # # When I log my subject's latest unlogged FIT kit
-    # # When I read my subject's latest logged FIT kit as "ABNORMAL"
-    # # Then my subject has been updated as follows:
-    # process_initial_invitation_and_fit_kit(page, nhs_no, user_role)
+    # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
+    # When I process the open "S9" letter batch for my subject
+    # Then my subject has been updated as follows:
+    batch_processing(
+        page,
+        "S9",
+        "Invitation & Test Kit (FIT)",
+        "S10 - Invitation & Test Kit Sent",
+        True,
+    )
 
-    # # When I view the subject
-    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # When I log my subject's latest unlogged FIT kit
+    fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
+    sample_date = datetime.now()
+    FitKitLogged().log_fit_kits(page, fit_kit, sample_date)
 
-    # # And I choose to book a practitioner clinic for my subject
-    # SubjectScreeningSummaryPage(page).click_book_practitioner_clinic_button()
+    # Then my subject has been updated as follows:
+    criteria = {
+        "latest event status": "S43 Kit Returned and Logged (Initial Test)",
+    }
+    subject_assertion(nhs_no, criteria)
 
-    # # And I select "BCS001" as the screening centre where the practitioner appointment will be held
-    # # And I set the practitioner appointment date to "today"
-    # # And I book the "earliest" available practitioner appointment on this date
-    # book_practitioner_clinic_and_process_letters(page, nhs_no)
+    # When I read my subject's latest logged FIT kit as "ABNORMAL"
+    FitKitLogged().read_latest_logged_kit(user_role, 2, fit_kit, "ABNORMAL")
 
-    # # When I switch users to BCSS "England" as user role "Screening Centre Manager"
-    # switch_to_screening_centre_manager(page)
+    # Then my subject has been updated as follows:
+    criteria = {
+        "latest event status": "A8 Abnormal",
+    }
+    subject_assertion(nhs_no, criteria)
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # # When I view the subject
-    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # And I choose to book a practitioner clinic for my subject
+    SubjectScreeningSummaryPage(page).click_book_practitioner_clinic_button()
 
-    # # And I view the event history for the subject's latest episode
-    # # And I view the latest practitioner appointment in the subject's episode
-    # # And I attend the subject's practitioner appointment "yesterday"
-    # attendance.mark_as_attended_yesterday()
+    # And I select "BCS001" as the screening centre where the practitioner appointment will be held
+    # And I set the practitioner appointment date to "today"
+    # And I book the "earliest" available practitioner appointment on this date
+    book_appointments(
+        page,
+        "BCS001 - Wolverhampton Bowel Cancer Screening Centre",
+        "The Royal Hospital (Wolverhampton)",
+    )
 
-    # # Then my subject has been updated as follows:
-    # criteria = {
-    #     "latest event status": "J10 Attended Colonoscopy Assessment Appointment",
-    # }
-    # subject_assertion(nhs_no, criteria)
+    # Then my subject has been updated as follows:
+    criteria = {
+        "latest event status": "A183 1st Colonoscopy Assessment Appointment Requested",
+    }
+    subject_assertion(nhs_no, criteria)
 
-    # # When I view the subject
-    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # And there is a "A183" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment"
+    # When I process the open "A183 - Practitioner Clinic 1st Appointment" letter batch for my subject
+    # Then my subject has been updated as follows:
+    batch_processing(
+        page,
+        "A183",
+        "Practitioner Clinic 1st Appointment",
+        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
 
-    # # And I edit the Colonoscopy Assessment Dataset for this subject
-    # # And I update the Colonoscopy Assessment Dataset with the following values:
-    # # 	| Fit for Colonoscopy (SSP) | No  |
-    # # 	| Dataset complete?         | Yes |
-    # # And I save the Colonoscopy Assessment Dataset
-    # SubjectScreeningSummaryPage(page).click_datasets_link()
-    # SubjectDatasetsPage(page).click_colonoscopy_show_datasets()
-    # dataset.select_fit_for_colonoscopy_option(ssp_options.NO)
-    # dataset.click_dataset_complete_radio_button_yes()
-    # dataset.save_dataset()
+    # And there is a "A183" letter batch for my subject with the exact title "GP Result (Abnormal)"
+    batch_processing(
+        page,
+        "A183",
+        "GP Result (Abnormal)",
+        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
 
-    # # And I view the subject
-    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-
-    # # And I advance the subject's episode for "Suitable for Radiological Test"
-    # SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-    # advance_fobt_episode.click_suitable_for_radiological_test_button()
-
-    # # Then my subject has been updated as follows:
-    # criteria = {
-    #     "latest event status": "A100 Suitable for Radiological Test",
-    # }
-    # subject_assertion(nhs_no, criteria)
-
-    # # And I view the subject
-    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-
-    # # When I view the advance episode options
-    # SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-
-    # # And I select Diagnostic Test Type "CT Colonography"
-    # # And I enter a Diagnostic Test First Offered Appointment Date of "today"
-    # # And I advance the subject's episode for "Invite for Diagnostic Test >>"
-    # advance_fobt_episode.select_ct_colonography_and_invite()
-
-    # # Then my subject has been updated as follows:
-    # criteria = {
-    #     "which diagnostic test": "latest test in latest episode",
-    #     "diagnostic test proposed type": "CT Colonography",
-    #     "latest event status": "A59 Invited for Diagnostic Test",
-    # }
-    # subject_assertion(nhs_no, criteria)
-
-    # # When the subject DNAs the diagnostic test
-    # attendance.mark_diagnostic_test_as_dna()
-
-    # # Then my subject has been updated as follows:
-    # criteria = {
-    #     "latest event status": "A172 DNA Diagnostic Test",
-    # }
-    # subject_assertion(nhs_no, criteria)
-
-    # # When I switch users to BCSS "England" as user role "Hub Manager"
-    # LogoutPage(page).log_out(close_page=False)
-    # BasePage(page).go_to_log_in_page()
-    # UserTools.user_login(page, "Hub Manager at BCS01")
-
-    # # And I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
-    # # NOTE LEAVE THIS BLOCK COMMENTED - Subject is already at A172 DNA Diagnostic Test (line 313)
-    # # Then my subject has been updated as follows:
-    # # batch_processing(
-    # #     page,
-    # #     "A183",
-    # #     "GP Result (Abnormal)",
-    # #     "A172 - DNA Diagnostic Test",
-    # # )
-    # # criteria = {
-    # #     "latest episode includes event status": "A167 GP Abnormal FOBT Result Sent",
-    # #     "latest episode accumulated result": "No Result",
-    # # }
-    # # subject_assertion(nhs_no, criteria)
-    nhs_no = "9298272839"
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
-    LogoutPage(page).log_out(close_page=False)
-    BasePage(page).go_to_log_in_page()
-    user_role = UserTools.user_login(page, "Screening Centre Manager at BCS001", True)
+    switch_user(page, "Screening Centre Manager")
 
-    # # And I view the subject
-    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # # And I view the advance episode options
-    # SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    # And I view the event history for the subject's latest episode
+    # And I view the latest practitioner appointment in the subject's episode
+    # And I attend the subject's practitioner appointment "yesterday"
+    attendance.mark_as_attended_yesterday()
 
-    # # And I select the advance episode option for "Record Diagnosis Date"
-    # AdvanceFOBTScreeningEpisodePage(page).click_record_diagnosis_date_button()
+    # Then my subject has been updated as follows:
+    criteria = {
+        "latest event status": "J10 Attended Colonoscopy Assessment Appointment",
+    }
+    subject_assertion(nhs_no, criteria)
 
-    # # And I select Diagnosis Date Reason "Patient could not be contacted"
-    # RecordDiagnosisDatePage(page).record_diagnosis_reason(
-    #     reason_text="Patient could not be contacted"
-    # )
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # # Then my subject has been updated as follows:
-    # criteria = {
-    #     "latest episode diagnosis date reason": "Patient could not be contacted",
-    #     "latest episode has diagnosis date": "No",
-    #     "latest episode includes event status": "A52 No diagnosis date recorded",
-    # }
-    # subject_assertion(nhs_no, criteria)
+    # And I edit the Colonoscopy Assessment Dataset for this subject
+    # And I update the Colonoscopy Assessment Dataset with the following values:
+    # 	| Fit for Colonoscopy (SSP) | No  |
+    # 	| Dataset complete?         | Yes |
+    # And I save the Colonoscopy Assessment Dataset
+    SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_colonoscopy_show_datasets()
+    dataset.select_fit_for_colonoscopy_option(ssp_options.NO)
+    dataset.click_dataset_complete_radio_button_yes()
+    dataset.save_dataset()
 
-    # # And I view the subject
-    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # And I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # # When I select the advance episode option for "Record Contact with Patient"
-    # # And I record contact with the subject with outcome "Close Episode - No Contact"
-    # SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-    # advance_fobt_episode.click_record_contact_with_patient_button()
-    # advance_fobt_episode.record_contact_close_episode_no_contact()
+    # And I advance the subject's episode for "Suitable for Radiological Test"
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    advance_fobt_episode.click_suitable_for_radiological_test_button()
 
-    # # Then my subject has been updated as follows:
-    # criteria = {
-    #     "latest event status": "A397 Discharged  from Screening Round - No Patient Contact",
-    # }
-    # subject_assertion(nhs_no, criteria)
+    # Then my subject has been updated as follows:
+    criteria = {
+        "latest event status": "A100 Suitable for Radiological Test",
+    }
+    subject_assertion(nhs_no, criteria)
 
-    # # And there is a "A397" letter batch for my subject with the exact title "Discharge from screening round - no contact (letter to patient)"
-    # # When I process the open "A397" letter batch for my subject
-    # # Then my subject has been updated as follows:
+    # And I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # When I view the advance episode options
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+
+    # And I select Diagnostic Test Type "CT Colonography"
+    # And I enter a Diagnostic Test First Offered Appointment Date of "today"
+    # And I advance the subject's episode for "Invite for Diagnostic Test >>"
+    advance_fobt_episode.select_ct_colonography_and_invite()
+
+    # Then my subject has been updated as follows:
+    criteria = {
+        "which diagnostic test": "latest test in latest episode",
+        "diagnostic test proposed type": "CT Colonography",
+        "latest event status": "A59 Invited for Diagnostic Test",
+    }
+    subject_assertion(nhs_no, criteria)
+
+    # When the subject DNAs the diagnostic test
+    attendance.mark_diagnostic_test_as_dna()
+
+    # Then my subject has been updated as follows:
+    criteria = {
+        "latest event status": "A172 DNA Diagnostic Test",
+    }
+    subject_assertion(nhs_no, criteria)
+
+    # When I switch users to BCSS "England" as user role "Hub Manager"
+    switch_user(page, "Hub Manager", "BCS01")
+
+    # And I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
+    # NOTE LEAVE COMMENTED - Subject is already at A172 DNA Diagnostic Test (line 313)
+    # Then my subject has been updated as follows:
     # batch_processing(
     #     page,
-    #     "A397",
-    #     "Discharge from screening round - no contact (letter to patient)",
-    #     "A391 - Patient Discharge Letter Printed - No Patient Contact",
+    #     "A183",
+    #     "GP Result (Abnormal)",
+    #     "A172 - DNA Diagnostic Test",
     # )
-
-    # # And there is a "A391" letter batch for my subject with the exact title "Discharge from screening round - no contact (letter to GP)"
-    # # When I process the open "A391 - Discharge from screening round - no contact (letter to GP)" letter batch for my subject
-    # batch_processing(
-    #     page,
-    #     "A391",
-    #     "Discharge from screening round - no contact (letter to GP)",
-    #     "A351 - GP Discharge Letter Printed - No Patient Contact",
-    # )
-
-    # # Then my subject has been updated as follows:
     # criteria = {
-    #     "calculated fobt due date": "2 years from episode end",
-    #     "calculated lynch due date": "Unchanged",
-    #     "calculated surveillance due date": "Unchanged",
-    #     "ceased confirmation date": "Null",
-    #     "ceased confirmation details": "Null",
-    #     "ceased confirmation user id": "Null",
-    #     "clinical reason for cease": "Null",
-    #     "latest episode accumulated result": "No result",
-    #     "latest episode recall calculation method": "Episode end date",
-    #     "latest episode recall episode type": "FOBT Screening",
-    #     "latest episode recall surveillance type": "Null",
-    #     "latest episode status": "Closed",
-    #     "latest episode status reason": "Patient could not be contacted",
-    #     "latest event status": "A351 GP Discharge Letter Printed - No Patient Contact",
-    #     "lynch due date": "Null",
-    #     "lynch due date date of change": "Unchanged",
-    #     "lynch due date reason": "Unchanged",
-    #     "screening due date": "Calculated FOBT Due Date",
-    #     "screening due date reason": "Recall",
-    #     "screening due date date of change": "Today",
-    #     # Screening status fields intentionally not checked
-    #     "surveillance due date": "Null",
-    #     "surveillance due date date of change": "Unchanged",
-    #     "surveillance due date reason": "Unchanged",
+    #     "latest episode includes event status": "A167 GP Abnormal FOBT Result Sent",
+    #     "latest episode accumulated result": "No Result",
     # }
     # subject_assertion(nhs_no, criteria)
 
-    # # When I view the subject
-    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # When I switch users to BCSS "England" as user role "Screening Centre Manager" (and remember session)
+    user_role = switch_user(page, "Screening Centre Manager", remember_user=True)
 
-    # # And I reopen the subject's episode for "Reopen to Reschedule Diagnostic Test"
+    # And I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # And I view the advance episode options
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+
+    # And I select the advance episode option for "Record Diagnosis Date"
+    AdvanceFOBTScreeningEpisodePage(page).click_record_diagnosis_date_button()
+
+    # And I select Diagnosis Date Reason "Patient could not be contacted"
+    RecordDiagnosisDatePage(page).record_diagnosis_reason(
+        reason_text="Patient could not be contacted"
+    )
+
+    # Then my subject has been updated as follows:
+    criteria = {
+        "latest episode diagnosis date reason": "Patient could not be contacted",
+        "latest episode has diagnosis date": "No",
+        "latest episode includes event status": "A52 No diagnosis date recorded",
+    }
+    subject_assertion(nhs_no, criteria)
+
+    # And I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # When I select the advance episode option for "Record Contact with Patient"
+    # And I record contact with the subject with outcome "Close Episode - No Contact"
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    advance_fobt_episode.click_record_contact_with_patient_button()
+    advance_fobt_episode.record_contact_close_episode_no_contact()
+
+    # Then my subject has been updated as follows:
+    criteria = {
+        "latest event status": "A397 Discharged  from Screening Round - No Patient Contact",
+    }
+    subject_assertion(nhs_no, criteria)
+
+    # And there is a "A397" letter batch for my subject with the exact title "Discharge from screening round - no contact (letter to patient)"
+    # When I process the open "A397" letter batch for my subject
+    # Then my subject has been updated as follows:
+    batch_processing(
+        page,
+        "A397",
+        "Discharge from screening round - no contact (letter to patient)",
+        "A391 - Patient Discharge Letter Printed - No Patient Contact",
+    )
+
+    # And there is a "A391" letter batch for my subject with the exact title "Discharge from screening round - no contact (letter to GP)"
+    # When I process the open "A391 - Discharge from screening round - no contact (letter to GP)" letter batch for my subject
+    batch_processing(
+        page,
+        "A391",
+        "Discharge from screening round - no contact (letter to GP)",
+        "A351 - GP Discharge Letter Printed - No Patient Contact",
+    )
+
+    # Then my subject has been updated as follows:
+    criteria = {
+        "calculated fobt due date": "2 years from episode end",
+        "calculated lynch due date": "Unchanged",
+        "calculated surveillance due date": "Unchanged",
+        "ceased confirmation date": "Null",
+        "ceased confirmation details": "Null",
+        "ceased confirmation user id": "Null",
+        "clinical reason for cease": "Null",
+        "latest episode accumulated result": "No result",
+        "latest episode recall calculation method": "Episode end date",
+        "latest episode recall episode type": "FOBT Screening",
+        "latest episode recall surveillance type": "Null",
+        "latest episode status": "Closed",
+        "latest episode status reason": "Patient could not be contacted",
+        "latest event status": "A351 GP Discharge Letter Printed - No Patient Contact",
+        "lynch due date": "Null",
+        "lynch due date date of change": "Unchanged",
+        "lynch due date reason": "Unchanged",
+        "screening due date": "Calculated FOBT Due Date",
+        "screening due date reason": "Recall",
+        "screening due date date of change": "Today",
+        # Screening status fields intentionally not checked
+        "surveillance due date": "Null",
+        "surveillance due date date of change": "Unchanged",
+        "surveillance due date reason": "Unchanged",
+    }
+    subject_assertion(nhs_no, criteria)
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # And I reopen the subject's episode for "Reopen to Reschedule Diagnostic Test"
     # SubjectScreeningSummaryPage(page).click_reopen_fobt_screening_episode_button()
-    # ReopenFOBTScreeningEpisodePage(
-    #     page
-    # ).click_reopen_to_reschedule_diagnostic_test_button()
+    ReopenFOBTScreeningEpisodePage(
+        page
+    ).click_reopen_to_reschedule_diagnostic_test_button()
 
-    # # Then my subject has been updated as follows:
-    # criteria = {
-    #     "calculated fobt due date": "As at episode start",
-    #     "calculated lynch due date": "Null",
-    #     "calculated surveillance due date": "Null",
-    #     "ceased confirmation date": "Null",
-    #     "ceased confirmation details": "Null",
-    #     "ceased confirmation user id": "Null",
-    #     "clinical reason for cease": "Null",
-    #     "latest episode accumulated result": "No result",
-    #     "latest episode includes event code": "E68 Reopen to Reschedule Diagnostic Test",
-    #     "latest episode recall calculation method": "Episode end date",
-    #     "latest episode recall episode type": "Null",
-    #     "latest episode recall surveillance type": "Null",
-    #     "latest episode status": "Open",
-    #     "latest episode status reason": "Null",
-    #     "latest event status": "A172 DNA Diagnostic Test",
-    #     "lynch due date": "Null",
-    #     "lynch due date date of change": "Unchanged",
-    #     "lynch due date reason": "Unchanged",
-    #     "screening due date": "Calculated FOBT due date",
-    #     "screening due date date of change": "Today",
-    #     "screening due date reason": "Reopened episode",
-    #     # Screening status fields intentionally not checked
-    #     "surveillance due date": "Null",
-    #     "surveillance due date date of change": "Unchanged",
-    #     "surveillance due date reason": "Unchanged",
-    # }
-    # subject_assertion(nhs_no, criteria)
+    # Then my subject has been updated as follows:
+    criteria = {
+        "calculated fobt due date": "As at episode start",
+        "calculated lynch due date": "Null",
+        "calculated surveillance due date": "Null",
+        "ceased confirmation date": "Null",
+        "ceased confirmation details": "Null",
+        "ceased confirmation user id": "Null",
+        "clinical reason for cease": "Null",
+        "latest episode accumulated result": "No result",
+        "latest episode includes event code": "E68 Reopen to Reschedule Diagnostic Test",
+        "latest episode recall calculation method": "Episode end date",
+        "latest episode recall episode type": "Null",
+        "latest episode recall surveillance type": "Null",
+        "latest episode status": "Open",
+        "latest episode status reason": "Null",
+        "latest event status": "A172 DNA Diagnostic Test",
+        "lynch due date": "Null",
+        "lynch due date date of change": "Unchanged",
+        "lynch due date reason": "Unchanged",
+        "screening due date": "Calculated FOBT due date",
+        "screening due date date of change": "Today",
+        "screening due date reason": "Reopened episode",
+        # Screening status fields intentionally not checked
+        "surveillance due date": "Null",
+        "surveillance due date date of change": "Unchanged",
+        "surveillance due date reason": "Unchanged",
+    }
+    subject_assertion(nhs_no, criteria)
 
-    # # When I select the advance episode option for "Record Contact with Patient"
-    # SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-    # AdvanceFOBTScreeningEpisodePage(page).click_record_contact_with_patient_button()
+    # When I select the advance episode option for "Record Contact with Patient"
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_record_contact_with_patient_button()
 
-    # # And I record contact with the subject with outcome "Suitable for Radiological Test"
-    # ContactWithPatientPage(page).record_contact("Suitable for Radiological Test")
+    # And I record contact with the subject with outcome "Suitable for Radiological Test"
+    ContactWithPatientPage(page).record_contact("Suitable for Radiological Test")
 
-    # # Then my subject has been updated as follows:
-    # criteria = {
-    #     "latest event status": "A100 Suitable for Radiological Test",
-    # }
-    # subject_assertion(nhs_no, criteria)
+    # Then my subject has been updated as follows:
+    criteria = {
+        "latest event status": "A100 Suitable for Radiological Test",
+    }
+    subject_assertion(nhs_no, criteria)
 
-    # # When I view the advance episode options
-    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-    # SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    # When I view the advance episode options
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
 
-    # # And I select Diagnostic Test Type "CT Colonography"
-    # AdvanceFOBTScreeningEpisodePage(page).select_test_type_dropdown_option(
-    #     "CT Colonography"
-    # )
-    # # And I enter a Diagnostic Test First Offered Appointment Date of "today"
-    # AdvanceFOBTScreeningEpisodePage(page).click_calendar_button()
-    # CalendarPicker(page).v1_calender_picker(datetime.today())
+    # And I select Diagnostic Test Type "CT Colonography"
+    AdvanceFOBTScreeningEpisodePage(page).select_test_type_dropdown_option(
+        "CT Colonography"
+    )
+    # And I enter a Diagnostic Test First Offered Appointment Date of "today"
+    AdvanceFOBTScreeningEpisodePage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
 
-    # # And I advance the subject's episode for "Invite for Diagnostic Test >>"
-    # AdvanceFOBTScreeningEpisodePage(page).click_invite_for_diagnostic_test_button()
+    # And I advance the subject's episode for "Invite for Diagnostic Test >>"
+    AdvanceFOBTScreeningEpisodePage(page).click_invite_for_diagnostic_test_button()
 
-    # # When I select the advance episode option for "Attend Diagnostic Test"
-    # # And I attend the subject's diagnostic test today
-    # # Then my subject has been updated as follows:
-    # attend_diagnostic_test_and_open_dataset(
-    #     page, nhs_no, expected_invite_status="A59 Invited for Diagnostic Test"
-    # )
+    # Then my subject has been updated as follows:
+    criteria = {
+        "which diagnostic test": "Latest test in latest episode",
+        "diagnostic test proposed type": "CT Colonography",
+        "latest event status": "A59 Invited for Diagnostic Test",
+    }
+    subject_assertion(nhs_no, criteria)
 
-    # # When I view the subject
-    # # And I edit the Investigation Dataset for this subject
-    # # And I set the following fields and values within the Investigation Dataset for this subject:
-    # general_information = {
-    #     "site": 1,
-    #     "practitioner": 1,
-    #     "testing clinician": 1,
-    #     "reporting radiologist": 2,
-    #     "fit for subsequent endoscopic referral": YesNoOptions.YES,
-    # }
+    # When I select the advance episode option for "Attend Diagnostic Test"
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_attend_diagnostic_test_button()
 
-    # # And I set the following fields and values within the Contrast, Tagging & Drug Information:
-    # # And I add the following Additional Bowel Preparation drugs and values within the Investigation Dataset for this subject:
-    # contrast_tagging_and_drug = {
-    #     "iv buscopan administered": CancerRadiologyYesNoOptions.NO,
-    #     "contraindicated": YesNoOptions.NO,
-    #     "iv contrast administered": IVContrastAdministeredOptions.NO,
-    #     "tagging agent given": TaggingAgentDrugAdministeredOptions.YES,
-    #     "additional bowel preparation administered": AdditionalBowelPrepAdministeredOptions.YES,
-    #     "drug_type1": DrugTypeOptions.PICOLAX,
-    #     "drug_dose1": "1",
-    # }
+    # And I attend the subject's diagnostic test today
+    AttendDiagnosticTestPage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+    AttendDiagnosticTestPage(page).click_save_button()
 
-    # # And I add the following "Tagging Agent Given" drugs and doses within the Investigation Dataset for this subject:
-    # # 	| Gastrografin | 1 |
-    # tagging_agent_given_drug_information = {
-    #     "drug_type1": DrugTypeOptions.GASTROGRAFIN,
-    #     "drug_dose1": "1",
-    # }
+    # Then my subject has been updated as follows:
+    criteria = {
+        "latest event status": "A259 Attended Diagnostic Test",
+    }
+    subject_assertion(nhs_no, criteria)
 
-    # # 	And I set the following fields and values within the Radiology Information:
-    # # 	And I set the following fields and values within the Radiology Information:
-    # radiology_information = {
-    #     "examination quality": ExaminationQualityOptions.GOOD,
-    #     "scan position": ScanPositionOptions.DUAL,
-    #     "procedure outcome": ProcedureOutcomeOptions.LEAVE_DEPARTMENT,
-    #     "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
-    #     "segmental inadequacy": SegmentalInadequacyOptions.NO,
-    #     "intracolonic summary code": IntracolonicSummaryCodeOptions.CX_INADEQUATE_STUDY,
-    # }
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # suspected_findings = {
-    #     "extracolonic summary code": ExtracolonicSummaryCodeOptions.E4_IMPORTANT_REQUIRES_ACTION,
-    # }
+    # And I edit the Investigation Dataset for this subject
+    SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_investigation_show_datasets()
 
-    # # And I set the following radiology failure reasons within the Investigation Dataset for this subject:
-    # # 	| No failure reasons | NOTE - this can be left as default - there is only one option
+    # And I set the following fields and values within the Investigation Dataset for this subject:
+    general_information = {
+        "site": 1,
+        "practitioner": 1,
+        "testing clinician": 1,
+        "reporting radiologist": 2,
+        "fit for subsequent endoscopic referral": YesNoOptions.YES,
+    }
 
-    # # And I open all minimized sections on the dataset
-    # # And I mark the Investigation Dataset as completed
-    # # When I press the save Investigation Dataset button
-    # # And I press OK on my confirmation prompt
-    # InvestigationDatasetCompletion(page).complete_dataset_with_args(
-    #     general_information=general_information,
-    #     contrast_tagging_and_drug=contrast_tagging_and_drug,
-    #     tagging_agent_given_drug_information=tagging_agent_given_drug_information,
-    #     radiology_information=radiology_information,
-    #     suspected_findings=suspected_findings,
-    # )
+    # And I set the following fields and values within the Contrast, Tagging & Drug Information:
+    # And I add the following Additional Bowel Preparation drugs and values within the Investigation Dataset for this subject:
+    contrast_tagging_and_drug = {
+        "iv buscopan administered": CancerRadiologyYesNoOptions.NO,
+        "contraindicated": YesNoOptions.NO,
+        "iv contrast administered": IVContrastAdministeredOptions.NO,
+        "tagging agent given": TaggingAgentDrugAdministeredOptions.YES,
+        "additional bowel preparation administered": AdditionalBowelPrepAdministeredOptions.YES,
+        "drug_type1": DrugTypeOptions.PICOLAX,
+        "drug_dose1": "1",
+    }
 
-    # # Then my subject has been updated as follows:
-    # criteria = {
-    #     "latest episode accumulated result": "Abnormal",
-    # }
-    # subject_assertion(nhs_no, criteria)
+    # And I add the following "Tagging Agent Given" drugs and doses within the Investigation Dataset for this subject:
+    # 	| Gastrografin | 1 |
+    tagging_agent_given_drug_information = {
+        "drug_type1": DrugTypeOptions.GASTROGRAFIN,
+        "drug_dose1": "1",
+    }
 
-    # # When I view the subject
-    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # 	And I set the following fields and values within the Radiology Information:
+    # 	And I set the following fields and values within the Radiology Information:
+    radiology_information = {
+        "examination quality": ExaminationQualityOptions.GOOD,
+        "scan position": ScanPositionOptions.DUAL,
+        "procedure outcome": ProcedureOutcomeOptions.LEAVE_DEPARTMENT,
+        "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
+        "segmental inadequacy": SegmentalInadequacyOptions.NO,
+        "intracolonic summary code": IntracolonicSummaryCodeOptions.CX_INADEQUATE_STUDY,
+    }
 
-    # # And I select the advance episode option for "Enter Diagnostic Test Outcome"
-    # SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-    # AdvanceFOBTScreeningEpisodePage(page).click_enter_diagnostic_test_outcome_button()
+    suspected_findings = {
+        "extracolonic summary code": ExtracolonicSummaryCodeOptions.E4_IMPORTANT_REQUIRES_ACTION,
+    }
 
-    # # And I select Outcome of Diagnostic Test "Refer Another Diagnostic Test"
-    # DiagnosticTestOutcomePage(page).select_test_outcome_option(
-    #     OutcomeOfDiagnosticTest.REFER_ANOTHER_DIAGNOSTIC_TEST
-    # )
+    # And I set the following radiology failure reasons within the Investigation Dataset for this subject:
+    # 	| No failure reasons | NOTE - this can be left as default - there is only one option
 
-    # # And I select Radiological or Endoscopic Referral value "Radiological"
-    # DiagnosticTestOutcomePage(page).select_referral_procedure_type(
-    #     ReferralProcedureType.RADIOLOGICAL
-    # )
+    # And I open all minimized sections on the dataset
+    # And I mark the Investigation Dataset as completed
+    # When I press the save Investigation Dataset button
+    # And I press OK on my confirmation prompt
+    InvestigationDatasetCompletion(page).complete_dataset_with_args(
+        general_information=general_information,
+        contrast_tagging_and_drug=contrast_tagging_and_drug,
+        tagging_agent_given_drug_information=tagging_agent_given_drug_information,
+        radiology_information=radiology_information,
+        suspected_findings=suspected_findings,
+    )
 
-    # # And I select Reason for Onward Referral value "Currently Unsuitable for Endoscopic Referral"
-    # DiagnosticTestOutcomePage(page).select_reason_for_onward_referral(
-    #     ReasonForOnwardReferral.CURRENTLY_UNSUITABLE_FOR_ENDOSCOPIC_REFERRAL
-    # )
+    # Then my subject has been updated as follows:
+    criteria = {
+        "latest episode accumulated result": "Abnormal",
+    }
+    subject_assertion(nhs_no, criteria)
 
-    # # And I set any onward referring clinician
-    # DiagnosticTestOutcomePage(page).select_valid_onward_referral_consultant_index(1)
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # # And I save the Diagnostic Test Outcome
-    # DiagnosticTestOutcomePage(page).click_save_button()
+    # And I select the advance episode option for "Enter Diagnostic Test Outcome"
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_enter_diagnostic_test_outcome_button()
 
-    # # Then my subject has been updated as follows:
-    # criteria = {
-    #     "latest event status": "A315 Diagnostic Test Outcome Entered",
-    # }
-    # subject_assertion(nhs_no, criteria)
+    # And I select Outcome of Diagnostic Test "Refer Another Diagnostic Test"
+    DiagnosticTestOutcomePage(page).select_test_outcome_option(
+        OutcomeOfDiagnosticTest.REFER_ANOTHER_DIAGNOSTIC_TEST
+    )
 
-    # # When I advance the subject's episode for "Post-investigation Appointment Required"
-    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-    # SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-    # AdvanceFOBTScreeningEpisodePage(
-    #     page
-    # ).click_post_investigation_appointment_required_button()
+    # And I select Radiological or Endoscopic Referral value "Radiological"
+    DiagnosticTestOutcomePage(page).select_referral_procedure_type(
+        ReferralProcedureType.RADIOLOGICAL
+    )
 
-    # # Then my subject has been updated as follows:
-    # criteria = {
-    #     "latest event status": "A360 Post-investigation Appointment Required",
-    # }
-    # subject_assertion(nhs_no, criteria)
+    # And I select Reason for Onward Referral value "Currently Unsuitable for Endoscopic Referral"
+    DiagnosticTestOutcomePage(page).select_reason_for_onward_referral(
+        ReasonForOnwardReferral.CURRENTLY_UNSUITABLE_FOR_ENDOSCOPIC_REFERRAL
+    )
+
+    # And I set any onward referring clinician
+    DiagnosticTestOutcomePage(page).select_valid_onward_referral_consultant_index(1)
+
+    # And I save the Diagnostic Test Outcome
+    DiagnosticTestOutcomePage(page).click_save_button()
+
+    # Then my subject has been updated as follows:
+    criteria = {
+        "latest event status": "A315 Diagnostic Test Outcome Entered",
+    }
+    subject_assertion(nhs_no, criteria)
+
+    # When I advance the subject's episode for "Post-investigation Appointment Required"
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(
+        page
+    ).click_post_investigation_appointment_required_button()
+
+    # Then my subject has been updated as follows:
+    criteria = {
+        "latest event status": "A360 Post-investigation Appointment Required",
+    }
+    subject_assertion(nhs_no, criteria)
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -700,12 +768,37 @@ def test_scenario_8(page: Page) -> None:
     AdvanceFOBTScreeningEpisodePage(page).click_calendar_button()
     CalendarPicker(page).v1_calender_picker(datetime.today())
 
-    # # And I advance the subject's episode for "Invite for Diagnostic Test >>"
+    # And I advance the subject's episode for "Invite for Diagnostic Test >>"
     AdvanceFOBTScreeningEpisodePage(page).click_invite_for_diagnostic_test_button()
 
-    attend_diagnostic_test_and_open_dataset(
-        page, nhs_no, expected_invite_status="A59 Invited for Diagnostic Test"
-    )
+    # Then my subject has been updated as follows:
+    criteria = {
+        "latest event status": "A59 Invited for Diagnostic Test",
+    }
+    subject_assertion(nhs_no, criteria)
+
+    # When I select the advance episode option for "Attend Diagnostic Test"
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_attend_diagnostic_test_button()
+
+    # And I attend the subject's diagnostic test today
+    AttendDiagnosticTestPage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+    AttendDiagnosticTestPage(page).click_save_button()
+
+    # Then my subject has been updated as follows:
+    criteria = {
+        "latest event status": "A259 Attended Diagnostic Test",
+    }
+    subject_assertion(nhs_no, criteria)
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # 	And I edit the Investigation Dataset for this subject
+    SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_investigation_show_datasets()
 
     # 	And I open all minimized sections on the dataset
     # 	And I add the following bowel preparation drugs and values within the Investigation Dataset for this subject:
@@ -908,126 +1001,19 @@ def test_scenario_8(page: Page) -> None:
     subject_assertion(nhs_no, criteria, user_role)
 
 
-# Helper functions
-def process_initial_invitation_and_fit_kit(
-    page: Page, nhs_no: str, user_role: UserRoleType
-) -> None:
+# Helper Methods
+def switch_user(
+    page, role: str, bcss_code: str = "BCS001", remember_user: bool = False
+):
     """
-    Processes the initial invitation and FIT kit flow:
-    - Processes S9 batch
-    - Logs FIT kit
-    - Reads kit as ABNORMAL
-    - Asserts subject status updates
-    """
-    batch_processing(
-        page,
-        "S9",
-        "Invitation & Test Kit (FIT)",
-        "S10 - Invitation & Test Kit Sent",
-        True,
-    )
+    Logs out the current user, navigates to the login page, and logs in as the specified role.
 
-    fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
-    sample_date = datetime.now()
-    FitKitLogged().log_fit_kits(page, fit_kit, sample_date)
-
-    subject_assertion(
-        nhs_no, {"latest event status": "S43 Kit Returned and Logged (Initial Test)"}
-    )
-
-    FitKitLogged().read_latest_logged_kit(user_role, 2, fit_kit, "ABNORMAL")
-    subject_assertion(nhs_no, {"latest event status": "A8 Abnormal"})
-
-    criteria = {
-        "latest event status": "A8 Abnormal",
-    }
-    subject_assertion(nhs_no, criteria)
-
-
-def book_practitioner_clinic_and_process_letters(page: Page, nhs_no: str) -> None:
-    """
-    Books practitioner clinic and processes A183 letters:
-    - Navigates to subject
-    - Books appointment
-    - Processes both A183 letter batches
-    - Asserts subject status
-    """
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-    SubjectScreeningSummaryPage(page).click_book_practitioner_clinic_button()
-
-    book_appointments(
-        page,
-        "BCS001 - Wolverhampton Bowel Cancer Screening Centre",
-        "The Royal Hospital (Wolverhampton)",
-    )
-
-    subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "A183 1st Colonoscopy Assessment Appointment Requested"
-        },
-    )
-
-    batch_processing(
-        page,
-        "A183",
-        "Practitioner Clinic 1st Appointment",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
-    )
-
-    batch_processing(
-        page,
-        "A183",
-        "GP Result (Abnormal)",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
-    )
-
-
-def switch_to_screening_centre_manager(page: Page) -> None:
-    """
-    Logs out and switches to Screening Centre Manager at BCS001
+    Args:
+        page: Playwright page object.
+        role (str): The user role to log in as (e.g., "Screening Centre Manager").
+        bcss_code (str): The BCSS code to use in the login string (default is "BCS001").
+        remember_user (bool): Whether to remember the user session (default is False).
     """
     LogoutPage(page).log_out(close_page=False)
     BasePage(page).go_to_log_in_page()
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-
-
-def attend_diagnostic_test_and_open_dataset(
-    page: Page,
-    nhs_no: str,
-    expected_invite_status: str = "A59 Invited for Diagnostic Test",
-) -> None:
-    """
-    Navigates to subject, attends diagnostic test, and opens investigation dataset.
-    Asserts invitation and attendance status.
-    """
-    # Assert invitation status
-    subject_assertion(
-        nhs_no,
-        {
-            "which diagnostic test": "Latest test in latest episode",
-            "diagnostic test proposed type": "CT Colonography",
-            "latest event status": expected_invite_status,
-        },
-    )
-
-    # Attend diagnostic test
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-    AdvanceFOBTScreeningEpisodePage(page).click_attend_diagnostic_test_button()
-    AttendDiagnosticTestPage(page).click_calendar_button()
-    CalendarPicker(page).v1_calender_picker(datetime.today())
-    AttendDiagnosticTestPage(page).click_save_button()
-
-    # Assert attendance
-    subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "A259 Attended Diagnostic Test",
-        },
-    )
-
-    # Open investigation dataset
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-    SubjectScreeningSummaryPage(page).click_datasets_link()
-    SubjectDatasetsPage(page).click_investigation_show_datasets()
+    return UserTools.user_login(page, f"{role} at {bcss_code}", remember_user)
