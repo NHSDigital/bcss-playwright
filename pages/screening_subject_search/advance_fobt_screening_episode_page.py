@@ -4,6 +4,19 @@ from pages.base_page import BasePage
 import logging
 from typing import List
 from utils.calendar_picker import CalendarPicker
+from enum import Enum
+
+
+class ContactDirection(Enum):
+    TO_PATIENT = "20159"
+    FROM_PATIENT = "20160"
+
+
+class ContactMethod(Enum):
+    IN_PERSON = "16028"
+    TELEPHONE = "16029"
+    VISIT = "16030"
+    LETTER = "20012"
 
 
 class AdvanceFOBTScreeningEpisodePage(BasePage):
@@ -85,9 +98,10 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         )
         # Contact recording locators
         self.contact_direction_dropdown = self.page.get_by_label("Contact Direction")
-        self.contact_type_dropdown = self.page.get_by_label(
-            "Contact made between patient"
+        self.contact_made_between_dropdown = self.page.get_by_label(
+            "Contact made between patient and"
         )
+        self.contact_method_dropdown = self.page.get_by_label("Contact Method")
         self.call_date_input = self.page.locator("#UI_CALL_DATE")
         self.start_time_input = self.page.locator("#UI_START_TIME")
         self.end_time_input = self.page.locator("#UI_END_TIME")
@@ -259,10 +273,13 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
             "[CONTACT RECORD] Starting contact recording flow with outcome: Close Episode - No Contact"
         )
 
-        # Step 1: Select direction and contact type
-        self.contact_direction_dropdown.select_option("20159")
-        self.contact_type_dropdown.select_option("1171")
-        logging.info("[CONTACT RECORD] Selected direction and contact type")
+        # Step 1: Select direction and contact method and practitioner
+        self.contact_direction_dropdown.select_option(ContactDirection.TO_PATIENT.value)
+        self.contact_method_dropdown.select_option(ContactMethod.TELEPHONE.value)
+        self.select_any_practitioner()
+        logging.info(
+            "[CONTACT RECORD] Selected direction, contact method, and practitioner"
+        )
 
         # Step 2: Pick calendar date using V1 calendar picker
         calendar_picker = CalendarPicker(self.page)
@@ -359,3 +376,23 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         self.safe_accept_dialog(
             self.redirect_to_reestablish_suitability_for_diagnostic_test_repatient_contact
         )
+
+    def select_any_practitioner(self) -> None:
+        """
+        Selects any practitioner from the 'Contact made between patient and' dropdown.
+        Skips the empty default option and selects the first available practitioner.
+        """
+        logging.info("[CONTACT RECORD] Selecting any practitioner from dropdown")
+
+        # Get all available options
+        options = self.contact_made_between_dropdown.locator("option").all()
+        for option in options:
+            value = option.get_attribute("value")
+            if value and value.strip():
+                self.contact_made_between_dropdown.select_option(value)
+                logging.info(
+                    f"[CONTACT RECORD] Selected practitioner with value: {value}"
+                )
+                return
+
+        logging.warning("[CONTACT RECORD] No valid practitioner found to select")
