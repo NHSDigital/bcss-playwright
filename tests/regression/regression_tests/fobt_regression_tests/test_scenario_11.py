@@ -254,7 +254,7 @@ def test_scenario_11(page: Page) -> None:
 
     # And I update the Colonoscopy Assessment Dataset with the following values:
     ColonoscopyDatasetsPage(page).select_fit_for_colonoscopy_option(
-        FitForColonoscopySspOptions.YES
+        option=FitForColonoscopySspOptions.YES
     )
     ColonoscopyDatasetsPage(page).click_dataset_complete_radio_button_yes()
 
@@ -270,7 +270,8 @@ def test_scenario_11(page: Page) -> None:
 
     # Then my subject has been updated as follows:
     subject_assertion(
-        nhs_no, {"latest event status": "A99 Suitable for Endoscopic Test"}
+        nhs_number=nhs_no,
+        criteria={"latest event status": "A99 Suitable for Endoscopic Test"},
     )
 
     # When I view the subject
