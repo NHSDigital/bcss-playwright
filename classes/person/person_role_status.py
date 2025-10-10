@@ -23,6 +23,10 @@ class PersonRoleStatus(Enum):
     def by_description(cls, description: str) -> Optional["PersonRoleStatus"]:
         """
         Returns the enum member matching the given description (case-sensitive).
+        Args:
+            description (str): The description to match. e.g., "Current".
+        Returns:
+            Optional[PersonRoleStatus]: The matching enum member, or None if not found.
         """
         for member in cls:
             if member.description == description:
@@ -35,15 +39,13 @@ class PersonRoleStatus(Enum):
     ) -> Optional["PersonRoleStatus"]:
         """
         Returns the enum member matching the given description (case-insensitive).
+        Args:
+            description (str): The description to match. e.g., "current", "CURRENT", "CuRrEnT".
+        Returns:
+            Optional[PersonRoleStatus]: The matching enum member, or None if not found.
         """
         desc_lower = description.lower()
         for member in cls:
             if member.description.lower() == desc_lower:
                 return member
         return None
-
-    def get_description(self) -> str:
-        """
-        Returns the description.
-        """
-        return self.description

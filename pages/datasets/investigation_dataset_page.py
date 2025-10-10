@@ -8,7 +8,6 @@ from utils.oracle.oracle_specific_functions.subject_datasets import (
 )
 from typing import Optional, Any, Union, List
 import logging
-import sys
 
 
 class InvestigationDatasetsPage(BasePage):

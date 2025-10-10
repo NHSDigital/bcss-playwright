@@ -14,7 +14,6 @@ from classes.subject_selection_query_builder.selection_builder_exception import 
     SelectionBuilderException,
 )
 from classes.user.user import User
-from typing import Dict
 from utils.oracle.oracle import OracleDB
 
 RESECT_AND_DISCARD_ACCREDITATION = 305730

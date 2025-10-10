@@ -12,11 +12,18 @@ class DateDescriptionUtils:
     DATE_FORMAT_YYYY_MM_DD = "%Y-%m-%d"
     DATE_FORMAT_DD_MM_YYYY = "%d/%m/%Y"
 
+    # Enum name constants
+    ENUM_VAL_NULL = "NULL"
+    ENUM_VAL_NOT_NULL = "NOT_NULL"
+
     @staticmethod
     def interpret_date(date_field_name: str, date_value: str) -> str:
         """
         Interprets a date description and returns a formatted date string (dd/MM/yyyy).
         If the date cannot be interpreted, returns the original value.
+        Args:
+            date_field_name (str): The name of the date field (for logging purposes).
+            date_value (str): The date description to interpret. E.g., "2 years ago", "NULL", "15/08/2020".
         """
         logging.debug(f"interpret_date: {date_field_name}, {date_value}")
         try:
@@ -34,6 +41,9 @@ class DateDescriptionUtils:
         """
         Converts a date description to an Oracle TO_DATE SQL string.
         Returns None if the date cannot be interpreted.
+        Args:
+            which_date (str): A label for the date being converted (for logging purposes). E.g., "start_date", "end_date".
+            date_description (str): The date description to convert. E.g., "2 years ago", "NULL", "15/08/2020".
         """
         logging.debug(
             f"convert_description_to_sql_date: {which_date}, {date_description}"
@@ -64,10 +74,10 @@ class DateDescriptionUtils:
             # If the date description is in the enum, use the suggested suitable date, plus allow for NULL and NOT NULL
             enum_val = DateDescription.by_description_case_insensitive(date_description)
             if enum_val is not None:
-                if enum_val.name == "NULL":
-                    return_date_string = "NULL"
-                elif enum_val.name == "NOT_NULL":
-                    return_date_string = "NOT NULL"
+                if enum_val.name == DateDescriptionUtils.ENUM_VAL_NULL:
+                    return_date_string = DateDescriptionUtils.ENUM_VAL_NULL
+                elif enum_val.name == DateDescriptionUtils.ENUM_VAL_NOT_NULL:
+                    return_date_string = DateDescriptionUtils.ENUM_VAL_NOT_NULL
                 else:
                     return_date = enum_val.suitable_date
 
@@ -86,6 +96,9 @@ class DateDescriptionUtils:
         """
         Converts a date description to a Python date object.
         Raises ValueError if the description cannot be interpreted.
+        Args:
+            which_date (str): A label for the date being converted (for logging purposes). E.g., "start_date", "end_date".
+            date_description (str): The date description to convert. E.g., "2 years ago", "NULL", "15/08/2020".
         """
         logging.debug(
             f"convert_description_to_local_date: {which_date}, {date_description}"
@@ -123,7 +136,10 @@ class DateDescriptionUtils:
         # Handle enum-based descriptions
         enum_val = DateDescription.by_description_case_insensitive(date_description)
         if enum_val is not None:
-            if enum_val.name in ["NULL", "NOT_NULL"]:
+            if enum_val.name in [
+                DateDescriptionUtils.ENUM_VAL_NULL,
+                DateDescriptionUtils.ENUM_VAL_NOT_NULL,
+            ]:
                 raise ValueError(f"Cannot convert '{date_description}' to a date.")
             if enum_val.suitable_date is not None:
                 return enum_val.suitable_date
@@ -132,10 +148,21 @@ class DateDescriptionUtils:
 
     @staticmethod
     def _is_relative_date(date_description, words, suffix):
+        """Checks if the date description is a relative date ending with the specified suffix.
+        Args:
+            date_description (str): The full date description string.
+            words (list): The split words of the date description.
+            suffix (str): The suffix to check for ("ago" or "ahead").
+        """
         return date_description.endswith(f" {suffix}") and len(words) == 3
 
     @staticmethod
     def _calculate_relative_date(words, is_ago):
+        """Calculates the date based on the relative description.
+        Args:
+            words (list): The split words of the date description. E.g., ["2", "years", "ago"].
+            is_ago (bool): Whether the date is in the past (True) or future (False).
+        """
         if not words[0].isdigit():
             raise ValueError(f"Invalid period number in '{' '.join(words)}'")
         number_of_periods = int(words[0])
@@ -151,6 +178,11 @@ class DateDescriptionUtils:
 
     @staticmethod
     def _get_delta_days(number_of_periods, period_type):
+        """Returns the number of days corresponding to the given period type and number.
+        Args:
+            number_of_periods (int): The number of periods (e.g., 2).
+            period_type (str): The type of period (e.g., "years", "months", "weeks", "days").
+        """
         if period_type in ["year", "years"]:
             return number_of_periods * 365
         if period_type in ["month", "months"]:
@@ -168,6 +200,12 @@ class DateDescriptionUtils:
         """
         Converts a date description to a formatted date string.
         Raises ValueError if the description cannot be interpreted.
+        Args:
+            which_date (str): A label for the date being converted (for logging purposes). E.g., "start_date", "end_date".
+            date_description (str): The date description to convert. E.g., "2 years ago", "NULL", "15/08/2020".
+            date_format (str): The desired output date format. E.g., "%d/%m/%Y".
+        Returns:
+            str: The formatted date string.
         """
         logging.debug(
             f"convert_description_to_string_date: {which_date}, {date_description}, {date_format}"
@@ -181,6 +219,11 @@ class DateDescriptionUtils:
     def is_valid_date(date_str: str, date_format: str) -> bool:
         """
         Checks if the given string is a valid date in the specified format.
+        Args:
+            date_str (str): The date string to validate.
+            date_format (str): The format to validate against. E.g., "%d/%m/%Y".
+        Returns:
+            bool: True if the string is a valid date, False otherwise.
         """
         try:
             datetime.strptime(date_str, date_format)

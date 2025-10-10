@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, Optional
+from typing import Optional
 
 
 class PersonSelectionCriteriaKey(Enum):
@@ -34,10 +34,9 @@ class PersonSelectionCriteriaKey(Enum):
         """Initialize the description lookup dictionaries."""
         cls._descriptions = {}
         cls._lowercase_descriptions = {}
-        if not cls._descriptions:
-            for member in cls:
-                cls._descriptions[member.value] = member
-                cls._lowercase_descriptions[member.value.lower()] = member
+        for member in cls:
+            cls._descriptions[member.value] = member
+            cls._lowercase_descriptions[member.value.lower()] = member
 
     @classmethod
     def by_description(cls, description: str) -> Optional["PersonSelectionCriteriaKey"]:
