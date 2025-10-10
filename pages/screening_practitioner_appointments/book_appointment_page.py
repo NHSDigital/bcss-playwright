@@ -49,6 +49,22 @@ class BookAppointmentPage(BasePage):
         """Clicks the save button."""
         self.safe_accept_dialog(self.save_button)
 
+    def click_save_button_and_return_message(self) -> str | None:
+        """
+        Clicks the save button and returns the dialog message if a dialog appears.
+        Returns None if no dialog appears.
+        """
+        dialog_message = None
+
+        def handle_dialog(dialog):
+            nonlocal dialog_message
+            dialog_message = dialog.message
+            dialog.accept()
+
+        self.page.once("dialog", handle_dialog)
+        self.click(self.save_button)
+        return dialog_message
+
     def appointment_booked_confirmation_is_displayed(self, message: str) -> None:
         """Checks if the appointment booked confirmation message is displayed."""
         expect(self.page.get_by_text(message)).to_be_visible(timeout=10000)

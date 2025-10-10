@@ -14,13 +14,6 @@ from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBu
 from utils.appointments import book_appointments, book_post_investigation_appointment
 from utils.oracle.oracle import OracleDB
 from utils.investigation_dataset import InvestigationDatasetCompletion
-from utils.datasets.investigation_datasets import (
-    get_default_general_information,
-    get_default_drug_information,
-    get_default_endoscopy_information,
-    get_normal_smokescreen_information,
-)
-from utils.sspi_change_steps import SSPIChangeSteps
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
@@ -35,6 +28,7 @@ from pages.screening_subject_search.episode_events_and_notes_page import (
 )
 from pages.screening_practitioner_appointments.appointment_detail_page import (
     AppointmentDetailPage,
+    ReasonForCancellationOptions,
 )
 from pages.screening_subject_search.advance_fobt_screening_episode_page import (
     AdvanceFOBTScreeningEpisodePage,
@@ -50,10 +44,6 @@ from pages.datasets.colonoscopy_dataset_page import (
     ColonoscopyDatasetsPage,
     FitForColonoscopySspOptions,
 )
-from pages.screening_subject_search.contact_with_patient_page import (
-    ContactWithPatientPage,
-)
-from pages.organisations.organisations_page import OrganisationSwitchPage
 from pages.datasets.investigation_dataset_page import (
     InvestigationDatasetsPage,
     FailureReasonsOptions,
@@ -66,32 +56,22 @@ from pages.datasets.investigation_dataset_page import (
     OutcomeAtTimeOfProcedureOptions,
     YesNoOptions,
     CompletionProofOptions,
-    AdenomaSubTypeOptions,
     EndoscopyLocationOptions,
     OpticalDiagnosisConfidenceOptions,
     OpticalDiagnosisOptions,
     PolypAccessOptions,
     PolypClassificationOptions,
-    PolypDysplasiaOptions,
     PolypExcisionCompleteOptions,
     PolypInterventionDeviceOptions,
-    PolypInterventionExcisionTechniqueOptions,
     PolypInterventionModalityOptions,
     PolypInterventionRetrievedOptions,
-    PolypInterventionSuccessOptions,
-    PolypReasonLeftInSituOptions,
     PolypTypeOptions,
-    ReasonPathologyLostOptions,
     SerratedLesionSubTypeOptions,
-    YesNoUncertainOptions,
-)
-from pages.screening_subject_search.reopen_fobt_screening_episode_page import (
-    ReopenFOBTScreeningEpisodePage,
 )
 from classes.repositories.person_repository import PersonRepository
+from pages.login.select_job_role_page import SelectJobRolePage
 
 
-@pytest.mark.wip
 @pytest.mark.usefixtures("setup_org_and_appointments")
 @pytest.mark.vpn_required
 @pytest.mark.regression
@@ -640,5 +620,205 @@ def test_scenario_11(page: Page) -> None:
     EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
 
     # And The Screening Centre cancels the practitioner appointment with reason "Screening Centre Cancelled"
+    AppointmentDetailPage(page).check_cancel_radio()
+    AppointmentDetailPage(page).select_reason_for_cancellation_option(
+        ReasonForCancellationOptions.SCREENING_CENTRE_CANCELLED
+    )
 
+    # And I press OK on my confirmation prompt
+    AppointmentDetailPage(page).click_save_button(accept_dialog=True)
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A417 Post-investigation Appointment Cancelled by SC",
+        },
+    )
+
+    # And there is a "A417" letter batch for my subject with the exact title "Post-Investigation Appointment Cancelled (Screening Centre)"
+    # When I process the open "A417" letter batch for my subject
+    batch_processing(
+        page,
+        "A417",
+        "Post-Investigation Appointment Cancelled (Screening Centre)",
+        "A422 - Post-investigation Appointment Cancellation Letter Printed",
+    )
+
+    # When I advance the subject's episode for "Post-investigation Appointment Required"
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(
+        page
+    ).click_post_investigation_appointment_required_button()
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A360 - Post-investigation Appointment Required",
+        },
+    )
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # And I choose to book a practitioner clinic for my subject
+    SubjectScreeningSummaryPage(page).click_book_practitioner_clinic_button()
+
+    # And I set the practitioner appointment date to "today"
+    # And I book the earliest available post investigation appointment on this date
+    book_post_investigation_appointment(page, "The Royal Hospital (Wolverhampton)", 1)
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A410 - Post-investigation Appointment Made",
+        },
+    )
+
+    # And there is a "A410" letter batch for my subject with the exact title "Post-Investigation Appointment Invitation Letter"
+    # When I process the open "A410 - Post-Investigation Appointment Invitation Letter" letter batch for my subject
+    batch_processing(
+        page,
+        "A410",
+        "Post-Investigation Appointment Invitation Letter",
+        "A415 - Post-investigation Appointment Invitation Letter Printed",
+    )
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # And I view the event history for the subject's latest episode
+    SubjectScreeningSummaryPage(page).expand_episodes_list()
+    SubjectScreeningSummaryPage(page).click_first_fobt_episode_link()
+
+    # And I view the latest practitioner appointment in the subject's episode
+    EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
+
+    # And I attend the subject's practitioner appointment "yesterday"
+    AppointmentDetailPage(page).mark_appointment_as_attended(
+        datetime.today() - timedelta(days=1)
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A416 - Post-investigation Appointment Attended",
+        },
+    )
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # And I view the advance episode options
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+
+    # And I select the advance episode option for "Record Diagnosis Date"
+    AdvanceFOBTScreeningEpisodePage(page).click_record_diagnosis_date_button()
+
+    # And I enter a Diagnosis Date of "today"
+    RecordDiagnosisDatePage(page).enter_date_in_diagnosis_date_field(datetime.today())
+
+    # And I save Diagnosis Date Information
+    RecordDiagnosisDatePage(page).click_save_button()
+
+    # Then my subject has been updated as follows:
+    criteria = {
+        "latest episode diagnosis date reason": "Null",
+        "latest episode has diagnosis date": "Yes",
+        "latest episode includes event status": "A50 Diagnosis date recorded",
+        "latest event status": "A416 Post-investigation Appointment Attended",
+    }
+    subject_assertion(nhs_no, criteria)
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # And I select the advance episode option for "Enter Diagnostic Test Outcome"
+    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(page).click_enter_diagnostic_test_outcome_button()
+
+    # And I select Outcome of Investigation Complete
+    DiagnosticTestOutcomePage(page).select_test_outcome_option(
+        OutcomeOfDiagnosticTest.INVESTIGATION_COMPLETE
+    )
+
+    # And I save the Diagnostic Test Outcome
+    DiagnosticTestOutcomePage(page).click_save_button()
+
+    # Then my subject has been updated as follows:
+    criteria = {
+        "latest episode includes event status": "A316 Post-investigation Appointment Attended",
+        "latest event status": "A430 Post-investigation Appointment Attended - Diagnostic Result Letter not Printed",
+    }
+    subject_assertion(nhs_no, criteria)
+
+    # When I switch users to BCSS "England" as user role "Hub Manager"
+    LogoutPage(page).log_out(close_page=False)
+    BasePage(page).go_to_log_in_page()
+    UserTools.user_login(page, "Hub Manager State Registered at BCS01")
+
+    # And I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
+    batch_processing(
+        page,
+        "A183",
+        "GP Result (Abnormal)",
+    )
+
+    # Then my subject has been updated as follows:
+    criteria = {
+        "latest episode includes event status": "A167 GP Abnormal FOBT Result Sent",
+        "latest event status": "A430 Post-investigation Appointment Attended - Diagnostic Result Letter not Printed",
+    }
+    subject_assertion(nhs_no, criteria)
+
+    # When I switch users to BCSS "England" as user role "Screening Centre Clerk"
+    LogoutPage(page).log_out(close_page=False)
+    BasePage(page).go_to_log_in_page()
+    UserTools.user_login(page, "Screening Centre Clerk at BCS001")
+    SelectJobRolePage(page).select_option_for_job_role("Screening Centre Clerk")
+    SelectJobRolePage(page).click_continue_button()
+
+    # And there is a "A430" letter batch for my subject with the exact title "Result Letters Following Post-investigation Appointment"
+    # And I process the open "A430" letter batch for my subject
+    batch_processing(
+        page,
+        "A430",
+        "Result Letters Following Post-investigation Appointment",
+    )
+    # Then my subject has been updated as follows:
+    criteria = {
+        "which diagnostic test": "Latest not-void test in latest episode",
+        "calculated fobt due date": "2 years from diagnostic test",
+        "calculated lynch due date": "Null",
+        "calculated surveillance due date": "Unchanged",
+        "ceased confirmation date": "Null",
+        "ceased confirmation details": "Null",
+        "ceased confirmation user id": "Null",
+        "clinical reason for cease": "Null",
+        "latest episode accumulated result": "Abnormal",
+        "latest episode recall calculation method": "Diagnostic test date",
+        "latest episode recall episode type": "FOBT Screening",
+        "latest episode recall surveillance type": "Null",
+        "latest episode status": "Closed",
+        "latest episode status reason": "Episode Complete",
+        "latest event status": "A65 Abnormal",
+        "lynch due date": "Null",
+        "lynch due date reason": "Unchanged",
+        "lynch due date date of change": "Unchanged",
+        "screening due date": "Calculated FOBT Due Date",
+        "screening due date date of change": "Today",
+        "screening due date reason": "Recall",
+        "screening status": "Recall",
+        "screening status reason": "Recall",
+        "surveillance due date": "Null",
+        "surveillance due date date of change": "Unchanged",
+        "surveillance due date reason": "Unchanged",
+        "symptomatic procedure date": "Null",
+        "symptomatic procedure result": "Null",
+        "screening referral type": "Null",
+    }
+    subject_assertion(nhs_no, criteria)
     LogoutPage(page).log_out()
