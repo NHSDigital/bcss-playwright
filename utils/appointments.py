@@ -168,7 +168,7 @@ def book_post_investigation_appointment(
         current_time = f"{hour:02d}:{minute:02d}"
         book_appointments_page.enter_appointment_start_time(current_time)
         dialog_message = book_appointments_page.click_save_button_and_return_message()
-        if dialog_message is None or overlap_message not in (dialog_message or ""):
+        if dialog_message is None or overlap_message not in dialog_message:
             # Success or no overlap dialog
             break
         # Increase time by 15 minutes
