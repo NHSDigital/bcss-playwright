@@ -3,6 +3,7 @@ from pages.base_page import BasePage
 from utils.table_util import TableUtils
 from datetime import datetime
 from utils.calendar_picker import CalendarPicker
+from typing import Optional
 
 
 class BookAppointmentPage(BasePage):
@@ -49,7 +50,7 @@ class BookAppointmentPage(BasePage):
         """Clicks the save button."""
         self.safe_accept_dialog(self.save_button)
 
-    def click_save_button_and_return_message(self) -> str | None:
+    def click_save_button_and_return_message(self) -> Optional[str]:
         """
         Clicks the save button and returns the dialog message if a dialog appears.
         Returns None if no dialog appears.
