@@ -12,9 +12,10 @@ class DateDescriptionUtils:
     DATE_FORMAT_YYYY_MM_DD = "%Y-%m-%d"
     DATE_FORMAT_DD_MM_YYYY = "%d/%m/%Y"
 
-    # Enum name constants
-    ENUM_VAL_NULL = "NULL"
-    ENUM_VAL_NOT_NULL = "NOT_NULL"
+    # string constants
+    NULL_STRING = "NULL"
+    NOT_NULL_STRING_UNDERSCORE = "NOT_NULL"
+    NOT_NULL_STRING = "NOT NULL"
 
     @staticmethod
     def interpret_date(date_field_name: str, date_value: str) -> str:
@@ -74,10 +75,10 @@ class DateDescriptionUtils:
             # If the date description is in the enum, use the suggested suitable date, plus allow for NULL and NOT NULL
             enum_val = DateDescription.by_description_case_insensitive(date_description)
             if enum_val is not None:
-                if enum_val.name == DateDescriptionUtils.ENUM_VAL_NULL:
-                    return_date_string = DateDescriptionUtils.ENUM_VAL_NULL
-                elif enum_val.name == DateDescriptionUtils.ENUM_VAL_NOT_NULL:
-                    return_date_string = DateDescriptionUtils.ENUM_VAL_NOT_NULL
+                if enum_val.name == DateDescriptionUtils.NULL_STRING:
+                    return_date_string = DateDescriptionUtils.NULL_STRING
+                elif enum_val.name == DateDescriptionUtils.NOT_NULL_STRING_UNDERSCORE:
+                    return_date_string = DateDescriptionUtils.NOT_NULL_STRING
                 else:
                     return_date = enum_val.suitable_date
 
@@ -137,8 +138,8 @@ class DateDescriptionUtils:
         enum_val = DateDescription.by_description_case_insensitive(date_description)
         if enum_val is not None:
             if enum_val.name in [
-                DateDescriptionUtils.ENUM_VAL_NULL,
-                DateDescriptionUtils.ENUM_VAL_NOT_NULL,
+                DateDescriptionUtils.NULL_STRING,
+                DateDescriptionUtils.NOT_NULL_STRING_UNDERSCORE,
             ]:
                 raise ValueError(f"Cannot convert '{date_description}' to a date.")
             if enum_val.suitable_date is not None:
