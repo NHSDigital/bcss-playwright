@@ -1,4 +1,4 @@
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 from utils.calendar_picker import CalendarPicker
 from datetime import datetime
@@ -24,6 +24,7 @@ class ContactWithPatientPage(BasePage):
         self.discussion_record_text_field = self.page.locator("#UI_COMMENT_ID")
         self.outcome_dropdown = self.page.locator("#UI_OUTCOME")
         self.save_button = self.page.get_by_role("button", name="Save")
+        self.patient_contacted_dropdown = self.page.locator("#UI_PATIENT_CONTACTED")
 
     def select_direction_dropdown_option(self, direction: str) -> None:
         """
@@ -79,7 +80,12 @@ class ContactWithPatientPage(BasePage):
         Select an option from the 'Outcome' dropdown by its label.
 
         Args:
-        outcome (str): The label of the outcome option to select.
+            outcome (str): The label of the outcome option to select.
+            Can be one of the following:
+            - 'Suitable for Endoscopic Test'
+            - 'Suitable for Radiological Test'
+            - 'Close Episode - Patient Choice'
+            - 'SSP Appointment Required'
         """
         self.outcome_dropdown.select_option(label=outcome)
 
@@ -102,3 +108,59 @@ class ContactWithPatientPage(BasePage):
             "Post-investigation Appointment Not Required"
         )
         self.click_save_button()
+
+    def select_patient_contacted_dropdown_option(self, option: str) -> None:
+        """
+        Select an option from the 'Patient Contacted' dropdown by its label.
+
+        Args:
+            option (str): The label of the patient contacted option to select.
+            Options can be 'Yes' or 'No'.
+        """
+        self.patient_contacted_dropdown.select_option(label=option)
+
+    def record_contact(self, outcome: str, patient_contacted: str = "Yes") -> None:
+        """
+        Records contact with the patient.
+        Args:
+            outcome (str): The outcome of the contact. Options include:
+                - 'Suitable for Endoscopic Test'
+                - 'Suitable for Radiological Test'
+                - 'Close Episode - Patient Choice'
+                - 'SSP Appointment Required'
+            patient_contacted (str): Indicates if the patient was contacted. Default is 'Yes'. Options include:
+                - 'Yes'
+                - 'No'
+        """
+        self.select_direction_dropdown_option("To patient")
+        self.select_caller_id_dropdown_index_option(1)
+        self.click_calendar_button()
+        CalendarPicker(self.page).v1_calender_picker(datetime.today())
+        self.enter_start_time("11:00")
+        self.enter_end_time("12:00")
+        self.enter_discussion_record_text("TEST AUTOMATION")
+        self.select_patient_contacted_dropdown_option(patient_contacted)
+        self.select_outcome_dropdown_option(outcome)
+        self.click_save_button()
+
+    def verify_contact_with_patient_page_is_displayed(self) -> None:
+        """Verify that the 'Contact With Patient' page is displayed."""
+        expect(self.bowel_cancer_screening_ntsh_page_title).to_have_text(
+            "Contact with Patient", timeout=10000
+        )
+
+    def verify_outcome_select_options(self, options: list) -> None:
+        """
+        Verifies that the 'Outcome' dropdown contains the expected options.
+        Args:
+            options (list): A list containing all of the expected options in the dropdown.
+        Raises:
+            AssertionError: If any of the expected options are missing.
+        """
+        actual_options = self.outcome_dropdown.locator("option").all_text_contents()
+        missing = [val for val in options if val not in actual_options]
+
+        assert not missing, (
+            f"Missing expected dropdown values in the outcome options: {missing}."
+            f"Actual options: {actual_options}"
+        )

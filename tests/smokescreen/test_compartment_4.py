@@ -27,7 +27,9 @@ from utils.user_tools import UserTools
 from utils.calendar_picker import CalendarPicker
 from utils.batch_processing import batch_processing
 from datetime import datetime
-from utils.oracle.oracle_specific_functions import get_subjects_for_appointments
+from utils.oracle.oracle_specific_functions.subject_appointment import (
+    get_subjects_for_appointments,
+)
 from utils.nhs_number_tools import NHSNumberTools
 import logging
 
@@ -114,8 +116,8 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
             current_month_displayed,
             BookAppointmentPage(page).appointment_cell_locators,
             [
-                BookAppointmentPage(page).available_background_colour,
-                BookAppointmentPage(page).some_available_background_colour,
+                BookAppointmentPage(page).appointment_fully_available_colour,
+                BookAppointmentPage(page).appointment_partially_available_colour,
             ],
         )
         BookAppointmentPage(page).appointments_table.click_first_input_in_column(

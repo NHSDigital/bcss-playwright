@@ -1,11 +1,10 @@
 from datetime import datetime, timedelta
 import pandas as pd
 import pytest
-from _pytest.fixtures import FixtureRequest
 import logging
 from playwright.sync_api import Page
-from classes.subject import Subject
-from classes.user import User
+from classes.subject.subject import Subject
+from classes.user.user import User
 from pages.base_page import BasePage
 from pages.datasets.colonoscopy_dataset_page import (
     ColonoscopyDatasetsPage,
@@ -23,15 +22,6 @@ from pages.screening_practitioner_appointments.appointment_detail_page import (
 from pages.screening_practitioner_appointments.book_appointment_page import (
     BookAppointmentPage,
 )
-from pages.screening_practitioner_appointments.practitioner_availability_page import (
-    PractitionerAvailabilityPage,
-)
-from pages.screening_practitioner_appointments.screening_practitioner_appointments_page import (
-    ScreeningPractitionerAppointmentsPage,
-)
-from pages.screening_practitioner_appointments.set_availability_page import (
-    SetAvailabilityPage,
-)
 from pages.screening_subject_search.advance_fobt_screening_episode_page import (
     AdvanceFOBTScreeningEpisodePage,
 )
@@ -44,13 +34,10 @@ from pages.screening_subject_search.subject_screening_summary_page import (
 from utils.batch_processing import batch_processing
 from utils.calendar_picker import CalendarPicker
 from utils.fit_kit import FitKitGeneration
-from utils.last_test_run import has_test_run_today
 from utils.oracle.oracle import OracleDB
-from utils.oracle.oracle_specific_functions import (
+from utils.oracle.oracle_specific_functions.kit_management import (
     update_kit_service_management_entity,
     execute_fit_kit_stored_procedures,
-    set_org_parameter_value,
-    get_org_parameter_value,
 )
 from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
 from utils.screening_subject_page_searcher import (
@@ -61,30 +48,7 @@ from utils.user_tools import UserTools
 from utils.datasets.investigation_datasets import go_from_a99_status_to_a259_status
 
 
-@pytest.fixture(scope="function", autouse=True)
-def before_each(page: Page, request: FixtureRequest) -> None:
-    """
-    Checks that the required organization parameters are set correctly before each test.
-    If not, it sets them to the expected values.
-    Also sets up appointments if the test has not been run today.
-    """
-    param_12_set_correctly = check_parameter(12, "23162", "10")
-    param_28_set_correctly = check_parameter(28, "23162", "07:00")
-    param_29_set_correctly = check_parameter(29, "23162", "20:00")
-    if not param_12_set_correctly:
-        set_org_parameter_value(12, "10", "23162")
-    if not param_28_set_correctly:
-        set_org_parameter_value(28, "07:00", "23162")
-    if not param_29_set_correctly:
-        set_org_parameter_value(29, "20:00", "23162")
-
-    base_url = request.config.getoption("--base-url")
-    if not has_test_run_today(
-        "subject/episodes/datasets/investigation/endoscopy/polypcategories/test_setup", base_url  # type: ignore
-    ):
-        setup_appointments(page)
-
-
+@pytest.mark.usefixtures("setup_org_and_appointments")
 @pytest.mark.vpn_required
 def test_setup_subjects_as_a99(page: Page, subjects_to_run_for: int) -> None:
     """
@@ -95,8 +59,8 @@ def test_setup_subjects_as_a99(page: Page, subjects_to_run_for: int) -> None:
     criteria = {
         "latest event status": "S9",
         "latest episode type": "FOBT",
-        "subject has unprocessed sspi updates": "no",
-        "subject has user dob updates": "no",
+        "subject has unprocessed sspi updates": "No",
+        "subject has user dob updates": "No",
     }
     user = User()
     subject = Subject()
@@ -115,6 +79,7 @@ def test_setup_subjects_as_a99(page: Page, subjects_to_run_for: int) -> None:
     LogoutPage(page).log_out()
 
 
+@pytest.mark.usefixtures("setup_org_and_appointments")
 @pytest.mark.vpn_required
 def test_setup_subjects_as_a259(page: Page, subjects_to_run_for: int) -> None:
     """
@@ -124,7 +89,7 @@ def test_setup_subjects_as_a259(page: Page, subjects_to_run_for: int) -> None:
     page.goto("/")
     criteria = {
         "latest episode status": "open",
-        "latest episode latest investigation dataset": "colonoscopy_new",
+        "latest episode latest investigation dataset": "Colonoscopy - new",
         "latest episode started": "less than 4 years ago",
     }
     user = User()
@@ -147,8 +112,8 @@ def test_setup_subjects_as_a259(page: Page, subjects_to_run_for: int) -> None:
     criteria = {
         "latest event status": "S9",
         "latest episode type": "FOBT",
-        "subject has unprocessed sspi updates": "no",
-        "subject has user dob updates": "no",
+        "subject has unprocessed sspi updates": "No",
+        "subject has user dob updates": "No",
     }
     user = User()
     subject = Subject()
@@ -170,59 +135,6 @@ def test_setup_subjects_as_a259(page: Page, subjects_to_run_for: int) -> None:
         BasePage(page).click_main_menu_link()
         go_from_a99_status_to_a259_status(page, nhs_no)
 
-    LogoutPage(page).log_out()
-
-
-def check_parameter(param_id: int, org_id: str, expected_param_value: str) -> bool:
-    """
-    Check if the organization parameter is set correctly.
-    Args:
-        param_id (int): The ID of the parameter to check.
-        org_id (str): The ID of the organization.
-        expected_param_value (str): The expected value of the parameter.
-
-    Returns:
-        bool: True if the parameter is set correctly, False otherwise.
-    """
-    df = get_org_parameter_value(param_id, org_id)
-    for _, row in df.iterrows():
-        val_matches = str(row["val"]) == expected_param_value
-        audit_reason_matches = row["audit_reason"] == "AUTOMATED TESTING - ADD"
-
-        if val_matches and audit_reason_matches:
-            logging.info(f"Parameter {param_id} is set correctly: {row['val']}")
-            return True
-
-    logging.warning(f"Parameter {param_id} is not set correctly, updating parameter.")
-    return False
-
-
-def setup_appointments(page: Page) -> None:
-    """
-    Set up appointments for multiple practitioners at a screening centre.
-    This function logs in as a Screening Centre Manager, sets availability for
-    practitioners, and creates appointments for the next 10 practitioners.
-    """
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    for index in range(10):
-        BasePage(page).go_to_screening_practitioner_appointments_page()
-        ScreeningPractitionerAppointmentsPage(page).go_to_set_availability_page()
-        SetAvailabilityPage(page).go_to_practitioner_availability_page()
-        PractitionerAvailabilityPage(page).select_site_dropdown_option(
-            "THE ROYAL HOSPITAL (WOLVERHAMPTON)"
-        )
-        PractitionerAvailabilityPage(
-            page
-        ).select_practitioner_dropdown_option_from_index(index + 1)
-        PractitionerAvailabilityPage(page).click_calendar_button()
-        CalendarPicker(page).select_day(datetime.today())
-        PractitionerAvailabilityPage(page).click_show_button()
-        PractitionerAvailabilityPage(page).enter_start_time("07:00")
-        PractitionerAvailabilityPage(page).enter_end_time("20:00")
-        PractitionerAvailabilityPage(page).click_calculate_slots_button()
-        PractitionerAvailabilityPage(page).enter_number_of_weeks("1")
-        PractitionerAvailabilityPage(page).click_save_button()
-        BasePage(page).click_main_menu_link()
     LogoutPage(page).log_out()
 
 
@@ -342,8 +254,8 @@ def setup_a99_status(page: Page, df: pd.DataFrame) -> pd.DataFrame:
             current_month_displayed,
             BookAppointmentPage(page).appointment_cell_locators,
             [
-                BookAppointmentPage(page).available_background_colour,
-                BookAppointmentPage(page).some_available_background_colour,
+                BookAppointmentPage(page).appointment_fully_available_colour,
+                BookAppointmentPage(page).appointment_partially_available_colour,
             ],
         )
         BookAppointmentPage(page).appointments_table.click_first_input_in_column(
@@ -376,7 +288,7 @@ def setup_a99_status(page: Page, df: pd.DataFrame) -> pd.DataFrame:
         search_subject_episode_by_nhs_number(page, nhs_no)
         SubjectScreeningSummaryPage(page).expand_episodes_list()
         SubjectScreeningSummaryPage(page).click_first_fobt_episode_link()
-        EpisodeEventsAndNotesPage(page).click_view_appointment_link()
+        EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
         AppointmentDetailPage(page).wait_for_attendance_radio(
             600000
         )  # Max of 10 minute wait as appointments need to be set for future times and they are in 10 minute intervals
@@ -426,7 +338,7 @@ def setup_a99_status(page: Page, df: pd.DataFrame) -> pd.DataFrame:
         SubjectDatasetsPage(page).click_colonoscopy_show_datasets()
 
         ColonoscopyDatasetsPage(page).select_fit_for_colonoscopy_option(
-            FitForColonoscopySspOptions.YES.value
+            FitForColonoscopySspOptions.YES
         )
         ColonoscopyDatasetsPage(page).click_dataset_complete_radio_button_yes()
         ColonoscopyDatasetsPage(page).save_dataset()

@@ -15,7 +15,7 @@ from pages.screening_subject_search.subject_events_notes import (
     SubjectEventsNotes,
     AdditionalCareNoteTypeOptions,
 )
-from utils.oracle.oracle_specific_functions import (
+from utils.oracle.oracle_specific_functions.subject_notes import (
     get_subjects_by_note_count,
     get_subjects_with_multiple_notes,
 )
@@ -185,7 +185,6 @@ def test_add_additional_care_note_for_subject_with_existing_note(
         f"Verification successful: Additional care note added for the subject with NHS Number: {nhs_no}. "
         f"Title and note matched the provided values. Title: '{note_title}', Note: '{note_text}'."
     )
-
 
 @pytest.mark.regression
 @pytest.mark.note_tests
