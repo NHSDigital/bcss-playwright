@@ -51,7 +51,9 @@ from pages.screening_subject_search.contact_with_patient_page import (
 from utils.user_tools import UserTools
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
 from utils.calendar_picker import CalendarPicker
-from utils.oracle.oracle_specific_functions import get_subjects_with_booked_appointments
+from utils.oracle.oracle_specific_functions.subject_appointment import (
+    get_subjects_with_booked_appointments,
+)
 from datetime import datetime, timedelta
 import logging
 
@@ -141,7 +143,7 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
 
         ColonoscopyDatasetsPage(page).select_asa_grade_option(AsaGradeOptions.FIT.value)
         ColonoscopyDatasetsPage(page).select_fit_for_colonoscopy_option(
-            FitForColonoscopySspOptions.YES.value
+            FitForColonoscopySspOptions.YES
         )
         ColonoscopyDatasetsPage(page).click_dataset_complete_radio_button_yes()
         ColonoscopyDatasetsPage(page).save_dataset()

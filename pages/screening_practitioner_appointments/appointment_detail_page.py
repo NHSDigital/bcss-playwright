@@ -1,5 +1,8 @@
 from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
+from enum import StrEnum
+from datetime import datetime
+from utils.calendar_picker import CalendarPicker
 
 
 class AppointmentDetailPage(BasePage):
@@ -13,6 +16,10 @@ class AppointmentDetailPage(BasePage):
         self.attended_check_box = self.page.locator("#UI_ATTENDED")
         self.calendar_button = self.page.get_by_role("button", name="Calendar")
         self.save_button = self.page.get_by_role("button", name="Save")
+        self.cancel_radio = self.page.get_by_role("radio", name="Cancel")
+        self.reason_for_cancellation_dropdown = self.page.get_by_label(
+            "Reason for Cancellation"
+        )
 
     def check_attendance_radio(self) -> None:
         """Checks the attendance radio button."""
@@ -26,9 +33,16 @@ class AppointmentDetailPage(BasePage):
         """Clicks the calendar button."""
         self.click(self.calendar_button)
 
-    def click_save_button(self) -> None:
-        """Clicks the save button."""
-        self.click(self.save_button)
+    def click_save_button(self, accept_dialog: bool = False) -> None:
+        """
+        Clicks the save button.
+        Args:
+            accept_dialog (bool): Whether to accept the dialog.
+        """
+        if accept_dialog:
+            self.safe_accept_dialog(self.save_button)
+        else:
+            self.click(self.save_button)
 
     def verify_text_visible(self, text: str) -> None:
         """Verifies that the specified text is visible on the page."""
@@ -60,3 +74,48 @@ class AppointmentDetailPage(BasePage):
                 timeout_duration - elapsed if timeout_duration - elapsed > 0 else 1000
             )
         )
+
+    def check_cancel_radio(self) -> None:
+        """Checks the cancel radio button."""
+        self.cancel_radio.check()
+
+    def select_reason_for_cancellation_option(self, option: str) -> None:
+        """
+        Selects the reason for cancellation from the dropdown.
+        Args:
+            option: The reason for cancellation to select.
+            The options are in the ReasonForCancellationOptions class
+        """
+        self.reason_for_cancellation_dropdown.select_option(value=option)
+
+    def mark_appointment_as_attended(self, date: datetime) -> None:
+        """
+        Marks an appointment as attended.
+        Args:
+            date (datetime): The date the appointment was attended
+        """
+        self.wait_for_attendance_radio(
+            600000
+        )  # Max of 10 minute wait as appointments need to be set for future times and they are in 10 minute intervals
+        self.check_attendance_radio()
+        self.check_attended_check_box()
+        self.click_calendar_button()
+        CalendarPicker(self.page).v1_calender_picker(date)
+        self.click_save_button()
+        self.verify_text_visible("Record updated")
+
+
+class ReasonForCancellationOptions(StrEnum):
+    """Enum for cancellation reason options"""
+
+    PATIENT_REQUESTS_DISCHARGE_FROM_SCREENING = "6008"
+    PATIENT_UNSUITABLE_RECENTLY_SCREENED = "6007"
+    PATIENT_UNSUITABLE_CURRENTLY_UNDERGOING_TREATMENT = "6006"
+    PATIENT_CANCELLED_TO_CONSIDER = "6005"
+    PATIENT_CANCELLED_MOVED_OUT_OF_AREA = "6003"
+    SCREENING_CENTRE_CANCELLED_OTHER_REASON = "6002"
+    CLINIC_UNAVAILABLE = "6001"
+    PRACTITIONER_UNAVAILABLE = "6000"
+    PATIENT_CANCELLED_OTHER_REASON = "6004"
+    PATIENT_CANCELLED = "6020"
+    SCREENING_CENTRE_CANCELLED = "6019"

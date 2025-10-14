@@ -1,8 +1,10 @@
+import re
 from playwright.sync_api import Page, expect, Locator
 from pages.base_page import BasePage
 from enum import Enum
 import logging
 import pytest
+from typing import List
 
 
 class SubjectScreeningSummaryPage(BasePage):
@@ -32,7 +34,9 @@ class SubjectScreeningSummaryPage(BasePage):
         self.individual_letters = self.page.get_by_role(
             "link", name="Individual Letters"
         )
-        self.retrieve_data_link = self.page.get_by_role("link", name="Retrieve Data from Spine")
+        self.retrieve_data_link = self.page.get_by_role(
+            "link", name="Retrieve Data from Spine"
+        )
         self.patient_contacts = self.page.get_by_role("link", name="Patient Contacts")
         self.more = self.page.get_by_role("link", name="more")
         self.change_screening_status = self.page.get_by_label("Change Screening Status")
@@ -40,7 +44,7 @@ class SubjectScreeningSummaryPage(BasePage):
         self.update_subject_data = self.page.get_by_role(
             "button", name="Update Subject Data"
         )
-        self.close_fobt_screening_episode = self.page.get_by_role(
+        self.close_fobt_screening_episode_button = self.page.get_by_role(
             "button", name="Close FOBT Screening Episode"
         )
         self.a_page_to_advance_the_episode = self.page.get_by_text(
@@ -68,6 +72,22 @@ class SubjectScreeningSummaryPage(BasePage):
         self.view_events_link = self.page.get_by_role("link", name="events")
         self.book_practitioner_clinic_button = self.page.get_by_role(
             "button", name="Book Practitioner Clinic"
+        )
+        self.subject_age_cell = self.page.locator(
+            "table#subjectSummaryTable tr:nth-of-type(1) td:nth-of-type(2)"
+        )
+
+        self.screening_status_cell = self.page.locator(
+            "td.epihdr_label:text('Screening Status') + td.epihdr_data"
+        )
+        self.latest_event_status_cell = self.page.locator(
+            "td.epihdr_label:text('Latest Event Status') + td.epihdr_data"
+        )
+        self.reopen_fobt_screening_episode_button = self.page.get_by_role(
+            "button", name="Reopen FOBT Screening Episode"
+        )
+        self.reopen_for_correction_button = self.page.get_by_role(
+            "button", name="Reopen episode for correction"
         )
 
     def wait_for_page_title(self) -> None:
@@ -100,21 +120,27 @@ class SubjectScreeningSummaryPage(BasePage):
         """Verify that the latest event status header is visible."""
         expect(self.latest_event_status).to_be_visible()
 
-    def verify_latest_event_status_value(self, latest_event_status: str | list) -> None:
+    def verify_latest_event_status_value(
+        self, latest_event_status: str | List[str]
+    ) -> None:
         """Verify that the latest event status value is visible."""
         self.wait_for_page_title()
         latest_event_status_locator = self.get_visible_status_from_list(
             latest_event_status
         )
         status = latest_event_status_locator.inner_text()
-        logging.info(f"Verifying subject has the status: {status}")
+        logging.info(f"[UI ASSERTIONS] Verifying subject has the status: {status}")
         try:
             expect(latest_event_status_locator).to_be_visible()
-            logging.info(f"Subject has the status: {status}")
+            logging.info(f"[UI ASSERTIONS COMPLETE] Subject has the status: {status}")
         except Exception:
-            pytest.fail(f"Subject does not have the status: {status}")
+            pytest.fail(
+                f"[UI ASSERTIONS FAILED] Subject does not have the status: {status}"
+            )
 
-    def get_visible_status_from_list(self, latest_event_status) -> Locator:
+    def get_visible_status_from_list(
+        self, latest_event_status: str | List[str]
+    ) -> Locator:
         """
         Get the first visible status from the latest event status string or list.
 
@@ -166,7 +192,7 @@ class SubjectScreeningSummaryPage(BasePage):
 
     def click_close_fobt_screening_episode(self) -> None:
         """Click on the 'Close FOBT Screening Episode' button."""
-        self.click(self.close_fobt_screening_episode)
+        self.click(self.close_fobt_screening_episode_button)
 
     def go_to_a_page_to_advance_the_episode(self) -> None:
         """Click on the link to go to a page to advance the episode."""
@@ -318,9 +344,84 @@ class SubjectScreeningSummaryPage(BasePage):
         Navigates to the Spine Search screen by clicking the appropriate link
         and loading the target URL.
         """
-        #self.retrieve_data_link.click()
         self.click(self.retrieve_data_link)
         self.page.goto(self.spine_url)
+
+    def assert_subject_age(self, expected_age: int) -> None:
+        """
+        Asserts that the subject's age displayed in the demographics cell matches the expected value.
+
+        Args:
+            expected_age (int): The age to verify against the UI.
+
+        Raises:
+            AssertionError: If the age in the UI does not match the expected value.
+        """
+        age_text = self.subject_age_cell.inner_text().strip()
+        match = re.search(r"\(age\s+(\d+)\)", age_text)
+        if not match:
+            raise AssertionError(
+                f"[AGE PARSE ERROR] Could not find age in text: '{age_text}'"
+            )
+
+        actual_age = int(match.group(1))
+        assert (
+            actual_age == expected_age
+        ), f"[AGE MISMATCH] Expected age {expected_age}, but found {actual_age} in UI."
+        logging.info("[UI ASSERTIONS COMPLETE] Subject age checked in the UI")
+
+    def assert_screening_status(self, expected_status: str) -> None:
+        """
+        Asserts that the screening status displayed in the summary matches the expected value.
+
+        Args:
+            expected_status (str): The expected screening status (e.g., 'Inactive').
+
+        Raises:
+            AssertionError: If the status in the UI does not match the expected value.
+        """
+        actual_status = self.screening_status_cell.inner_text().strip()
+        assert (
+            actual_status.lower() == expected_status.lower()
+        ), f"[SCREENING STATUS MISMATCH] Expected '{expected_status}', but found '{actual_status}' in UI."
+        logging.info(
+            "[UI ASSERTIONS COMPLETE] Subject screening status checked in the UI"
+        )
+
+    def assert_latest_event_status(self, expected_status: str) -> None:
+        """
+        Asserts that the latest event status displayed in the summary table matches the expected value.
+
+        Args:
+            expected_status (str): The expected event status (e.g., 'S9 Pre-invitation Sent').
+
+        Raises:
+            AssertionError: If the status in the UI does not match the expected value.
+        """
+        actual_status = self.latest_event_status_cell.inner_text().strip()
+        assert (
+            actual_status == expected_status
+        ), f"[LATEST EVENT STATUS MISMATCH] Expected '{expected_status}', but found '{actual_status}' in UI."
+        logging.info(
+            "[UI ASSERTIONS COMPLETE] Subject latest event status checked in the UI"
+        )
+
+    def click_reopen_fobt_screening_episode_button(self) -> None:
+        """Click on the 'Reopen FOBT Screening Episode' button"""
+        self.click(self.reopen_fobt_screening_episode_button)
+
+    def reopen_fobt_screening_episode(self) -> None:
+        """
+        Reopen a previously closed FOBT screening episode, including confirmation modal.
+        - Clicks the 'Reopen FOBT Screening Episode' button
+        - Then safely accepts the dialog triggered by 'Reopen episode for correction'
+        """
+        # Step 1: Click the initial 'Reopen FOBT Screening Episode' button
+        self.click_reopen_fobt_screening_episode_button()
+
+        # Step 2: Safely accept the confirmation dialog triggered by the correction button
+        self.safe_accept_dialog(self.reopen_for_correction_button)
+
 
 class ChangeScreeningStatusOptions(Enum):
     """Enum for Change Screening Status options."""

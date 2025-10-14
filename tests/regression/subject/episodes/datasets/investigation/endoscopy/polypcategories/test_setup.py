@@ -3,8 +3,8 @@ import pandas as pd
 import pytest
 import logging
 from playwright.sync_api import Page
-from classes.subject import Subject
-from classes.user import User
+from classes.subject.subject import Subject
+from classes.user.user import User
 from pages.base_page import BasePage
 from pages.datasets.colonoscopy_dataset_page import (
     ColonoscopyDatasetsPage,
@@ -35,7 +35,7 @@ from utils.batch_processing import batch_processing
 from utils.calendar_picker import CalendarPicker
 from utils.fit_kit import FitKitGeneration
 from utils.oracle.oracle import OracleDB
-from utils.oracle.oracle_specific_functions import (
+from utils.oracle.oracle_specific_functions.kit_management import (
     update_kit_service_management_entity,
     execute_fit_kit_stored_procedures,
 )
@@ -59,8 +59,8 @@ def test_setup_subjects_as_a99(page: Page, subjects_to_run_for: int) -> None:
     criteria = {
         "latest event status": "S9",
         "latest episode type": "FOBT",
-        "subject has unprocessed sspi updates": "no",
-        "subject has user dob updates": "no",
+        "subject has unprocessed sspi updates": "No",
+        "subject has user dob updates": "No",
     }
     user = User()
     subject = Subject()
@@ -89,7 +89,7 @@ def test_setup_subjects_as_a259(page: Page, subjects_to_run_for: int) -> None:
     page.goto("/")
     criteria = {
         "latest episode status": "open",
-        "latest episode latest investigation dataset": "colonoscopy_new",
+        "latest episode latest investigation dataset": "Colonoscopy - new",
         "latest episode started": "less than 4 years ago",
     }
     user = User()
@@ -112,8 +112,8 @@ def test_setup_subjects_as_a259(page: Page, subjects_to_run_for: int) -> None:
     criteria = {
         "latest event status": "S9",
         "latest episode type": "FOBT",
-        "subject has unprocessed sspi updates": "no",
-        "subject has user dob updates": "no",
+        "subject has unprocessed sspi updates": "No",
+        "subject has user dob updates": "No",
     }
     user = User()
     subject = Subject()
@@ -254,8 +254,8 @@ def setup_a99_status(page: Page, df: pd.DataFrame) -> pd.DataFrame:
             current_month_displayed,
             BookAppointmentPage(page).appointment_cell_locators,
             [
-                BookAppointmentPage(page).available_background_colour,
-                BookAppointmentPage(page).some_available_background_colour,
+                BookAppointmentPage(page).appointment_fully_available_colour,
+                BookAppointmentPage(page).appointment_partially_available_colour,
             ],
         )
         BookAppointmentPage(page).appointments_table.click_first_input_in_column(
@@ -288,7 +288,7 @@ def setup_a99_status(page: Page, df: pd.DataFrame) -> pd.DataFrame:
         search_subject_episode_by_nhs_number(page, nhs_no)
         SubjectScreeningSummaryPage(page).expand_episodes_list()
         SubjectScreeningSummaryPage(page).click_first_fobt_episode_link()
-        EpisodeEventsAndNotesPage(page).click_view_appointment_link()
+        EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
         AppointmentDetailPage(page).wait_for_attendance_radio(
             600000
         )  # Max of 10 minute wait as appointments need to be set for future times and they are in 10 minute intervals
@@ -338,7 +338,7 @@ def setup_a99_status(page: Page, df: pd.DataFrame) -> pd.DataFrame:
         SubjectDatasetsPage(page).click_colonoscopy_show_datasets()
 
         ColonoscopyDatasetsPage(page).select_fit_for_colonoscopy_option(
-            FitForColonoscopySspOptions.YES.value
+            FitForColonoscopySspOptions.YES
         )
         ColonoscopyDatasetsPage(page).click_dataset_complete_radio_button_yes()
         ColonoscopyDatasetsPage(page).save_dataset()
