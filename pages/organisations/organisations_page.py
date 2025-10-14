@@ -70,14 +70,14 @@ class OrganisationsPage(BasePage):
 
     def navigate_to_surveillance_review_summary(self) -> None:
         """Navigates through the organisation pages to the Surveillance Review Summary."""
-        self.org_and_site_details_link.click()
-        self.list_all_orgs_link.click()
+        self.click(self.org_and_site_details_link)
+        self.click(self.list_all_orgs_link)
         self.click_back_button()
-        self.list_all_sites_link.click()
+        self.click(self.list_all_sites_link)
         for _ in range(3):
             self.click_back_button()
-        self.surveillance_link.click()
-        self.manage_surveillance_review_link.click()
+        self.click(self.surveillance_link)
+        self.click(self.manage_surveillance_review_link)
         self.page.goto(
             "https://bcss-bcss-18680-ddc-bcss.k8s-nonprod.texasplatform.uk/surveillance/review/summary"
         )

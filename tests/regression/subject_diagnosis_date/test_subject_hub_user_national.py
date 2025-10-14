@@ -14,7 +14,6 @@ from pages.surveillance.surveillance_summary_review_page import SurveillanceSumm
 
 
 # Scenario 1
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.hub_user_tests
 def test_hub_user_alerts_populated(page: Page) -> None:
@@ -33,7 +32,6 @@ def test_hub_user_alerts_populated(page: Page) -> None:
 
 
 # Scenario 2
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.hub_user_tests
 def test_hub_user_kits_logged_not_read_report(page: Page) -> None:
@@ -52,7 +50,6 @@ def test_hub_user_kits_logged_not_read_report(page: Page) -> None:
 
 
 # Scenario 3
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.hub_user_tests
 def test_hub_user_people_requiring_colonoscopy_assessment_report(page: Page) -> None:
@@ -71,7 +68,6 @@ def test_hub_user_people_requiring_colonoscopy_assessment_report(page: Page) -> 
 
 
 # Scenario 4
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.hub_user_tests
 def test_screening_centre_user_subject_search_and_summary(page: Page) -> None:
@@ -92,7 +88,6 @@ def test_screening_centre_user_subject_search_and_summary(page: Page) -> None:
 
 
 # Scenario 5
-@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.hub_user_tests
 def test_screening_centre_user_subject_search_and_surveillance(page: Page) -> None:

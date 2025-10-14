@@ -230,20 +230,21 @@ class SubjectScreeningPage(BasePage):
             screening_status (Optional[str]): Screening status code.
             episode_status (Optional[str]): Episode status code.
         """
+        # Fill in all provided fields before triggering any search
         if surname:
             self.surname_field.fill(surname)
         if forename:
             self.forename_field.fill(forename)
         if screening_status:
             self.screening_status_dropdown.select_option(screening_status)
-            self.screening_status_dropdown.click()
-        if surname or forename or screening_status:
-            self.click(self.search_button)
-            self.back_link.click()
+            self.click(self.screening_status_dropdown)
         if episode_status:
             self.episode_status_dropdown.select_option(episode_status)
+
+        # Only click search if at least one field was filled
+        if any([surname, forename, screening_status, episode_status]):
             self.click(self.search_button)
-            self.back_link.click()
+            self.click(self.back_link)
 
 
 class ScreeningStatusSearchOptions(Enum):

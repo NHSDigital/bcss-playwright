@@ -29,11 +29,11 @@ class SurveillanceSummaryPage(BasePage):
 
     def navigate_to_surveillance_review_summary(self):
         """Navigates through multiple UI steps to reach the Surveillance Review Summary section."""
-        self.org_and_site_details_link.click()
-        self.list_all_orgs_link.click()
-        self.back_link.click()
-        self.list_all_sites_link.click()
+        self.click(self.org_and_site_details_link)
+        self.click(self.list_all_orgs_link)
+        self.click(self.back_link)
+        self.click(self.list_all_sites_link)
         for _ in range(3):
-            self.back_link.click()
-        self.surveillance_link.click()
-        self.manage_surveillance_review_link.click()
+            self.click(self.back_link)
+        self.click(self.surveillance_link)
+        self.click(self.manage_surveillance_review_link)
