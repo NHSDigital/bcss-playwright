@@ -3,6 +3,7 @@ from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 from enum import Enum
 from utils.calendar_picker import CalendarPicker
+from typing import Optional
 
 
 class SubjectScreeningPage(BasePage):
@@ -213,17 +214,36 @@ class SubjectScreeningPage(BasePage):
 
         logging.info("[KIT REQUEST] 'Send a kit' form submitted successfully")
 
-    def search_subject_with_args(self, surname: str, forename: str, screening_status: str, episode_status: str) -> None:
-        """Searches for a subject using the provided criteria."""
-        self.surname_field.fill(surname)
-        self.forename_field.fill(forename)
-        self.screening_status_dropdown.select_option(screening_status)
-        self.screening_status_dropdown.click()
-        self.search_button.click()
-        self.back_link.click()
-        self.episode_status_dropdown.select_option(episode_status)
-        self.search_button.click()
-        self.back_link.click()
+    def search_subject_with_args(
+        self,
+        surname: Optional[str] = None,
+        forename: Optional[str] = None,
+        screening_status: Optional[str] = None,
+        episode_status: Optional[str] = None,
+    ) -> None:
+        """
+        Searches for a subject using any combination of the provided criteria.
+
+        Args:
+            surname (Optional[str]): Subject's surname.
+            forename (Optional[str]): Subject's forename.
+            screening_status (Optional[str]): Screening status code.
+            episode_status (Optional[str]): Episode status code.
+        """
+        if surname:
+            self.surname_field.fill(surname)
+        if forename:
+            self.forename_field.fill(forename)
+        if screening_status:
+            self.screening_status_dropdown.select_option(screening_status)
+            self.screening_status_dropdown.click()
+        if surname or forename or screening_status:
+            self.click(self.search_button)
+            self.back_link.click()
+        if episode_status:
+            self.episode_status_dropdown.select_option(episode_status)
+            self.click(self.search_button)
+            self.back_link.click()
 
 
 class ScreeningStatusSearchOptions(Enum):

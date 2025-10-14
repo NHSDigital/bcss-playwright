@@ -4,11 +4,17 @@ from utils.user_tools import UserTools
 from pages.base_page import BasePage
 from pages.alerts.alerts_page import AlertsPage
 from pages.gfobt_test_kits.gfobt_test_kits_page import GFOBTTestKitsPage
-from pages.screening_practitioner_appointments.screening_practitioner_appointments_page import ScreeningPractitionerAppointmentsPage
-from pages.screening_subject_search.subject_screening_search_page import SubjectScreeningPage
+from pages.screening_practitioner_appointments.screening_practitioner_appointments_page import (
+    ScreeningPractitionerAppointmentsPage,
+)
+from pages.screening_subject_search.subject_screening_search_page import (
+    SubjectScreeningPage,
+)
 from pages.surveillance.surveillance_summary_review_page import SurveillanceSummaryPage
 
+
 # Scenario 1
+@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.hub_user_tests
 def test_hub_user_alerts_populated(page: Page) -> None:
@@ -25,7 +31,9 @@ def test_hub_user_alerts_populated(page: Page) -> None:
     alerts_page.click_refresh_alerts()
     expect(alerts_page.refresh_alerts_link).to_be_visible(timeout=5000)
 
+
 # Scenario 2
+@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.hub_user_tests
 def test_hub_user_kits_logged_not_read_report(page: Page) -> None:
@@ -42,7 +50,9 @@ def test_hub_user_kits_logged_not_read_report(page: Page) -> None:
     test_kits_page.open_test_kits_report()
     expect(test_kits_page.test_kits_header).to_be_visible(timeout=5000)
 
+
 # Scenario 3
+@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.hub_user_tests
 def test_hub_user_people_requiring_colonoscopy_assessment_report(page: Page) -> None:
@@ -59,7 +69,9 @@ def test_hub_user_people_requiring_colonoscopy_assessment_report(page: Page) -> 
     appointments_page.open_appointments_report()
     expect(appointments_page.appointments_header).to_be_visible(timeout=5000)
 
+
 # Scenario 4
+@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.hub_user_tests
 def test_screening_centre_user_subject_search_and_summary(page: Page) -> None:
@@ -74,9 +86,13 @@ def test_screening_centre_user_subject_search_and_summary(page: Page) -> None:
     # Step 2: Use POM for subject search
     search_page = SubjectScreeningPage(page)
     """screening_status=4004 value represents 'Recall' & episode_status=2 value represents 'Closed'"""
-    search_page.search_subject_with_args(surname="A*", forename="A*", screening_status="4004", episode_status="2")
+    search_page.search_subject_with_args(
+        surname="A*", forename="A*", screening_status="4004", episode_status="2"
+    )
+
 
 # Scenario 5
+@pytest.mark.wip
 @pytest.mark.regression
 @pytest.mark.hub_user_tests
 def test_screening_centre_user_subject_search_and_surveillance(page: Page) -> None:
@@ -89,15 +105,6 @@ def test_screening_centre_user_subject_search_and_surveillance(page: Page) -> No
     BasePage(page).go_to_organisations_page()
 
     # Step 2: Use POM for navigation and assertion
-    sur_page = SurveillanceSummaryPage(
-    page,
-    org_and_site_details_link_text="Organisation and Site Details",
-    list_all_orgs_link_text="List All Organisations",
-    list_all_sites_link_text="List All Sites",
-    surveillance_link_text="Surveillance",
-    manage_surveillance_review_link_text="Manage Surveillance Review",
-    surveillance_review_summary_header_text="Surveillance Review Summary"
-)
+    sur_page = SurveillanceSummaryPage(page)
     sur_page.navigate_to_surveillance_review_summary()
     expect(sur_page.surveillance_review_summary_header).to_be_visible(timeout=5000)
-
