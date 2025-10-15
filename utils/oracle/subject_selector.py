@@ -20,6 +20,12 @@ class SubjectSelector:
 
         Args:
             criteria (dict): Dictionary of filtering conditions to select a subject.
+                Example criteria:
+                    {
+                        "subject age": "75",
+                        "screening status": "Inactive",
+                        "subject hub code": "BCS02",
+                    }
 
         Returns:
             str: The NHS number of the selected subject.
@@ -63,6 +69,12 @@ class SubjectSelector:
 
         Args:
             criteria (dict): Dictionary of filtering conditions to select a subject.
+                Example criteria:
+                    {
+                        "subject age": "75",
+                        "screening status": "Pre-invitation",
+                        "subject hub code": "BCS02",
+                    }
 
         Returns:
             str: The NHS number of the selected subject.
@@ -105,6 +117,14 @@ class SubjectSelector:
         """
         Retrieves a subject NHS number suitable for Lynch self-referral scenarios.
         If no subject is found, creates one and returns its NHS number.
+
+        Internally uses the following selection criteria:
+            {
+                "subject age": "75",
+                "subject has lynch diagnosis": "Yes",
+                "screening status": "Lynch Self-referral",
+                "subject hub code": "BCS01"
+            }
 
         Args:
             screening_centre (str): Screening centre code for subject association.

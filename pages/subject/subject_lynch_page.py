@@ -7,10 +7,14 @@ class SubjectPage(BasePage):
     """Page object for interacting with subject-related actions."""
 
     class StatusCodes:
+        """Status codes used in the screening status dropdown."""
+
         LYNCH_SELF_REFERRAL = "4005"
         SEEKING_FURTHER_DATA = "4007"
 
     class ReasonCodes:
+        """Reason codes used in the reason dropdown."""
+
         SELF_REFERRAL = "11316"
         UNCERTIFIED_DEATH = "11314"
         RESET_TO_SELF_REFERRAL = "11529"
