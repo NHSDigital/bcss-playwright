@@ -1,3 +1,4 @@
+import pandas as pd
 from oracle.oracle import OracleDB
 import logging
 from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
@@ -95,4 +96,64 @@ class SubjectSelector:
 
         nhs_number = result_df["subject_nhs_number"].iloc[0]
         logging.info(f"[SUBJECT SELECTOR] Found subject NHS number: {nhs_number}")
+        return nhs_number
+
+    @staticmethod
+    def get_or_create_subject_for_lynch_self_referral(
+        screening_centre: str = "BCS01", base_age: int = 75
+    ) -> str:
+        """
+        Retrieves a subject NHS number suitable for Lynch self-referral scenarios.
+        If no subject is found, creates one and returns its NHS number.
+
+        Args:
+            screening_centre (str): Screening centre code for subject association.
+            base_age (int): Minimum age to filter subject candidates.
+
+        Returns:
+            str: The NHS number of the selected or created subject.
+        """
+        from utils.oracle.oracle import OracleSubjectTools  # avoid circular import
+
+        criteria = {
+            "subject age": str(base_age),
+            "subject has lynch diagnosis": "Yes",
+            "screening status": "Lynch Self-referral",
+            "subject hub code": screening_centre,
+        }
+
+        logging.info(
+            "[SUBJECT SELECTOR] Attempting to find or create Lynch self-referral subject"
+        )
+        user_details = UserTools.retrieve_user(f"Hub Manager at {screening_centre}")
+        user = UserTools.get_user_object(user_details)
+        subject = Subject()
+        query_builder = SubjectSelectionQueryBuilder()
+
+        query, bind_vars = query_builder.build_subject_selection_query(
+            criteria=criteria,
+            user=user,
+            subject=subject,
+        )
+        result_df = OracleDB().execute_query(query, bind_vars)
+
+        if not result_df.empty:
+            nhs_number = result_df["subject_nhs_number"].iloc[0]
+            logging.info(
+                f"[SUBJECT SELECTOR] Found existing subject NHS number: {nhs_number}"
+            )
+            return nhs_number
+
+        logging.warning("[SUBJECT SELECTOR] No existing subject found — creating one")
+        nhs_number = OracleSubjectTools().create_self_referral_ready_subject(
+            screening_centre=screening_centre,
+            base_age=base_age,
+        )
+        logging.info(
+            f"[SUBJECT CREATED - LYNCH SELF-REFERRAL] NHS number: {nhs_number}"
+        )
+
+        nhs_df = pd.DataFrame({"subject_nhs_number": [nhs_number]})
+        OracleDB().exec_bcss_timed_events(nhs_df)
+
         return nhs_number

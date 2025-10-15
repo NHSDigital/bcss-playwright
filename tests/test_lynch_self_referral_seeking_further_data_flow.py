@@ -6,9 +6,11 @@ from classes.user.user import User
 from pages.logout.log_out_page import LogoutPage
 from utils.oracle.oracle import OracleDB, OracleSubjectTools
 from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
+from utils.oracle.subject_selector import SubjectSelector
 from utils.user_tools import UserTools
 from pages.subject.subject_lynch_page import SubjectPage
 from utils.subject_assertion import subject_assertion
+from utils import screening_subject_page_searcher
 
 
 @pytest.mark.wip
@@ -27,46 +29,44 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
     Set to Seeking Further Data
     Revert to Lynch Self-referral
     """
+    subject_page = SubjectPage(page)
+
     logging.info("[TEST START] test_lynch_self_referral_seeking_further_data_flow")
 
     # Given I log in to BCSS "England" as user role "Hub Manager"
     login_role = "Hub Manager at BCS01"
-
-    # Log in using the string
     UserTools.user_login(page, login_role)
 
-    # Retrieve user details using the same string
+    criteria = {
+        "subject age": "75",
+        "subject has lynch diagnosis": "Yes",
+        "screening status": "Lynch Self-referral",
+        "subject hub code": "BCS01",
+    }
+
+    # Retrieve user details and user object
     user_details = UserTools.retrieve_user(login_role)
     user = UserTools.get_user_object(user_details)
 
-    # And I have created a new subject ready for self-referral using OracleSubjectTools
-    nhs_no = OracleSubjectTools().create_self_referral_ready_subject(
-        screening_centre=user_details["hub_code"], base_age=75
+    # # TODO: When I receive Lynch diagnosis "EPCAM" for a new subject in my hub aged "75" with diagnosis date "3 years ago" and last colonoscopy date "2 years ago"
+    # Get or create a subject suitable for Lynch self-referral
+    nhs_no = SubjectSelector.get_or_create_subject_for_lynch_self_referral(
+        screening_centre=user_details["hub_code"],
+        base_age=75,
     )
 
     logging.info(
         "[SUBJECT CREATED IN DB] created subject in the database with no screening history who is eligible to self refer"
     )
 
-    # TODO: When I receive Lynch diagnosis "EPCAM" for a new subject in my hub aged "75" with diagnosis date "3 years ago" and last colonoscopy date "2 years ago"
-    prepare_subject_with_lynch_diagnosis(
-        page,
-        user,
-        nhs_no,
-        SubjectPage.TestData.subject_age,
-        SubjectPage.TestData.diagnosis_date,
-        SubjectPage.TestData.last_colonoscopy_date,
-    )
-
     # Then Comment: NHS number
     logging.info(f"[SUBJECT CREATION] Created subject's NHS number: {nhs_no}")
 
-    # When I self refer the subject
-    subject_page = SubjectPage(page)
+    # TODO: When I self refer the subject
+    # And I press OK on my confirmation prompt
     subject_page.self_refer_subject()
-    subject_page.confirm_prompt()
+    logging.info("[UI ACTION] Self-referred the subject")
 
-    # TODO: And I press OK on my confirmation prompt
     # Then my subject has been updated as follows:
     criteria = {
         "calculated fobt due date": "Null",
@@ -91,6 +91,12 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
     }
 
     subject_assertion(nhs_no, criteria)
+    logging.info(
+        "[ASSERTION PASSED] Subject details after self-referral are as expected"
+    )
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
     # When I set the subject to Seeking Further Data
     subject_page.set_seeking_further_data()
@@ -121,9 +127,7 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
     subject_assertion(nhs_no, criteria)
 
     # When I set the subject from Seeking Further Data back to "Lynch Self-referral"
-    subject_page.set_screening_status(
-        SubjectPage.TestData.screening_status_lynch_self_referral
-    )
+    subject_page.set_self_referral_screening_status()
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -149,6 +153,7 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
     }
 
     subject_assertion(nhs_no, criteria)
+
     LogoutPage(page).log_out()
     logging.info("[TEST END] test_lynch_self_referral_seeking_further_data_flow")
 
@@ -173,9 +178,6 @@ def prepare_subject_with_lynch_diagnosis(
     """
 
     criteria = {"nhs number": nhs_no}
-
-    # if last_colonoscopy_date:
-    #     criteria["lynch last colonoscopy date"] = last_colonoscopy_date
 
     query, bind_vars = SubjectSelectionQueryBuilder().build_subject_selection_query(
         criteria=criteria,
