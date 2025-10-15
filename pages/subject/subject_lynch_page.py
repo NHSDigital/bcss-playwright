@@ -6,6 +6,16 @@ import logging
 class SubjectPage(BasePage):
     """Page object for interacting with subject-related actions."""
 
+    class Locators:
+        SCREENING_STATUS_DROPDOWN = "Change Screening Status"
+        REASON_DROPDOWN = "Reason"
+        UPDATE_BUTTON = "Update Subject Data"
+        DIAGNOSIS_TYPE_DROPDOWN = "Diagnosis Type"
+        AGE_INPUT = "Age"
+        DIAGNOSIS_DATE_INPUT = "Diagnosis Date"
+        LAST_COLONOSCOPY_DATE_INPUT = "Last Colonoscopy Date"
+        SUBMIT_BUTTON = "Submit"
+
     class StatusCodes:
         """Status codes used in the screening status dropdown."""
 
@@ -36,16 +46,18 @@ class SubjectPage(BasePage):
         logging.info("[UI ACTION] Self-referring the subject")
 
         # Select 'Lynch Self-referral' from the dropdown
-        self.page.get_by_label("Change Screening Status").select_option(
+        self.page.get_by_label(self.Locators.SCREENING_STATUS_DROPDOWN).select_option(
             self.StatusCodes.LYNCH_SELF_REFERRAL
         )
 
-        # Select reason: 'Self-referral' (value: 11316)
-        self.page.get_by_label("Reason").select_option(self.ReasonCodes.SELF_REFERRAL)
+        # Select reason: 'Reset seeking further data to Lynch Self-referral'
+        self.page.get_by_label(self.Locators.REASON_DROPDOWN).select_option(
+            self.ReasonCodes.RESET_TO_SELF_REFERRAL
+        )
 
-        # Click the update button
+        # Click the update subject data button
         self.safe_accept_dialog(
-            self.page.get_by_role("button", name="Update Subject Data")
+            self.page.get_by_role("button", name=self.Locators.UPDATE_BUTTON)
         )
 
     def set_seeking_further_data(self) -> None:
@@ -56,18 +68,18 @@ class SubjectPage(BasePage):
         )
 
         # Select 'Seeking Further Data' from the screening status dropdown
-        self.page.get_by_label("Change Screening Status").select_option(
+        self.page.get_by_label(self.Locators.SCREENING_STATUS_DROPDOWN).select_option(
             self.StatusCodes.SEEKING_FURTHER_DATA
         )
 
         # Select 'Uncertified Death' as the reason
-        self.page.get_by_label("Reason", exact=True).select_option(
+        self.page.get_by_label(self.Locators.REASON_DROPDOWN).select_option(
             self.ReasonCodes.UNCERTIFIED_DEATH
         )
 
         # Click the update button
         self.safe_accept_dialog(
-            self.page.get_by_role("button", name="Update Subject Data")
+            self.page.get_by_role("button", name=self.Locators.UPDATE_BUTTON)
         )
 
     def set_self_referral_screening_status(self) -> None:
@@ -75,17 +87,17 @@ class SubjectPage(BasePage):
         logging.info("[UI ACTION] Setting screening status to 'Lynch Self-referral'")
 
         # Select 'Lynch Self-referral'
-        self.page.get_by_label("Change Screening Status").select_option(
+        self.page.get_by_label(self.Locators.SCREENING_STATUS_DROPDOWN).select_option(
             self.StatusCodes.LYNCH_SELF_REFERRAL
         )
 
         # Select reason: 'Reset seeking further data to Lynch Self-referral'
-        self.page.get_by_label("Reason").select_option(
+        self.page.get_by_label(self.Locators.REASON_DROPDOWN).select_option(
             self.ReasonCodes.RESET_TO_SELF_REFERRAL
         )
 
         # Click the update button
-        self.page.get_by_role("button", name="Update Subject Data").click()
+        self.click(self.page.get_by_role("button", name=self.Locators.UPDATE_BUTTON))
 
     def receive_lynch_diagnosis(
         self, diagnosis_type, age, diagnosis_date, last_colonoscopy_date=None
@@ -97,12 +109,16 @@ class SubjectPage(BasePage):
             f"[UI ACTION] Receiving Lynch diagnosis: {diagnosis_type}, age={age}, diagnosis_date={diagnosis_date}, colonoscopy={last_colonoscopy_date}"
         )
 
-        # Example UI interactions
-        self.page.get_by_label("Diagnosis Type").select_option(diagnosis_type)
-        self.page.get_by_label("Age").fill(str(age))
-        self.page.get_by_label("Diagnosis Date").fill(diagnosis_date)
+        # UI interactions
+        self.page.get_by_label(self.Locators.DIAGNOSIS_TYPE_DROPDOWN).select_option(
+            diagnosis_type
+        )
+        self.page.get_by_label(self.Locators.AGE_INPUT).fill(str(age))
+        self.page.get_by_label(self.Locators.DIAGNOSIS_DATE_INPUT).fill(diagnosis_date)
 
         if last_colonoscopy_date:
-            self.page.get_by_label("Last Colonoscopy Date").fill(last_colonoscopy_date)
+            self.page.get_by_label(self.Locators.LAST_COLONOSCOPY_DATE_INPUT).fill(
+                last_colonoscopy_date
+            )
 
-        self.page.get_by_role("button", name="Submit").click()
+        self.click(self.page.get_by_role("button", name=self.Locators.SUBMIT_BUTTON))

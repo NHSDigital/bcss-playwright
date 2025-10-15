@@ -54,6 +54,10 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
     # Then Comment: NHS number
     logging.info(f"[SUBJECT CREATION] Created subject's NHS number: {nhs_no}")
 
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    logging.info(f"[UI ACTION] Navigated to subject summary page for {nhs_no}")
+    
     # When I self refer the subject
     subject_page.self_refer_subject()
     logging.info("[UI ACTION] Self-referred the subject")
