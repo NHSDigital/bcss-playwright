@@ -4,7 +4,7 @@ from playwright.sync_api import Page
 from classes.subject.subject import Subject
 from classes.user.user import User
 from pages.logout.log_out_page import LogoutPage
-from utils.oracle.oracle import OracleDB, OracleSubjectTools
+from utils.oracle.oracle import OracleDB
 from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
 from utils.oracle.subject_selector import SubjectSelector
 from utils.user_tools import UserTools
@@ -37,16 +37,8 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
     login_role = "Hub Manager at BCS01"
     UserTools.user_login(page, login_role)
 
-    criteria = {
-        "subject age": "75",
-        "subject has lynch diagnosis": "Yes",
-        "screening status": "Lynch Self-referral",
-        "subject hub code": "BCS01",
-    }
-
     # Retrieve user details and user object
     user_details = UserTools.retrieve_user(login_role)
-    user = UserTools.get_user_object(user_details)
 
     # # TODO: When I receive Lynch diagnosis "EPCAM" for a new subject in my hub aged "75" with diagnosis date "3 years ago" and last colonoscopy date "2 years ago"
     # Get or create a subject suitable for Lynch self-referral
@@ -62,13 +54,12 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
     # Then Comment: NHS number
     logging.info(f"[SUBJECT CREATION] Created subject's NHS number: {nhs_no}")
 
-    # TODO: When I self refer the subject
-    # And I press OK on my confirmation prompt
+    # When I self refer the subject
     subject_page.self_refer_subject()
     logging.info("[UI ACTION] Self-referred the subject")
 
     # Then my subject has been updated as follows:
-    criteria = {
+    self_referral_criteria = {
         "calculated fobt due date": "Null",
         "calculated lynch due date": "today",
         "calculated surveillance due date": "Null",
@@ -90,7 +81,7 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
         "surveillance due date reason": "Null",
     }
 
-    subject_assertion(nhs_no, criteria)
+    subject_assertion(nhs_no, self_referral_criteria)
     logging.info(
         "[ASSERTION PASSED] Subject details after self-referral are as expected"
     )
@@ -98,11 +89,11 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # When I set the subject to Seeking Further Data
+    # And I set the subject to Seeking Further Data
     subject_page.set_seeking_further_data()
 
     # Then my subject has been updated as follows:
-    criteria = {
+    seeking_further_data_criteria = {
         "calculated fobt due date": "Null",
         "calculated lynch due date": "today",
         "calculated surveillance due date": "Null",
@@ -124,13 +115,13 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
         "surveillance due date reason": "Null",
     }
 
-    subject_assertion(nhs_no, criteria)
+    subject_assertion(nhs_no, seeking_further_data_criteria)
 
     # When I set the subject from Seeking Further Data back to "Lynch Self-referral"
     subject_page.set_self_referral_screening_status()
 
     # Then my subject has been updated as follows:
-    criteria = {
+    reverted_criteria = {
         "calculated fobt due date": "Null",
         "calculated lynch due date": "today",
         "calculated surveillance due date": "Null",
@@ -152,13 +143,13 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
         "surveillance due date reason": "Null",
     }
 
-    subject_assertion(nhs_no, criteria)
+    subject_assertion(nhs_no, reverted_criteria)
 
     LogoutPage(page).log_out()
     logging.info("[TEST END] test_lynch_self_referral_seeking_further_data_flow")
 
 
-# Helper Functions
+# Helper Functions - TODO: move to a utils file later
 def prepare_subject_with_lynch_diagnosis(
     page: Page,
     user: User,

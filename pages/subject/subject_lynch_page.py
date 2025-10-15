@@ -6,9 +6,14 @@ import logging
 class SubjectPage(BasePage):
     """Page object for interacting with subject-related actions."""
 
-    def __init__(self, page: Page):
-        super().__init__(page)
-        self.page = page
+    class StatusCodes:
+        LYNCH_SELF_REFERRAL = "4005"
+        SEEKING_FURTHER_DATA = "4007"
+
+    class ReasonCodes:
+        SELF_REFERRAL = "11316"
+        UNCERTIFIED_DEATH = "11314"
+        RESET_TO_SELF_REFERRAL = "11529"
 
     class TestData:
         hub_manager_role = "Hub Manager"
@@ -18,10 +23,26 @@ class SubjectPage(BasePage):
         last_colonoscopy_date = "2 years ago"
         screening_status_lynch_self_referral = "Lynch Self-referral"
 
+    def __init__(self, page: Page):
+        super().__init__(page)
+        self.page = page
+
     def self_refer_subject(self) -> None:
-        """Implement UI steps to self-refer the subject."""
-        logging.warning("[TODO] self_refer_subject not yet implemented.")
-        # TODO: Implement UI steps to self-refer the subject
+        """Perform UI steps to self-refer the subject."""
+        logging.info("[UI ACTION] Self-referring the subject")
+
+        # Select 'Lynch Self-referral' from the dropdown
+        self.page.get_by_label("Change Screening Status").select_option(
+            self.StatusCodes.LYNCH_SELF_REFERRAL
+        )
+
+        # Select reason: 'Self-referral' (value: 11316)
+        self.page.get_by_label("Reason").select_option(self.ReasonCodes.SELF_REFERRAL)
+
+        # Click the update button
+        self.safe_accept_dialog(
+            self.page.get_by_role("button", name="Update Subject Data")
+        )
 
     def set_seeking_further_data(self) -> None:
         """Set the subject to Seeking Further Data."""
@@ -32,13 +53,13 @@ class SubjectPage(BasePage):
 
         # Select 'Seeking Further Data' from the screening status dropdown
         self.page.get_by_label("Change Screening Status").select_option(
-            "4007"
-        )  # Seeking Further Data
+            self.StatusCodes.SEEKING_FURTHER_DATA
+        )
 
         # Select 'Uncertified Death' as the reason
         self.page.get_by_label("Reason", exact=True).select_option(
-            "11314"
-        )  # Uncertified Death
+            self.ReasonCodes.UNCERTIFIED_DEATH
+        )
 
         # Click the update button
         self.safe_accept_dialog(
@@ -49,11 +70,15 @@ class SubjectPage(BasePage):
         """Set the screening status to 'Lynch Self-referral' with reason 'Reset seeking further data to Lynch Self-referral'."""
         logging.info("[UI ACTION] Setting screening status to 'Lynch Self-referral'")
 
-        # Select 'Lynch Self-referral' (value: 4005)
-        self.page.get_by_label("Change Screening Status").select_option("4005")
+        # Select 'Lynch Self-referral'
+        self.page.get_by_label("Change Screening Status").select_option(
+            self.StatusCodes.LYNCH_SELF_REFERRAL
+        )
 
-        # Select reason: 'Reset seeking further data to Lynch Self-referral' (value: 11529)
-        self.page.get_by_label("Reason").select_option("11529")
+        # Select reason: 'Reset seeking further data to Lynch Self-referral'
+        self.page.get_by_label("Reason").select_option(
+            self.ReasonCodes.RESET_TO_SELF_REFERRAL
+        )
 
         # Click the update button
         self.page.get_by_role("button", name="Update Subject Data").click()
