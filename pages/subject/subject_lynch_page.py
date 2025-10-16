@@ -8,6 +8,7 @@ class SubjectPage(BasePage):
 
     class Locators:
         SCREENING_STATUS_DROPDOWN = "Change Screening Status"
+        SCREENING_REASON_SELECT = "#A_C_SSReasonForChange"
         REASON_DROPDOWN = "Reason"
         UPDATE_BUTTON = "Update Subject Data"
         DIAGNOSIS_TYPE_DROPDOWN = "Diagnosis Type"
@@ -15,6 +16,8 @@ class SubjectPage(BasePage):
         DIAGNOSIS_DATE_INPUT = "Diagnosis Date"
         LAST_COLONOSCOPY_DATE_INPUT = "Last Colonoscopy Date"
         SUBMIT_BUTTON = "Submit"
+        SCREENING_STATUS_SELECT = "#S_S_ScreeningStatus"
+        UPDATE_BUTTON_INPUT = "input[type='button'][value='Update Subject Data']"
 
     class StatusCodes:
         """Status codes used in the screening status dropdown."""
@@ -51,7 +54,7 @@ class SubjectPage(BasePage):
         )
 
         # Select reason: 'Reset seeking further data to Lynch Self-referral'
-        self.page.get_by_label(self.Locators.REASON_DROPDOWN).select_option(
+        self.page.get_by_label(self.Locators.SCREENING_REASON_SELECT).select_option(
             self.ReasonCodes.RESET_TO_SELF_REFERRAL
         )
 
@@ -68,19 +71,17 @@ class SubjectPage(BasePage):
         )
 
         # Select 'Seeking Further Data' from the screening status dropdown
-        self.page.get_by_label(self.Locators.SCREENING_STATUS_DROPDOWN).select_option(
+        self.page.locator(self.Locators.SCREENING_STATUS_SELECT).select_option(
             self.StatusCodes.SEEKING_FURTHER_DATA
         )
 
         # Select 'Uncertified Death' as the reason
-        self.page.get_by_label(self.Locators.REASON_DROPDOWN).select_option(
+        self.page.locator(self.Locators.SCREENING_REASON_SELECT).select_option(
             self.ReasonCodes.UNCERTIFIED_DEATH
         )
 
         # Click the update button
-        self.safe_accept_dialog(
-            self.page.get_by_role("button", name=self.Locators.UPDATE_BUTTON)
-        )
+        self.page.locator(self.Locators.UPDATE_BUTTON_INPUT).click()
 
     def set_self_referral_screening_status(self) -> None:
         """Set the screening status to 'Lynch Self-referral' with reason 'Reset seeking further data to Lynch Self-referral'."""

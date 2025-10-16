@@ -1,16 +1,16 @@
 import pytest
 import logging
 from playwright.sync_api import Page
-from classes.subject.subject import Subject
 from classes.user.user import User
+from classes.subject.subject import Subject
 from pages.logout.log_out_page import LogoutPage
-from utils.oracle.oracle import OracleDB
-from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
 from utils.oracle.subject_selector import SubjectSelector
+from utils.oracle.oracle import OracleDB
 from utils.user_tools import UserTools
 from pages.subject.subject_lynch_page import SubjectPage
 from utils.subject_assertion import subject_assertion
 from utils import screening_subject_page_searcher
+from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
 
 
 @pytest.mark.wip
@@ -40,12 +40,15 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
     # Retrieve user details and user object
     user_details = UserTools.retrieve_user(login_role)
 
-    # # TODO: When I receive Lynch diagnosis "EPCAM" for a new subject in my hub aged "75" with diagnosis date "3 years ago" and last colonoscopy date "2 years ago"
+    # When I receive Lynch diagnosis "EPCAM" for a new subject in my hub aged "75" with diagnosis date "3 years ago" and last colonoscopy date "2 years ago"
+    # TODO: What is involved in receiving an "EPCAM" diagnosis? Is it covered by this code?
     # Get or create a subject suitable for Lynch self-referral
     nhs_no = SubjectSelector.get_or_create_subject_for_lynch_self_referral(
         screening_centre=user_details["hub_code"],
         base_age=75,
     )
+
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
 
     logging.info(
         "[SUBJECT CREATED IN DB] created subject in the database with no screening history who is eligible to self refer"
@@ -57,8 +60,9 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     logging.info(f"[UI ACTION] Navigated to subject summary page for {nhs_no}")
-    
+
     # When I self refer the subject
+    # TODO: This step may not be needed as the created subject is already has a status of "Self-referral"
     subject_page.self_refer_subject()
     logging.info("[UI ACTION] Self-referred the subject")
 
@@ -119,6 +123,17 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
         "surveillance due date reason": "Null",
     }
 
+    # The below lines down to logging.info are just for debug purposes to show the actual DB row
+    # Remove them once the test is stable
+    query, bind_vars = SubjectSelectionQueryBuilder().build_subject_selection_query(
+        criteria={"nhs number": nhs_no},
+        user=User(),
+        subject=Subject(),
+        subjects_to_retrieve=1,
+    )
+    df = OracleDB().execute_query(query, bind_vars)
+    logging.info(f"[DEBUG] Subject DB row:\n{df.to_dict(orient='records')}")
+
     subject_assertion(nhs_no, seeking_further_data_criteria)
 
     # When I set the subject from Seeking Further Data back to "Lynch Self-referral"
@@ -151,48 +166,3 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
 
     LogoutPage(page).log_out()
     logging.info("[TEST END] test_lynch_self_referral_seeking_further_data_flow")
-
-
-# Helper Functions - TODO: move to a utils file later
-def prepare_subject_with_lynch_diagnosis(
-    page: Page,
-    user: User,
-    nhs_no: str,
-    age: int,
-    diagnosis_date: str,
-    last_colonoscopy_date: str | None = None,
-) -> str:
-    """
-    Helper function to receive a Lynch diagnosis for a new subject.
-    Args:
-        page (Page): Playwright Page object for browser interaction.
-        user (User): User object representing the logged-in user.
-        age (int): Age of the subject.
-        diagnosis_date (str): Date of the Lynch diagnosis.
-        last_colonoscopy_date (str | None): Date of the last colonoscopy, if applicable.
-    """
-
-    criteria = {"nhs number": nhs_no}
-
-    query, bind_vars = SubjectSelectionQueryBuilder().build_subject_selection_query(
-        criteria=criteria,
-        user=user,
-        subject=Subject(),
-        subjects_to_retrieve=1,
-    )
-
-    nhs_no_df = OracleDB().execute_query(query, bind_vars)
-    if nhs_no_df.empty:
-        raise ValueError("[SUBJECT SELECTION] No subject found matching criteria.")
-
-    nhs_no = nhs_no_df["subject_nhs_number"].iloc[0]
-    logging.info(f"[SUBJECT SELECTED] NHS number: {nhs_no}")
-
-    subject_page = SubjectPage(page)
-    subject_page.receive_lynch_diagnosis(
-        diagnosis_type=SubjectPage.TestData.lynch_diagnosis_type,
-        age=age,
-        diagnosis_date=diagnosis_date,
-        last_colonoscopy_date=last_colonoscopy_date,
-    )
-    return nhs_no
