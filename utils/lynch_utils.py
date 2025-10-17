@@ -75,9 +75,9 @@ def insert_validated_lynch_patient_from_new_subject_with_age(
     else:
         date_of_birth -= timedelta(days=days)
 
-    date_of_birth_str = DateDescriptionUtils.convert_description_to_sql_date(
+    date_of_birth_str = str(DateDescriptionUtils.convert_description_to_sql_date(
         DATE_OF_BIRTH_DESCRIPTION, date_of_birth.strftime(DATE_FORMAT_DD_MM_YYYY)
-    )
+    ))
     if date_of_birth_str is None:
         raise SelectionBuilderException(
             "Failed to convert date of birth to SQL date.", date_of_birth_str
