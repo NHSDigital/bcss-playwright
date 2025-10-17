@@ -209,16 +209,17 @@ def test_scenario_11(page: Page) -> None:
     # When I process the open "A183 - Practitioner Clinic 1st Appointment" letter batch for my subject
     # Then my subject has been updated as follows:
     batch_processing(
-        page,
-        "A183",
-        "Practitioner Clinic 1st Appointment",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+        page=page,
+        batch_type="A183",
+        batch_description="Practitioner Clinic 1st Appointment",
+        latest_event_status="A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
     )
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
     LogoutPage(page).log_out(close_page=False)
     BasePage(page).go_to_log_in_page()
     user_role = UserTools.user_login(page, "Screening Centre Manager at BCS001", True)
+
     if user_role is None:
         raise ValueError("User role is none")
 
@@ -282,7 +283,7 @@ def test_scenario_11(page: Page) -> None:
 
     # And I select Diagnostic Test Type "Colonoscopy"
     AdvanceFOBTScreeningEpisodePage(page).select_test_type_dropdown_option(
-        "Colonoscopy"
+        text="Colonoscopy"
     )
 
     # And I enter a Diagnostic Test First Offered Appointment Date of "tomorrow"
@@ -294,7 +295,7 @@ def test_scenario_11(page: Page) -> None:
 
     # Then my subject has been updated as follows:
     AdvanceFOBTScreeningEpisodePage(page).verify_latest_event_status_value(
-        "A59 - Invited for Diagnostic Test"
+        latest_event_status="A59 - Invited for Diagnostic Test"
     )
 
     # When I select the advance episode option for "Attend Diagnostic Test"
@@ -309,8 +310,8 @@ def test_scenario_11(page: Page) -> None:
 
     # Then my subject has been updated as follows:
     subject_assertion(
-        nhs_no,
-        {
+        nhs_number=nhs_no,
+        criteria={
             "latest event status": "A259 Attended Diagnostic Test",
         },
     )
@@ -654,8 +655,8 @@ def test_scenario_11(page: Page) -> None:
 
     # Then my subject has been updated as follows:
     subject_assertion(
-        nhs_no,
-        {
+        nhs_number=nhs_no,
+        criteria={
             "latest event status": "A360 Post-investigation Appointment Required",
         },
     )
@@ -668,7 +669,11 @@ def test_scenario_11(page: Page) -> None:
 
     # And I set the practitioner appointment date to "today"
     # And I book the earliest available post investigation appointment on this date
-    book_post_investigation_appointment(page, "The Royal Hospital (Wolverhampton)", 1)
+    book_post_investigation_appointment(
+        page=page,
+        site="The Royal Hospital (Wolverhampton)",
+        screening_practitioner_index=1,
+    )
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -681,10 +686,10 @@ def test_scenario_11(page: Page) -> None:
     # And there is a "A410" letter batch for my subject with the exact title "Post-Investigation Appointment Invitation Letter"
     # When I process the open "A410 - Post-Investigation Appointment Invitation Letter" letter batch for my subject
     batch_processing(
-        page,
-        "A410",
-        "Post-Investigation Appointment Invitation Letter",
-        "A415 - Post-investigation Appointment Invitation Letter Printed",
+        page=page,
+        batch_type="A410",
+        batch_description="Post-Investigation Appointment Invitation Letter",
+        latest_event_status="A415 - Post-investigation Appointment Invitation Letter Printed",
     )
 
     # When I view the subject
