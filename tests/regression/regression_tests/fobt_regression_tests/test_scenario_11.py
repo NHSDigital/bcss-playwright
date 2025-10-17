@@ -288,7 +288,7 @@ def test_scenario_11(page: Page) -> None:
 
     # And I enter a Diagnostic Test First Offered Appointment Date of "tomorrow"
     AdvanceFOBTScreeningEpisodePage(page).click_calendar_button()
-    CalendarPicker(page).v1_calender_picker(datetime.today() + timedelta(days=1))
+    CalendarPicker(page).v1_calender_picker(date=datetime.today() + timedelta(days=1))
 
     # And I advance the subject's episode for "Invite for Diagnostic Test >>"
     AdvanceFOBTScreeningEpisodePage(page).click_invite_for_diagnostic_test_button()
@@ -299,13 +299,15 @@ def test_scenario_11(page: Page) -> None:
     )
 
     # When I select the advance episode option for "Attend Diagnostic Test"
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    screening_subject_page_searcher.navigate_to_subject_summary_page(
+        page=page, nhs_no=nhs_no
+    )
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
     AdvanceFOBTScreeningEpisodePage(page).click_attend_diagnostic_test_button()
 
     # And I attend the subject's diagnostic test today
     AttendDiagnosticTestPage(page).click_calendar_button()
-    CalendarPicker(page).v1_calender_picker(datetime.today())
+    CalendarPicker(page).v1_calender_picker(date=datetime.today())
     AttendDiagnosticTestPage(page).click_save_button()
 
     # Then my subject has been updated as follows:
