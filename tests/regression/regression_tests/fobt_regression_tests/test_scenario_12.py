@@ -167,7 +167,10 @@ def test_scenario_12(page: Page) -> None:
     # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
     # When I process the open "S9" letter batch for my subject
     batch_processing(
-        page, "S9", "Invitation & Test Kit (FIT)", "S10 - Invitation & Test Kit Sent"
+        page=page,
+        batch_type="S9",
+        batch_description="Invitation & Test Kit (FIT)",
+        latest_event_status="S10 - Invitation & Test Kit Sent",
     )
 
     # When I log my subject's latest unlogged FIT kit
@@ -181,7 +184,9 @@ def test_scenario_12(page: Page) -> None:
     )
 
     # When I read my subject's latest logged FIT kit as "ABNORMAL"
-    FitKitLogged().read_latest_logged_kit(user_role, 2, fit_kit, "ABNORMAL")
+    FitKitLogged().read_latest_logged_kit(
+        user=user_role, kit_type=2, kit=fit_kit, kit_result="ABNORMAL"
+    )
 
     # Then my subject has been updated as follows:
     subject_assertion(nhs_no, {"latest event status": "A8 Abnormal"})
@@ -196,9 +201,9 @@ def test_scenario_12(page: Page) -> None:
     # And I set the practitioner appointment date to "today"
     # And I book the "earliest" available practitioner appointment on this date
     book_appointments(
-        page,
-        "BCS001 - Wolverhampton Bowel Cancer Screening Centre",
-        "The Royal Hospital (Wolverhampton)",
+        page=page,
+        screening_centre="BCS001 - Wolverhampton Bowel Cancer Screening Centre",
+        site="The Royal Hospital (Wolverhampton)",
     )
 
     # Then my subject has been updated as follows:
@@ -308,7 +313,7 @@ def test_scenario_12(page: Page) -> None:
 
     # Then my subject has been updated as follows:
     AdvanceFOBTScreeningEpisodePage(page).verify_latest_event_status_value(
-        "A59 - Invited for Diagnostic Test"
+        latest_event_status="A59 - Invited for Diagnostic Test"
     )
 
     # When I select the advance episode option for "Attend Diagnostic Test"
@@ -323,8 +328,8 @@ def test_scenario_12(page: Page) -> None:
 
     # Then my subject has been updated as follows:
     subject_assertion(
-        nhs_no,
-        {
+        nhs_number=nhs_no,
+        criteria={
             "latest event status": "A259 Attended Diagnostic Test",
         },
     )
@@ -705,7 +710,7 @@ def test_scenario_12(page: Page) -> None:
         "symptomatic procedure result": "Null",
         "screening referral type": "Null",
     }
-    subject_assertion(nhs_no, criteria)
+    subject_assertion(nhs_number=nhs_no, criteria=criteria)
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -715,7 +720,7 @@ def test_scenario_12(page: Page) -> None:
 
     # And I select the advance episode option for "Non-neoplastic and Other Non-bowel Cancer Result"
     AdvanceFOBTScreeningEpisodePage(
-        page
+        page=page
     ).click_non_neoplastic_and_other_non_bowel_cancer_result_button()
 
     # And I set the Date of Symptomatic Procedure to "today"
@@ -725,7 +730,7 @@ def test_scenario_12(page: Page) -> None:
 
     # And the Screening Interval is 24 months
     NonNeoplasticResultFromSymptomaticProcedurePage(page).assert_text_in_alert_textbox(
-        "recall interval of 24 months"
+        expected_text="recall interval of 24 months"
     )
 
     # And I select test number 1
