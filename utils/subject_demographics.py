@@ -11,6 +11,7 @@ from pages.screening_subject_search.subject_screening_search_page import (
 from pages.screening_subject_search.subject_demographic_page import (
     SubjectDemographicPage,
 )
+from typing import Optional
 
 
 class SubjectDemographicUtil:
@@ -101,3 +102,40 @@ class SubjectDemographicUtil:
         """
         fake = Faker()
         return fake.date_time_between(start, end)
+
+    def updated_subject_demographics(
+        self,
+        nhs_no: str,
+        age: Optional[int] = None,
+        postcode: Optional[str] = None,
+        dialog_text: Optional[str] = None,
+    ) -> None:
+        """
+        Navigates to the subject demographics page and updates a subject's demographics.
+        Args:
+            nhs_no (str): The NHS number of the subject you want to update.
+            date_of_birth (Optional[datetime]): The new date of birth to set for the subject.
+            postcode (Optional[str]): The new postcode to set for the subject.
+        """
+        BasePage(self.page).click_main_menu_link()
+        BasePage(self.page).go_to_screening_subject_search_page()
+        SubjectScreeningPage(self.page).click_demographics_filter()
+        SubjectScreeningPage(self.page).click_nhs_number_filter()
+        SubjectScreeningPage(self.page).nhs_number_filter.fill(nhs_no)
+        SubjectScreeningPage(self.page).nhs_number_filter.press("Tab")
+        SubjectScreeningPage(self.page).select_search_area_option(
+            SearchAreaSearchOptions.SEARCH_AREA_WHOLE_DATABASE.value
+        )
+        SubjectScreeningPage(self.page).click_search_button()
+        if postcode:
+            SubjectDemographicPage(self.page).fill_postcode_input(postcode)
+        if age:
+            date_of_birth = datetime.now() - relativedelta(years=age)
+            SubjectDemographicPage(self.page).fill_dob_input(date_of_birth)
+        if any([postcode, date_of_birth]):
+            if dialog_text:
+                SubjectDemographicPage(
+                    self.page
+                ).click_update_subject_data_button_and_assert_dialog(dialog_text)
+            else:
+                SubjectDemographicPage(self.page).click_update_subject_data_button()

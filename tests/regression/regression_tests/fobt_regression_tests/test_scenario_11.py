@@ -656,7 +656,7 @@ def test_scenario_11(page: Page) -> None:
     subject_assertion(
         nhs_no,
         {
-            "latest event status": "A360 - Post-investigation Appointment Required",
+            "latest event status": "A360 Post-investigation Appointment Required",
         },
     )
 
@@ -674,7 +674,7 @@ def test_scenario_11(page: Page) -> None:
     subject_assertion(
         nhs_no,
         {
-            "latest event status": "A410 - Post-investigation Appointment Made",
+            "latest event status": "A410 Post-investigation Appointment Made",
         },
     )
 
@@ -706,7 +706,7 @@ def test_scenario_11(page: Page) -> None:
     subject_assertion(
         nhs_no,
         {
-            "latest event status": "A416 - Post-investigation Appointment Attended",
+            "latest event status": "A416 Post-investigation Appointment Attended",
         },
     )
 
