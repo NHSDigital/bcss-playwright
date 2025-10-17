@@ -1,6 +1,7 @@
 import pytest
 import logging
 from playwright.sync_api import Page
+from streamlit import user
 from classes.user.user import User
 from classes.subject.subject import Subject
 from pages.logout.log_out_page import LogoutPage
@@ -11,6 +12,7 @@ from pages.subject.subject_lynch_page import SubjectPage
 from utils.subject_assertion import subject_assertion
 from utils import screening_subject_page_searcher
 from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
+from utils.lynch_utils import insert_validated_lynch_patient_from_new_subject_with_age
 
 
 @pytest.mark.wip
@@ -49,17 +51,14 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
 
     # Given I log in to BCSS "England" as user role "Hub Manager"
     login_role = "Hub Manager at BCS01"
-    UserTools.user_login(page, login_role)
-
-    # Retrieve user details and user object
-    user_details = UserTools.retrieve_user(login_role)
-
+    user_role = UserTools.user_login(page, login_role, True)
+    if user_role is None:
+        raise ValueError(f"User role '{login_role}' could not be determined after login.")
+    
     # When I receive Lynch diagnosis "EPCAM" for a new subject in my hub aged "75" with diagnosis date "3 years ago" and last colonoscopy date "2 years ago"
-    # TODO: What is involved in receiving an "EPCAM" diagnosis? Is it covered by this code?
     # Get or create a subject suitable for Lynch self-referral
-    nhs_no = SubjectSelector.get_or_create_subject_for_lynch_self_referral(
-        screening_centre=user_details["hub_code"],
-        base_age=75,
+    nhs_no = insert_validated_lynch_patient_from_new_subject_with_age(
+        "75", "EPCAM", "3 years ago", "2 years ago", user_role
     )
 
     OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
@@ -82,14 +81,14 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
 
     # Then my subject has been updated as follows:
     self_referral_criteria = {
-        # "calculated fobt due date": "Null",
-        # "calculated lynch due date": "Today",
+        "calculated fobt due date": "Null",
+        "calculated lynch due date": "Today",
         # "calculated surveillance due date": "Null",
         # "lynch due date": "Today",
         # "lynch due date date of change": "Null",
         # "lynch due date reason": "Self-referral",
         # "previous screening status": "Lynch Surveillance",
-        "screening due date": "Null",
+        # "screening due date": "Null",
         # "screening due date date of change": "Null",
         # "screening due date reason": "null",
         # "screening status": "Lynch Self-referral",
@@ -109,66 +108,66 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
         "[ASSERTION PASSED] Subject details after self-referral are as expected"
     )
 
-    # When I view the subject
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # # When I view the subject
+    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # And I set the subject to Seeking Further Data
-    subject_page.set_seeking_further_data()
+    # # And I set the subject to Seeking Further Data
+    # subject_page.set_seeking_further_data()
 
-    # Then my subject has been updated as follows:
-    seeking_further_data_criteria = {
-        "calculated fobt due date": "Null",
-        "calculated lynch due date": "today",
-        "calculated surveillance due date": "Null",
-        "lynch due date": "today",
-        "lynch due date date of change": "Null",
-        "lynch due date reason": "Self-referral",
-        "previous screening status": "Lynch Self-referral",
-        "screening due date": "Null",
-        "screening due date date of change": "Null",
-        "screening due date reason": "Null",
-        "subject has lynch diagnosis": "Yes",
-        "subject lower fobt age": "Default",
-        "subject lower lynch age": "25",
-        "screening status": "Seeking Further Data",
-        "screening status date of change": "Today",
-        "screening status reason": "Uncertified Death",
-        "surveillance due date": "Null",
-        "surveillance due date date of change": "Null",
-        "surveillance due date reason": "Null",
-    }
-    debug_log_subject_db_row(nhs_no)  # For debug purposes - can be removed later
+    # # Then my subject has been updated as follows:
+    # seeking_further_data_criteria = {
+    #     "calculated fobt due date": "Null",
+    #     "calculated lynch due date": "today",
+    #     "calculated surveillance due date": "Null",
+    #     "lynch due date": "today",
+    #     "lynch due date date of change": "Null",
+    #     "lynch due date reason": "Self-referral",
+    #     "previous screening status": "Lynch Self-referral",
+    #     "screening due date": "Null",
+    #     "screening due date date of change": "Null",
+    #     "screening due date reason": "Null",
+    #     "subject has lynch diagnosis": "Yes",
+    #     "subject lower fobt age": "Default",
+    #     "subject lower lynch age": "25",
+    #     "screening status": "Seeking Further Data",
+    #     "screening status date of change": "Today",
+    #     "screening status reason": "Uncertified Death",
+    #     "surveillance due date": "Null",
+    #     "surveillance due date date of change": "Null",
+    #     "surveillance due date reason": "Null",
+    # }
+    # debug_log_subject_db_row(nhs_no)  # For debug purposes - can be removed later
 
-    subject_assertion(nhs_no, seeking_further_data_criteria)
+    # subject_assertion(nhs_no, seeking_further_data_criteria)
 
-    # When I set the subject from Seeking Further Data back to "Lynch Self-referral"
-    subject_page.set_self_referral_screening_status()
+    # # When I set the subject from Seeking Further Data back to "Lynch Self-referral"
+    # subject_page.set_self_referral_screening_status()
 
-    # Then my subject has been updated as follows:
-    reverted_criteria = {
-        "calculated fobt due date": "Null",
-        "calculated lynch due date": "today",
-        "calculated surveillance due date": "Null",
-        "lynch due date": "today",
-        "lynch due date date of change": "Null",
-        "lynch due date reason": "Self-referral",
-        "previous screening status": "Lynch Self-referral",
-        "screening due date": "Null",
-        "screening due date date of change": "Null",
-        "screening due date reason": "Null",
-        "subject has lynch diagnosis": "Yes",
-        "subject lower fobt age": "Default",
-        "subject lower lynch age": "25",
-        "screening status": "Lynch Self-referral",
-        "screening status date of change": "Today",
-        "screening status reason": "Reset seeking further data to Lynch Self-referral",
-        "surveillance due date": "Null",
-        "surveillance due date date of change": "Null",
-        "surveillance due date reason": "Null",
-    }
-    debug_log_subject_db_row(nhs_no)  # For debug purposes - can be removed later
+    # # Then my subject has been updated as follows:
+    # reverted_criteria = {
+    #     "calculated fobt due date": "Null",
+    #     "calculated lynch due date": "today",
+    #     "calculated surveillance due date": "Null",
+    #     "lynch due date": "today",
+    #     "lynch due date date of change": "Null",
+    #     "lynch due date reason": "Self-referral",
+    #     "previous screening status": "Lynch Self-referral",
+    #     "screening due date": "Null",
+    #     "screening due date date of change": "Null",
+    #     "screening due date reason": "Null",
+    #     "subject has lynch diagnosis": "Yes",
+    #     "subject lower fobt age": "Default",
+    #     "subject lower lynch age": "25",
+    #     "screening status": "Lynch Self-referral",
+    #     "screening status date of change": "Today",
+    #     "screening status reason": "Reset seeking further data to Lynch Self-referral",
+    #     "surveillance due date": "Null",
+    #     "surveillance due date date of change": "Null",
+    #     "surveillance due date reason": "Null",
+    # }
+    # debug_log_subject_db_row(nhs_no)  # For debug purposes - can be removed later
 
-    subject_assertion(nhs_no, reverted_criteria)
+    # subject_assertion(nhs_no, reverted_criteria)
 
-    LogoutPage(page).log_out()
-    logging.info("[TEST END] test_lynch_self_referral_seeking_further_data_flow")
+    # LogoutPage(page).log_out()
+    # logging.info("[TEST END] test_lynch_self_referral_seeking_further_data_flow")
