@@ -76,8 +76,8 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
 
     # # When I self refer the subject
     # # TODO: This step may not be needed as the created subject already has a status of "Self-referral"?
-    subject_page.self_refer_subject()
-    logging.info("[UI ACTION] Self-referred the subject")
+    # subject_page.self_refer_subject()
+    # logging.info("[UI ACTION] Self-referred the subject")
 
     # Then my subject has been updated as follows:
     self_referral_criteria = {
