@@ -140,7 +140,6 @@ class SubjectDemographicPage(BasePage):
             Handles the dialog and asserts that the dialog contains the expected text.
             Args:
                 dialog (Dialog): the playwright dialog object
-                accept (bool): Set to True if you want to accept the dialog, by default is is set to False.
             """
             logging.info(f"Dialog appeared with message: {dialog.message}")
             actual_text = dialog.message

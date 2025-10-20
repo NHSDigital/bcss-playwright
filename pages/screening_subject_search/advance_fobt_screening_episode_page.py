@@ -96,9 +96,6 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         self.redirect_to_reestablish_suitability_for_diagnostic_test_repatient_contact = self.page.get_by_role(
             "button", name="Redirect to re-establish"
         )
-        self.invite_for_diagnostic_test_button = self.page.get_by_role(
-            "button", name="Invite for Diagnostic Test >>"
-        )
         self.mdt_referral_required_button = self.page.get_by_role(
             "button", name="MDT Referral Required"
         )

@@ -114,19 +114,21 @@ class SubjectDemographicUtil:
         Navigates to the subject demographics page and updates a subject's demographics.
         Args:
             nhs_no (str): The NHS number of the subject you want to update.
-            date_of_birth (Optional[datetime]): The new date of birth to set for the subject.
-            postcode (Optional[str]): The new postcode to set for the subject.
+            age (int): The aage the subject should be updated to.
+            postcode (str): The new postcode of the subject.
+            dialog_text (str): The dialog text to assert
         """
+        subject_screening_page = SubjectScreeningPage(self.page)
         BasePage(self.page).click_main_menu_link()
         BasePage(self.page).go_to_screening_subject_search_page()
-        SubjectScreeningPage(self.page).click_demographics_filter()
-        SubjectScreeningPage(self.page).click_nhs_number_filter()
-        SubjectScreeningPage(self.page).nhs_number_filter.fill(nhs_no)
-        SubjectScreeningPage(self.page).nhs_number_filter.press("Tab")
-        SubjectScreeningPage(self.page).select_search_area_option(
+        subject_screening_page.click_demographics_filter()
+        subject_screening_page.click_nhs_number_filter()
+        subject_screening_page.nhs_number_filter.fill(nhs_no)
+        subject_screening_page.nhs_number_filter.press("Tab")
+        subject_screening_page.select_search_area_option(
             SearchAreaSearchOptions.SEARCH_AREA_WHOLE_DATABASE.value
         )
-        SubjectScreeningPage(self.page).click_search_button()
+        subject_screening_page.click_search_button()
         if postcode:
             SubjectDemographicPage(self.page).fill_postcode_input(postcode)
         if age:

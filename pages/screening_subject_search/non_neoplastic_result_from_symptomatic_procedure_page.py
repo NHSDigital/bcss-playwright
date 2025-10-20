@@ -9,7 +9,6 @@ class NonNeoplasticResultFromSymptomaticProcedurePage(BasePage):
 
     def __init__(self, page: Page):
         super().__init__(page)
-        self.page = page
         # Non Neoplastic Result From Symptomatic Procedure - page locators
         self.date_of_symptomatic_procedure_calendar_button = self.page.locator(
             "#UI_SURGERY_DATE__LinkOrButton"
@@ -46,7 +45,7 @@ class NonNeoplasticResultFromSymptomaticProcedurePage(BasePage):
         """
         Select a test from the all tests dropdown by its index.
         Args:
-            test_number (int): The index of the test to select (1-based index). Example: 1
+            test_number (int): The index of the test to select (1-based index). Example: if you want to select the 1st test pass in 1
         """
         self.click(self.all_tests.nth(test_number - 1))
 

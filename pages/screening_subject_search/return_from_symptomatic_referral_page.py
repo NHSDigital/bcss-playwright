@@ -7,7 +7,6 @@ class ReturnFromSymptomaticReferralPage(BasePage):
 
     def __init__(self, page: Page):
         super().__init__(page)
-        self.page = page
         # Return From Symptomatic Referral - page locators
         self.radiological_or_endoscopic_referral_dropdown = self.page.locator(
             "#referralTypeId"
