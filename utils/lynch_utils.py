@@ -183,7 +183,7 @@ class LynchUtils:
             :diagnosis_date AS diagnosis_date,
             :last_colonoscopy_date AS last_colonoscopy_date,
             (SELECT site_code FROM sites WHERE site_type_id = 306448 AND end_date IS NULL
-             ORDER BY DBMS_RANDOM.random FETCH FIRST 1 ROW ONLY) AS genetics_team,
+            ORDER BY DBMS_RANDOM.random FETCH FIRST 1 ROW ONLY) AS genetics_team,
             'BCSS_READY' AS processing_status,
             SYSDATE AS created_datestamp,
             SYSDATE AS updated_datestamp,
@@ -205,11 +205,11 @@ class LynchUtils:
             :address_line_5 AS address_line_5,
             :postcode AS postcode,
             (SELECT gp.org_code
-             FROM gp_practice_current_links gpl
-             INNER JOIN org gp ON gp.org_id = gpl.gp_practice_id
-             INNER JOIN org hub ON hub.org_id = gpl.hub_id
-             WHERE hub.org_code = :org_code
-             ORDER BY DBMS_RANDOM.random FETCH FIRST 1 ROW ONLY) AS gp_practice_code,
+            FROM gp_practice_current_links gpl
+            INNER JOIN org gp ON gp.org_id = gpl.gp_practice_id
+            INNER JOIN org hub ON hub.org_id = gpl.hub_id
+            WHERE hub.org_code = :org_code
+            ORDER BY DBMS_RANDOM.random FETCH FIRST 1 ROW ONLY) AS gp_practice_code,
             NULL AS validation_error,
             NULL AS updated_user_code,
             NULL AS date_of_death
