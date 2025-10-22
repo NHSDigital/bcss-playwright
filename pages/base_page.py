@@ -314,11 +314,3 @@ class BasePage:
             locator.select_option(option)
         except Exception as e:
             logging.error(f"Option selection failed: {e}")
-
-    def go_to_subjects_page(self) -> None:
-        """
-        Navigates to the Subjects page from the main menu.
-        """
-        self.page.get_by_role("link", name="Lynch Surveillance").click()
-        self.page.get_by_role("link", name="Set Lynch Invitation Rates").click()
-        self.page.get_by_role("button", name="Set Rates").click()
