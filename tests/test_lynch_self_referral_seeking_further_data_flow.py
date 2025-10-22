@@ -1,37 +1,23 @@
 import pytest
 import logging
 from playwright.sync_api import Page
-from classes.user.user import User
-from classes.subject.subject import Subject
 from pages.logout.log_out_page import LogoutPage
 from utils.oracle.oracle import OracleDB
 from utils.user_tools import UserTools
-from pages.subject.subject_lynch_page import SubjectPage
+from pages.screening_subject_search.subject_screening_summary_page import (
+    SubjectScreeningSummaryPage,
+    ChangeScreeningStatusOptions,
+    ReasonOptions,
+)
 from utils.subject_assertion import subject_assertion
 from utils import screening_subject_page_searcher
-from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
-from utils.lynch_utils import insert_validated_lynch_patient_from_new_subject_with_age
+from utils.lynch_utils import LynchUtils
 
 
-@pytest.mark.wip
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.lynch_self_referral_tests
 def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
-
-    # Temporary helper
-    # The below lines down to logging.info are just for debug purposes to show the actual DB row
-    # TODO: Remove this once the test is stable
-    def debug_log_subject_db_row(nhs_no):
-        query, bind_vars = SubjectSelectionQueryBuilder().build_subject_selection_query(
-            criteria={"nhs number": nhs_no},
-            user=User(),
-            subject=Subject(),
-            subjects_to_retrieve=1,
-        )
-        df = OracleDB().execute_query(query, bind_vars)
-        logging.info(f"[DEBUG DB ROW] Subject DB row:\n{df.to_dict(orient='records')}")
-
     """
     Scenario: [BCSS-20606] Verify that a Lynch self-referred subject can be moved to 'Seeking Further Data' (due to uncertified death) and then reverted back to 'Lynch Self-referral' status.
 
@@ -43,8 +29,6 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
     Set to Seeking Further Data
     Revert to Lynch Self-referral
     """
-    subject_page = SubjectPage(page)
-
     logging.info("[TEST START] test_lynch_self_referral_seeking_further_data_flow")
 
     # Given I log in to BCSS "England" as user role "Hub Manager"
@@ -57,7 +41,7 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
 
     # When I receive Lynch diagnosis "EPCAM" for a new subject in my hub aged "75" with diagnosis date "3 years ago" and last colonoscopy date "2 years ago"
     # Get or create a subject suitable for Lynch self-referral
-    nhs_no = insert_validated_lynch_patient_from_new_subject_with_age(
+    nhs_no = LynchUtils.insert_validated_lynch_patient_from_new_subject_with_age(
         "75", "EPCAM", "3 years ago", "2 years ago", user_role
     )
 
@@ -74,10 +58,8 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     logging.info(f"[UI ACTION] Navigated to subject summary page for {nhs_no}")
 
-    # # When I self refer the subject
-    # # TODO: This step may not be needed as the created subject already has a status of "Self-referral"?
-    # subject_page.self_refer_subject()
-    # logging.info("[UI ACTION] Self-referred the subject")
+    # When I self refer the subject
+    SubjectScreeningSummaryPage(page).click_self_refer_lynch_surveillance_button()
 
     # Then my subject has been updated as follows:
     self_referral_criteria = {
@@ -101,7 +83,6 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
         "surveillance due date reason": "null",
         "surveillance due date": "Null",
     }
-    debug_log_subject_db_row(nhs_no)  # TODO:For debug purposes - can be removed later
 
     subject_assertion(nhs_no, self_referral_criteria)
     logging.info(
@@ -112,7 +93,10 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
     # And I set the subject to Seeking Further Data
-    subject_page.set_seeking_further_data()
+    SubjectScreeningSummaryPage(page).change_screening_status(
+        ChangeScreeningStatusOptions.SEEKING_FURTHER_DATA,
+        ReasonOptions.UNCERTIFIED_DEATH,
+    )
 
     # Then my subject has been updated as follows:
     seeking_further_data_criteria = {
@@ -136,12 +120,14 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
         "surveillance due date date of change": "Null",
         "surveillance due date reason": "Null",
     }
-    debug_log_subject_db_row(nhs_no)  # TODO: For debug purposes - can be removed later
 
     subject_assertion(nhs_no, seeking_further_data_criteria)
 
     # When I set the subject from Seeking Further Data back to "Lynch Self-referral"
-    subject_page.set_self_referral_screening_status()
+    SubjectScreeningSummaryPage(page).change_screening_status(
+        ChangeScreeningStatusOptions.LYNCH_SELF_REFERRAL,
+        ReasonOptions.RESET_SEEKING_FURTHER_DATA_TO_LYNCH_SELF_REFERRAL,
+    )
 
     # Then my subject has been updated as follows:
     reverted_criteria = {
@@ -165,7 +151,6 @@ def test_lynch_self_referral_seeking_further_data_flow(page: Page) -> None:
         "surveillance due date date of change": "Null",
         "surveillance due date reason": "Null",
     }
-    debug_log_subject_db_row(nhs_no)  # TODO: For debug purposes - can be removed later
 
     subject_assertion(nhs_no, reverted_criteria)
 
