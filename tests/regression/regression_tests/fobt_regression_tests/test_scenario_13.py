@@ -123,7 +123,7 @@ def test_scenario_13(page: Page) -> None:
         page, "Hub Manager State Registered at BCS01", return_role_type=True
     )
     if user_role is None:
-        raise ValueError("User cannot be assigned to a UserRoleType")
+        raise ValueError("This user cannot be assigned to a UserRoleType")
 
     # And there is a subject who meets the following criteria:
     criteria = {
@@ -143,7 +143,7 @@ def test_scenario_13(page: Page) -> None:
         subjects_to_retrieve=1,
     )
 
-    nhs_no_df = OracleDB().execute_query(query, bind_vars)
+    nhs_no_df = OracleDB().execute_query(query=query, parameters=bind_vars)
     nhs_no = nhs_no_df["subject_nhs_number"].iloc[0]
 
     # Then Comment: NHS number
@@ -245,7 +245,9 @@ def test_scenario_13(page: Page) -> None:
     )
 
     # When I view the subject
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    screening_subject_page_searcher.navigate_to_subject_summary_page(
+        page=page, nhs_no=nhs_no
+    )
 
     # And I edit the Colonoscopy Assessment Dataset for this subject
     SubjectScreeningSummaryPage(page).click_datasets_link()
@@ -261,7 +263,9 @@ def test_scenario_13(page: Page) -> None:
     ColonoscopyDatasetsPage(page).save_dataset()
 
     # And I view the subject
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    screening_subject_page_searcher.navigate_to_subject_summary_page(
+        page=page, nhs_no=nhs_no
+    )
 
     # And I advance the subject's episode for "Suitable for Endoscopic Test"
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
@@ -269,8 +273,8 @@ def test_scenario_13(page: Page) -> None:
 
     # Then my subject has been updated as follows:
     subject_assertion(
-        nhs_no,
-        {"latest event status": "A99 Suitable for Endoscopic Test"},
+        nhs_number=nhs_no,
+        criteria={"latest event status": "A99 Suitable for Endoscopic Test"},
     )
 
     # When I view the subject
