@@ -1,6 +1,6 @@
 # BCSS Playwright Automation Repository Reference
 
-This document provides a comprehensive reference for all Page Object Models (POMs), classes, utilities, and UI applications available in this repository.
+This document provides a comprehensive reference for all Page Object Models (POMs), classes, utilities, and UI applications available in this repository.<br>
 It is intended to help developers and testers understand the structure, usage, and capabilities of each component.
 
 ---
@@ -9,18 +9,54 @@ It is intended to help developers and testers understand the structure, usage, a
 
 - [BCSS Playwright Automation Repository Reference](#bcss-playwright-automation-repository-reference)
   - [Table of Contents](#table-of-contents)
+  - [Directory Structure](#directory-structure)
   - [Page Object Models (POMs)](#page-object-models-poms)
-    - [Available POMs](#available-poms)
+    - [Usage Examples](#usage-examples)
+    - [Naming Conventions](#naming-conventions)
+  - [Classes](#classes)
+    - [Useful Classes](#useful-classes)
+    - [Class Descriptions](#class-descriptions)
+    - [Relationships/Dependencies](#relationshipsdependencies)
+    - [Utility Classes](#utility-classes)
+    - [Common Patterns](#common-patterns)
+  - [Utilities](#utilities)
+    - [Available Utilities](#available-utilities)
+  - [UI Applications](#ui-applications)
+  - [Conftest \& Fixtures](#conftest--fixtures)
+    - [Available Fixtures](#available-fixtures)
+    - [Example Usage](#example-usage)
+      - [Using as a Function Argument](#using-as-a-function-argument)
+      - [Using the @pytest.mark.usefixtures Decorator](#using-the-pytestmarkusefixtures-decorator)
+      - [Using Both](#using-both)
+    - [Custom CLI Options](#custom-cli-options)
+
+---
+
+## Directory Structure
+
+- pages/: Page Object Models
+- classes/: Domain models, repositories, enums
+- utils/: Utility modules
+- docs/: Documentation and guides
+- tests/: Automated test scripts
 
 ---
 
 ## Page Object Models (POMs)
 
 All POMs are located in the `pages/` directory.<br>
-Each POM encapsulates locators and methods for interacting with a specific page or feature in the UI.
-The POMs have been organised into folders based on the base/main page to allow for easier navigation.
+Each POM encapsulates locators and methods for interacting with a specific page or feature in the UI.<br>
+The purpose of POMs is to promote reusability and maintainability of the automation code by providing a clear structure for page interactions.<br>
 
-### Available POMs
+The POMs have been organised into folders based on the base/main page to allow for easier navigation.<br>
+POMs follow the naming convention of `<page_name>_page.py` to clearly indicate their purpose.<br>
+
+Please refer to the list below for all available POMs in this repository.
+
+---
+
+<details>
+<summary><strong>Available POMs</strong></summary>
 
 - base_page
 - alerts/
@@ -74,7 +110,7 @@ The POMs have been organised into folders based on the base/main page to allow f
   - view_fit_kit_result_page
   - view_screening_centre_fit_confguration_page
 - gfobt_test_kits/
-  - gfobt_creaate_qc_kit_page
+  - gfobt_create_qc_kit_page
   - gfobt_test_kit_logging_page
   - gfobt_test_kit_quality_control_reading_page
   - gfobt_test_kits_page
@@ -105,7 +141,7 @@ The POMs have been organised into folders based on the base/main page to allow f
   - appointment_calendar_page
   - appointment_detail_page
   - book_appointment_page
-  - colonoscopy_assessment_appointments_apge
+  - colonoscopy_assessment_appointments_page
   - practitioner_availability_page
   - screening_practitioner_appointments_page
   - screening_practitioner_day_view_page
@@ -117,12 +153,12 @@ The POMs have been organised into folders based on the base/main page to allow f
   - contact_with_patient_page
   - diagnostic_test_outcome_page
   - episode_events_and_notes_page
-  - handover_into_symptomatic_cate_page
-  - non_neoplastic_result_from_symtpomatic_prociedure_page
-  - patient_adviced_of_diagnosis_page
+  - handover_into_symptomatic_care_page
+  - non_neoplastic_result_from_symptomatic_procedure_page
+  - patient_advised_of_diagnosis_page
   - record_diagnosis_date_page
   - reopen_fobt_screening_episode_page
-  - return_from_symtomatic_referral_page
+  - return_from_symptomatic_referral_page
   - subject_demographic_page
   - subject_episode_events_and_notes_page
   - subject_events_notes_page
@@ -132,4 +168,397 @@ The POMs have been organised into folders based on the base/main page to allow f
 - surveillance/
   - surveillance_summary_review_page
 
+</details>
+
 ---
+
+### Usage Examples
+
+To use a POM in a test, instantiate the page object and call its methods:
+
+```python
+from pages.login.login_page import LoginPage
+
+def test_user_can_login(page):
+    login_page = LoginPage(page)
+    login_page.navigate()
+    login_page.login("user@example.com", "securepassword")
+    assert login_page.is_logged_in()
+```
+
+---
+
+### Naming Conventions
+
+- **File Names:** Use lowercase with underscores, ending in `_page.py` (e.g., `login_page.py`, `reports_page.py`).
+- **Class Names:** Use PascalCase, ending in `Page` (e.g., `LoginPage`, `ReportsPage`).
+
+---
+
+## Classes
+
+This repository includes multiple classes which have been organised into categories to allow for easier navigation.<br>
+All classes are located in the `classes/` directory.<br>
+Each class encapsulates domain logic, data models, enums, repositories, or utility functions for the BCSS Playwright automation framework.<br>
+
+---
+
+<details>
+<summary><strong>Available Classes</strong></summary>
+
+- address/
+  - address.py
+  - address_contact_type.py
+  - address_type.py
+- appointment/
+  - appointment_slot_type.py
+  - appointment_status_type.py
+- bowel_scope/
+  - bowel_scope_dd_reason_for_change_type.py
+- ceased/
+  - ceased_confirmation_details.py
+  - ceased_confirmation_user_id.py
+  - clinical_cease_reason_type.py
+  - manual_cease_requested.py
+- data/
+  - data_creation.py
+- database/
+  - database_error.py
+  - database_transition_parameters.py
+- datasets/
+  - asa_grade_type.py
+  - cancer_treatment_intent.py
+  - final_pretreatment_m_category_type.py
+  - final_pretreatment_n_category_type.py
+  - final_pretreatment_t_category_type.py
+  - intended_extent_type.py
+  - location_type.py
+  - metastases_location_type.py
+  - metastases_present_type.py
+  - previously_excised_tumour_type.py
+  - reason_no_treatment_received_type.py
+  - scan_type.py
+  - symptomatic_procedure_result_type.py
+  - treatment_given.py
+  - treatment_type.py
+- date/
+  - date_description.py
+  - date_description_utils.py
+  - has_date_of_death_removal.py
+  - has_user_dob_update.py
+- deduction/
+  - deduction_reason_types.py
+- diagnostic/
+  - diagnosis_date_reason_type.py
+  - diagnostic_test_has_outcome_of_result.py
+  - diagnostic_test_has_result.py
+  - diagnostic_test_is_void.py
+  - diagnostic_test_referral_type.py
+  - diagnostic_test_type.py
+  - which_diagnostic_test.py
+- entities/
+  - kit_service_management_entity.py
+- episode/
+  - episode_result_type.py
+  - episode_status_reason_type.py
+  - episode_status_type.py
+  - episode_sub_type.py
+  - episode_type.py
+  - latest_episode_has_dataset.py
+  - latest_episode_latest_investigation_dataset.py
+  - prevalent_incident_status_type.py
+  - subject_has_episode.py
+- event/
+  - event_code_type.py
+  - event_status_type.py
+- invitation/
+  - invitation_plan.py
+  - invitation_plan_status_type.py
+  - invitation_plan_week.py
+  - invited_since_age_extension.py
+- kits/
+  - analyser.py
+  - analyser_result_code_type.py
+  - kit_service_management_record.py
+  - kit_status.py
+  - kit_type.py
+- lynch/
+  - lynch_incident_episode_type.py
+  - lynch_sdd_reason_for_change_type.py
+- notify/
+  - notify_event_status.py
+  - notify_message_status.py
+  - notify_message_type.py
+- organisation/
+  - organisation.py
+  - organisation_complex.py
+- person/
+  - person.py
+  - person_accreditation_status.py
+  - person_data.py
+  - person_role_status.py
+  - person_selection_criteria_key.py
+- recall/
+  - recall_calculation_method_type.py
+  - recall_episode_type.py
+  - recall_surveillance_type.py
+- referral/
+  - has_referral_date.py
+  - reason_for_onward_referral_type.py
+  - reason_for_symptomatic_referral_type.py
+- repositories/
+  - analyser_repository.py
+  - episode_repository.py
+  - general_repository.py
+  - invitation_repository.py
+  - kit_service_management_repository.py
+  - person_repository.py
+  - subject_repository.py
+  - user_repository.py
+  - word_repository.py
+- role/
+  - role_type.py
+- screening/
+  - has_gp_practice.py
+  - has_unprocessed_sspi_updates.py
+  - hub_type.py
+  - region_type.py
+  - screening_referral_type.py
+  - screening_status_type.py
+  - ss_reason_for_change_type.py
+  - subject_hub_code.py
+  - subject_screening_centre_code.py
+- subject/
+  - gender_type.py
+  - pi_subject.py
+  - subject.py
+- subject_selection_query_builder/
+  - selection_builder_exception.py
+  - subject_selection_criteria_key.py
+- surveillance/
+  - does_subject_have_surveillance_review_case.py
+  - sdd_reason_for_change_type.py
+  - ssdd_reason_for_change_type.py
+  - surveillance_review_case_type.py
+  - surveillance_review_status_type.py
+- user/
+  - user.py
+  - user_role_type.py
+- yes_no/
+  - yes_no.py
+  - yes_no_type.py
+
+</details>
+
+---
+
+### Useful Classes
+
+There are some classes that may be commonly used across multiple tests.<br>
+These include:
+
+- `Person` - Represents a person in the system, encapsulating their attributes and behaviors.
+- `User` - Represents a user of the system, providing methods for user management and authentication.
+- `Subject` - Represents a screening subject, providing methods to interact with subject data.
+- `EpisodeRepository` - Provides methods to interact with episode data in the database.
+- `SubjectRepository` - Provides methods to interact with subject data in the database.
+- `PersonRepository` - Provides methods to manage person data.
+- `UserRepository` - Provides methods to manage user data.
+
+---
+
+### Class Descriptions
+
+- **address/**: Models address data and types.
+- **appointment/**: Models appointment slots and statuses.
+- **bowel_scope/**: Models bowel scope change reasons.
+- **ceased/**: Models cease confirmation details and reasons.
+- **data/**: Data creation helpers for test setup.
+- **database/**: Database error handling and transition parameter classes.
+- **datasets/**: Models for dataset fields, cancer treatment, and related enums.
+- **date/**: Date description and utility classes for parsing and formatting dates.
+- **deduction/**: Deduction reason types.
+- **diagnostic/**: Diagnostic test types, outcomes, and related logic.
+- **entities/**: Entity classes for kit management.
+- **episode/**: Models episode status, type, and related logic.
+- **event/**: Event code and status types.
+- **invitation/**: Invitation plan and status models.
+- **kits/**: Kit management, types, and status classes.
+- **lynch/**: Lynch syndrome incident and change reason types.
+- **notify/**: Notification event and message status/types.
+- **organisation/**: Organisation and complex organisation models.
+- **person/**: Person models, accreditation, roles, and selection criteria.
+- **recall/**: Recall calculation and episode types.
+- **referral/**: Referral date and reason types.
+- **repositories/**: Repository classes for DB access (depend on entity/data classes).
+- **role/**: Role type enums.
+- **screening/**: Screening centre, status, and region models.
+- **subject/**: Subject models, gender, and PI subject.
+- **subject_selection_query_builder/**: Selection builder and criteria key classes.
+- **surveillance/**: Surveillance review and change reason types.
+- **user/**: User models and role types.
+- **yes_no/**: Yes/No type enums.
+
+---
+
+### Relationships/Dependencies
+
+- **Repositories** depend on entity/data classes to perform DB operations.
+- **EpisodeRepository**, **SubjectRepository**, **PersonRepository**, and **UserRepository** are central for test data setup and verification.
+- **Enums** (e.g., status types, reason types) are used throughout models and repositories for consistency.
+
+---
+
+### Utility Classes
+
+- Utility/helper classes simplify common tasks:
+  - `date_description_utils.py`: Date parsing and formatting.
+  - `data_creation.py`: Test data generation.
+  - `database_transition_parameters.py`: DB transition configuration.
+  - `kit_service_management_entity.py`: Kit management helpers.
+
+---
+
+### Common Patterns
+
+- **Repository Pattern**: Used for DB access and data management (e.g., `SubjectRepository`, `PersonRepository`).
+- **Factory Pattern**: Used in data creation utilities for generating test data.
+- **Singleton Pattern**: Used for configuration or shared resources (where applicable).
+
+---
+
+## Utilities
+
+Utility modules provide reusable functions and helpers for common tasks in test automation, such as database interaction, data generation, accessibility scanning, and more.<br>
+All utility guides are located in the `docs/utility-guides/` directory. Each utility typically has a corresponding Python module in the `utils/` directory.
+
+---
+
+### Available Utilities
+
+- [Axe Utility](docs/utility-guides/Axe.md)
+- [Appointments Utility](docs/utility-guides/Appointments.md)
+- [Batch Processing Utility](docs/utility-guides/BatchProcessing.md)
+- [Calendar Picker Utility](docs/utility-guides/CalendarPicker.md)
+- [Call and Recall Utility](docs/utility-guides/CallAndRecallUtils.md)
+- [Dataset Field Utility](docs/utility-guides/DatasetField.md)
+- [Date Time Utility](docs/utility-guides/DateTimeUtility.md)
+- [Fit Kit Utility](docs/utility-guides/FitKit.md)
+- [Investigation Dataset Utility](docs/utility-guides/InvestigationDataset.md)
+- [Jira Confluence Utility](docs/utility-guides/JiraConfluenceUtil.md)
+- [Load Properties Utility](docs/utility-guides/LoadProperties.md)
+- [Manual Cease Workflow Utility](docs/utility-guides/ManualCease.md)
+- [NHS Number Tools Utility](docs/utility-guides/NHSNumberTools.md)
+- [Notify Criteria Parser Utility](docs/utility-guides/NotifyCriteriaParser.md)
+- [Oracle Utility](docs/utility-guides/Oracle.md)
+- [PDF Reader Utility](docs/utility-guides/PDFReader.md)
+- [Screening Subject Page Searcher Utility](docs/utility-guides/ScreeningSubjectPageSearcher.md)
+- [Subject Assertion Utility](docs/utility-guides/SubjectAssertion.md)
+- [Subject Creation Utility](docs/utility-guides/SubjectCreationUtil.md)
+- [Subject Demographics Utility](docs/utility-guides/SubjectDemographics.md)
+- [Subject Notes Utility](docs/utility-guides/SubjectNotes.md)
+- [Subject Selection Query Builder Utility](docs/utility-guides/SubjectSelectionQueryBuilder.md)
+- [Table Utility](docs/utility-guides/TableUtil.md)
+- [User Tools Utility](docs/utility-guides/UserTools.md)
+
+---
+
+## UI Applications
+
+This repository also includes a couple of ui applications.<br>
+The UI applications can be used to assit with test creation or to obtain subject related SQL queries.<br>
+
+Currently there are two applications available:
+
+- [Subject Criteria Builder Application](docs/SubjectCriteriaBuilderApplication.md)
+- [Investigation Dataset Application](docs/InvestigationDatasetBuilderApplication.md)
+
+To see more information on these applications click on their respective links to view the guides surrounding these applications.
+
+---
+
+## Conftest & Fixtures
+
+The `conftest.py` file is located at the root of the repository and is used to define reusable pytest fixtures and hooks for test setup, teardown, and configuration.<br>
+Fixtures in `conftest.py` help manage environment variables, test data, organisational setup, and provide shared resources across multiple test files.
+
+### Available Fixtures
+
+- **import_local_env_file**
+  Loads environment variables from `local.env` at the start of the test session.
+
+- **smokescreen_properties**
+  Loads properties from the smokescreen properties file for use in tests.
+
+- **general_properties**
+  Loads general properties from the main properties file for use in tests.
+
+- **setup_org_and_appointments**
+  Ensures required organisation parameters and appointments are set up before tests run. Only runs once per day per environment.
+
+- **subjects_to_run_for**
+  Retrieves the value of the `--subjects-to-run-for` CLI argument (default: 10).
+
+---
+
+### Example Usage
+
+You can use fixtures in your tests by either:
+
+- Adding them as function arguments
+- Using the `@pytest.mark.usefixtures` decorator
+
+---
+
+#### Using as a Function Argument
+
+```python
+import pytest
+
+def test_example(page: Page, general_properties: dict):
+    # Access general properties loaded by the fixture
+    assert "eng_screening_centre_id" in general_properties
+```
+
+---
+
+#### Using the @pytest.mark.usefixtures Decorator
+
+```python
+import pytest
+
+@pytest.mark.usefixtures("setup_org_and_appointments")
+def test_my_function(page: Page):
+    # Organisation and appointments are set up before this test runs
+    # Your test code here
+```
+
+---
+
+#### Using Both
+
+```python
+import pytest
+
+@pytest.mark.usefixtures("setup_org_and_appointments")
+def test_with_properties(page: Page, general_properties: dict):
+    # Both fixtures are available
+    org_id = general_properties["eng_screening_centre_id"]
+    # Your test code here
+```
+
+---
+
+### Custom CLI Options
+
+You can pass custom options to pytest via the command line, such as:
+
+```sh
+pytest tests/test_setup.py::test_setup_subjects_as_a259 --subjects-to-run-for=5
+```
+
+This sets the number of subjects to run the test setup for using the `subjects_to_run_for` fixture.
+
+---
+
+For more details, see the comments and docstrings in [`conftest.py`](../conftest.py).
