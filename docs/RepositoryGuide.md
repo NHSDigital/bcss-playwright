@@ -57,6 +57,7 @@ Please refer to the list below for all available POMs in this repository.
 
 <details>
 <summary><strong>Available POMs</strong></summary>
+<!-- vale-on -->
 
 - base_page
 - alerts/
@@ -168,6 +169,7 @@ Please refer to the list below for all available POMs in this repository.
 - surveillance/
   - surveillance_summary_review_page
 
+<!-- vale-off -->
 </details>
 
 ---
@@ -465,7 +467,7 @@ All utility guides are located in the `docs/utility-guides/` directory. Each uti
 
 ## UI Applications
 
-This repository also includes a couple of ui applications.<br>
+This repository also includes a couple of UI applications.<br>
 The UI applications can be used to assit with test creation or to obtain subject related SQL queries.<br>
 
 Currently there are two applications available:
@@ -479,24 +481,24 @@ To see more information on these applications click on their respective links to
 
 ## Conftest & Fixtures
 
-The `conftest.py` file is located at the root of the repository and is used to define reusable pytest fixtures and hooks for test setup, teardown, and configuration.<br>
+The `conftest.py` file is located at the root of the repository and is used to define reusable pytest fixtures and hooks for test setup, tear down, and configuration.<br>
 Fixtures in `conftest.py` help manage environment variables, test data, organisational setup, and provide shared resources across multiple test files.
 
 ### Available Fixtures
 
-- **import_local_env_file**
+- **`import_local_env_file`**
   Loads environment variables from `local.env` at the start of the test session.
 
-- **smokescreen_properties**
+- **`smokescreen_properties`**
   Loads properties from the smokescreen properties file for use in tests.
 
-- **general_properties**
+- **`general_properties`**
   Loads general properties from the main properties file for use in tests.
 
-- **setup_org_and_appointments**
+- **`setup_org_and_appointments`**
   Ensures required organisation parameters and appointments are set up before tests run. Only runs once per day per environment.
 
-- **subjects_to_run_for**
+- **`subjects_to_run_for`**
   Retrieves the value of the `--subjects-to-run-for` CLI argument (default: 10).
 
 ---
