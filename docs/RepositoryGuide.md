@@ -57,7 +57,7 @@ Please refer to the list below for all available POMs in this repository.
 
 <details>
 <summary><strong>Available POMs</strong></summary>
-<!-- vale-on -->
+<!-- vale off -->
 
 - base_page
 - alerts/
@@ -169,7 +169,7 @@ Please refer to the list below for all available POMs in this repository.
 - surveillance/
   - surveillance_summary_review_page
 
-<!-- vale-off -->
+<!-- vale on -->
 </details>
 
 ---
