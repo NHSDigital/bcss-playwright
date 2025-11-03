@@ -179,13 +179,21 @@ Please refer to the list below for all available POMs in this repository.
 To use a POM in a test, instantiate the page object and call its methods:
 
 ```python
-from pages.login.login_page import LoginPage
+from pages.screening_subject_search.subject_screening_search_page import (
+  SubjectScreeningPage,
+  SearchAreaSearchOptions,
+)
 
-def test_user_can_login(page):
-    login_page = LoginPage(page)
-    login_page.navigate()
-    login_page.login("user@example.com", "securepassword")
-    assert login_page.is_logged_in()
+def test_search_user_by_nhs_number(page):
+  nhs_number = "1234567890"
+  SubjectScreeningPage(page).click_clear_filters_button()
+  SubjectScreeningPage(page).click_episodes_filter()
+  SubjectScreeningPage(page).nhs_number_filter.fill(nhs_number)
+  SubjectScreeningPage(page).nhs_number_filter.press("Tab")
+  SubjectScreeningPage(page).select_search_area_option(
+    SearchAreaSearchOptions.SEARCH_AREA_WHOLE_DATABASE.value
+  )
+  SubjectScreeningPage(page).click_search_button()
 ```
 
 ---
@@ -369,6 +377,68 @@ These include:
 
 ---
 
+#### When to Use
+
+Use these classes whenever you need to interact with core domain objects or perform database operations in your tests.
+For example, when setting up test data, verifying database state after UI actions, or retrieving specific attributes for assertions.
+
+#### Why Use
+
+- They encapsulate business logic and data access, making tests cleaner and easier to maintain.
+- They provide a consistent interface for interacting with the system under test.
+- Repositories abstract away SQL/database details, allowing you to focus on test logic.
+
+#### How to Use
+
+- Instantiate the class or repository in your test.
+- Call the relevant methods to fetch, create, update, or verify data.
+
+Example usage in a test:
+
+```python
+from classes.repositories.subject_repository import SubjectRepository
+from classes.person.person import Person
+
+def test_subject_exists_in_db():
+    repo = SubjectRepository()
+    nhs_number = "1234567890"
+    assert repo.find_by_nhs_number(nhs_number)
+
+def test_person_attributes():
+    person = Person(name="John Doe", dob="1980-01-01")
+    assert person.name == "John Doe"
+```
+
+You can also use repositories to set up test data before running UI tests, or to verify that changes made in the UI are reflected in the database.
+
+---
+
+#### Why Use Repositories?
+
+Repositories are used to abstract and encapsulate all database access and query logic for a specific domain (e.g., subjects, episodes, users).<br>
+This pattern helps keep your test code clean, maintainable, and focused on business logic rather than SQL or data access details.
+By using repositories, you can:
+
+- Centralise and reuse query logic across tests.
+- Reduce duplication and improve maintainability.
+
+---
+
+#### Example: Using a Repository in a Test
+
+```python
+from classes.repositories.subject_repository import SubjectRepository
+
+def test_subject_exists_in_db():
+    repo = SubjectRepository()
+    nhs_number = "1234567890"
+    assert repo.find_by_nhs_number(nhs_number)
+```
+
+You can also use repositories to fetch or update domain objects, set up test data, or verify database state after UI actions.
+
+---
+
 ### Class Descriptions
 
 - **address/**: Models address data and types.
@@ -423,9 +493,59 @@ These include:
 
 ### Common Patterns
 
-- **Repository Pattern**: Used for DB access and data management (e.g., `SubjectRepository`, `PersonRepository`).
-- **Factory Pattern**: Used in data creation utilities for generating test data.
-- **Singleton Pattern**: Used for configuration or shared resources (where applicable).
+- **Repository Pattern**
+Used for DB access and data management (e.g., `SubjectRepository`, `PersonRepository`).
+
+**Example:**
+
+```python
+from classes.repositories.subject_repository import SubjectRepository
+
+repo = SubjectRepository()
+subject = repo.find_by_nhs_number("1234567890")
+```
+
+**Benefits:**
+
+- Centralizes data access logic
+- Makes tests and business logic independent of database details
+- Improves maintainability and testability
+
+- **Factory Pattern**
+Used in data creation utilities for generating test data.
+
+**Example:**
+
+```python
+from classes.data.data_creation import DataFactory
+
+test_subject = DataFactory.create_subject(age=45, status="Active")
+```
+
+**Benefits:**
+
+- Simplifies creation of complex objects
+- Promotes reuse and consistency in test data setup
+- Makes it easy to vary object attributes for different test scenarios
+
+- **Singleton Pattern**
+
+Used for configuration or shared resources (where applicable).
+
+**Example:**
+
+```python
+  from utils.load_properties import PropertiesLoader
+
+  config = PropertiesLoader.get_instance()
+  value = config.get("some_property")
+```
+
+**Benefits:**
+
+- Ensures a single, shared instance for configuration or resources
+- Reduces memory usage and avoids conflicting state
+- Makes global settings easy to access and update
 
 ---
 
