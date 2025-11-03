@@ -498,36 +498,37 @@ You can also use repositories to fetch or update domain objects, set up test dat
 ## Utilities
 
 Utility modules provide reusable functions and helpers for common tasks in test automation, such as database interaction, data generation, accessibility scanning, and more.<br>
-All utility guides are located in the `docs/utility-guides/` directory. Each utility typically has a corresponding Python module in the `utils/` directory.
+All utility guides are located in the `docs/utility-guides/` directory. Each utility typically has a corresponding Python module in the `utils/` directory.<br>
+Some utilities also have unit tests created. these unit tests are stored in `test_utils`.
 
 ---
 
 ### Available Utilities
 
-- [Axe Utility](docs/utility-guides/Axe.md)
-- [Appointments Utility](docs/utility-guides/Appointments.md)
-- [Batch Processing Utility](docs/utility-guides/BatchProcessing.md)
-- [Calendar Picker Utility](docs/utility-guides/CalendarPicker.md)
-- [Call and Recall Utility](docs/utility-guides/CallAndRecallUtils.md)
-- [Dataset Field Utility](docs/utility-guides/DatasetField.md)
-- [Date Time Utility](docs/utility-guides/DateTimeUtility.md)
-- [Fit Kit Utility](docs/utility-guides/FitKit.md)
-- [Investigation Dataset Utility](docs/utility-guides/InvestigationDataset.md)
-- [Jira Confluence Utility](docs/utility-guides/JiraConfluenceUtil.md)
-- [Load Properties Utility](docs/utility-guides/LoadProperties.md)
-- [Manual Cease Workflow Utility](docs/utility-guides/ManualCease.md)
-- [NHS Number Tools Utility](docs/utility-guides/NHSNumberTools.md)
-- [Notify Criteria Parser Utility](docs/utility-guides/NotifyCriteriaParser.md)
-- [Oracle Utility](docs/utility-guides/Oracle.md)
-- [PDF Reader Utility](docs/utility-guides/PDFReader.md)
-- [Screening Subject Page Searcher Utility](docs/utility-guides/ScreeningSubjectPageSearcher.md)
-- [Subject Assertion Utility](docs/utility-guides/SubjectAssertion.md)
-- [Subject Creation Utility](docs/utility-guides/SubjectCreationUtil.md)
-- [Subject Demographics Utility](docs/utility-guides/SubjectDemographics.md)
-- [Subject Notes Utility](docs/utility-guides/SubjectNotes.md)
-- [Subject Selection Query Builder Utility](docs/utility-guides/SubjectSelectionQueryBuilder.md)
-- [Table Utility](docs/utility-guides/TableUtil.md)
-- [User Tools Utility](docs/utility-guides/UserTools.md)
+- [Axe Utility](utility-guides/Axe.md)
+- [Appointments Utility](utility-guides/Appointments.md)
+- [Batch Processing Utility](utility-guides/BatchProcessing.md)
+- [Calendar Picker Utility](utility-guides/CalendarPicker.md)
+- [Call and Recall Utility](utility-guides/CallAndRecallUtils.md)
+- [Dataset Field Utility](utility-guides/DatasetField.md)
+- [Date Time Utility](utility-guides/DateTimeUtility.md)
+- [Fit Kit Utility](utility-guides/FitKit.md)
+- [Investigation Dataset Utility](utility-guides/InvestigationDataset.md)
+- [Jira Confluence Utility](utility-guides/JiraConfluenceUtil.md)
+- [Load Properties Utility](utility-guides/LoadProperties.md)
+- [Manual Cease Workflow Utility](utility-guides/ManualCease.md)
+- [NHS Number Tools Utility](utility-guides/NHSNumberTools.md)
+- [Notify Criteria Parser Utility](utility-guides/NotifyCriteriaParser.md)
+- [Oracle Utility](utility-guides/Oracle.md)
+- [PDF Reader Utility](utility-guides/PDFReader.md)
+- [Screening Subject Page Searcher Utility](utility-guides/ScreeningSubjectPageSearcher.md)
+- [Subject Assertion Utility](utility-guides/SubjectAssertion.md)
+- [Subject Creation Utility](utility-guides/SubjectCreationUtil.md)
+- [Subject Demographics Utility](utility-guides/SubjectDemographics.md)
+- [Subject Notes Utility](utility-guides/SubjectNotes.md)
+- [Subject Selection Query Builder Utility](utility-guides/SubjectSelectionQueryBuilder.md)
+- [Table Utility](utility-guides/TableUtil.md)
+- [User Tools Utility](utility-guides/UserTools.md)
 
 ---
 
