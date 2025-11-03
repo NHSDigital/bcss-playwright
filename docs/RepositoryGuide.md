@@ -15,10 +15,14 @@ It is intended to help developers and testers understand the structure, usage, a
     - [Naming Conventions](#naming-conventions)
   - [Classes](#classes)
     - [Useful Classes](#useful-classes)
+      - [When to Use](#when-to-use)
+      - [Why Use](#why-use)
+      - [How to Use](#how-to-use)
+      - [Why Use Repositories?](#why-use-repositories)
+      - [Example: Using a Repository in a Test](#example-using-a-repository-in-a-test)
     - [Class Descriptions](#class-descriptions)
     - [Relationships/Dependencies](#relationshipsdependencies)
     - [Utility Classes](#utility-classes)
-    - [Common Patterns](#common-patterns)
   - [Utilities](#utilities)
     - [Available Utilities](#available-utilities)
   - [UI Applications](#ui-applications)
@@ -488,64 +492,6 @@ You can also use repositories to fetch or update domain objects, set up test dat
   - `data_creation.py`: Test data generation.
   - `database_transition_parameters.py`: DB transition configuration.
   - `kit_service_management_entity.py`: Kit management helpers.
-
----
-
-### Common Patterns
-
-- **Repository Pattern**
-Used for DB access and data management (e.g., `SubjectRepository`, `PersonRepository`).
-
-**Example:**
-
-```python
-from classes.repositories.subject_repository import SubjectRepository
-
-repo = SubjectRepository()
-subject = repo.find_by_nhs_number("1234567890")
-```
-
-**Benefits:**
-
-- Centralizes data access logic
-- Makes tests and business logic independent of database details
-- Improves maintainability and testability
-
-- **Factory Pattern**
-Used in data creation utilities for generating test data.
-
-**Example:**
-
-```python
-from classes.data.data_creation import DataFactory
-
-test_subject = DataFactory.create_subject(age=45, status="Active")
-```
-
-**Benefits:**
-
-- Simplifies creation of complex objects
-- Promotes reuse and consistency in test data setup
-- Makes it easy to vary object attributes for different test scenarios
-
-- **Singleton Pattern**
-
-Used for configuration or shared resources (where applicable).
-
-**Example:**
-
-```python
-  from utils.load_properties import PropertiesLoader
-
-  config = PropertiesLoader.get_instance()
-  value = config.get("some_property")
-```
-
-**Benefits:**
-
-- Ensures a single, shared instance for configuration or resources
-- Reduces memory usage and avoids conflicting state
-- Makes global settings easy to access and update
 
 ---
 
