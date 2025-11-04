@@ -446,6 +446,8 @@ You can also use repositories to fetch or update domain objects, set up test dat
 
 ### Class Descriptions
 
+<!-- vale off -->
+
 | Folder                              | Description                                                        |
 |--------------------------------------|--------------------------------------------------------------------|
 | address                             | Models address data and types.                                     |
@@ -477,6 +479,8 @@ You can also use repositories to fetch or update domain objects, set up test dat
 | surveillance                        | Surveillance review and change reason types.                       |
 | user                                | User models and role types.                                        |
 | yes_no                              | Yes/No type enums.                                                 |
+
+<!-- vale on -->
 
 ---
 
