@@ -52,8 +52,9 @@ All POMs are located in the `pages/` directory.<br>
 Each POM encapsulates locators and methods for interacting with a specific page or feature in the UI.<br>
 The purpose of POMs is to promote reusability and maintainability of the automation code by providing a clear structure for page interactions.<br>
 
-The POMs have been organised into folders based on the base/main page to allow for easier navigation.<br>
+The POMs have been organised into folders based on the main menu within the UI to allow for easier navigation.<br>
 POMs follow the naming convention of `<page_name>_page.py` to clearly indicate their purpose.<br>
+All of the POMs inherit the `BasePage` POM. This is so that they can leverage common functionality such as the common click method.<br>
 
 Please refer to the list below for all available POMs in this repository.
 
@@ -445,35 +446,37 @@ You can also use repositories to fetch or update domain objects, set up test dat
 
 ### Class Descriptions
 
-- **address/**: Models address data and types.
-- **appointment/**: Models appointment slots and statuses.
-- **bowel_scope/**: Models bowel scope change reasons.
-- **ceased/**: Models cease confirmation details and reasons.
-- **data/**: Data creation helpers for test setup.
-- **database/**: Database error handling and transition parameter classes.
-- **datasets/**: Models for dataset fields, cancer treatment, and related enums.
-- **date/**: Date description and utility classes for parsing and formatting dates.
-- **deduction/**: Deduction reason types.
-- **diagnostic/**: Diagnostic test types, outcomes, and related logic.
-- **entities/**: Entity classes for kit management.
-- **episode/**: Models episode status, type, and related logic.
-- **event/**: Event code and status types.
-- **invitation/**: Invitation plan and status models.
-- **kits/**: Kit management, types, and status classes.
-- **lynch/**: Lynch syndrome incident and change reason types.
-- **notify/**: Notification event and message status/types.
-- **organisation/**: Organisation and complex organisation models.
-- **person/**: Person models, accreditation, roles, and selection criteria.
-- **recall/**: Recall calculation and episode types.
-- **referral/**: Referral date and reason types.
-- **repositories/**: Repository classes for DB access (depend on entity/data classes).
-- **role/**: Role type enums.
-- **screening/**: Screening centre, status, and region models.
-- **subject/**: Subject models, gender, and PI subject.
-- **subject_selection_query_builder/**: Selection builder and criteria key classes.
-- **surveillance/**: Surveillance review and change reason types.
-- **user/**: User models and role types.
-- **yes_no/**: Yes/No type enums.
+| Folder                              | Description                                                        |
+|--------------------------------------|--------------------------------------------------------------------|
+| address                             | Models address data and types.                                     |
+| appointment                         | Models appointment slots and statuses.                             |
+| bowel_scope                         | Models bowel scope change reasons.                                 |
+| ceased                              | Models cease confirmation details and reasons.                     |
+| data                                | Data creation helpers for test setup.                              |
+| database                            | Database error handling and transition parameter classes.          |
+| datasets                            | Models for dataset fields, cancer treatment, and related enums.    |
+| date                                | Date description and utility classes for parsing and formatting.   |
+| deduction                           | Deduction reason types.                                            |
+| diagnostic                          | Diagnostic test types, outcomes, and related logic.                |
+| entities                            | Entity classes for kit management.                                 |
+| episode                             | Models episode status, type, and related logic.                    |
+| event                               | Event code and status types.                                       |
+| invitation                          | Invitation plan and status models.                                 |
+| kits                                | Kit management, types, and status classes.                         |
+| lynch                               | Lynch syndrome incident and change reason types.                   |
+| notify                              | Notification event and message status/types.                       |
+| organisation                        | Organisation and complex organisation models.                      |
+| person                              | Person models, accreditation, roles, and selection criteria.       |
+| recall                              | Recall calculation and episode types.                              |
+| referral                            | Referral date and reason types.                                    |
+| repositories                        | Repository classes for DB access (depend on entity/data classes).  |
+| role                                | Role type enums.                                                  |
+| screening                           | Screening centre, status, and region models.                       |
+| subject                             | Subject models, gender, and PI subject.                            |
+| subject_selection_query_builder      | Selection builder and criteria key classes.                        |
+| surveillance                        | Surveillance review and change reason types.                       |
+| user                                | User models and role types.                                        |
+| yes_no                              | Yes/No type enums.                                                 |
 
 ---
 
