@@ -100,7 +100,6 @@ from utils.oracle.subject_creation_util import CreateSubjectSteps
 from classes.repositories.subject_repository import SubjectRepository
 
 
-
 @pytest.mark.usefixtures("setup_org_and_appointments")
 # @pytest.mark.vpn_required
 # @pytest.mark.regression
@@ -241,7 +240,7 @@ def test_scenario_14(page: Page) -> None:
     # And I set the practitioner appointment date to "today"
     # And I book the "earliest" available practitioner appointment on this date
     book_appointments(
-        page=page,
+        page,
         screening_centre="BCS001 - Wolverhampton Bowel Cancer Screening Centre",
         site="The Royal Hospital (Wolverhampton)",
     )
@@ -285,10 +284,10 @@ def test_scenario_14(page: Page) -> None:
 
     # When I process the open "A183 - 1st Colonoscopy Assessment Appointment" letter batch for my subject
     batch_processing(
-        page,
-        "A183",
-        "Practitioner Clinic 1st Appointment",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+        page=page,
+        batch_type="A183",
+        batch_description="Practitioner Clinic 1st Appointment",
+        latest_event_status="A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
     )
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
@@ -341,7 +340,7 @@ def test_scenario_14(page: Page) -> None:
 
     # And I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(
-        page=page, nhs_no=nhs_no
+        page, nhs_no
     )
 
     # And I advance the subject's episode for "Suitable for Endoscopic Test"
@@ -935,7 +934,7 @@ def test_scenario_14(page: Page) -> None:
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
     LogoutPage(page).log_out(close_page=False)
     BasePage(page).go_to_log_in_page()
-    user_role = UserTools.user_login(page, "Screening Centre Manager at BCS001", True)
+    UserTools.user_login(page, "Screening Centre Manager at BCS001")
     # And I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     # And I reopen the subject's episode for "Reopen to Re-record Outcome from Symptomatic Referral"
