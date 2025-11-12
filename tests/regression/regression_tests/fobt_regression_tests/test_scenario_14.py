@@ -100,7 +100,7 @@ from utils.oracle.subject_creation_util import CreateSubjectSteps
 from classes.repositories.subject_repository import SubjectRepository
 
 
-@pytest.mark.wip
+
 @pytest.mark.usefixtures("setup_org_and_appointments")
 # @pytest.mark.vpn_required
 # @pytest.mark.regression
@@ -273,12 +273,15 @@ def test_scenario_14(page: Page) -> None:
     # And I save Diagnosis Date Information
     RecordDiagnosisDatePage(page).click_save_button()
     # Then my subject has been updated as follows:
+
     criteria = {
         "latest episode diagnosis date reason": "Null",
         "latest episode has diagnosis date": "Yes",
         "latest episode includes event status": "A50 Diagnosis date recorded",
         "latest event status": "A183 1st Colonoscopy Assessment Appointment Requested ",
     }
+    subject_assertion(
+        nhs_number=nhs_no,criteria=criteria)
 
     # When I process the open "A183 - 1st Colonoscopy Assessment Appointment" letter batch for my subject
     batch_processing(
@@ -747,7 +750,7 @@ def test_scenario_14(page: Page) -> None:
     # When I switch users to BCSS "England" as user role "Senior Screening Assistant"
     LogoutPage(page).log_out(close_page=False)
     BasePage(page).go_to_log_in_page()
-    user_role = UserTools.user_login(page, "Senior Screening Assistant at BCS01", True)
+    UserTools.user_login(page, "Senior Screening Assistant at BCS01")
 
     # And I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
     batch_processing(
