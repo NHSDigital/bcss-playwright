@@ -13,9 +13,7 @@ from utils.calendar_picker import CalendarPicker
 from utils.user_tools import UserTools
 from utils.subject_assertion import subject_assertion
 from utils import screening_subject_page_searcher
-from utils.batch_processing import (
-    batch_processing
-)
+from utils.batch_processing import batch_processing
 from utils.fit_kit import FitKitLogged, FitKitGeneration
 from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
 from utils.appointments import book_appointments, book_post_investigation_appointment
@@ -206,13 +204,17 @@ def test_scenario_14(page: Page) -> None:
     batch_processing(
         page=page,
         batch_type="S9",
-        batch_description="Invitation & Test Kit (FIT)",
         latest_event_status="S10 - Invitation & Test Kit Sent",
+        batch_description="Invitation & Test Kit (FIT)",
     )
 
     # When I log my subject's latest unlogged FIT kit
     fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
-    FitKitLogged().log_fit_kits(page=page, fit_kit=fit_kit, sample_date=datetime.now())
+    FitKitLogged().log_fit_kits(
+        page=page,
+        sample_date=datetime.now(),
+        fit_kit=fit_kit,
+    )
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -222,7 +224,7 @@ def test_scenario_14(page: Page) -> None:
 
     # When I read my subject's latest logged FIT kit as "ABNORMAL"
     FitKitLogged().read_latest_logged_kit(
-        user=user_role, kit_type=2, kit=fit_kit, kit_result="ABNORMAL"
+        user=user_role, kit=fit_kit, kit_type=2, kit_result="ABNORMAL"
     )
 
     # Then my subject has been updated as follows:
@@ -279,14 +281,13 @@ def test_scenario_14(page: Page) -> None:
         "latest episode includes event status": "A50 Diagnosis date recorded",
         "latest event status": "A183 1st Colonoscopy Assessment Appointment Requested ",
     }
-    subject_assertion(
-        nhs_number=nhs_no,criteria=criteria)
+    subject_assertion(nhs_number=nhs_no, criteria=criteria)
 
     # When I process the open "A183 - 1st Colonoscopy Assessment Appointment" letter batch for my subject
     batch_processing(
         page=page,
-        batch_type="A183",
         batch_description="Practitioner Clinic 1st Appointment",
+        batch_type="A183",
         latest_event_status="A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
     )
 
@@ -309,15 +310,15 @@ def test_scenario_14(page: Page) -> None:
 
     # And I attend the subject's practitioner appointment "2 days ago"
     AppointmentDetailPage(page).mark_appointment_as_attended(
-        datetime.today() - timedelta(days=2)
+        date=datetime.today() - timedelta(days=2)
     )
 
     # Then my subject has been updated as follows:
     subject_assertion(
-        nhs_number=nhs_no,
         criteria={
             "latest event status": "J10 Attended Colonoscopy Assessment Appointment",
         },
+        nhs_number=nhs_no,
     )
 
     # When I view the subject
@@ -339,9 +340,7 @@ def test_scenario_14(page: Page) -> None:
     ColonoscopyDatasetsPage(page).save_dataset()
 
     # And I view the subject
-    screening_subject_page_searcher.navigate_to_subject_summary_page(
-        page, nhs_no
-    )
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
     # And I advance the subject's episode for "Suitable for Endoscopic Test"
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
@@ -349,8 +348,8 @@ def test_scenario_14(page: Page) -> None:
 
     # Then my subject has been updated as follows:
     subject_assertion(
-        nhs_number=nhs_no,
         criteria={"latest event status": "A99 Suitable for Endoscopic Test"},
+        nhs_number=nhs_no,
     )
 
     # When I view the subject
@@ -411,9 +410,6 @@ def test_scenario_14(page: Page) -> None:
         f"{df["person_family_name"].iloc[0]} {df["person_given_name"].iloc[0]}"
     )
 
-    # And I add the following bowel preparation drugs and values within the Investigation Dataset for this subject:
-    drug_information = {"drug_type1": DrugTypeOptions.MANNITOL, "drug_dose1": "3"}
-
     # And I set the following fields and values within the Investigation Dataset for this subject:
     general_information = {
         "site": 1,
@@ -421,6 +417,9 @@ def test_scenario_14(page: Page) -> None:
         "testing clinician": person_name,
         "aspirant endoscopist": None,
     }
+    # And I add the following bowel preparation drugs and values within the Investigation Dataset for this subject:
+    drug_information = {"drug_type1": DrugTypeOptions.MANNITOL, "drug_dose1": "3"}
+    # And I set the following endoscopy fields and values within the Investigation Dataset for this subject:
     endoscopy_information = {
         "endoscope inserted": "yes",
         "procedure type": "therapeutic",
@@ -445,11 +444,7 @@ def test_scenario_14(page: Page) -> None:
     # And I set the following failure reasons within the Investigation Dataset for this subject:
     failure_information = {"failure reasons": FailureReasonsOptions.ADHESION}
 
-    # And I add new polyp 1 with the following fields and values within the Investigation Dataset for this subject:
-    # And I add new polyp 2 with the following fields and values within the Investigation Dataset for this subject:
-    # And I add new polyp 3 with the following fields and values within the Investigation Dataset for this subject:
-    # And I add new polyp 4 with the following fields and values within the Investigation Dataset for this subject:
-    # And I add new polyp 5 with the following fields and values within the Investigation Dataset for this subject:
+    # And I add new polyp 1-5 with the following fields and values within the Investigation Dataset for this subject:
     polyp_information = [
         {
             "location": EndoscopyLocationOptions.CAECUM,
