@@ -1680,10 +1680,9 @@ class OpticalDiagnosisConfidenceOptions(StrEnum):
 
 class PolypTypeLeftInSituOptions(StrEnum):
     """Enum for Polyp Type Left in Situ options"""
-    
+
     INFLAMMATORY_POLYP = "17300~Sub Type Not Applicable"
     LYMPHOID_FOLLICLE = "200599~Sub Type Not Applicable"
-
 
 
 # Registry of all known Enums to search when matching string values
