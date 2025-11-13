@@ -376,14 +376,16 @@ def test_scenario_15(page: Page) -> None:
     )
 
     # When I view the subject
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    screening_subject_page_searcher.navigate_to_subject_summary_page(
+        page=page, nhs_no=nhs_no
+    )
 
     # And I edit the Investigation Dataset for this subject
     SubjectScreeningSummaryPage(page).click_datasets_link()
     SubjectDatasetsPage(page).click_investigation_show_datasets()
 
     # And there is a clinician who meets the following criteria:
-    user = User.from_user_role_type(user_role)
+    user = User.from_user_role_type(user_role_type=user_role)
     criteria = {
         "Person has current role": "Accredited Screening Colonoscopist",
         "Person has current role in organisation": "User's SC",
@@ -393,7 +395,7 @@ def test_scenario_15(page: Page) -> None:
         criteria=criteria, person=None, required_person_count=1, user=user, subject=None
     )
     logging.info(f"Final query: {query}")
-    df = OracleDB().execute_query(query)
+    df = OracleDB().execute_query(query, None)
     person_name = (
         f"{df["person_family_name"].iloc[0]} {df["person_given_name"].iloc[0]}"
     )
@@ -726,7 +728,7 @@ def test_scenario_15(page: Page) -> None:
     # And I advance the subject's episode for "Post-investigation Appointment Required"
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
     AdvanceFOBTScreeningEpisodePage(
-        page
+        page=page
     ).click_post_investigation_appointment_required_button()
 
     # Then my subject has been updated as follows:
@@ -741,7 +743,7 @@ def test_scenario_15(page: Page) -> None:
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
     # And I choose to book a practitioner clinic for my subject
-    SubjectScreeningSummaryPage(page).click_book_practitioner_clinic_button()
+    SubjectScreeningSummaryPage(page=page).click_book_practitioner_clinic_button()
 
     # And I set the practitioner appointment date to "today"
     # And I book the earliest available post investigation appointment on this date
@@ -773,7 +775,7 @@ def test_scenario_15(page: Page) -> None:
     SubjectScreeningSummaryPage(page).click_first_fobt_episode_link()
 
     # And I view the latest practitioner appointment in the subject's episode
-    EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
+    EpisodeEventsAndNotesPage(page=page).click_most_recent_view_appointment_link()
 
     # And I attend the subject's practitioner appointment "today"
     AppointmentDetailPage(page).mark_appointment_as_attended(datetime.today())
@@ -806,7 +808,7 @@ def test_scenario_15(page: Page) -> None:
 
     # Then my subject has been updated as follows:
     AdvanceFOBTScreeningEpisodePage(page).verify_latest_event_status_value(
-        "A99 - Suitable for Endoscopic Test"
+        latest_event_status="A99 - Suitable for Endoscopic Test"
     )
 
     # When I view the advance episode options
@@ -824,7 +826,7 @@ def test_scenario_15(page: Page) -> None:
 
     # Then my subject has been updated as follows:
     AdvanceFOBTScreeningEpisodePage(page).verify_latest_event_status_value(
-        "A59 - Invited for Diagnostic Test"
+        latest_event_status="A59 - Invited for Diagnostic Test"
     )
 
     # When I select the advance episode option for "Attend Diagnostic Test"
@@ -846,7 +848,9 @@ def test_scenario_15(page: Page) -> None:
     )
 
     # When I view the subject
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    screening_subject_page_searcher.navigate_to_subject_summary_page(
+        page=page, nhs_no=nhs_no
+    )
 
     # And I edit the Investigation Dataset for this subject
     SubjectScreeningSummaryPage(page).click_datasets_link()
@@ -866,7 +870,7 @@ def test_scenario_15(page: Page) -> None:
         criteria=criteria, person=None, required_person_count=1, user=user, subject=None
     )
     logging.info(f"Final query: {query}")
-    df = OracleDB().execute_query(query)
+    df = OracleDB().execute_query(query, None)
     person_name = (
         f"{df["person_family_name"].iloc[0]} {df["person_given_name"].iloc[0]}"
     )
@@ -878,6 +882,7 @@ def test_scenario_15(page: Page) -> None:
         "testing clinician": person_name,
         "aspirant endoscopist": None,
     }
+
     endoscopy_information = {
         "endoscope inserted": "yes",
         "procedure type": "therapeutic",
