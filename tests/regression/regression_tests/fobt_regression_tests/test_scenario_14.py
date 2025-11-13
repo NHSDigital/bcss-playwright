@@ -363,12 +363,13 @@ def test_scenario_14(page: Page) -> None:
     )
     # And I enter a Diagnostic Test First Offered Appointment Date of "today"
     AdvanceFOBTScreeningEpisodePage(page).click_calendar_button()
-    CalendarPicker(page).v1_calender_picker(datetime.today())
+    CalendarPicker(page).v1_calender_picker(date=datetime.today())
     # And I advance the subject's episode for "Invite for Diagnostic Test >>"
     AdvanceFOBTScreeningEpisodePage(page).click_invite_for_diagnostic_test_button()
     # Then my subject has been updated as follows:
+    latest_event_status = "A59 - Invited for Diagnostic Test"
     AdvanceFOBTScreeningEpisodePage(page).verify_latest_event_status_value(
-        latest_event_status="A59 - Invited for Diagnostic Test"
+        latest_event_status
     )
 
     # And I select the advance episode option for "Attend Diagnostic Test"
@@ -377,14 +378,15 @@ def test_scenario_14(page: Page) -> None:
     AdvanceFOBTScreeningEpisodePage(page).click_attend_diagnostic_test_button()
     # And I attend the subject's diagnostic test yesterday
     AttendDiagnosticTestPage(page).click_calendar_button()
-    CalendarPicker(page).v1_calender_picker(datetime.today() - timedelta(days=1))
+    CalendarPicker(page).v1_calender_picker(date=datetime.today() - timedelta(days=1))
     AttendDiagnosticTestPage(page).click_save_button()
     # Then my subject has been updated as follows:
+    criteria = {
+        "latest event status": "A259 Attended Diagnostic Test",
+    }
     subject_assertion(
         nhs_number=nhs_no,
-        criteria={
-            "latest event status": "A259 Attended Diagnostic Test",
-        },
+        criteria=criteria,
     )
 
     # When I view the subject
@@ -402,7 +404,11 @@ def test_scenario_14(page: Page) -> None:
         "Resect & Discard accreditation status": "None",
     }
     query = PersonRepository().build_person_selection_query(
-        criteria=criteria, person=None, required_person_count=1, user=user, subject=None
+        criteria=criteria,
+        person=None,
+        user=user,
+        subject=None,
+        required_person_count=1,
     )
     logging.info(f"Final query: {query}")
     df = OracleDB().execute_query(query)
@@ -412,13 +418,16 @@ def test_scenario_14(page: Page) -> None:
 
     # And I set the following fields and values within the Investigation Dataset for this subject:
     general_information = {
-        "site": 1,
         "practitioner": 1,
+        "site": 1,
         "testing clinician": person_name,
         "aspirant endoscopist": None,
     }
     # And I add the following bowel preparation drugs and values within the Investigation Dataset for this subject:
-    drug_information = {"drug_type1": DrugTypeOptions.MANNITOL, "drug_dose1": "3"}
+    drug_information = {
+        "drug_dose1": "3",
+        "drug_type1": DrugTypeOptions.MANNITOL,
+    }
     # And I set the following endoscopy fields and values within the Investigation Dataset for this subject:
     endoscopy_information = {
         "endoscope inserted": "yes",
