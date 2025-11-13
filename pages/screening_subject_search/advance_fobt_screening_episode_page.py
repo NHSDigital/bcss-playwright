@@ -114,9 +114,11 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
             "button",
             name="Refer Another Diagnostic Test after return from Symptomatic Referral",
         )
-        self.redirect_to_establish_suitability_for_diagnostic_tests_button = self.page.get_by_role(
-            "button",
-            name="Redirect to Establish Suitability for Diagnostic Tests",
+        self.redirect_to_establish_suitability_for_diagnostic_tests_button = (
+            self.page.get_by_role(
+                "button",
+                name="Redirect to Establish Suitability for Diagnostic Tests",
+            )
         )
         # Contact recording locators
         self.contact_direction_dropdown = self.page.get_by_label("Contact Direction")

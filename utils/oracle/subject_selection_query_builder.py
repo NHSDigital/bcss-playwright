@@ -716,6 +716,8 @@ class SubjectSelectionQueryBuilder:
             # ------------------------------------------------------------------------
             case SubjectSelectionCriteriaKey.ADD_COLUMN_TO_SELECT_STATEMENT:
                 self._add_extra_column_to_select_statement()
+            case SubjectSelectionCriteriaKey.ADD_JOIN_TO_FROM_STATEMENT:
+                self._add_extra_join_to_from_statement()
             # ------------------------------------------------------------------------
             # 🛑 Fallback: Unmatched Criteria Key
             # ------------------------------------------------------------------------
@@ -791,6 +793,12 @@ class SubjectSelectionQueryBuilder:
         Adds an extra column to the SELECT statement.
         """
         self.sql_select.append(f", {self.criteria_value}")
+
+    def _add_extra_join_to_from_statement(self) -> None:
+        """
+        Adds extra joins to the FROM statement.
+        """
+        self.sql_from.append(f" {self.criteria_value} ")
 
     def _add_criteria_nhs_number(self) -> None:
         """
@@ -2920,9 +2928,9 @@ class SubjectSelectionQueryBuilder:
         try:
             hub_enum = SubjectHubCode.by_description(self.criteria_value.lower())
             if hub_enum in [SubjectHubCode.USER_HUB, SubjectHubCode.USER_ORGANISATION]:
-                if user.organisation is None or user.organisation.id is None:
-                    raise ValueError("User organisation or organisation_id is None")
-                hub_code = user.organisation.id
+                if user.organisation is None or user.organisation.code is None:
+                    raise ValueError("User organisation or organisation_code is None")
+                hub_code = user.organisation.code
             else:
                 raise SelectionBuilderException(
                     self.criteria_key_name, self.criteria_value

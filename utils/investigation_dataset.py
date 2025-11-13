@@ -885,6 +885,14 @@ class InvestigationDatasetCompletion:
                         f"divLeftInSituReason{polyp_number}",
                         value,
                     )
+                case "polyp type left in situ":
+                    DatasetFieldUtil(
+                        self.page
+                    ).populate_select_locator_for_field_inside_div(
+                        "Polyp Type Left in Situ",
+                        f"divLeftInSituPolypType{polyp_number}",
+                        value,
+                    )
 
     def fill_polyp_x_intervention(
         self, polyp_intervention: dict, polyp_number: int

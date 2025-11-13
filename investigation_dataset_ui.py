@@ -42,6 +42,7 @@ from pages.datasets.investigation_dataset_page import (
     PolypInterventionRetrievedOptions,
     OpticalDiagnosisOptions,
     OpticalDiagnosisConfidenceOptions,
+    PolypTypeLeftInSituOptions,
 )
 
 
@@ -90,6 +91,7 @@ ENUM_MAP = {
     "ExtracolonicSummaryCodeOptions": ExtracolonicSummaryCodeOptions,
     "OpticalDiagnosisOptions": OpticalDiagnosisOptions,
     "OpticalDiagnosisConfidenceOptions": OpticalDiagnosisConfidenceOptions,
+    "PolypTypeLeftInSituOptions": PolypTypeLeftInSituOptions,
     "PolypInterventionRetrievedOptions": PolypInterventionRetrievedOptions,
 }
 
