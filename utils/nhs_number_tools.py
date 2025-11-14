@@ -63,19 +63,34 @@ class NHSNumberTools:
                 nhs_number_base + random.Random().randint(0, nhs_number_range - 1)
             )
             if NHSNumberTools.is_valid_nhs_number(nhs_number):
-                break
-        nhs_number += str(NHSNumberTools.calculate_nhs_number_checksum(nhs_number))
-        logging.debug("generateRandomNHSNumber: end")
-        return nhs_number
+                nhs_number_full = nhs_number + str(
+                    NHSNumberTools.calculate_nhs_number_checksum(nhs_number)
+                )
+                # Final check for the full 10-digit number
+                if NHSNumberTools.is_valid_nhs_number(nhs_number_full):
+                    logging.debug("generateRandomNHSNumber: end")
+                    return nhs_number_full
+                # If invalid, continue loop to generate a new one
 
     @staticmethod
     def is_valid_nhs_number(nhs_number: str) -> bool:
         """
-        Checks if the NHS number is valid
+        Checks if the NHS number is valid.
         Returns:
-            bool: True if it is valid, False if it is not
+            bool: True if it is valid, False if it is not.
         """
-        return len(nhs_number) == 9 and nhs_number.isdigit()
+        if len(nhs_number) == 9 and nhs_number.isdigit():
+            return True  # For base generation
+        if len(nhs_number) == 10 and nhs_number.isdigit():
+            # Validate checksum for full NHS number
+            digits = [int(d) for d in nhs_number]
+            total = sum((10 - i) * digits[i] for i in range(9))
+            remainder = total % 11
+            checksum = 11 - remainder
+            if checksum == 11:
+                checksum = 0
+            return digits[9] == checksum
+        return False
 
     @staticmethod
     def calculate_nhs_number_checksum(nhs_number: str) -> int:
