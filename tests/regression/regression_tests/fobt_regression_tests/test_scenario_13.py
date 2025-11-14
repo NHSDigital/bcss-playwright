@@ -134,6 +134,7 @@ def test_scenario_13(page: Page) -> None:
         "subject age": "Between 60 and 72",
         "subject has unprocessed sspi updates": "No",
         "subject has user dob updates": "No",
+        "subject hub code": "User's hub",
     }
 
     query, bind_vars = SubjectSelectionQueryBuilder().build_subject_selection_query(

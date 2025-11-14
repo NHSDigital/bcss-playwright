@@ -1678,6 +1678,13 @@ class OpticalDiagnosisConfidenceOptions(StrEnum):
     LOW = "305746"
 
 
+class PolypTypeLeftInSituOptions(StrEnum):
+    """Enum for Polyp Type Left in Situ options"""
+
+    INFLAMMATORY_POLYP = "17300~Sub Type Not Applicable"
+    LYMPHOID_FOLLICLE = "200599~Sub Type Not Applicable"
+
+
 # Registry of all known Enums to search when matching string values
 ALL_ENUMS: List[type[Enum]] = [
     obj

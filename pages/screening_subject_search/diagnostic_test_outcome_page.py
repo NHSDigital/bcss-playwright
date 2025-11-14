@@ -6,17 +6,27 @@ from enum import StrEnum
 
 
 class ReferralProcedureType(StrEnum):
+    """Enum class referral procedure type options"""
+
     ENDOSCOPIC = "20356"
     RADIOLOGICAL = "20357"
 
 
 class ReasonForOnwardReferral(StrEnum):
+    """Enum class containing reason for onward referral options"""
+
     CURRENTLY_UNSUITABLE_FOR_ENDOSCOPIC_REFERRAL = "20358"
     FURTHER_CLINICAL_ASSESSMENT = "20359"
     INCOMPLETE_COLONIC_VISUALISATION = "20481"
     POLYP_EXCISION = "203011"
     CORRECTIVE_SURGERY = "203012"
     SUSPECTED_CANCER_SURGERY = "203013"
+    POLYP_NOT_FULLY_EXCISED = "20321"
+    CHECK_POLYP_SITE = "20322"
+    MULTIPLE_POLYPS_NOT_ALL_REMOVED = "20323"
+    HISTOLOGY_REQUIRED = "20324"
+    UNEXPLAINED_SYMPTOMS = "20325"
+    INTERVENTIONS_REQUIRED = "20326"
 
 
 class DiagnosticTestOutcomePage(BasePage):
