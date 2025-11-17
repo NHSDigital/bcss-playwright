@@ -82,7 +82,7 @@ from pages.screening_subject_search.reopen_fobt_screening_episode_page import (
 from pages.screening_subject_search.contact_with_patient_page import (
     ContactWithPatientPage,
 )
-from pages.screening_subject_search.refer_to_mdt_page import ReferToMdtPage
+from pages.screening_subject_search.refer_to_mdt_page import ReferToMDTPage
 from pages.screening_subject_search.lnpcp_result_from_symptomatic_procedure_page import (
     LnpcpResultFromSymptomaticProcedure,
 )
@@ -99,11 +99,9 @@ from classes.repositories.subject_repository import SubjectRepository
 
 
 @pytest.mark.usefixtures("setup_org_and_appointments")
-# @pytest.mark.vpn_required
-# @pytest.mark.regression
-# @pytest.mark.fobt_regression_tests
-
-
+@pytest.mark.vpn_required
+@pytest.mark.regression
+@pytest.mark.fobt_regression_tests
 def test_scenario_14(page: Page) -> None:
     """
         Scenario: 14: LNPCP result from symptomatic procedure
@@ -735,9 +733,9 @@ def test_scenario_14(page: Page) -> None:
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
     AdvanceFOBTScreeningEpisodePage(page).click_mdt_referral_required_button()
     # # And I enter simple MDT information
-    ReferToMdtPage(page).enter_date_in_Mdt_discussion_date_field(datetime.today())
-    ReferToMdtPage(page).select_mdt_location_lookup(1)
-    ReferToMdtPage(page).click_record_MDT_appointment_button()
+    ReferToMDTPage(page).enter_date_in_Mdt_discussion_date_field(datetime.today())
+    ReferToMDTPage(page).select_mdt_location_lookup(1)
+    ReferToMDTPage(page).click_record_MDT_appointment_button()
     #  Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
@@ -1145,3 +1143,4 @@ def test_scenario_14(page: Page) -> None:
             "screening referral type": "Null",
         },
     )
+    LogoutPage(page).log_out()
