@@ -1,5 +1,3 @@
-from altair import value
-from pandas import options
 from playwright.sync_api import Page
 from enum import StrEnum
 from datetime import datetime
@@ -1157,7 +1155,7 @@ class InvestigationDatasetCompletion:
         dynamic_id = f"anchorPolypHistology{polyp_number}_1"
         locator = self.page.locator(f"#{dynamic_id}")
 
-        if locator.count() > 0:
+        if locator.is_visible():
             text = locator.inner_text().strip()
             if text == "Show details":
                 locator.click()
