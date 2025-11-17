@@ -290,6 +290,16 @@
           "field": "left in situ",
           "value": "YesNoOptions.YES"
         }
+      },
+      {
+        "key": "polyp type left in situ",
+        "type": "PolypTypeLeftInSituOptions",
+        "description": "Polyp type that was left in situ",
+        "optional": true,
+        "conditional_on": {
+          "field": "reason left in situ",
+          "value": "PolypReasonLeftInSituOptions.POLYP_TYPE"
+        }
       }
     ],
     "list": true

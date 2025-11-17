@@ -2928,8 +2928,8 @@ class SubjectSelectionQueryBuilder:
         try:
             hub_enum = SubjectHubCode.by_description(self.criteria_value.lower())
             if hub_enum in [SubjectHubCode.USER_HUB, SubjectHubCode.USER_ORGANISATION]:
-                if user.organisation is None or user.organisation.id is None:
-                    raise ValueError("User organisation or organisation_id is None")
+                if user.organisation is None or user.organisation.code is None:
+                    raise ValueError("User organisation or organisation_code is None")
                 hub_code = user.organisation.code
             else:
                 raise SelectionBuilderException(

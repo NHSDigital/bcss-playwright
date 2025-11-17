@@ -2,10 +2,8 @@ import pytest
 import logging
 from datetime import datetime, timedelta
 from playwright.sync_api import Page
-from classes.subject import subject
 from classes.subject.subject import Subject
 from classes.user.user import User
-from pages.screening_subject_search import refer_to_mdt_page
 from pages.screening_subject_search.non_neoplastic_result_from_symptomatic_procedure_page import (
     NonNeoplasticResultFromSymptomaticProcedurePage,
 )
@@ -74,13 +72,9 @@ from pages.datasets.investigation_dataset_page import (
     PolypExcisionCompleteOptions,
     PolypDysplasiaOptions,
     YesNoUncertainOptions,
-    ReasonPathologyLostOptions,
 )
 from pages.screening_subject_search.reopen_fobt_screening_episode_page import (
     ReopenFOBTScreeningEpisodePage,
-)
-from pages.screening_subject_search.contact_with_patient_page import (
-    ContactWithPatientPage,
 )
 from pages.screening_subject_search.refer_to_mdt_page import ReferToMDTPage
 from pages.screening_subject_search.lnpcp_result_from_symptomatic_procedure_page import (
@@ -90,11 +84,8 @@ from pages.screening_subject_search.handover_into_symptomatic_care_page import (
     HandoverIntoSymptomaticCarePage,
 )
 from classes.repositories.person_repository import PersonRepository
-from classes.repositories.episode_repository import EpisodeRepository
 from utils.sspi_change_steps import SSPIChangeSteps
 from pages.organisations.organisations_page import OrganisationSwitchPage
-from utils.call_and_recall_utils import CallAndRecallUtils
-from utils.oracle.subject_creation_util import CreateSubjectSteps
 from classes.repositories.subject_repository import SubjectRepository
 
 
