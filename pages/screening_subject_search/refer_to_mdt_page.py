@@ -4,7 +4,7 @@ from datetime import datetime
 from utils.calendar_picker import CalendarPicker
 
 
-class ReferToMdtPage(BasePage):
+class ReferToMDTPage(BasePage):
     """Refer to MDT Page locators, and methods for interacting with the page."""
 
     def __init__(self, page: Page):
