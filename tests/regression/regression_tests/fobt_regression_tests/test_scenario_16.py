@@ -500,7 +500,7 @@ def test_scenario_16(page: Page) -> None:
     ]
 
     # I add interventions 1 for polyps 1-3 with the following fields and values within the Investigation Dataset for this subject:
-    polyp_intervention = [
+    polyp_interventions = [
         [
             {
                 "modality": PolypInterventionModalityOptions.POLYPECTOMY,
@@ -565,12 +565,12 @@ def test_scenario_16(page: Page) -> None:
     # When I press the save Investigation Dataset button
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
-        drug_information=drug_information,
         endoscopy_information=endoscopy_information,
-        failure_information=failure_information,
+        drug_information=drug_information,
         completion_information=completion_information,
+        failure_information=failure_information,
         polyp_information=polyp_information,
-        polyp_intervention=polyp_intervention,
+        polyp_intervention=polyp_interventions,
         polyp_histology=polyp_histology,
     )
 
