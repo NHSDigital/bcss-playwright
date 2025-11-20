@@ -135,7 +135,7 @@ def book_appointments(page: Page, screening_centre: str, site: str) -> None:
 def book_post_investigation_appointment(
     page: Page,
     site: str,
-    screening_practitioner_index: int,
+    screening_practitioner_index: int = 1,
     appointment_start_time: str = "08:00",
 ) -> None:
     """
@@ -170,6 +170,7 @@ def book_post_investigation_appointment(
         dialog_message = book_appointments_page.click_save_button_and_return_message()
         if dialog_message is None or overlap_message not in dialog_message:
             # Success or no overlap dialog
+            page.wait_for_timeout(500) # Timeout to allow subject updates to take place
             break
         # Increase time by 15 minutes
         minute += 15
