@@ -504,16 +504,16 @@ def test_scenario_16(page: Page) -> None:
         [
             {
                 "modality": PolypInterventionModalityOptions.POLYPECTOMY,
-                "device": PolypInterventionDeviceOptions.HOT_SNARE,
                 "excised": YesNoOptions.YES,
+                "device": PolypInterventionDeviceOptions.HOT_SNARE,
                 "retrieved": PolypInterventionRetrievedOptions.YES,
             }
         ],
         [
             {
                 "modality": PolypInterventionModalityOptions.EMR,
-                "device": PolypInterventionDeviceOptions.HOT_SNARE,
                 "excised": YesNoOptions.YES,
+                "device": PolypInterventionDeviceOptions.HOT_SNARE,
                 "retrieved": PolypInterventionRetrievedOptions.YES,
                 "excision technique": PolypInterventionExcisionTechniqueOptions.EN_BLOC,
             }
@@ -521,8 +521,8 @@ def test_scenario_16(page: Page) -> None:
         [
             {
                 "modality": PolypInterventionModalityOptions.POLYPECTOMY,
-                "device": PolypInterventionDeviceOptions.HOT_SNARE,
                 "excised": YesNoOptions.YES,
+                "device": PolypInterventionDeviceOptions.HOT_SNARE,
                 "retrieved": PolypInterventionRetrievedOptions.YES,
                 "excision technique": PolypInterventionExcisionTechniqueOptions.PIECE_MEAL,
                 "polyp appears fully resected endoscopically": YesNoOptions.YES,
