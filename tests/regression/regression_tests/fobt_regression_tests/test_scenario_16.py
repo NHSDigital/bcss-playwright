@@ -479,22 +479,22 @@ def test_scenario_16(page: Page) -> None:
         {
             "location": EndoscopyLocationOptions.ANASTOMOSIS,
             "classification": PolypClassificationOptions.IP,
-            "estimate of whole polyp size": "11",
             "polyp access": PolypAccessOptions.EASY,
+            "estimate of whole polyp size": "11",
             "left in situ": YesNoOptions.NO,
         },
         {
             "location": EndoscopyLocationOptions.CAECUM,
             "classification": PolypClassificationOptions.LST_NG,
-            "estimate of whole polyp size": "5",
             "polyp access": PolypAccessOptions.EASY,
+            "estimate of whole polyp size": "5",
             "left in situ": YesNoOptions.NO,
         },
         {
             "location": EndoscopyLocationOptions.HEPATIC_FLEXURE,
             "classification": PolypClassificationOptions.LST_NG,
-            "estimate of whole polyp size": "21",
             "polyp access": PolypAccessOptions.EASY,
+            "estimate of whole polyp size": "21",
             "left in situ": YesNoOptions.NO,
         },
     ]
@@ -533,8 +533,8 @@ def test_scenario_16(page: Page) -> None:
     # I update histology details for polyps 1-3 with the following fields and values within the Investigation Dataset for this subject:
     polyp_histology = [
         {
-            "date of receipt": datetime.today(),
             "date of reporting": datetime.today(),
+            "date of receipt": datetime.today(),
             "pathology provider": 1,
             "pathologist": 1,
             "polyp type": PolypTypeOptions.ADENOMA,
@@ -545,8 +545,8 @@ def test_scenario_16(page: Page) -> None:
             "polyp carcinoma": YesNoUncertainOptions.NO,
         },
         {
-            "date of receipt": datetime.today(),
             "date of reporting": datetime.today(),
+            "date of receipt": datetime.today(),
             "pathology provider": 1,
             "pathologist": 1,
             "polyp type": PolypTypeOptions.ADENOMA,
