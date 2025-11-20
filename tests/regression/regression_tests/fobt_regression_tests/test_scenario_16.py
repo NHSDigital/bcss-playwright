@@ -7,9 +7,9 @@ from classes.user.user import User
 from classes.repositories.subject_repository import SubjectRepository
 from utils.calendar_picker import CalendarPicker
 from utils.user_tools import UserTools
-from utils.subject_assertion import subject_assertion
 from utils import screening_subject_page_searcher
 from utils.batch_processing import batch_processing
+from utils.subject_assertion import subject_assertion
 from utils.fit_kit import FitKitLogged, FitKitGeneration
 from utils.oracle.subject_selection_query_builder import SubjectSelectionQueryBuilder
 from utils.appointments import book_appointments, book_post_investigation_appointment
@@ -24,6 +24,12 @@ from pages.screening_subject_search.diagnostic_test_outcome_page import (
     ReferralProcedureType,
     ReasonForOnwardReferral,
 )
+from pages.screening_subject_search.advance_fobt_screening_episode_page import (
+    AdvanceFOBTScreeningEpisodePage,
+)
+from pages.screening_subject_search.attend_diagnostic_test_page import (
+    AttendDiagnosticTestPage,
+)
 from pages.logout.log_out_page import LogoutPage
 from pages.base_page import BasePage
 from pages.screening_subject_search.episode_events_and_notes_page import (
@@ -31,12 +37,6 @@ from pages.screening_subject_search.episode_events_and_notes_page import (
 )
 from pages.screening_practitioner_appointments.appointment_detail_page import (
     AppointmentDetailPage,
-)
-from pages.screening_subject_search.advance_fobt_screening_episode_page import (
-    AdvanceFOBTScreeningEpisodePage,
-)
-from pages.screening_subject_search.attend_diagnostic_test_page import (
-    AttendDiagnosticTestPage,
 )
 from pages.screening_subject_search.record_diagnosis_date_page import (
     RecordDiagnosisDatePage,
@@ -57,10 +57,10 @@ from pages.datasets.investigation_dataset_page import (
     LateOutcomeOptions,
     OutcomeAtTimeOfProcedureOptions,
     YesNoOptions,
-    EndoscopyLocationOptions,
-    CompletionProofOptions,
     PolypAccessOptions,
     PolypClassificationOptions,
+    EndoscopyLocationOptions,
+    CompletionProofOptions,
     PolypInterventionDeviceOptions,
     PolypInterventionExcisionTechniqueOptions,
     PolypInterventionModalityOptions,
@@ -128,8 +128,6 @@ def test_scenario_16(page: Page) -> None:
     if user_role is None:
         raise ValueError("The current user cannot be assigned to a UserRoleType")
 
-    user = User().from_user_role_type(user_role)
-
     # And there is a subject who meets the following criteria:
     query, bind_vars = SubjectSelectionQueryBuilder().build_subject_selection_query(
         criteria={
@@ -142,7 +140,7 @@ def test_scenario_16(page: Page) -> None:
             "subject has user dob updates": "No",
             "subject hub code": "User's hub",
         },
-        user=user,
+        user=User().from_user_role_type(user_role),
         subject=Subject(),
         subjects_to_retrieve=1,
     )
@@ -326,8 +324,8 @@ def test_scenario_16(page: Page) -> None:
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
     # And I view the event history for the subject's latest episode
-    SubjectScreeningSummaryPage(page).expand_episodes_list()
-    SubjectScreeningSummaryPage(page).click_first_fobt_episode_link()
+    SubjectScreeningSummaryPage(page=page).expand_episodes_list()
+    SubjectScreeningSummaryPage(page=page).click_first_fobt_episode_link()
 
     # And I view the latest practitioner appointment in the subject's episode
     EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
@@ -346,7 +344,9 @@ def test_scenario_16(page: Page) -> None:
     )
 
     # When I view the subject
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    screening_subject_page_searcher.navigate_to_subject_summary_page(
+        nhs_no=nhs_no, page=page
+    )
 
     # And I edit the Colonoscopy Assessment Dataset for this subject
     SubjectScreeningSummaryPage(page).click_datasets_link()
@@ -365,8 +365,10 @@ def test_scenario_16(page: Page) -> None:
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
     # And I advance the subject's episode for "Suitable for Endoscopic Test"
-    SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
-    AdvanceFOBTScreeningEpisodePage(page).click_suitable_for_endoscopic_test_button()
+    SubjectScreeningSummaryPage(page=page).click_advance_fobt_screening_episode_button()
+    AdvanceFOBTScreeningEpisodePage(
+        page=page
+    ).click_suitable_for_endoscopic_test_button()
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -433,7 +435,7 @@ def test_scenario_16(page: Page) -> None:
         user=user,
         subject=None,
     )
-    df = OracleDB().execute_query(query, None)
+    df = OracleDB().execute_query(query=query, parameters=None)
     person_name = (
         f"{df["person_family_name"].iloc[0]} {df["person_given_name"].iloc[0]}"
     )
@@ -455,8 +457,8 @@ def test_scenario_16(page: Page) -> None:
         "comfort during examination": ComfortOptions.NO_DISCOMFORT,
         "comfort during recovery": ComfortOptions.NO_DISCOMFORT,
         "endoscopist defined extent": EndoscopyLocationOptions.APPENDIX,
-        "scope imager used": YesNoOptions.YES,
         "retroverted view": YesNoOptions.NO,
+        "scope imager used": YesNoOptions.YES,
         "start of intubation time": "09:00",
         "start of extubation time": "09:30",
         "end time of procedure": "10:00",
@@ -466,13 +468,13 @@ def test_scenario_16(page: Page) -> None:
         "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
     }
 
-    # And I set the following completion proof values within the Investigation Dataset for this subject:
+    # I set the following completion proof values within the Investigation Dataset for this subject:
     completion_information = {"completion proof": CompletionProofOptions.VIDEO_APPENDIX}
 
-    # And I set the following failure reasons within the Investigation Dataset for this subject:
+    # I set the following failure reasons within the Investigation Dataset for this subject:
     failure_information = {"failure reasons": FailureReasonsOptions.NO_FAILURE_REASONS}
 
-    # And I add new polyps 1-3 with the following fields and values within the Investigation Dataset for this subject:
+    # I add new polyps 1-3 with the following fields and values within the Investigation Dataset for this subject:
     polyp_information = [
         {
             "location": EndoscopyLocationOptions.ANASTOMOSIS,
@@ -497,7 +499,7 @@ def test_scenario_16(page: Page) -> None:
         },
     ]
 
-    # And I add intervention 1 for polyps 1-3 with the following fields and values within the Investigation Dataset for this subject:
+    # I add interventions 1 for polyps 1-3 with the following fields and values within the Investigation Dataset for this subject:
     polyp_intervention = [
         [
             {
@@ -528,7 +530,7 @@ def test_scenario_16(page: Page) -> None:
         ],
     ]
 
-    # And I update histology details for polyps 1-3 with the following fields and values within the Investigation Dataset for this subject:
+    # I update histology details for polyps 1-3 with the following fields and values within the Investigation Dataset for this subject:
     polyp_histology = [
         {
             "date of receipt": datetime.today(),
@@ -573,27 +575,37 @@ def test_scenario_16(page: Page) -> None:
     )
 
     # Then the Investigation Dataset result message is "LNPCP"
-    InvestigationDatasetsPage(page).expect_text_to_be_visible("LNPCP")
+    InvestigationDatasetsPage(page).expect_text_to_be_visible(text="LNPCP")
 
     # Then I confirm the Polyp Algorithm Size for Polyp 1 is 13
-    InvestigationDatasetsPage(page).assert_polyp_algorithm_size(1, "13")
+    InvestigationDatasetsPage(page).assert_polyp_algorithm_size(
+        polyp_number=1, expected_value="13"
+    )
 
     # Then I confirm the Polyp Algorithm Size for Polyp 2 is 4
-    InvestigationDatasetsPage(page).assert_polyp_algorithm_size(2, "4")
+    InvestigationDatasetsPage(page).assert_polyp_algorithm_size(
+        polyp_number=2, expected_value="4"
+    )
 
     # Then I confirm the Polyp Algorithm Size for Polyp 3 is 21
-    InvestigationDatasetsPage(page).assert_polyp_algorithm_size(3, "21")
+    InvestigationDatasetsPage(page).assert_polyp_algorithm_size(
+        polyp_number=3, expected_value="21"
+    )
 
     # And I confirm the Polyp Category for Polyp 1 is "Advanced colorectal polyp"
     InvestigationDatasetsPage(page).assert_polyp_category(
-        1, "Advanced colorectal polyp"
+        polyp_number=1, expected_value="Advanced colorectal polyp"
     )
 
     # And I confirm the Polyp Category for Polyp 2 is "Premalignant polyp"
-    InvestigationDatasetsPage(page).assert_polyp_category(2, "Premalignant polyp")
+    InvestigationDatasetsPage(page).assert_polyp_category(
+        polyp_number=2, expected_value="Premalignant polyp"
+    )
 
     # And I confirm the Polyp Category for Polyp 3 is "LNPCP"
-    InvestigationDatasetsPage(page).assert_polyp_category(3, "LNPCP")
+    InvestigationDatasetsPage(page).assert_polyp_category(
+        polyp_number=3, expected_value="LNPCP"
+    )
 
     # And I confirm the Episode Result is "LNPCP"
     EpisodeRepository().confirm_episode_result(nhs_no, "LNPCP")
