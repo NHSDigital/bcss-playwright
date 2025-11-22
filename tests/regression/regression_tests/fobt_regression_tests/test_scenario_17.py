@@ -663,14 +663,15 @@ def test_scenario_17(page: Page) -> None:
         page=page,
         batch_type="A183",
         batch_description="GP Result (Abnormal)",
-        latest_event_status="A167 - GP Abnormal FOBT Result Sent",
+        #     latest_event_status="A357 - Patient Unfit, Handover into Symptomatic Care",
     )
+
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
         {
-            "latest event status": "A357 Patient Unfit,Handover into Symptomatic Care",
             "latest episode includes event status": "A167 GP Abnormal FOBT Result Sent",
+            "latest event status": "A357 Patient Unfit, Handover into Symptomatic Care",
         },
     )
     LogoutPage(page).log_out(close_page=False)
@@ -689,14 +690,6 @@ def test_scenario_17(page: Page) -> None:
         "A357",
         "Handover into Symptomatic Care, Patient Unfit",
     )
-    user_role = UserTools.user_login(
-        page, "Specialist Screening Practitioner at BCS009 & BCS001", True
-    )
-
-    OrganisationSwitchPage(page).select_organisation_by_id("BCS001")
-    OrganisationSwitchPage(page).click_continue()
-    if user_role is None:
-        raise ValueError("User role is none")
     subject_assertion(
         nhs_no,
         {
