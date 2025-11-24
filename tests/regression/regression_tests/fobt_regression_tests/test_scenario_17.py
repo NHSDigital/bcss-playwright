@@ -578,12 +578,11 @@ def test_scenario_17(page: Page) -> None:
         letter_type,
     )
     # Then my subject has been updated as follows:
+    criteria = {"latest event status": "A415 Post-investigation Appointment Invitation Letter Printed"}
     subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "A415 Post-investigation Appointment Invitation Letter Printed",
-        },
-    )
+    nhs_no,
+    criteria,
+)
     #  When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     # And I view the event history for the subject's latest episode
@@ -594,13 +593,14 @@ def test_scenario_17(page: Page) -> None:
     # And I attend the subject's practitioner appointment "today"
     AppointmentDetailPage(page).mark_appointment_as_attended(datetime.today())
     # Then my subject has been updated as follows:
+    criteria = {
+    "latest episode includes event status": "A416 Post-investigation Appointment Attended ",
+    "latest event status": "A316 Post-investigation Appointment Attended ",
+}
     subject_assertion(
-        nhs_number=nhs_no,
-        criteria={
-            "latest episode includes event status": "A416 Post-investigation Appointment Attended ",
-            "latest event status": "A316 Post-investigation Appointment Attended ",
-        },
-    )
+    nhs_number=nhs_no,
+    criteria=criteria,
+)
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -612,12 +612,11 @@ def test_scenario_17(page: Page) -> None:
     ReferToMDTPage(page).select_mdt_location_lookup(1)
     ReferToMDTPage(page).click_record_MDT_appointment_button()
     #  Then my subject has been updated as follows:
+    criteria = {"latest event status": "A348 MDT Referral Required"}
     subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "A348 MDT Referral Required",
-        },
-    )
+    nhs_no,
+    criteria,
+)
     # And there is a "A348" letter batch for my subject with the exact title "GP Letter Indicating Referral to MDT"
     # When I process the open "A348" letter batch for my subject
     batch_processing(
@@ -661,7 +660,7 @@ def test_scenario_17(page: Page) -> None:
     # When I switch users to BCSS "England" as user role "Hub Manager"
     LogoutPage(page).log_out(close_page=False)
     BasePage(page).go_to_log_in_page()
-    user_role = UserTools.user_login(
+    UserTools.user_login(
         page, "Hub Manager at BCS01", return_role_type=True
     )
 
