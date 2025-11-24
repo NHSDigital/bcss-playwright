@@ -87,7 +87,7 @@ from pages.organisations.organisations_page import OrganisationSwitchPage
 @pytest.mark.fobt_regression_tests
 def test_scenario_17(page: Page) -> None:
     """
-        Scenario: 14: Unsuitable for symptomatic (cease)
+        Scenario: 17: Unsuitable for symptomatic (cease)
 
         S9-S10-S43-A8-A183-A25-J10-(A50)-A99-A59-A259-A315-A360-A410-A415-A416-A316-A348-A372-A357-(A167)-A356-C203 [SSCL24b]
 
@@ -174,10 +174,8 @@ def test_scenario_17(page: Page) -> None:
     )
 
     # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {"latest event status": "S43 Kit Returned and Logged (Initial Test)"},
-    )
+    criteria = {"latest event status": "S43 Kit Returned and Logged (Initial Test)"}
+    subject_assertion(nhs_no, criteria)
 
     # When I read my subject's latest logged FIT kit as "ABNORMAL"
     FitKitLogged().read_latest_logged_kit(
@@ -198,11 +196,14 @@ def test_scenario_17(page: Page) -> None:
     # And I select "BCS001" as the screening centre where the practitioner appointment will be held
     # And I set the practitioner appointment date to "today"
     # And I book the "earliest" available practitioner appointment on this date
+    screening_centre = "BCS001 - Wolverhampton Bowel Cancer Screening Centre"
+    site = "The Royal Hospital (Wolverhampton)"
+
     book_appointments(
-        page,
-        screening_centre="BCS001 - Wolverhampton Bowel Cancer Screening Centre",
-        site="The Royal Hospital (Wolverhampton)",
-    )
+    page,
+    screening_centre=screening_centre,
+    site=site,
+)
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -213,9 +214,13 @@ def test_scenario_17(page: Page) -> None:
     )
 
     # And there is a "A183" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment"
+    letter_code = "A183"
+    letter_type = "Practitioner Clinic 1st Appointment"
+    is_active = True
+
     SubjectRepository().there_is_letter_batch_for_subject(
-        nhs_no, "A183", "Practitioner Clinic 1st Appointment", True
-    )
+    nhs_no, letter_code, letter_type, is_active
+)
     # And there is a "A183" letter batch for my subject with the exact title "GP Result (Abnormal)"
     SubjectRepository().there_is_letter_batch_for_subject(
         nhs_no, "A183", "GP Result (Abnormal)", True
@@ -332,12 +337,11 @@ def test_scenario_17(page: Page) -> None:
     AttendDiagnosticTestPage(page).click_save_button()
 
     # Then my subject has been updated as follows:
+    criteria = {"latest event status": "A259 Attended Diagnostic Test"}
     subject_assertion(
-        nhs_number=nhs_no,
-        criteria={
-            "latest event status": "A259 Attended Diagnostic Test",
-        },
-    )
+    nhs_number=nhs_no,
+    criteria=criteria,
+)
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -368,12 +372,6 @@ def test_scenario_17(page: Page) -> None:
         f"{df["person_family_name"].iloc[0]} {df["person_given_name"].iloc[0]}"
     )
     # And I set the following fields and values within the Investigation Dataset for this subject:
-    general_information = {
-        "site": 1,
-        "practitioner": 1,
-        "testing clinician": person_name,
-        "aspirant endoscopist": None,
-    }
     endoscopy_information = {
         "endoscope inserted": "yes",
         "procedure type": "therapeutic",
@@ -391,6 +389,13 @@ def test_scenario_17(page: Page) -> None:
         "outcome at time of procedure": OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
         "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
     }
+    general_information = {
+        "site": 1,
+        "practitioner": 1,
+        "testing clinician": person_name,
+        "aspirant endoscopist": None,
+    }
+
     # And I set the following completion proof values within the Investigation Dataset for this subject:
     completion_information = {"completion proof": CompletionProofOptions.VIDEO_APPENDIX}
 
@@ -425,8 +430,8 @@ def test_scenario_17(page: Page) -> None:
         [
             {
                 "modality": PolypInterventionModalityOptions.POLYPECTOMY,
-                "device": PolypInterventionDeviceOptions.HOT_SNARE,
                 "excised": YesNoOptions.YES,
+                "device": PolypInterventionDeviceOptions.HOT_SNARE,
                 "retrieved": PolypInterventionRetrievedOptions.YES,
             }
         ],
@@ -442,8 +447,8 @@ def test_scenario_17(page: Page) -> None:
         [
             {
                 "modality": PolypInterventionModalityOptions.POLYPECTOMY,
-                "device": PolypInterventionDeviceOptions.HOT_SNARE,
                 "excised": YesNoOptions.YES,
+                "device": PolypInterventionDeviceOptions.HOT_SNARE,
                 "retrieved": PolypInterventionRetrievedOptions.YES,
                 "excision technique": PolypInterventionExcisionTechniqueOptions.PIECE_MEAL,
                 "polyp appears fully resected endoscopically": YesNoOptions.YES,
