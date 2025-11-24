@@ -200,10 +200,10 @@ def test_scenario_17(page: Page) -> None:
     site = "The Royal Hospital (Wolverhampton)"
 
     book_appointments(
-    page,
-    screening_centre=screening_centre,
-    site=site,
-)
+        page,
+        screening_centre=screening_centre,
+        site=site,
+    )
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -219,8 +219,8 @@ def test_scenario_17(page: Page) -> None:
     is_active = True
 
     SubjectRepository().there_is_letter_batch_for_subject(
-    nhs_no, letter_code, letter_type, is_active
-)
+        nhs_no, letter_code, letter_type, is_active
+    )
     # And there is a "A183" letter batch for my subject with the exact title "GP Result (Abnormal)"
     SubjectRepository().there_is_letter_batch_for_subject(
         nhs_no, "A183", "GP Result (Abnormal)", True
@@ -339,9 +339,9 @@ def test_scenario_17(page: Page) -> None:
     # Then my subject has been updated as follows:
     criteria = {"latest event status": "A259 Attended Diagnostic Test"}
     subject_assertion(
-    nhs_number=nhs_no,
-    criteria=criteria,
-)
+        nhs_number=nhs_no,
+        criteria=criteria,
+    )
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -376,8 +376,8 @@ def test_scenario_17(page: Page) -> None:
         "endoscope inserted": "yes",
         "procedure type": "therapeutic",
         "bowel preparation quality": BowelPreparationQualityOptions.GOOD,
-        "comfort during examination": ComfortOptions.NO_DISCOMFORT,
         "comfort during recovery": ComfortOptions.NO_DISCOMFORT,
+        "comfort during examination": ComfortOptions.NO_DISCOMFORT,
         "endoscopist defined extent": EndoscopyLocationOptions.APPENDIX,
         "scope imager used": YesNoOptions.YES,
         "retroverted view": YesNoOptions.NO,
@@ -390,8 +390,8 @@ def test_scenario_17(page: Page) -> None:
         "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
     }
     general_information = {
-        "site": 1,
         "practitioner": 1,
+        "site": 1,
         "testing clinician": person_name,
         "aspirant endoscopist": None,
     }
@@ -406,8 +406,8 @@ def test_scenario_17(page: Page) -> None:
         {
             "location": EndoscopyLocationOptions.ANASTOMOSIS,
             "classification": PolypClassificationOptions.IP,
-            "estimate of whole polyp size": "11",
             "polyp access": PolypAccessOptions.EASY,
+            "estimate of whole polyp size": "11",
             "left in situ": YesNoOptions.NO,
         },
         {
@@ -420,8 +420,8 @@ def test_scenario_17(page: Page) -> None:
         {
             "location": EndoscopyLocationOptions.HEPATIC_FLEXURE,
             "classification": PolypClassificationOptions.LST_NG,
-            "estimate of whole polyp size": "21",
             "polyp access": PolypAccessOptions.EASY,
+            "estimate of whole polyp size": "21",
             "left in situ": YesNoOptions.NO,
         },
     ]
@@ -458,8 +458,8 @@ def test_scenario_17(page: Page) -> None:
     # And I add histology for 3 polyps with the following fields and values within the Investigation Dataset for this subject:
     polyp_histology = [
         {
-            "date of receipt": datetime.today(),
             "date of reporting": datetime.today(),
+            "date of receipt": datetime.today(),
             "pathology provider": 1,
             "pathologist": 1,
             "polyp type": PolypTypeOptions.ADENOMA,
@@ -536,11 +536,10 @@ def test_scenario_17(page: Page) -> None:
     # And I save the Diagnostic Test Outcome information
     DiagnosticTestOutcomePage(page).click_save_button()
     # Then my subject has been updated as follows:
+    criteria = {"latest event status": "A315 Diagnostic Test Outcome Entered"}
     subject_assertion(
         nhs_no,
-        {
-            "latest event status": "A315 Diagnostic Test Outcome Entered",
-        },
+        criteria,
     )
     # When I advance the subject's episode for "Post-investigation Appointment Required"
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
@@ -570,10 +569,13 @@ def test_scenario_17(page: Page) -> None:
     )
     # And there is a "A410" letter batch for my subject with the exact title "Post-Investigation Appointment Invitation Letter"
     # When I process the open "A410 - Post-Investigation Appointment Invitation Letter" letter batch for my subject
+    letter_code = "A410"
+    letter_type = "Post-Investigation Appointment Invitation Letter"
+
     batch_processing(
         page,
-        "A410",
-        "Post-Investigation Appointment Invitation Letter",
+        letter_code,
+        letter_type,
     )
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -671,7 +673,6 @@ def test_scenario_17(page: Page) -> None:
         page=page,
         batch_type="A183",
         batch_description="GP Result (Abnormal)",
-        #     latest_event_status="A357 - Patient Unfit, Handover into Symptomatic Care",
     )
 
     # Then my subject has been updated as follows:
