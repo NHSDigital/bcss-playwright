@@ -470,8 +470,8 @@ def test_scenario_17(page: Page) -> None:
             "polyp carcinoma": YesNoUncertainOptions.NO,
         },
         {
-            "date of receipt": datetime.today(),
             "date of reporting": datetime.today(),
+            "date of receipt": datetime.today(),
             "pathology provider": 1,
             "pathologist": 1,
             "polyp type": PolypTypeOptions.ADENOMA,
@@ -489,8 +489,8 @@ def test_scenario_17(page: Page) -> None:
     # When I press the save Investigation Dataset button
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
         general_information=general_information,
-        drug_information=drug_information,
         endoscopy_information=endoscopy_information,
+        drug_information=drug_information,
         failure_information=failure_information,
         completion_information=completion_information,
         polyp_information=polyp_information,
@@ -499,23 +499,19 @@ def test_scenario_17(page: Page) -> None:
     )
     # Then the Investigation Dataset result message, which I will cancel, is "LNPCP"
     InvestigationDatasetsPage(page).expect_text_to_be_visible("LNPCP")
-    # Then I confirm the Polyp Algorithm Size for Polyp 1 is 13
+    # Then I confirm the Polyp Algorithm Size for Polyp 1,2 and 3 are 13,4,21 respectively
     InvestigationDatasetsPage(page).assert_polyp_algorithm_size(1, "13")
 
-    # And I confirm the Polyp Algorithm Size for Polyp 2 is 4
     InvestigationDatasetsPage(page).assert_polyp_algorithm_size(2, "4")
 
-    # And I confirm the Polyp Algorithm Size for Polyp 3 is 21
     InvestigationDatasetsPage(page).assert_polyp_algorithm_size(3, "21")
-    # And I confirm the Polyp Category for Polyp 1 is "Advanced colorectal polyp"
+    # And I confirm the Polyp Category for Polyp 1,2,3 are "Advanced colorectal polyp", "Premalignant polyp" and "LNPCP" respectively
     InvestigationDatasetsPage(page).assert_polyp_category(
         1, "Advanced colorectal polyp"
     )
 
-    # And I confirm the Polyp Category for Polyp 2 is "Premalignant polyp"
     InvestigationDatasetsPage(page).assert_polyp_category(2, "Premalignant polyp")
 
-    # And I confirm the Polyp Category for Polyp 3 is "LNPCP"
     InvestigationDatasetsPage(page).assert_polyp_category(3, "LNPCP")
     # And I confirm the Episode Result is "Abnormal"
     EpisodeRepository().confirm_episode_result(nhs_no, "LNPCP")
