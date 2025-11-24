@@ -658,6 +658,9 @@ def test_scenario_17(page: Page) -> None:
         page, "Hub Manager at BCS01", return_role_type=True
     )
 
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
     # And I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
     batch_processing(
         page=page,
@@ -724,3 +727,4 @@ def test_scenario_17(page: Page) -> None:
         },
         user_role=user_role,
     )
+    LogoutPage(page).log_out()
