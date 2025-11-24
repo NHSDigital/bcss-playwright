@@ -500,7 +500,10 @@ def test_scenario_17(page: Page) -> None:
     # Then the Investigation Dataset result message, which I will cancel, is "LNPCP"
     InvestigationDatasetsPage(page).expect_text_to_be_visible("LNPCP")
     # Then I confirm the Polyp Algorithm Size for Polyp 1,2 and 3 are 13,4,21 respectively
-    InvestigationDatasetsPage(page).assert_polyp_algorithm_size(1, "13")
+    expected_size = 1
+    expected_value = "13"
+
+    InvestigationDatasetsPage(page).assert_polyp_algorithm_size(expected_size, expected_value)
 
     InvestigationDatasetsPage(page).assert_polyp_algorithm_size(2, "4")
 
@@ -514,7 +517,8 @@ def test_scenario_17(page: Page) -> None:
 
     InvestigationDatasetsPage(page).assert_polyp_category(3, "LNPCP")
     # And I confirm the Episode Result is "Abnormal"
-    EpisodeRepository().confirm_episode_result(nhs_no, "LNPCP")
+    episode_result = "LNPCP"
+    EpisodeRepository().confirm_episode_result(nhs_no, episode_result)
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
