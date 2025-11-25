@@ -131,6 +131,11 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
                 name="Redirect to Establish Suitability for Diagnostic Tests",
             )
         )
+        self.redirect_to_establish_attendance_at_appointment_button = (
+            self.page.get_by_role(
+                "button", name="Redirect to Establish Attendance at Appointment"
+            )
+        )
         # Contact recording locators
         self.contact_direction_dropdown = self.page.get_by_label("Contact Direction")
         self.contact_made_between_dropdown = self.page.get_by_label(
@@ -484,4 +489,12 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         """Click the 'Redirect to Establish Suitability for Diagnostic Tests' button"""
         self.safe_accept_dialog(
             self.redirect_to_establish_suitability_for_diagnostic_tests_button
+        )
+
+    def click_redirect_to_establish_attendance_at_appointment_button(
+        self,
+    ) -> None:
+        """Click the 'Redirect to Establish Attendance at Appointment' button"""
+        self.safe_accept_dialog(
+            self.redirect_to_establish_attendance_at_appointment_button
         )

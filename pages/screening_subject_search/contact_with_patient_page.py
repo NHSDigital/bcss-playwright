@@ -128,6 +128,7 @@ class ContactWithPatientPage(BasePage):
                 - 'Suitable for Radiological Test'
                 - 'Close Episode - Patient Choice'
                 - 'SSP Appointment Required'
+                - 'Close Episode with Existing result'
             patient_contacted (str): Indicates if the patient was contacted. Default is 'Yes'. Options include:
                 - 'Yes'
                 - 'No'

@@ -268,7 +268,7 @@ def test_scenario_14(page: Page) -> None:
         "latest episode diagnosis date reason": "Null",
         "latest episode has diagnosis date": "Yes",
         "latest episode includes event status": "A50 Diagnosis date recorded",
-        "latest event status": "A183 1st Colonoscopy Assessment Appointment Requested ",
+        "latest event status": "A183 1st Colonoscopy Assessment Appointment Requested",
     }
     subject_assertion(nhs_number=nhs_no, criteria=criteria)
 
