@@ -29,6 +29,7 @@ class LynchSDDReasonForChangeType(Enum):
     )
     REVERSAL_OF_DEATH_NOTIFICATION = (305713, "Reversal of Death Notification")
     SELECTED_FOR_LYNCH_SURVEILLANCE = (307071, "Selected for Lynch Surveillance")
+    WITHDRAWN_FROM_LYNCH_SURVEILLANCE = (307119, "Withdrawn from Lynch Surveillance")
     NULL = (None, "null")
     NOT_NULL = (None, "not null")
     UNCHANGED = (None, "unchanged")

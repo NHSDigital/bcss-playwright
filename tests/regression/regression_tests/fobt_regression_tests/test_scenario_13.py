@@ -139,7 +139,7 @@ def test_scenario_13(page: Page) -> None:
 
     query, bind_vars = SubjectSelectionQueryBuilder().build_subject_selection_query(
         criteria=criteria,
-        user=User(),
+        user=User().from_user_role_type(user_role),
         subject=Subject(),
         subjects_to_retrieve=1,
     )
@@ -536,7 +536,7 @@ def test_scenario_13(page: Page) -> None:
     # Then my subject has been updated as follows:
     criteria = {
         "which diagnostic test": "Latest not-void test in latest episode",
-        "calculated FOBT Due Date": "Unchanged",
+        "calculated FOBT Due Date": "2 years from episode end",
         "calculated Lynch due date": "Null",
         "calculated Surveillance Due Date": "3 years from episode end",
         "ceased confirmation date": "Today",
@@ -554,6 +554,7 @@ def test_scenario_13(page: Page) -> None:
         "lynch due date reason": "Unchanged",
         "lynch due date date of change": "Unchanged",
         "pre-interrupt event status": "A259 Attended Diagnostic Test",
+        "previous screening status": "Surveillance",
         "screening Due Date": "Null",
         "screening Due Date Date of change": "Today",
         "screening Due Date Reason": "Ceased",
@@ -562,7 +563,7 @@ def test_scenario_13(page: Page) -> None:
         "screening status reason": "Individual has left the country",
         "surveillance Due Date": "Null",
         "surveillance due date date of change": "Unchanged",
-        "surveillance due date reason": "Unchanged",
+        "surveillance due date reason": "Ceased",
         "symptomatic procedure date": "Null",
         "symptomatic procedure result": "Null",
         "screening referral type": "Null",
@@ -634,8 +635,8 @@ def test_scenario_13(page: Page) -> None:
         "screening status date of change": "Today",
         "screening status reason": "Reopened episode",
         "surveillance due date": "Null",
-        "surveillance due date date of change": "Unchanged",
-        "surveillance due date reason": "Unchanged",
+        "surveillance due date date of change": "Null",
+        "surveillance due date reason": "Null",
         "symptomatic procedure date": "Null",
         "symptomatic procedure result": "Null",
         "screening referral type": "Null",
