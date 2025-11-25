@@ -126,6 +126,7 @@ class SDDReasonForChangeType(Enum):
     REVERSAL_OF_DEATH_NOTIFICATION = (11565, "Reversal of Death Notification")
     ROLLOUT_IMPLEMENTATION = (11337, "Rollout Implementation")
     SELFREFERRAL = (11332, "Self-Referral")
+    WITHDRAWN_FROM_LYNCH_SURVEILLANCE = (307123, "Withdrawn from Lynch Surveillance")
 
     # Special values (no valid_value_id)
     NULL = (None, "null")
