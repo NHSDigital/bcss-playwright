@@ -447,8 +447,8 @@ def test_scenario_17(page: Page) -> None:
         [
             {
                 "modality": PolypInterventionModalityOptions.POLYPECTOMY,
-                "excised": YesNoOptions.YES,
                 "device": PolypInterventionDeviceOptions.HOT_SNARE,
+                "excised": YesNoOptions.YES,
                 "retrieved": PolypInterventionRetrievedOptions.YES,
                 "excision technique": PolypInterventionExcisionTechniqueOptions.PIECE_MEAL,
                 "polyp appears fully resected endoscopically": YesNoOptions.YES,
@@ -460,8 +460,8 @@ def test_scenario_17(page: Page) -> None:
         {
             "date of reporting": datetime.today(),
             "date of receipt": datetime.today(),
-            "pathology provider": 1,
             "pathologist": 1,
+            "pathology provider": 1,
             "polyp type": PolypTypeOptions.ADENOMA,
             "adenoma sub type": AdenomaSubTypeOptions.NOT_REPORTED,
             "polyp excision complete": PolypExcisionCompleteOptions.R1,
@@ -472,8 +472,8 @@ def test_scenario_17(page: Page) -> None:
         {
             "date of reporting": datetime.today(),
             "date of receipt": datetime.today(),
-            "pathology provider": 1,
             "pathologist": 1,
+            "pathology provider": 1,
             "polyp type": PolypTypeOptions.ADENOMA,
             "adenoma sub type": AdenomaSubTypeOptions.TUBULOVILLOUS_ADENOMA,
             "polyp excision complete": PolypExcisionCompleteOptions.R1,
@@ -488,9 +488,9 @@ def test_scenario_17(page: Page) -> None:
     ]
     # When I press the save Investigation Dataset button
     InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        general_information=general_information,
         endoscopy_information=endoscopy_information,
         drug_information=drug_information,
+        general_information=general_information,
         failure_information=failure_information,
         completion_information=completion_information,
         polyp_information=polyp_information,
