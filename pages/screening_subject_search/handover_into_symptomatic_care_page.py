@@ -28,9 +28,13 @@ class HandoverIntoSymptomaticCarePage(BasePage):
         """
         self.referral_dropdown.select_option(value)
 
-    def select_first_practitioner(self) -> None:
-        """Select the first option from the Practitioner dropdown."""
-        self.practitioner_dropdown.select_option(index=1)
+    def select_practitioner_from_index(self, practitioner_index: int) -> None:
+        """
+        Select the first option from the Practitioner dropdown.
+        Args:
+            practitioner_index (int): The index of the practitioner to select.
+        """
+        self.practitioner_dropdown.select_option(index=practitioner_index)
 
     def click_calendar_button(self) -> None:
         """Click the calendar button to open the calendar picker."""

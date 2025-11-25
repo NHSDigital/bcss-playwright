@@ -641,7 +641,7 @@ def test_scenario_17(page: Page) -> None:
     HandoverIntoSymptomaticCarePage(page).select_referral_dropdown_option(
         "Referral to Patient's GP Practice"
     )
-    HandoverIntoSymptomaticCarePage(page).select_first_practitioner()
+    HandoverIntoSymptomaticCarePage(page).select_practitioner_from_index(1)
     HandoverIntoSymptomaticCarePage(page).fill_notes("Handover notes - unfit (cease)")
     HandoverIntoSymptomaticCarePage(page).select_cease_from_program(True)
     HandoverIntoSymptomaticCarePage(page).click_save_button()
