@@ -15,11 +15,11 @@ class ReferToMDTPage(BasePage):
         self.mdt_discussion_date_field = self.page.locator("#UI_MDT_DATE_LinkOrButton")
         self.mdt_location = self.page.locator("#UI_NS_SITE_SELECT_LINK")
         self.visible_ui_results_string = 'select[id^="UI_RESULTS_"]:visible'
-        self.record_MDT_appointment_button = self.page.locator(
+        self.record_mdt_appointment_button = self.page.locator(
             '[name="UI_BUTTON_SAVE"]'
         )
 
-    def enter_date_in_Mdt_discussion_date_field(self, date: datetime) -> None:
+    def enter_date_in_mdt_discussion_date_field(self, date: datetime) -> None:
         """
         Enters a date in the MDT discussion date field.
         Args:
@@ -43,6 +43,6 @@ class ReferToMDTPage(BasePage):
         option_elements.nth(option).wait_for(state="visible")
         self.click(option_elements.nth(option))
 
-    def click_record_MDT_appointment_button(self) -> None:
+    def click_record_mdt_appointment_button(self) -> None:
         """Clicks the record MDT appointment button."""
-        self.click(self.record_MDT_appointment_button)
+        self.click(self.record_mdt_appointment_button)
