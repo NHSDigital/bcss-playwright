@@ -80,7 +80,6 @@ from classes.repositories.person_repository import PersonRepository
 from pages.organisations.organisations_page import OrganisationSwitchPage
 
 
-@pytest.mark.wip
 @pytest.mark.usefixtures("setup_org_and_appointments")
 @pytest.mark.vpn_required
 @pytest.mark.regression
