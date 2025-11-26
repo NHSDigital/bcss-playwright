@@ -2,7 +2,6 @@ from datetime import datetime
 import pytest
 import logging
 from playwright.sync_api import Page
-from classes.repositories.episode_repository import EpisodeRepository
 from classes.subject.subject import Subject
 from classes.user.user import User
 from pages.logout.log_out_page import LogoutPage
@@ -13,7 +12,6 @@ from utils.user_tools import UserTools
 from utils.oracle.oracle import OracleDB
 
 
-@pytest.mark.wip
 @pytest.mark.usefixtures("setup_org_and_appointments")
 @pytest.mark.vpn_required
 @pytest.mark.regression
