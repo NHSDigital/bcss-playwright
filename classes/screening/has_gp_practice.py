@@ -33,7 +33,7 @@ class HasGPPractice(Enum):
             Optional[HasGPPractice]: The matching enum member, or None if not found.
         """
         for member in cls:
-            if member.value == description:
+            if member.value.lower() == description:
                 return member
         return None
 
