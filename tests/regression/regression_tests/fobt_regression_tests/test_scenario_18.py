@@ -759,9 +759,6 @@ def test_scenario_18(page: Page) -> None:
     ContactWithPatientPage(page).record_post_investigation_appointment_not_required()
 
     # Then my subject has been updated as follows:
-    criteria = {
-        "latest episode includes event status": "A323 Post-investigation Appointment NOT Required"
-    }
     subject_assertion(
         nhs_no,
         {
