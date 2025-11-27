@@ -69,6 +69,15 @@ class SubjectScreeningSummaryPage(BasePage):
         )
         self.temporary_address_popup = self.page.locator("#idTempAddress")
         self.close_button = self.page.get_by_role("img", name="close")
+        self.request_cease_button = self.page.get_by_role(
+            "button", name="Request Cease"
+        )
+        self.record_disclaimer_letter_sent = self.page.get_by_role(
+            "button", name="Record Disclaimer Letter Sent"
+        )
+        self.record_return_of_disclaimer_letter = self.page.get_by_role(
+            "button", name="Record Return of Disclaimer Letter"
+        )
 
         # List of Subject Episodes - page filters
         self.view_events_link = self.page.get_by_role("link", name="events")
@@ -449,6 +458,18 @@ class SubjectScreeningSummaryPage(BasePage):
     def assert_reopen_episode_button_not_visible(self) -> None:
         """Assert that the 'Reopen FOBT Screening Episode' button is not visible"""
         expect(self.reopen_fobt_screening_episode_button).not_to_be_visible()
+
+    def click_request_cease_button(self) -> None:
+        """Click the 'Request Cease' button."""
+        self.click(self.request_cease_button)
+
+    def click_record_disclaimer_letter_sent(self) -> None:
+        """Click the 'Record Disclaimer Letter Sent' button."""
+        self.click(self.record_disclaimer_letter_sent)
+
+    def click_record_return_of_disclaimer_letter(self) -> None:
+        """Click the 'Record Return of Disclaimer Letter' button."""
+        self.click(self.record_return_of_disclaimer_letter)
 
 
 class ChangeScreeningStatusOptions(StrEnum):

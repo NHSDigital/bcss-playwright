@@ -37,6 +37,9 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         self.invite_for_diagnostic_test_button = self.page.get_by_role(
             "button", name="Invite for Diagnostic Test >>"
         )
+        self.cancer_result_refer_mdt_button = self.page.get_by_role(
+            "button", name="Cancer Result, Refer MDT >>"
+        )
         self.attend_diagnostic_test_button = self.page.get_by_role(
             "button", name="Attend Diagnostic Test"
         )
@@ -136,6 +139,10 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
                 "button", name="Redirect to Establish Attendance at Appointment"
             )
         )
+        self.date_of_symptomatic_procedure_input = self.page.get_by_role(
+            "textbox", name="Date of Symptomatic Procedure"
+        )
+
         # Contact recording locators
         self.contact_direction_dropdown = self.page.get_by_label("Contact Direction")
         self.contact_made_between_dropdown = self.page.get_by_label(
@@ -150,6 +157,7 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         self.patient_contacted_dropdown = self.page.get_by_label("Patient Contacted")
         self.outcome_dropdown = self.page.get_by_label("Outcome")
         self.save_button = self.page.locator("input[name='UI_BUTTON_SAVE']")
+
         # CT Colonography invitation locators
         self.ct_colonography_appointment_date_input = self.page.locator(
             "#UI_APPT_DATE_38"
@@ -176,6 +184,10 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
     def click_invite_for_diagnostic_test_button(self) -> None:
         """Click the 'Invite for Diagnostic Test' button."""
         self.safe_accept_dialog(self.invite_for_diagnostic_test_button)
+
+    def click_cancer_result_refer_mdt_button(self) -> None:
+        """Click the 'Cancer Result, Refer MDT >>' button."""
+        self.safe_accept_dialog(self.cancer_result_refer_mdt_button)
 
     def click_attend_diagnostic_test_button(self) -> None:
         """Click the 'Attend Diagnostic Test' button."""
@@ -497,4 +509,14 @@ class AdvanceFOBTScreeningEpisodePage(BasePage):
         """Click the 'Redirect to Establish Attendance at Appointment' button"""
         self.safe_accept_dialog(
             self.redirect_to_establish_attendance_at_appointment_button
+        )
+
+    def enter_date_of_symptomatic_procedure(self, date: datetime) -> None:
+        """
+        Enter a date of symptomatic procedure.
+        Args:
+            date (datetime): The date to enter
+        """
+        CalendarPicker(self.page).calendar_picker_ddmmyyyy(
+            date, self.date_of_symptomatic_procedure_input
         )

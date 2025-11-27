@@ -32,3 +32,5 @@ class CloseFobtScreeningEpisodePage(BasePage):
 
         # Step 4: Click final 'Close Episode' button
         self.safe_accept_dialog(self.final_close_button)
+
+        self.page.wait_for_timeout(500)  # Timeout to allow subject to be updated on DB.

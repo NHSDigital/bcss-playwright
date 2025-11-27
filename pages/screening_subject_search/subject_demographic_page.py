@@ -52,6 +52,12 @@ class SubjectDemographicPage(BasePage):
         self.temporary_address_postcode = self.page.locator(
             "#UI_SUBJECT_ALT_POSTCODE_0"
         )
+        self.accept_or_reject_sspi_dob_change = self.page.locator(
+            "#UI_FEED_DATA_ITEM_CHOICE_4"
+        )
+        self.process_feed_data_button = self.page.get_by_role(
+            "button", name="Process Feed Data"
+        )
 
     def is_forename_filled(self) -> bool:
         """
@@ -216,3 +222,16 @@ class SubjectDemographicPage(BasePage):
 
         # Click the update subject data button to save changes
         self.update_subject_data_button.click()
+
+    def accept_or_reject_sspi_date_of_birth(self, accept_or_reject: bool) -> None:
+        """
+        Accepts or rejects the DOB SSPI update.
+        Args:
+            accept_or_reject (bool): True to accept, False to reject.
+        """
+        if accept_or_reject:
+            self.accept_or_reject_sspi_dob_change.select_option(label="Accept")
+        else:
+            self.accept_or_reject_sspi_dob_change.select_option(label="Reject")
+        self.assert_dialog_text("Feed processed successfully", True)
+        self.click(self.process_feed_data_button)

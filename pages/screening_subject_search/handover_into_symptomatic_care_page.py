@@ -1,5 +1,7 @@
 from playwright.sync_api import Page
 from pages.base_page import BasePage
+from datetime import datetime
+from utils.calendar_picker import CalendarPicker
 
 
 class HandoverIntoSymptomaticCarePage(BasePage):
@@ -18,6 +20,8 @@ class HandoverIntoSymptomaticCarePage(BasePage):
         self.cease_from_program_dropdown = self.page.locator(
             "#UI_CEASE_FROM_PROGRAM_ID"
         )
+        self.mdt_date_field = self.page.locator("#UI_MDT_DATE")
+        self.site_dropdown = self.page.locator("#UI_NS_SITE_SELECT_LINK")
 
     def select_referral_dropdown_option(self, value: str) -> None:
         """
@@ -75,3 +79,42 @@ class HandoverIntoSymptomaticCarePage(BasePage):
         """
         value = "Yes" if cease else "No"
         self.cease_from_program_dropdown.select_option(value)
+
+    def enter_mdt_date(self, date: datetime) -> None:
+        """
+        Enters a date into the 'MDT Date' field
+        Args:
+            date (datetime): The date to enter.
+        """
+        CalendarPicker(self.page).calendar_picker_ddmmyyyy(date, self.mdt_date_field)
+
+    def select_site_dropdown_option_index(self, index: int) -> None:
+        """
+        Select a given option from the site dropdown.
+
+        Args:
+            value (str): The value of the option you want to select
+        """
+        self.click(self.site_dropdown)
+        select_locator = self.page.locator('select[id^="UI_RESULTS_"]:visible')
+        select_locator.first.wait_for(state="visible")
+
+        # Find all option elements inside the select and click the one at the given index
+        option_elements = select_locator.first.locator("option")
+        option_elements.nth(index).wait_for(state="visible")
+        self.click(option_elements.nth(index))
+
+    def fill_with_cancer_details(self) -> None:
+        """
+        Complete the Handover into Symptomatic Care form with the cancer details scenario:
+            MDT Date: Today
+            Site: Last option
+            Screening Practitioner: 1st option
+            Note: Handover notes for Cancer scenario
+        """
+        self.enter_mdt_date(datetime.today())
+        self.select_site_dropdown_option_index(-1)
+        self.select_practitioner_from_index(1)
+        self.fill_notes("Handover notes for Cancer scenario")
+        self.click_save_button()
+        self.page.wait_for_timeout(500)  # Timeout to allow subject to update in the DB.

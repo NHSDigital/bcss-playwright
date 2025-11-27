@@ -724,9 +724,9 @@ def test_scenario_14(page: Page) -> None:
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
     AdvanceFOBTScreeningEpisodePage(page).click_mdt_referral_required_button()
     # # And I enter simple MDT information
-    ReferToMDTPage(page).enter_date_in_Mdt_discussion_date_field(datetime.today())
+    ReferToMDTPage(page).enter_date_in_mdt_discussion_date_field(datetime.today())
     ReferToMDTPage(page).select_mdt_location_lookup(1)
-    ReferToMDTPage(page).click_record_MDT_appointment_button()
+    ReferToMDTPage(page).click_record_mdt_appointment_button()
     #  Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,

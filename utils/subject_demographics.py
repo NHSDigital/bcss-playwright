@@ -118,17 +118,7 @@ class SubjectDemographicUtil:
             postcode (str): The new postcode of the subject.
             dialog_text (str): The dialog text to assert
         """
-        subject_screening_page = SubjectScreeningPage(self.page)
-        BasePage(self.page).click_main_menu_link()
-        BasePage(self.page).go_to_screening_subject_search_page()
-        subject_screening_page.click_demographics_filter()
-        subject_screening_page.click_nhs_number_filter()
-        subject_screening_page.nhs_number_filter.fill(nhs_no)
-        subject_screening_page.nhs_number_filter.press("Tab")
-        subject_screening_page.select_search_area_option(
-            SearchAreaSearchOptions.SEARCH_AREA_WHOLE_DATABASE.value
-        )
-        subject_screening_page.click_search_button()
+        self.go_to_subject_demographic_page(nhs_no)
         if postcode:
             SubjectDemographicPage(self.page).fill_postcode_input(postcode)
         if age:
@@ -141,3 +131,40 @@ class SubjectDemographicUtil:
                 ).click_update_subject_data_button_and_assert_dialog(dialog_text)
             else:
                 SubjectDemographicPage(self.page).click_update_subject_data_button()
+
+    def go_to_subject_demographic_page(self, nhs_no: str) -> None:
+        """
+        Navigates to the subject demographics page for the specified subject.
+        Args:
+            nhs_no (str): The NHS number of the subject.
+        """
+        subject_screening_page = SubjectScreeningPage(self.page)
+        BasePage(self.page).click_main_menu_link()
+        BasePage(self.page).go_to_screening_subject_search_page()
+        subject_screening_page.click_demographics_filter()
+        subject_screening_page.click_nhs_number_filter()
+        subject_screening_page.nhs_number_filter.fill(nhs_no)
+        subject_screening_page.nhs_number_filter.press("Tab")
+        subject_screening_page.select_search_area_option(
+            SearchAreaSearchOptions.SEARCH_AREA_WHOLE_DATABASE.value
+        )
+        subject_screening_page.click_search_button()
+
+    def accept_or_reject_sspi_update(
+        self, nhs_no: str, accept_or_reject: bool, data_item_name: str
+    ) -> None:
+        """
+        Accept or reject and SSPI update.
+        Args:
+        nhs_no (str): The NHS number of the subject.
+            accept_or_reject (bool): True to accept, False to reject.
+            data_item_name (str): The name of the data item to accept/reject.
+        """
+        self.go_to_subject_demographic_page(nhs_no)
+        match data_item_name.lower():
+            case "date of birth":
+                SubjectDemographicPage(self.page).accept_or_reject_sspi_date_of_birth(
+                    accept_or_reject
+                )
+            case _:
+                return
