@@ -12,6 +12,7 @@ from pages.screening_subject_search.confirm_the_manual_sending_of_a_disclaimer_l
 from pages.screening_subject_search.record_informed_dissent_page import (
     RecordInformedDissentPage,
 )
+from typing import Optional
 
 
 class RecordRequestToCeasePage(BasePage):
@@ -134,14 +135,16 @@ class ReasonForCeasing(Enum):
         return self._is_immediate_cease_reason
 
     @classmethod
-    def get_by_reason(cls, reason: str):
-        for member in cls:
-            if member.reason == reason:
-                return member
-        return None
-
-    @classmethod
-    def by_description_case_insensitive(cls, reason: str):
+    def by_description_case_insensitive(
+        cls, reason: str
+    ) -> Optional["ReasonForCeasing"]:
+        """
+        Get ReasonForCeasing member by description, case insensitive.
+        Args:
+            reason (str): The reason description to look for.
+        Returns:
+            Optional[ReasonForCeasing]: The matching ReasonForCeasing member, or None if not found.
+        """
         reason_lower = reason.lower()
         for member in cls:
             if member.reason.lower() == reason_lower:
