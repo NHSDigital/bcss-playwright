@@ -57,7 +57,9 @@ from pages.datasets.investigation_dataset_page import (
     YesNoOptions,
     EndoscopyLocationOptions,
 )
-from pages.screening_subject_search.non_neoplastic_result_from_symptomatic_procedure_page import (NonNeoplasticResultFromSymptomaticProcedurePage)
+from pages.screening_subject_search.non_neoplastic_result_from_symptomatic_procedure_page import (
+    NonNeoplasticResultFromSymptomaticProcedurePage,
+)
 from utils.subject_demographics import SubjectDemographicUtil
 from pages.screening_subject_search.reopen_fobt_screening_episode_page import (
     ReopenFOBTScreeningEpisodePage,
@@ -431,7 +433,7 @@ def test_scenario_12(page: Page) -> None:
 
     # And I set the practitioner appointment date to "today"
     # And I book the earliest available post investigation appointment on this date
-    book_post_investigation_appointment(page, "The Royal Hospital (Wolverhampton)", 1)
+    book_post_investigation_appointment(page, "The Royal Hospital (Wolverhampton)")
 
     # Then my subject has been updated as follows:
     subject_assertion(

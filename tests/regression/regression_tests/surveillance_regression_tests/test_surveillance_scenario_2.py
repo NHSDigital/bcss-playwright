@@ -1,12 +1,9 @@
 import pytest
 from playwright.sync_api import Page
 from utils.user_tools import UserTools
-from utils.oracle.subject_creation_util import CreateSubjectSteps
 from utils.subject_assertion import subject_assertion
-from utils.call_and_recall_utils import CallAndRecallUtils
 import logging
 from utils.batch_processing import batch_processing
-from utils.fit_kit import FitKitGeneration, FitKitLogged
 from pages.logout.log_out_page import LogoutPage
 from datetime import datetime
 from utils.generate_health_check_forms_util import GenerateHealthCheckFormsUtil
@@ -31,14 +28,13 @@ from pages.screening_subject_search.episode_events_and_notes_page import (
 )
 from pages.screening_practitioner_appointments.appointment_detail_page import (
     AppointmentDetailPage,
-    ReasonForCancellationOptions,
 )
 from utils.subject_demographics import SubjectDemographicUtil
 from pages.screening_subject_search.discharge_from_surveillance_page import (
     DischargeFromSurveillancePage,
 )
-from pages.screening_subject_search.reopen_fobt_screening_episode_page import (
-    ReopenFOBTScreeningEpisodePage,
+from pages.screening_subject_search.reopen_surveillance_episode_page import (
+    ReopenSurveillanceEpisodePage,
 )
 
 
@@ -80,192 +76,190 @@ def test_scenario_2(page: Page, general_properties: dict) -> None:
     > Record discharge, clinical decision > X89 > C203 (3.4)
     > Check recall [SSCL25a]
     """
-    # # Given I log in to BCSS "England" as user role "Screening Centre Manager"
-    # user_role = UserTools.user_login(
-    #     page, "Screening Centre Manager at BCS001", return_role_type=True
-    # )
-    # if user_role is None:
-    #     raise ValueError("User cannot be assigned to a UserRoleType")
+    # Given I log in to BCSS "England" as user role "Screening Centre Manager"
+    user_role = UserTools.user_login(
+        page, "Screening Centre Manager at BCS001", return_role_type=True
+    )
+    if user_role is None:
+        raise ValueError("User cannot be assigned to a UserRoleType")
 
-    # # When I run surveillance invitations for 1 subject
-    # org_id = general_properties["eng_screening_centre_id"]
-    # nhs_no = GenerateHealthCheckFormsUtil(page).invite_surveillance_subjects_early(org_id)
-    # logging.info(f"[SUBJECT RETRIEVAL] Subject's NHS Number: {nhs_no}")
+    # When I run surveillance invitations for 1 subject
+    org_id = general_properties["eng_screening_centre_id"]
+    nhs_no = GenerateHealthCheckFormsUtil(page).invite_surveillance_subjects_early(
+        org_id
+    )
+    logging.info(f"[SUBJECT RETRIEVAL] Subject's NHS Number: {nhs_no}")
 
-    # # Then my subject has been updated as follows:
-    # subject_assertion(
-    #     nhs_no,
-    #     {
-    #         "latest episode status": "Open",
-    #         "latest episode type": "Surveillance",
-    #         "latest event status": "X500 Selected For Surveillance",
-    #         "responsible screening centre code": "User's screening centre",
-    #         "subject has unprocessed SSPI updates": "No",
-    #         "subject has user DOB updates": "No",
-    #     },
-    #     user_role,
-    # )
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest episode status": "Open",
+            "latest episode type": "Surveillance",
+            "latest event status": "X500 Selected For Surveillance",
+            "responsible screening centre code": "User's screening centre",
+            "subject has unprocessed SSPI updates": "No",
+            "subject has user DOB updates": "No",
+        },
+        user_role,
+    )
 
-    # # When I set the value of parameter 82 to "N" for my organisation with immediate effect
-    # set_org_parameter_value(82, "N", org_id)
+    # When I set the value of parameter 82 to "N" for my organisation with immediate effect
+    set_org_parameter_value(82, "N", org_id)
 
-    # # And there is a "X500" letter batch for my subject with the exact title "Surveillance Selection"
-    # # When I process the open "X500" letter batch for my subject
-    # batch_processing(
-    #     page,
-    #     "X500",
-    #     "Surveillance Selection",
-    # )
+    # And there is a "X500" letter batch for my subject with the exact title "Surveillance Selection"
+    # When I process the open "X500" letter batch for my subject
+    batch_processing(
+        page,
+        "X500",
+        "Surveillance Selection",
+    )
 
-    # # Then my subject has been updated as follows:
-    # subject_assertion(
-    #     nhs_no,
-    #     {"latest event status": "X505 HealthCheck Form Printed"}
-    # )
+    # Then my subject has been updated as follows:
+    subject_assertion(nhs_no, {"latest event status": "X505 HealthCheck Form Printed"})
 
-    # # When I view the subject
-    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # # And I select the advance episode option for "Record Contact with Patient"
-    # SubjectScreeningSummaryPage(page).click_advance_surveillance_episode_button()
-    # AdvanceSurveillanceEpisodePage(page).click_record_contact_with_patient_button()
+    # And I select the advance episode option for "Record Contact with Patient"
+    SubjectScreeningSummaryPage(page).click_advance_surveillance_episode_button()
+    AdvanceSurveillanceEpisodePage(page).click_record_contact_with_patient_button()
 
-    # # And I record contact with the subject with outcome "Invite for Surveillance practitioner clinic (assessment)"
-    # ContactWithPatientPage(page).record_contact("Invite for Surveillance practitioner clinic (assessment)")
+    # And I record contact with the subject with outcome "Invite for Surveillance practitioner clinic (assessment)"
+    ContactWithPatientPage(page).record_contact(
+        "Invite for Surveillance practitioner clinic (assessment)"
+    )
 
-    # # Then my subject has been updated as follows:
-    # subject_assertion(
-    #     nhs_no,
-    #     {"latest event status": "X600 Surveillance Appointment Required"}
-    # )
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no, {"latest event status": "X600 Surveillance Appointment Required"}
+    )
 
-    # # When I view the subject
-    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # # And I choose to book a practitioner clinic for my subject
-    # SubjectScreeningSummaryPage(page=page).click_book_practitioner_clinic_button()
+    # And I choose to book a practitioner clinic for my subject
+    SubjectScreeningSummaryPage(page=page).click_book_practitioner_clinic_button()
 
-    # # And I set the practitioner appointment date to "today"
-    # # And I book the earliest available post investigation appointment on this date
-    # book_post_investigation_appointment(page, "The Royal Hospital (Wolverhampton)", 1)
+    # And I set the practitioner appointment date to "today"
+    # And I book the earliest available post investigation appointment on this date
+    book_post_investigation_appointment(page, "The Royal Hospital (Wolverhampton)")
 
-    # # Then my subject has been updated as follows:
-    # subject_assertion(
-    #     nhs_no,
-    #     {
-    #         "latest event status": "X610 Surveillance Appointment Made",
-    #     },
-    # )
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "X610 Surveillance Appointment Made",
+        },
+    )
 
-    # # And there is a "X610" letter batch for my subject with the exact title "Surveillance Appointment Invitation Letter"
-    # SubjectRepository().there_is_letter_batch_for_subject(
-    #         nhs_no, "X610", "Surveillance Appointment Invitation Letter", True
-    #     )
+    # And there is a "X610" letter batch for my subject with the exact title "Surveillance Appointment Invitation Letter"
+    SubjectRepository().there_is_letter_batch_for_subject(
+        nhs_no, "X610", "Surveillance Appointment Invitation Letter", True
+    )
 
-    # # When I switch users to BCSS "England" as user role "Screening Centre Manager"
-    # LogoutPage(page).log_out(close_page=False)
-    # BasePage(page).go_to_log_in_page()
+    # When I switch users to BCSS "England" as user role "Screening Centre Manager"
+    LogoutPage(page).log_out(close_page=False)
+    BasePage(page).go_to_log_in_page()
     user_role = UserTools.user_login(page, "Screening Centre Manager at BCS001", True)
     if user_role is None:
         raise ValueError("The current user cannot be assigned a user role")
 
-    nhs_no = "9771852477"
+    # And I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # # And I view the subject
-    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # And I view the event history for the subject's latest episode
+    SubjectScreeningSummaryPage(page).expand_episodes_list()
+    SubjectScreeningSummaryPage(page).click_first_surveillance_epsiode_link()
 
-    # # And I view the event history for the subject's latest episode
-    # SubjectScreeningSummaryPage(page).expand_episodes_list()
-    # SubjectScreeningSummaryPage(page).click_first_surveillance_epsiode_link()
+    # And I view the latest practitioner appointment in the subject's episode
+    EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
 
-    # # And I view the latest practitioner appointment in the subject's episode
-    # EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
+    # And The Screening Centre cancels the practitioner appointment with reason "Screening Centre Cancelled"
+    AppointmentDetailPage(page).check_cancel_radio()
+    AppointmentDetailPage(page).select_reason_for_cancellation_option(
+        "Screening Centre Cancelled"
+    )
 
-    # # And The Screening Centre cancels the practitioner appointment with reason "Screening Centre Cancelled"
-    # AppointmentDetailPage(page).check_cancel_radio()
-    # AppointmentDetailPage(page).select_reason_for_cancellation_option(
-    #     "Screening Centre Cancelled"
-    # )
+    # And I press OK on my confirmation prompt
+    AppointmentDetailPage(page).click_save_button(accept_dialog=True)
 
-    # # And I press OK on my confirmation prompt
-    # AppointmentDetailPage(page).click_save_button(accept_dialog=True)
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "X9 Surveillance Appointment Cancelled Letters not Prepared",
+        },
+    )
 
-    # # Then my subject has been updated as follows:
-    # subject_assertion(
-    #     nhs_no,
-    #     {
-    #         "latest event status": "X9 Surveillance Appointment Cancelled Letters not Prepared",
-    #     },
-    # )
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # # When I view the subject
-    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # Then I "can" postpone the subject's surveillance episode
+    SubjectScreeningSummaryPage(page).can_postpone_surveillance_episode()
 
-    # # Then I "can" postpone the subject's surveillance episode
-    # SubjectScreeningSummaryPage(page).can_postpone_surveillance_episode()
+    # And I choose to book a practitioner clinic for my subject
+    SubjectScreeningSummaryPage(page=page).click_book_practitioner_clinic_button()
 
-    # # And I choose to book a practitioner clinic for my subject
-    # SubjectScreeningSummaryPage(page=page).click_book_practitioner_clinic_button()
+    # And I set the practitioner appointment date to "today"
+    # And I book the earliest available post investigation appointment on this date
+    book_post_investigation_appointment(page, "The Royal Hospital (Wolverhampton)")
 
-    # # And I set the practitioner appointment date to "today"
-    # # And I book the earliest available post investigation appointment on this date
-    # book_post_investigation_appointment(page, "The Royal Hospital (Wolverhampton)", 1)
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "X610 Surveillance Appointment Made",
+        },
+    )
 
-    # # Then my subject has been updated as follows:
-    # subject_assertion(
-    #     nhs_no,
-    #     {
-    #         "latest event status": "X610 Surveillance Appointment Made",
-    #     },
-    # )
+    # And there is a "X610" letter batch for my subject with the exact title "Surveillance Appointment Invitation Letter"
+    # When I process the open "X610" letter batch for my subject
+    batch_processing(
+        page,
+        "X610",
+        "Surveillance Appointment Invitation Letter",
+    )
 
-    # # And there is a "X610" letter batch for my subject with the exact title "Surveillance Appointment Invitation Letter"
-    # # When I process the open "X610" letter batch for my subject
-    # batch_processing(
-    #     page,
-    #     "X610",
-    #     "Surveillance Appointment Invitation Letter",
-    # )
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "X615 Surveillance Appointment Invitation Letter Printed"
+        },
+    )
 
-    # # Then my subject has been updated as follows:
-    # subject_assertion(
-    #     nhs_no,
-    #     {
-    #         "latest event status": "X615 Surveillance Appointment Invitation Letter Printed"
-    #     },
-    # )
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-    # # When I view the subject
-    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # And I view the event history for the subject's latest episode
+    SubjectScreeningSummaryPage(page).expand_episodes_list()
+    SubjectScreeningSummaryPage(page).click_first_surveillance_epsiode_link()
 
-    # # And I view the event history for the subject's latest episode
-    # SubjectScreeningSummaryPage(page).expand_episodes_list()
-    # SubjectScreeningSummaryPage(page).click_first_surveillance_epsiode_link()
+    # And I view the latest practitioner appointment in the subject's episode
+    EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
 
-    # # And I view the latest practitioner appointment in the subject's episode
-    # EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
+    # And I attend the subject's practitioner appointment "today"
+    AppointmentDetailPage(page).mark_appointment_as_attended(datetime.today())
 
-    # # And I attend the subject's practitioner appointment "today"
-    # AppointmentDetailPage(page).mark_appointment_as_attended(datetime.today())
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {"latest event status": "X650 Patient Attended Surveillance Appointment"},
+    )
 
-    # # Then my subject has been updated as follows:
-    # subject_assertion(
-    #     nhs_no,
-    #     {"latest event status": "X650 Patient Attended Surveillance Appointment"},
-    # )
+    # When I view the subject
+    # And I update the subject's date of birth to make them 42 years old
+    # And I update the subject's postcode to "AA1 2BB"
+    # And I save my changes to the subject's demographics
+    SubjectDemographicUtil(page).updated_subject_demographics(
+        nhs_no,
+        42,
+        "AA1 2BB",
+    )
 
-    # # When I view the subject
-    # # And I update the subject's date of birth to make them 42 years old
-    # # And I update the subject's postcode to "AA1 2BB"
-    # # And I save my changes to the subject's demographics
-    # SubjectDemographicUtil(page).updated_subject_demographics(
-    #     nhs_no,
-    #     42,
-    #     "AA1 2BB",
-    # )
-
-    # # Then my subject has been updated as follows:
-    # subject_assertion(nhs_no, {"subject age": "42"})
+    # Then my subject has been updated as follows:
+    subject_assertion(nhs_no, {"subject age": "42"})
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -316,5 +310,165 @@ def test_scenario_2(page: Page, general_properties: dict) -> None:
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
     # And I reopen the subject's episode for "Reopen episode for correction"
-    SubjectScreeningSummaryPage(page).click_reopen_fobt_screening_episode_button()
-    ReopenFOBTScreeningEpisodePage(page).click_reopen_episode_for_correction_button()
+    SubjectScreeningSummaryPage(page).click_reopen_surveillance_episode_button()
+    ReopenSurveillanceEpisodePage(page).click_reopen_episode_for_correction_button()
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "calculated fobt due date": "Null",
+            "calculated lynch due date": "Null",
+            "calculated surveillance due date": "As at episode start",
+            "ceased confirmation date": "Null",
+            "ceased confirmation details": "Null",
+            "ceased confirmation user id": "Null",
+            "clinical reason for cease": "Null",
+            "latest episode accumulated result": "Null",
+            "latest episode includes event code": "E63 Reopen episode for correction",
+            "latest episode recall calculation method": "Episode end date",
+            "latest episode recall episode type": "Null",
+            "latest episode recall surveillance type": "Null",
+            "latest episode status": "Open",
+            "latest episode status reason": "Null",
+            "latest event status": "X900 Surveillance Episode reopened",
+            "lynch due date": "Null",
+            "lynch due date date of change": "Unchanged",
+            "lynch due date reason": "Unchanged",
+            "screening due date": "Null",
+            "screening due date date of change": "Unchanged",
+            "screening due date reason": "Unchanged",
+            "screening status": "Surveillance",
+            "screening status date of change": "Today",
+            "screening status reason": "Reopened episode",
+            "surveillance due date": "Calculated surveillance due date",
+            "surveillance due date date of change": "Today",
+            "surveillance due date reason": "Reopened episode",
+        },
+    )
+
+    # When I view the subject
+    # And I update the subject's date of birth to make them 74 years old
+    # And I update the subject's postcode to "AA1 2BB"
+    # And I save my changes to the subject's demographics
+    SubjectDemographicUtil(page).updated_subject_demographics(
+        nhs_no,
+        74,
+        "AA1 2BB",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(nhs_no, {"subject age": "74"})
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # And I advance the subject's episode for "Book Surveillance Appointment"
+    SubjectScreeningSummaryPage(page).click_advance_surveillance_episode_button()
+    AdvanceSurveillanceEpisodePage(page).click_book_surveillance_appointment_button()
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no, {"latest event status": "X600 Surveillance Appointment Required"}
+    )
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # And I choose to book a practitioner clinic for my subject
+    SubjectScreeningSummaryPage(page=page).click_book_practitioner_clinic_button()
+
+    # And I set the practitioner appointment date to "today"
+    # And I book the earliest available post investigation appointment on this date
+    book_post_investigation_appointment(page, "The Royal Hospital (Wolverhampton)")
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "X610 Surveillance Appointment Made",
+        },
+    )
+
+    # And there is a "X610" letter batch for my subject with the exact title "Surveillance Appointment Invitation Letter"
+    # When I process the open "X610" letter batch for my subject
+    batch_processing(
+        page,
+        "X610",
+        "Surveillance Appointment Invitation Letter",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "X615 Surveillance Appointment Invitation Letter Printed",
+        },
+    )
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # And I view the event history for the subject's latest episode
+    SubjectScreeningSummaryPage(page).expand_episodes_list()
+    SubjectScreeningSummaryPage(page).click_first_surveillance_epsiode_link()
+
+    # And I view the latest practitioner appointment in the subject's episode
+    EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
+
+    # And I attend the subject's practitioner appointment "today"
+    AppointmentDetailPage(page).mark_appointment_as_attended(datetime.today())
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {"latest event status": "X650 Patient Attended Surveillance Appointment"},
+    )
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # And I select the advance episode option for "Discharge from Screening and Surveillance - Clinical Decision"
+    SubjectScreeningSummaryPage(page).click_advance_surveillance_episode_button()
+    AdvanceSurveillanceEpisodePage(
+        page
+    ).click_discharge_from_screening_and_surveillance_clinical_decision_button()
+
+    # And I complete the Discharge from Surveillance form including Screening Consultant
+    DischargeFromSurveillancePage(page).complete_discharge_from_surveillance_form(True)
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "calculated fobt due date": "2 years from episode end",
+            "calculated lynch due date": "Null",
+            "calculated surveillance due date": "Null",
+            "ceased confirmation date": "Today",
+            "ceased confirmation details": "Notes for subject being discharged",
+            "ceased confirmation user id": "User's ID",
+            "clinical reason for cease": "Null",
+            "latest episode accumulated result": "(Any) Surveillance non-participation",
+            "latest episode recall calculation method": "Episode end date",
+            "latest episode recall episode type": "FOBT Screening",
+            "latest episode recall surveillance type": "Null",
+            "latest episode status": "Closed",
+            "latest episode status reason": "Discharge from Surveillance - Age",
+            "latest event status": "X89 Discharge from Screening and Surveillance - Clinical Decision",
+            "lynch due date": "Null",
+            "lynch due date date of change": "Unchanged",
+            "lynch due date reason": "Unchanged",
+            "screening due date": "Null",
+            "screening due date date of change": "Unchanged",
+            "screening due date reason": "Unchanged",
+            "screening status": "Ceased",
+            "screening status date of change": "Today",
+            "screening status reason": "Outside Screening Population",
+            "surveillance due date": "Null",
+            "surveillance due date date of change": "Today",
+            "surveillance due date reason": "Discharge from Surveillance - Age",
+        },
+        user_role,
+    )
+
+    LogoutPage(page).log_out()

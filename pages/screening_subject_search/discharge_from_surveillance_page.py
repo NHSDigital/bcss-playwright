@@ -13,12 +13,14 @@ class DischargeFromSurveillancePage(BasePage):
 
         # Locators
         self.date_decision_made_input_field = self.page.locator("#UI_OTHER_DATE")
-        self.screening_consultant_lookup_link = self.page.locator("#UI_CONSULTANT_PIO_SELECT_LINK")
-        self.screening_pracitioner_dropdown = self.page.locator("#UI_SCREENING_PRACTITIONER")
-        self.notes_field = self.page.locator("#UI_NOTES")
-        self.save_button = self.page.get_by_role(
-            "button", name="Save"
+        self.screening_consultant_lookup_link = self.page.locator(
+            "#UI_CONSULTANT_PIO_SELECT_LINK"
         )
+        self.screening_pracitioner_dropdown = self.page.locator(
+            "#UI_SCREENING_PRACTITIONER"
+        )
+        self.notes_field = self.page.locator("#UI_NOTES")
+        self.save_button = self.page.get_by_role("button", name="Save")
 
     def enter_date_decition_made(self, date: datetime) -> None:
         """
@@ -26,7 +28,9 @@ class DischargeFromSurveillancePage(BasePage):
         Args:
             date (datetime): the date to enter.
         """
-        CalendarPicker(self.page).calendar_picker_ddmmyyyy(date, self.date_decision_made_input_field)
+        CalendarPicker(self.page).calendar_picker_ddmmyyyy(
+            date, self.date_decision_made_input_field
+        )
 
     def select_screening_consultant_from_index(self, index: int) -> None:
         """
@@ -63,7 +67,9 @@ class DischargeFromSurveillancePage(BasePage):
         """Click on the 'Save' button."""
         self.safe_accept_dialog(self.save_button)
 
-    def complete_discharge_from_surveillance_form(self, include_screening_consultant: bool) -> None:
+    def complete_discharge_from_surveillance_form(
+        self, include_screening_consultant: bool
+    ) -> None:
         """
         Completes the discharge from surveillance form.
         Args:
@@ -75,4 +81,6 @@ class DischargeFromSurveillancePage(BasePage):
         self.select_screening_pracitioner_from_index(1)
         self.fill_notes_field("Notes for subject being discharged")
         self.click_save_button()
-        
+        self.page.wait_for_timeout(
+            1000
+        )  # Timeout to allow subject to be updated on the DB.
