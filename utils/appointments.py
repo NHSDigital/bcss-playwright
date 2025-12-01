@@ -145,7 +145,6 @@ def book_post_investigation_appointment(
     Args:
         page (Page): The Playwright page object.
         site (str): The name of the site.
-        appointment_start_time (str): The start time for the appointment.
     """
     book_appointments_page = BookAppointmentPage(page)
     book_appointments_page.select_site_dropdown_option(
@@ -210,8 +209,6 @@ def book_practitioner_appointment(
     Args:
         page (Page): The Playwright page object.
         site (str): The name of the site.
-        screening_practitioner_index (int): The index of the screening practitioner to select.
-        appointment_start_time (str): The start time for the appointment.
     """
     book_post_investigation_appointment(page, site)
 
