@@ -1032,6 +1032,7 @@ class EventStatusType(Enum):
     U81 = (11283, "U81", "Kit Returned and Logged (Technical Fail; Weak Positive")
     U97 = (11284, "U97", "Weak Positive, Waiting for Screening Centre Assistance")
     U98 = (11285, "U98", "Weak Positive, Waiting for Programme Hub Assistance")
+    X500=(20100, "X500", "Selected For Surveillance")
 
     def __init__(self, valid_value_id: int, allowed_value: str, description: str):
         """

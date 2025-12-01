@@ -54,6 +54,7 @@ class BasePage:
             "#ntshPageTitle"
         )
         self.main_menu_header = self.page.locator("#ntshPageTitle")
+        self.surveillance = self.page.get_by_text("Surveillance", exact=True)
 
     def click_main_menu_link(self) -> None:
         """Click the Base Page 'Main Menu' link if it is visible."""
@@ -120,6 +121,10 @@ class BasePage:
     def click_help_link(self) -> None:
         """Click the Base Page 'Help' link."""
         self.click(self.help_link)
+
+    def click_surveillance_link(self) -> None:
+        """Click the Surveillance Page link."""
+        self.click(self.surveillance)    
 
     def bowel_cancer_screening_system_header_is_displayed(self) -> None:
         """Asserts that the Bowel Cancer Screening System header is displayed."""
