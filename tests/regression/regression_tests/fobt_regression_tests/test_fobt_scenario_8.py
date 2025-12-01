@@ -646,9 +646,7 @@ def test_scenario_8(page: Page) -> None:
 
     # And I set the practitioner appointment date to "today"
     # And I book the earliest available post investigation appointment on this date
-    book_post_investigation_appointment(
-        page, "The Royal Hospital (Wolverhampton)", 1, "12:00"
-    )
+    book_post_investigation_appointment(page, "The Royal Hospital (Wolverhampton)")
 
     # Then my subject has been updated as follows:
     criteria = {

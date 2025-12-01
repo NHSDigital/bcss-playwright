@@ -600,7 +600,7 @@ def test_scenario_11(page: Page) -> None:
 
     # And I set the practitioner appointment date to "today"
     # And I book the earliest available post investigation appointment on this date
-    book_post_investigation_appointment(page, "The Royal Hospital (Wolverhampton)", 1)
+    book_post_investigation_appointment(page, "The Royal Hospital (Wolverhampton)")
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -672,9 +672,7 @@ def test_scenario_11(page: Page) -> None:
     # And I set the practitioner appointment date to "today"
     # And I book the earliest available post investigation appointment on this date
     book_post_investigation_appointment(
-        page=page,
-        site="The Royal Hospital (Wolverhampton)",
-        screening_practitioner_index=1,
+        page=page, site="The Royal Hospital (Wolverhampton)"
     )
 
     # Then my subject has been updated as follows:
