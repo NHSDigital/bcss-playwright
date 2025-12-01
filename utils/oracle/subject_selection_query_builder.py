@@ -2966,7 +2966,7 @@ class SubjectSelectionQueryBuilder:
         sc_code = None
 
         try:
-            option = SubjectScreeningCentreCode.by_description(
+            option = SubjectScreeningCentreCode.by_description_case_insensitive(
                 self.criteria_value.lower()
             )
             match option:
@@ -2979,9 +2979,9 @@ class SubjectSelectionQueryBuilder:
                     | SubjectScreeningCentreCode.USER_SC
                     | SubjectScreeningCentreCode.USER_ORGANISATION
                 ):
-                    if user.organisation is None or user.organisation.id is None:
-                        raise ValueError("User organisation or organisation_id is None")
-                    sc_code = user.organisation.id
+                    if user.organisation is None or user.organisation.code is None:
+                        raise ValueError("User organisation or organisation_code is None")
+                    sc_code = user.organisation.code
                 case _:
                     raise SelectionBuilderException(
                         self.criteria_key_name, self.criteria_value

@@ -56,12 +56,18 @@ class SubjectScreeningSummaryPage(BasePage):
             "go to a page to Close the"
         )
         self.display_rs = self.page.locator("#displayRS")
-        self.first_fobt_episode_link = page.get_by_role(
+        self.first_fobt_episode_link = self.page.get_by_role(
             "link", name="FOBT Screening"
+        ).first
+        self.first_surveillance_epsiode_link = self.page.get_by_role(
+            "link", name="Surveillance"
         ).first
         self.datasets_link = self.page.get_by_role("link", name="Datasets")
         self.advance_fobt_screening_episode_button = self.page.get_by_role(
             "button", name="Advance FOBT Screening Episode"
+        )
+        self.advance_surveillance_episode_button = self.page.get_by_role(
+            "button", name="Advance Surveillance Episode"
         )
         self.additional_care_note_link = self.page.get_by_role("link", name="(AN)")
         self.temporary_address_icon = self.page.get_by_role(
@@ -77,6 +83,9 @@ class SubjectScreeningSummaryPage(BasePage):
         )
         self.record_return_of_disclaimer_letter = self.page.get_by_role(
             "button", name="Record Return of Disclaimer Letter"
+        )
+        self.postpone_surveillance_episode_button = self.page.get_by_role(
+            "button", name="Postpone Surveillance Episode"
         )
 
         # List of Subject Episodes - page filters
@@ -232,6 +241,10 @@ class SubjectScreeningSummaryPage(BasePage):
         """Click on the first FOBT episode link."""
         self.click(self.first_fobt_episode_link)
 
+    def click_first_surveillance_epsiode_link(self) -> None:
+        """Click on the first Surveillance episode link."""
+        self.click(self.first_surveillance_epsiode_link)
+
     def click_datasets_link(self) -> None:
         """Click on the 'Datasets' link."""
         self.click(self.datasets_link)
@@ -244,6 +257,10 @@ class SubjectScreeningSummaryPage(BasePage):
             logging.info("Episode successfully advanced")
         except Exception as e:
             pytest.fail(f"Unable to advance the episode: {e}")
+
+    def click_advance_surveillance_episode_button(self) -> None:
+        """Click on the 'Advance Surveillance Episode' button."""
+        self.click(self.advance_surveillance_episode_button)
 
     def verify_additional_care_note_visible(self) -> None:
         """Verifies that the '(AN)' link is visible."""
@@ -470,6 +487,21 @@ class SubjectScreeningSummaryPage(BasePage):
     def click_record_return_of_disclaimer_letter(self) -> None:
         """Click the 'Record Return of Disclaimer Letter' button."""
         self.click(self.record_return_of_disclaimer_letter)
+
+    def click_postpone_surveillance_episode_button(self) -> None:
+        """Click the 'Postpose Surveillance Episode' button."""
+        self.click(self.postpone_surveillance_episode_button)
+
+    def can_postpone_surveillance_episode(self, able_to_click: bool = True) -> None:
+        """
+        Asserts whether the 'Postpone Surveillance Episode' button is visible or not.
+        Args:
+            able_to_click (bool): If True, asserts the button is visible. If False, asserts the button is not visible.
+        """
+        if able_to_click:
+            expect(self.postpone_surveillance_episode_button).to_be_visible()
+        else:
+            expect(self.postpone_surveillance_episode_button).not_to_be_visible()
 
 
 class ChangeScreeningStatusOptions(StrEnum):
