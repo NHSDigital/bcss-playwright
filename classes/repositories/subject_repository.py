@@ -282,41 +282,42 @@ class SubjectRepository:
                 f"[DB ASSERTION Passed] Subject {nhs_no} does not have a {letter_batch_code} - {letter_batch_title} batch"
             )
 
-
     def get_early_subject_to_be_invited_for_surveillance(
-        self, screening_centre_id: int, s_due_count_date: str
-    ) -> Optional[str]:
+        self, screening_centre_id: str, surveillance_due_count_date: str
+    ) -> str:
         """
-        Finds a subject in the DB who is due to be invited for surveillance early.
+        Finds an early invite surveillance subject based on the surveillance due count date.
         Args:
-            screening_centre_id (int): The screening centre ID.
-            s_due_count_date (str): The due count date in 'DD/MM/YYYY' format.
+            screening_centre_id (str): The screening centre ID.
+            surveillance_due_count_date (str): The surveillance due count date.
         Returns:
-            str: The NHS number of a subject that matches the provided criteria, or None if not found.
+            str: The NHS number of the early invite surveillance subject.
+        Raises:
+            ValueError: If no early invite surveillance subjects are found.
         """
-        sql_query = """SELECT ss.subject_nhs_number
-            FROM screening_subject_t ss
-            INNER JOIN sd_contact_t c ON ss.subject_nhs_number = c.nhs_number
-            WHERE c.responsible_sc_id = :screeningCentreId
-            AND c.deduction_reason IS NULL
-            AND c.date_of_death IS NULL
-            AND TRUNC (ss.surveillance_screen_due_date) <= TO_DATE(:sDueCountDate, 'DD/MM/YYYY')
-            AND ss.screening_status_id = 4006
-            AND c.date_of_death IS NULL
-            AND NOT EXISTS (
-                SELECT 1
-                FROM ep_subject_episode_t ep
-                WHERE ep.screening_subject_id = ss.screening_subject_id
-                AND ep.episode_status_id IN (11352, 11354)
-            )
-            ORDER BY TRUNC(ss.surveillance_screen_due_date)
-            FETCH FIRST 1 ROW ONLY
+        query = """ SELECT ss.subject_nhs_number
+        FROM screening_subject_t ss
+        INNER JOIN sd_contact_t c ON ss.subject_nhs_number = c.nhs_number
+        WHERE c.responsible_sc_id = :screeningCentreId
+		AND c.deduction_reason IS NULL
+		AND c.date_of_death IS NULL
+		AND TRUNC (ss.surveillance_screen_due_date) <= TO_DATE(:sDueCountDate, 'DD/MM/YYYY')
+		AND ss.screening_status_id = 4006
+		AND c.date_of_death IS NULL
+		AND NOT EXISTS (
+			SELECT 1
+			FROM ep_subject_episode_t ep
+			WHERE ep.screening_subject_id = ss.screening_subject_id
+			AND ep.episode_status_id IN (11352, 11354)
+		)
+		ORDER BY TRUNC(ss.surveillance_screen_due_date)
+		FETCH FIRST 1 ROW ONLY
         """
-        bind_vars = {
-            "screeningCentreId": screening_centre_id,
-            "sDueCountDate": s_due_count_date,
+        parameters = {
+            "screeningCentreId": int(screening_centre_id),
+            "sDueCountDate": surveillance_due_count_date,
         }
-        df = self.oracle_db.execute_query(sql_query, bind_vars)
+        df = self.oracle_db.execute_query(query, parameters)
         if df.empty:
-            return None
+            raise ValueError("No early invite surveillance subjects found")
         return df["subject_nhs_number"].iloc[0]

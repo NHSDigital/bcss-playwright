@@ -1,6 +1,9 @@
 from enum import Enum
 from typing import Optional
 
+discharged_from_surveillance_string = "Discharged from Surveillance - GP Letter Printed"
+handover_into_symptomatic_care_string = "Handover into Symptomatic Care"
+
 
 class EventStatusType(Enum):
     """
@@ -145,7 +148,7 @@ class EventStatusType(Enum):
     A343 = (160158, "A343", "High-risk Adenoma")
     A344 = (160159, "A344", "Abnormal")
     A345 = (160153, "A345", "Cancer Result, Refer MDT")
-    A346 = (160163, "A346", "Handover into Symptomatic Care")
+    A346 = (160163, "A346", handover_into_symptomatic_care_string)
     A347 = (20074, "A347", "Refer to Symptomatic")
     A348 = (20075, "A348", "MDT Referral Required")
     A350 = (
@@ -193,7 +196,7 @@ class EventStatusType(Enum):
     A382 = (11553, "A382", "Handover into Symptomatic Care - GP Letter Printed")
     A383 = (20421, "A383", "Handover into Symptomatic Care - Patient Letter Printed")
     A384 = (20420, "A384", "Discharged from Screening - GP letter not required")
-    A385 = (20419, "A385", "Handover into Symptomatic Care")
+    A385 = (20419, "A385", handover_into_symptomatic_care_string)
     A389 = (
         305783,
         "A389",
@@ -1032,7 +1035,130 @@ class EventStatusType(Enum):
     U81 = (11283, "U81", "Kit Returned and Logged (Technical Fail; Weak Positive")
     U97 = (11284, "U97", "Weak Positive, Waiting for Screening Centre Assistance")
     U98 = (11285, "U98", "Weak Positive, Waiting for Programme Hub Assistance")
-    X500=(20100, "X500", "Selected For Surveillance")
+    X2 = (20346, "X2", "Surveillance appointment rescheduled")
+    X372 = (11554, "X372", "Handover into Symptomatic Care - GP Letter Printed")
+    X374 = (20085, "X374", "Handover into Symptomatic Care - Patient Letter Printed")
+    X376 = (20086, "X376", discharged_from_surveillance_string)
+    X377 = (20087, "X377", discharged_from_surveillance_string)
+    X379 = (20088, "X379", discharged_from_surveillance_string)
+    X380 = (20089, "X380", "Discharge from Screening and Surveillance - Patient Choice")
+    X381 = (
+        20090,
+        "X381",
+        "Discharge from Screening and Surveillance - No Patient Contact",
+    )
+    X382 = (
+        20091,
+        "X382",
+        "Discharge from Screening and Surveillance - Clinical Decision",
+    )
+    X384 = (
+        20183,
+        "X384",
+        "Discharged from Screening & Surveillance - GP Letter Not Required",
+    )
+    X386 = (20092, "X386", "Discharged from Surveillance - Patient Letter Printed")
+    X387 = (20093, "X387", "Discharged from Surveillance - Patient Letter Printed")
+    X389 = (20184, "X389", "Discharge from Surveillance - Clinical Decision")
+    X390 = (20094, "X390", "Discharge from Surveillance - Clinical Decision")
+    X391 = (20095, "X391", handover_into_symptomatic_care_string)
+    X392 = (20096, "X392", "Discharge from Surveillance - Patient Choice")
+    X394 = (20097, "X394", "Handover into Symptomatic Care - Patient Age")
+    X395 = (
+        20098,
+        "X395",
+        "Discharged from Surveillance - National Guidelines Return FOBT",
+    )
+    X398 = (20099, "X398", "Discharge from Surveillance - No Patient Contact")
+    X399 = (
+        200263,
+        "X399",
+        "Discharged  from Surveillance - National Guidelines Cease Screening",
+    )
+    X500 = (20100, "X500", "Selected For Surveillance")
+    X501 = (20101, "X501", "No Response to HealthCheck Form")
+    X505 = (20102, "X505", "HealthCheck Form Printed")
+    X510 = (20103, "X510", "Surveillance Reminder Printed")
+    X512 = (20104, "X512", "Patient Contact Resulted in Discharge from Surveillance")
+    X513 = (20196, "X513", "No Patient Contact - Discharge from Surveillance")
+    X600 = (20107, "X600", "Surveillance Appointment Required")
+    X610 = (20114, "X610", "Surveillance Appointment Made")
+    X615 = (20116, "X615", "Surveillance Appointment Invitation Letter Printed")
+    X617 = (20117, "X617", "Surveillance Appointment Cancelled by SC")
+    X620 = (20118, "X620", "Surveillance Appointment Cancelled by Patient")
+    X622 = (20122, "X622", "Surveillance Appointment Cancellation Letter Printed")
+    X625 = (20119, "X625", "Practitioner did not attend Surveillance Appointment")
+    X641 = (20120, "X641", "Patient did not attend Surveillance Appointment")
+    X650 = (20108, "X650", "Patient Attended Surveillance Appointment")
+    X76 = (20109, "X76", "Discharged from Surveillance & Screening - GP Letter Printed")
+    X77 = (20110, "X77", "Discharged from Surveillance & Screening - GP Letter Printed")
+    X79 = (20111, "X79", "Discharge from Surveillance & Screening - GP Letter Printed")
+    X86 = (
+        20112,
+        "X86",
+        "Discharged from Surveillance & Screening - Patient Letter Printed",
+    )
+    X87 = (
+        20113,
+        "X87",
+        "Discharged from Surveillance & Screening - Patient Letter Printed",
+    )
+    X89 = (
+        20185,
+        "X89",
+        "Discharge from Screening and Surveillance - Clinical Decision",
+    )
+    X9 = (20115, "X9", "Surveillance Appointment Cancelled Letters not Prepared")
+    X900 = (20237, "X900", "Surveillance Episode reopened")
+    X92 = (20188, "X92", "Close Surveillance Episode via interrupt")
+    Z1 = (
+        11289,
+        "Z1",
+        "Appointment Cancellation Requested by SC prior to Letter Preparation",
+    )
+    Z10 = (20344, "Z10", "Colonoscopy assessment appointment rescheduled")
+    Z11 = (20345, "Z11", "Post-Investigation appointment rescheduled")
+    Z12 = (
+        205221,
+        "Z12",
+        "Redirected Colonoscopy Assessment Appointment Cancellation Requested by SC prior to Preparation of Letters",
+    )
+    Z2 = (
+        11290,
+        "Z2",
+        "Appointment Cancellation Requested by SC (follows a DNA) prior to Letter Preparation",
+    )
+    Z3 = (
+        15006,
+        "Z3",
+        "Appointment Cancellation Requested by SC prior to Letter Preparation",
+    )
+    Z4 = (
+        15007,
+        "Z4",
+        "Appointment Cancellation Requested by SC (follows a DNA)  prior to Letter Preparation",
+    )
+    Z5 = (
+        15008,
+        "Z5",
+        "Appointment Cancellation Requested prior to Letter Preparation (Patient to Reschedule)",
+    )
+    Z6 = (
+        15009,
+        "Z6",
+        "Appointment Cancellation Requested (follows a DNA)  prior to Letter Preparation (Patient to Reschedule)",
+    )
+    Z7 = (
+        15010,
+        "Z7",
+        "Appointment Cancellation Requested prior to Letter Preparation (SC Non-attendance)",
+    )
+    Z8 = (
+        15011,
+        "Z8",
+        "Appointment Cancellation Requested (follows a DNA)  prior to Letter Preparation (SC Non-attendance)",
+    )
+    Z9 = (160174, "Z9", "Post-investigation Appointment Cancelled Letters not Prepared")
 
     def __init__(self, valid_value_id: int, allowed_value: str, description: str):
         """

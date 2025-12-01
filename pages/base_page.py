@@ -37,6 +37,9 @@ class BasePage:
         self.lynch_surveillance_page = self.page.get_by_role(
             "link", name="Lynch Surveillance"
         )
+        self.surveillance_page = self.page.get_by_role(
+            "link", name="Surveillance", exact=True
+        )
         self.organisations_page = self.page.get_by_role("link", name="Organisations")
         self.reports_page = self.page.get_by_role("link", name="Reports")
         self.screening_practitioner_appointments_page = self.page.get_by_role(
@@ -186,6 +189,10 @@ class BasePage:
     def go_to_lynch_surveillance_page(self) -> None:
         """Click the Base Page 'Lynch Surveillance' link."""
         self.click(self.lynch_surveillance_page)
+
+    def go_to_surveillance_page(self) -> None:
+        """Click the Base Page 'Surveillance' link."""
+        self.click(self.surveillance_page)
 
     def go_to_organisations_page(self) -> None:
         """Click the Base Page 'Organisations' link."""
