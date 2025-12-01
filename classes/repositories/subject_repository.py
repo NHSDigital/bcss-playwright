@@ -298,19 +298,19 @@ class SubjectRepository:
         FROM screening_subject_t ss
         INNER JOIN sd_contact_t c ON ss.subject_nhs_number = c.nhs_number
         WHERE c.responsible_sc_id = :screeningCentreId
-		AND c.deduction_reason IS NULL
-		AND c.date_of_death IS NULL
-		AND TRUNC (ss.surveillance_screen_due_date) <= TO_DATE(:sDueCountDate, 'DD/MM/YYYY')
-		AND ss.screening_status_id = 4006
-		AND c.date_of_death IS NULL
-		AND NOT EXISTS (
-			SELECT 1
-			FROM ep_subject_episode_t ep
-			WHERE ep.screening_subject_id = ss.screening_subject_id
-			AND ep.episode_status_id IN (11352, 11354)
-		)
-		ORDER BY TRUNC(ss.surveillance_screen_due_date)
-		FETCH FIRST 1 ROW ONLY
+        AND c.deduction_reason IS NULL
+        AND c.date_of_death IS NULL
+        AND TRUNC (ss.surveillance_screen_due_date) <= TO_DATE(:sDueCountDate, 'DD/MM/YYYY')
+        AND ss.screening_status_id = 4006
+        AND c.date_of_death IS NULL
+        AND NOT EXISTS (
+            SELECT 1
+            FROM ep_subject_episode_t ep
+            WHERE ep.screening_subject_id = ss.screening_subject_id
+            AND ep.episode_status_id IN (11352, 11354)
+        )
+        ORDER BY TRUNC(ss.surveillance_screen_due_date)
+        FETCH FIRST 1 ROW ONLY
         """
         parameters = {
             "screeningCentreId": int(screening_centre_id),
