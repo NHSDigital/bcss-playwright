@@ -20,6 +20,7 @@ class AppointmentDetailPage(BasePage):
         self.reason_for_cancellation_dropdown = self.page.get_by_label(
             "Reason for Cancellation"
         )
+        self.reschedule_radio_button = self.page.get_by_label("Reschedule")
 
     def check_attendance_radio(self) -> None:
         """Checks the attendance radio button."""
@@ -28,6 +29,10 @@ class AppointmentDetailPage(BasePage):
     def check_attended_check_box(self) -> None:
         """Checks the attended check box."""
         self.attended_check_box.check()
+
+    def click_reschedule_radio(self) -> None:
+        """Clicks the reschedule radio button"""
+        self.click(self.reschedule_radio_button)
 
     def click_calendar_button(self) -> None:
         """Clicks the calendar button."""

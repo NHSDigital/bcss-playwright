@@ -35,6 +35,7 @@ from utils.appointments import (
     AppointmentAttendance,
     book_post_investigation_appointment,
 )
+from utils.calendar_picker import CalendarPicker
 from utils.generate_health_check_forms_util import GenerateHealthCheckFormsUtil
 from utils.sspi_change_steps import SSPIChangeSteps
 from utils.user_tools import UserTools
@@ -42,7 +43,7 @@ from utils.subject_assertion import subject_assertion
 import logging
 from utils.batch_processing import batch_processing
 from pages.logout.log_out_page import LogoutPage
-from datetime import datetime
+from datetime import datetime, timedelta
 from classes.repositories.subject_repository import SubjectRepository
 from utils.oracle.oracle_specific_functions.organisation_parameters import (
     set_org_parameter_value,
@@ -92,58 +93,59 @@ def test_scenario_1(page: Page, general_properties: dict) -> None:
     > Process X382 letter batch > X79 > C203 (3.4)
     > Check recall [SSCL25a]
 
-    #"""
+    """
     # Given I log in to BCSS "England" as user role "Screening Centre Manager at BCS001"
     user_role = UserTools.user_login(
         page, "Screening Centre Manager at BCS001", return_role_type=True
     )
-    # if user_role is None:
-    #     raise ValueError("User cannot be assigned to a UserRoleType")
+    if user_role is None:
+        raise ValueError("User cannot be assigned to a UserRoleType")
 
-    # #    When I run surveillance invitations for 1 subject
+    #    When I run surveillance invitations for 1 subject
 
-    # nhs_no = GenerateHealthCheckFormsUtil(page).invite_surveillance_subjects_early(general_properties["eng_screening_centre_id"])
-    # # Then my subject has been updated as follows:
+    nhs_no = GenerateHealthCheckFormsUtil(page).invite_surveillance_subjects_early(
+        general_properties["eng_screening_centre_id"]
+    )
+    # Then my subject has been updated as follows:
 
-    # criteria = {
-    #     "latest episode status": "Open",
-    #     "latest episode type": "Surveillance",
-    #     "latest event status": "X500 Selected For Surveillance",
-    #     "responsible screening centre code": "User's screening centre",
-    #     "subject has unprocessed sspi updates": "No",
-    #     "subject has user dob updates": "No",
-    # }
+    criteria = {
+        "latest episode status": "Open",
+        "latest episode type": "Surveillance",
+        "latest event status": "X500 Selected For Surveillance",
+        "responsible screening centre code": "User's screening centre",
+        "subject has unprocessed sspi updates": "No",
+        "subject has user dob updates": "No",
+    }
 
-    # subject_assertion(nhs_no, criteria,user_role)
-    # # And there is a "X500" letter batch for my subject with the exact title "Surveillance Selection"
-    # SubjectRepository().there_is_letter_batch_for_subject(
-    #     nhs_no, "X500", "Surveillance Selection"
-    # )
-    # # Then Comment: NHS number    logging.info(f"Surveillance Scenario  NHS Number: {nhs_number}")
+    subject_assertion(nhs_no, criteria, user_role)
+    # And there is a "X500" letter batch for my subject with the exact title "Surveillance Selection"
+    SubjectRepository().there_is_letter_batch_for_subject(
+        nhs_no, "X500", "Surveillance Selection"
+    )
+    # Then Comment: NHS number    logging.info(f"Surveillance Scenario  NHS Number: {nhs_number}")
     # When I set the value of parameter 82 to "Y" for my organisation with immediate effect
-    # org_id = general_properties["eng_screening_centre_id"]
-    # set_org_parameter_value(82, "Y", org_id)
-    # # When I receive an SSPI update to change their date of birth to "72" years old
-    # SSPIChangeSteps().sspi_update_to_change_dob_received(nhs_no, 72)
-    # # Then my subject has been updated as follows:
-    # subject_assertion(nhs_no, {"subject age": "72"})
-    # # When I process the open "X500" letter batch for my subject
-    # batch_processing(
-    #     page,
-    #     batch_type="X500",
-    #     batch_description="Surveillance Selection",
-    # )
-    # # Then my subject has been updated as follows:
-    # subject_assertion(
-    #     nhs_no,
-    #     {
-    #         "latest event status": "X505 HealthCheck Form Printed",
-    #     },
-    # )
-    # UserTools.user_login(
-    #     page, "Screening Centre Manager at BCS001", return_role_type=True
-    # )
-    nhs_no = "9712072282"
+    org_id = general_properties["eng_screening_centre_id"]
+    set_org_parameter_value(82, "Y", org_id)
+    # When I receive an SSPI update to change their date of birth to "72" years old
+    SSPIChangeSteps().sspi_update_to_change_dob_received(nhs_no, 72)
+    # Then my subject has been updated as follows:
+    subject_assertion(nhs_no, {"subject age": "72"})
+    # When I process the open "X500" letter batch for my subject
+    batch_processing(
+        page,
+        batch_type="X500",
+        batch_description="Surveillance Selection",
+    )
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "X505 HealthCheck Form Printed",
+        },
+    )
+    UserTools.user_login(
+        page, "Screening Centre Manager at BCS001", return_role_type=True
+    )
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     # And I select the advance episode option for "Record Contact with Patient"
@@ -217,12 +219,7 @@ def test_scenario_1(page: Page, general_properties: dict) -> None:
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
     # And I view the event history for the subject's latest episode
-    SubjectScreeningSummaryPage(page).expand_episodes_list()
-    SubjectScreeningSummaryPage(page).click_first_surveillance_epsiode_link()
-
     # And I view the latest practitioner appointment in the subject's episode
-    EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
-
     # And the subject DNAs the practitioner appointment
     AppointmentAttendance(page).mark_as_dna("Patient did not attend")
 
@@ -326,7 +323,9 @@ def test_scenario_1(page: Page, general_properties: dict) -> None:
     # Then I "cannot" postpone the subject's surveillance episode
     SubjectScreeningSummaryPage(page).can_postpone_surveillance_episode(False)
     # When I process the open "X390" letter batch for my subject
-    batch_processing(page, "X390", "Discharge from Surveillance - Clinical Decision")
+    batch_processing(
+        page, "X390", "Discharge from surveillance - Clinical (letter to GP)"
+    )
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -416,9 +415,15 @@ def test_scenario_1(page: Page, general_properties: dict) -> None:
     # And I choose to book a practitioner clinic for my subject
     SubjectScreeningSummaryPage(page=page).click_book_practitioner_clinic_button()
 
-    # And I set the practitioner appointment date to "tomorrow"--recheck this, we dont have anything for tomorrow
+    # And I set the practitioner appointment date to "tomorrow"
     # And I book the earliest available post investigation appointment on this date
-    book_post_investigation_appointment(page, "The Royal Hospital (Wolverhampton)")
+
+    tomorrow = datetime.today() + timedelta(days=1)
+    book_post_investigation_appointment(
+        page,
+        "The Royal Hospital (Wolverhampton)",
+        appointment_date=tomorrow,
+    )
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -441,7 +446,11 @@ def test_scenario_1(page: Page, general_properties: dict) -> None:
     EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
 
     # And the Screening Centre reschedules the surveillance practitioner appointment to "today"-recheck this
-    AppointmentDetailPage(page).mark_appointment_as_attended(datetime.today())
+    AppointmentDetailPage(page).click_reschedule_radio()
+    AppointmentDetailPage(page).click_calendar_button()
+    CalendarPicker(page).v2_calendar_picker(datetime.today())
+    book_post_investigation_appointment(page, "The Royal Hospital (Wolverhampton)")
+
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
