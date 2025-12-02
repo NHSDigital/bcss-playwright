@@ -143,9 +143,6 @@ def test_scenario_1(page: Page, general_properties: dict) -> None:
             "latest event status": "X505 HealthCheck Form Printed",
         },
     )
-    UserTools.user_login(
-        page, "Screening Centre Manager at BCS001", return_role_type=True
-    )
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     # And I select the advance episode option for "Record Contact with Patient"
