@@ -49,14 +49,12 @@ from utils.oracle.oracle_specific_functions.organisation_parameters import (
     set_org_parameter_value,
 )
 
-
-@pytest.mark.wip
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.survelliance_regression_tests
 def test_scenario_1(page: Page, general_properties: dict) -> None:
     """
-        Scenario: 1: Discharge for clinical decision (GP letter required)
+    Scenario: 1: Discharge for clinical decision (GP letter required)
 
     X500-X505-X600-X610-X615-X641-X600-X610-X615-X650-X390-X379-C203 [SSCL28b] X900-X600-X610-X2-X610-X615-X650-X382-X79-C203 [SSCL25a]
 
@@ -67,7 +65,7 @@ def test_scenario_1(page: Page, general_properties: dict) -> None:
     Note: parameter 82 controls whether or not a GP letter is required when a patient is discharged from Surveillance as a result of a clinical decision.  It actually defaults to Y, but it's set at SC level in the scenario to be sure it holds the correct value.  As a parameter can't be set with immediate effect through the screens, the scenario uses a direct database update to do this.
 
 
-        Scenario summary:
+    Scenario summary:
     >Run surveillance invitations for 1 subject > X500 (3.1)
     > SSPI update changes subject to in-age
     > Process X500 letter batch > X505 (3.1)
