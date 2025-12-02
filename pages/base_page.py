@@ -127,7 +127,7 @@ class BasePage:
 
     def click_surveillance_link(self) -> None:
         """Click the Surveillance Page link."""
-        self.click(self.surveillance)    
+        self.click(self.surveillance)
 
     def bowel_cancer_screening_system_header_is_displayed(self) -> None:
         """Asserts that the Bowel Cancer Screening System header is displayed."""

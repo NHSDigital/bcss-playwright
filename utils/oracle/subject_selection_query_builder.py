@@ -468,7 +468,7 @@ class SubjectSelectionQueryBuilder:
             case SubjectSelectionCriteriaKey.LATEST_EPISODE_SUB_TYPE:
                 self._add_criteria_latest_episode_sub_type()
             case SubjectSelectionCriteriaKey.LATEST_EPISODE_STATUS:
-                self._add_criteria_latest_episode_status()				   
+                self._add_criteria_latest_episode_status()
 
             case SubjectSelectionCriteriaKey.LATEST_EPISODE_STATUS_REASON:
                 self._add_criteria_latest_episode_status_reason()
@@ -718,7 +718,7 @@ class SubjectSelectionQueryBuilder:
                 self._add_extra_column_to_select_statement()
             case SubjectSelectionCriteriaKey.ADD_JOIN_TO_FROM_STATEMENT:
                 self._add_extra_join_to_from_statement()
-            
+
             # ------------------------------------------------------------------------
             # 🛑 Fallback: Unmatched Criteria Key
             # ------------------------------------------------------------------------
@@ -2981,7 +2981,9 @@ class SubjectSelectionQueryBuilder:
                     | SubjectScreeningCentreCode.USER_ORGANISATION
                 ):
                     if user.organisation is None or user.organisation.code is None:
-                        raise ValueError("User organisation or organisation_code is None")
+                        raise ValueError(
+                            "User organisation or organisation_code is None"
+                        )
                     sc_code = user.organisation.code
                 case _:
                     raise SelectionBuilderException(
