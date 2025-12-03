@@ -49,6 +49,7 @@ from utils.oracle.oracle_specific_functions.organisation_parameters import (
     set_org_parameter_value,
 )
 
+
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.survelliance_regression_tests
@@ -121,7 +122,7 @@ def test_scenario_1(page: Page, general_properties: dict) -> None:
     SubjectRepository().there_is_letter_batch_for_subject(
         nhs_no, "X500", "Surveillance Selection"
     )
-    
+
     # When I set the value of parameter 82 to "Y" for my organisation with immediate effect
     org_id = general_properties["eng_screening_centre_id"]
     set_org_parameter_value(82, "Y", org_id)
