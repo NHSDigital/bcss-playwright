@@ -104,6 +104,7 @@ def test_scenario_1(page: Page, general_properties: dict) -> None:
     nhs_no = GenerateHealthCheckFormsUtil(page).invite_surveillance_subjects_early(
         general_properties["eng_screening_centre_id"]
     )
+    logging.info(f"[SUBJECT RETRIEVAL] Subject's NHS Number: {nhs_no}")
     # Then my subject has been updated as follows:
 
     criteria = {
@@ -120,7 +121,7 @@ def test_scenario_1(page: Page, general_properties: dict) -> None:
     SubjectRepository().there_is_letter_batch_for_subject(
         nhs_no, "X500", "Surveillance Selection"
     )
-    # Then Comment: NHS number    logging.info(f"Surveillance Scenario  NHS Number: {nhs_number}")
+    
     # When I set the value of parameter 82 to "Y" for my organisation with immediate effect
     org_id = general_properties["eng_screening_centre_id"]
     set_org_parameter_value(82, "Y", org_id)
