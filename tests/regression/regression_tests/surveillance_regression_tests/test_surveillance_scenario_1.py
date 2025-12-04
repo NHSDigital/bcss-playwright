@@ -2,7 +2,6 @@ import pytest
 from playwright.sync_api import Page
 from sqlalchemy import false
 from classes.repositories.subject_repository import SubjectRepository
-from classes.subject import subject
 from conftest import general_properties
 from pages.base_page import BasePage
 from pages.screening_practitioner_appointments.appointment_detail_page import (

@@ -133,7 +133,7 @@ def book_appointments(page: Page, screening_centre: str, site: str) -> None:
 
 
 def book_post_investigation_appointment(
-    page: Page, site: str, appointment_date= datetime.today()
+    page: Page, site: str, appointment_date:datetime=datetime.today()
 ) -> None:
     """
     Book a post-investigation appointment for a subject.
