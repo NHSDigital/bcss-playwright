@@ -341,7 +341,7 @@ class SubjectScreeningSummaryPage(BasePage):
 
     def click_view_events_link(self) -> None:
         """Click on the 'View Events' link."""
-        self.click(self.view_events_link)
+        self.click(self.view_events_link.first)
 
     def assert_view_letter_links_for_event(
         self, event_name: str, expected_count: int

@@ -133,18 +133,18 @@ def book_appointments(page: Page, screening_centre: str, site: str) -> None:
 
 
 def book_post_investigation_appointment(
-    page: Page,
-    site: str,
+    page: Page, site: str, appointment_date:datetime=datetime.today()
 ) -> None:
     """
     Book a post-investigation appointment for a subject.
-    Sets the appointment date to today and the start time to '08:00'.
+    If appointment_date is not provided, sets the appointment date to today and the start time to '08:00'.
     If a dialog about overlapping appointments is triggered, increases the start time by 15 minutes and retries.
     If all times for a practitioner are exhausted, tries the next practitioner.
     Loops until a successful booking or all practitioners are exhausted.
     Args:
         page (Page): The Playwright page object.
         site (str): The name of the site.
+        appointment_date (datetime, optional): The appointment date. Defaults to today.
     """
     book_appointments_page = BookAppointmentPage(page)
     book_appointments_page.select_site_dropdown_option(
@@ -166,7 +166,7 @@ def book_post_investigation_appointment(
         book_appointments_page.select_screening_practitioner_dropdown_option(
             screening_practitioner_index
         )
-        book_appointments_page.enter_appointment_date(datetime.today())
+        book_appointments_page.enter_appointment_date(appointment_date)
 
         hour, minute = map(int, appointment_start_time.split(":"))
 

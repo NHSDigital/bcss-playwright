@@ -718,6 +718,7 @@ class SubjectSelectionQueryBuilder:
                 self._add_extra_column_to_select_statement()
             case SubjectSelectionCriteriaKey.ADD_JOIN_TO_FROM_STATEMENT:
                 self._add_extra_join_to_from_statement()
+
             # ------------------------------------------------------------------------
             # 🛑 Fallback: Unmatched Criteria Key
             # ------------------------------------------------------------------------
