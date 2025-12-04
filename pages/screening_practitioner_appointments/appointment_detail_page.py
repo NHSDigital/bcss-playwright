@@ -84,9 +84,12 @@ class AppointmentDetailPage(BasePage):
         Selects the reason for cancellation from the dropdown.
         Args:
             option: The reason for cancellation to select.
-            The options are in the ReasonForCancellationOptions class
+            The options are in the ReasonForCancellationOptions class or can be the string value.
         """
-        self.reason_for_cancellation_dropdown.select_option(value=option)
+        if option in ReasonForCancellationOptions._value2member_map_:
+            self.reason_for_cancellation_dropdown.select_option(value=option)
+        else:
+            self.reason_for_cancellation_dropdown.select_option(label=option)
 
     def mark_appointment_as_attended(self, date: datetime) -> None:
         """
