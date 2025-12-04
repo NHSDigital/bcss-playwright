@@ -1,4 +1,3 @@
-import pytest
 from playwright.sync_api import Page
 from pages.base_page import BasePage
 from pages.surveillance.surveillance_page import SurveillancePage
@@ -28,11 +27,15 @@ class GenerateHealthCheckFormsUtil:
         surveillance_due_count_date = ProduceHealthCheckFormsPage(
             self.page
         ).return_surveillance_due_count_date_value()
-        nhs_no = self.find_early_invite_subjects(screening_centre_id, surveillance_due_count_date)
+        nhs_no = self.find_early_invite_subjects(
+            screening_centre_id, surveillance_due_count_date
+        )
         ProduceHealthCheckFormsPage(self.page).click_generate_healthcheck_forms_button()
         return nhs_no
 
-    def find_early_invite_subjects(self, screening_centre_id: str, surveillance_due_count_date: str) -> str:
+    def find_early_invite_subjects(
+        self, screening_centre_id: str, surveillance_due_count_date: str
+    ) -> str:
         """
         Find an early invite subject for surveillance based on the surveillance due count date.
         Args:

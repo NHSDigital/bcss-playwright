@@ -114,7 +114,7 @@ class AdvanceEpisodePage(BasePage):
             "button",
             name="Refer Another Diagnostic Test after return from Symptomatic Referral",
         )
-        self.refer_to_survelliance_after_symptomatic_referral_button = (
+        self.refer_to_surveillance_after_symptomatic_referral_button = (
             self.page.get_by_role(
                 "button", name="Refer to Surveillance after Symptomatic Referral"
             )
@@ -463,12 +463,12 @@ class AdvanceEpisodePage(BasePage):
         """Click the 'LNPCP Result from Symptomatic Procedure' button."""
         self.safe_accept_dialog(self.lnpcp_result_from_symptomatic_procedure_button)
 
-    def click_refer_to_survelliance_after_symptomatic_referral_button(
+    def click_refer_to_surveillance_after_symptomatic_referral_button(
         self,
     ) -> None:
         """Click the 'Refer to Surveillance after Symptomatic Referral' button."""
         self.safe_accept_dialog(
-            self.refer_to_survelliance_after_symptomatic_referral_button
+            self.refer_to_surveillance_after_symptomatic_referral_button
         )
 
     def click_redirect_to_rerecord_the_outcome_of_symptomatic_referral_button(
