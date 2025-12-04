@@ -2981,9 +2981,7 @@ class SubjectSelectionQueryBuilder:
                     | SubjectScreeningCentreCode.USER_ORGANISATION
                 ):
                     if user.organisation is None or user.organisation.code is None:
-                        raise ValueError(
-                            "User organisation or organisation_code is None"
-                        )
+                        raise ValueError("User organisation or organisation_code is None")
                     sc_code = user.organisation.code
                 case _:
                     raise SelectionBuilderException(

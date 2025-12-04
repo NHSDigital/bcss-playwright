@@ -819,7 +819,7 @@ def test_scenario_14(page: Page) -> None:
 
     AdvanceFOBTScreeningEpisodePage(
         page
-    ).click_refer_to_survelliance_after_symptomatic_referral_button()
+    ).click_refer_to_surveillance_after_symptomatic_referral_button()
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -1009,7 +1009,7 @@ def test_scenario_14(page: Page) -> None:
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
     AdvanceFOBTScreeningEpisodePage(
         page
-    ).click_refer_to_survelliance_after_symptomatic_referral_button()
+    ).click_refer_to_surveillance_after_symptomatic_referral_button()
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
@@ -1084,7 +1084,7 @@ def test_scenario_14(page: Page) -> None:
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
     AdvanceFOBTScreeningEpisodePage(
         page
-    ).click_refer_to_survelliance_after_symptomatic_referral_button()
+    ).click_refer_to_surveillance_after_symptomatic_referral_button()
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,

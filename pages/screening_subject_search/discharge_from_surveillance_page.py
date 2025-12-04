@@ -1,4 +1,4 @@
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 from pages.base_page import BasePage
 from datetime import datetime
 from utils.calendar_picker import CalendarPicker
@@ -22,7 +22,7 @@ class DischargeFromSurveillancePage(BasePage):
         self.notes_field = self.page.locator("#UI_NOTES")
         self.save_button = self.page.get_by_role("button", name="Save")
 
-    def enter_date_decition_made(self, date: datetime) -> None:
+    def enter_date_decision_made(self, date: datetime) -> None:
         """
         Enter a date into the 'Date Decision Made' field
         Args:
@@ -73,9 +73,9 @@ class DischargeFromSurveillancePage(BasePage):
         """
         Completes the discharge from surveillance form.
         Args:
-            include_screening_consultant (bool): Wether or not to include a screening consultant in the form
+            include_screening_consultant (bool): Whether or not to include a screening consultant in the form
         """
-        self.enter_date_decition_made(datetime.today())
+        self.enter_date_decision_made(datetime.today())
         if include_screening_consultant:
             self.select_screening_consultant_from_index(-1)
         self.select_screening_pracitioner_from_index(1)

@@ -139,7 +139,7 @@ def test_scenario_2(page: Page, general_properties: dict) -> None:
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
     # And I choose to book a practitioner clinic for my subject
-    SubjectScreeningSummaryPage(page=page).click_book_practitioner_clinic_button()
+    SubjectScreeningSummaryPage(page).click_book_practitioner_clinic_button()
 
     # And I set the practitioner appointment date to "today"
     # And I book the earliest available post investigation appointment on this date
@@ -157,13 +157,6 @@ def test_scenario_2(page: Page, general_properties: dict) -> None:
     SubjectRepository().there_is_letter_batch_for_subject(
         nhs_no, "X610", "Surveillance Appointment Invitation Letter", True
     )
-
-    # When I switch users to BCSS "England" as user role "Screening Centre Manager"
-    LogoutPage(page).log_out(close_page=False)
-    BasePage(page).go_to_log_in_page()
-    user_role = UserTools.user_login(page, "Screening Centre Manager at BCS001", True)
-    if user_role is None:
-        raise ValueError("The current user cannot be assigned a user role")
 
     # And I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
