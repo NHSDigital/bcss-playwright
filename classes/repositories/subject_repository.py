@@ -1,4 +1,3 @@
-from ast import Str
 import logging
 from typing import Optional
 from classes.subject.pi_subject import PISubject

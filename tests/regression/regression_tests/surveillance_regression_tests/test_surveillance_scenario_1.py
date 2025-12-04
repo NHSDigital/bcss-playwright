@@ -2,6 +2,7 @@ import pytest
 from playwright.sync_api import Page
 from sqlalchemy import false
 from classes.repositories.subject_repository import SubjectRepository
+from classes.subject import subject
 from conftest import general_properties
 from pages.base_page import BasePage
 from pages.screening_practitioner_appointments.appointment_detail_page import (
@@ -274,6 +275,7 @@ def test_scenario_1(page: Page, general_properties: dict) -> None:
             "latest event status": "X615 Surveillance Appointment Invitation Letter Printed",
         },
     )
+
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
@@ -391,7 +393,6 @@ def test_scenario_1(page: Page, general_properties: dict) -> None:
         "surveillance due date reason": "Reopened episode",
     }
     subject_assertion(nhs_no, criteria)
-
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
@@ -442,7 +443,8 @@ def test_scenario_1(page: Page, general_properties: dict) -> None:
     # And I view the latest practitioner appointment in the subject's episode
     EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
 
-    # And the Screening Centre reschedules the surveillance practitioner appointment to "today"-recheck this
+    # And the Screening Centre reschedules the surveillance practitioner appointment to "today"
+
     AppointmentDetailPage(page).click_reschedule_radio()
     AppointmentDetailPage(page).click_calendar_button()
     CalendarPicker(page).v2_calendar_picker(datetime.today())
@@ -457,6 +459,7 @@ def test_scenario_1(page: Page, general_properties: dict) -> None:
         },
     )
     # And there is a "X610" letter batch for my subject with the exact title "Surveillance Appointment Invitation Letter"
+
     SubjectRepository().there_is_letter_batch_for_subject(
         nhs_no, "X610", "Surveillance Appointment Invitation Letter"
     )

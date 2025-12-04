@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 from playwright.sync_api import Page
 from pages.base_page import BasePage
 from pages.logout.log_out_page import LogoutPage
@@ -134,7 +133,7 @@ def book_appointments(page: Page, screening_centre: str, site: str) -> None:
 
 
 def book_post_investigation_appointment(
-    page: Page, site: str, appointment_date: Optional[datetime] = None
+    page: Page, site: str, appointment_date= datetime.today()
 ) -> None:
     """
     Book a post-investigation appointment for a subject.
@@ -147,8 +146,6 @@ def book_post_investigation_appointment(
         site (str): The name of the site.
         appointment_date (datetime, optional): The appointment date. Defaults to today.
     """
-    if appointment_date is None:
-        appointment_date = datetime.today()
     book_appointments_page = BookAppointmentPage(page)
     book_appointments_page.select_site_dropdown_option(
         [
