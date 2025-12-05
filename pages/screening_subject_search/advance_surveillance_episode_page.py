@@ -24,6 +24,10 @@ class AdvanceSurveillanceEpisodePage(AdvanceEpisodePage):
         self.book_surveillance_appointment_button = self.page.get_by_role(
             "button", name="Book Surveillance Appointment"
         )
+        self.discharge_from_surveillance_patient_choice_button = self.page.get_by_role(
+            "button",
+            name="Discharge from Surveillance - Patient Choice",
+        )
 
     def click_discharge_from_surveillance_clinical_decision_button(self) -> None:
         """Click on the 'Discharge from Surveillance - Clinical Decision' button."""
@@ -41,3 +45,9 @@ class AdvanceSurveillanceEpisodePage(AdvanceEpisodePage):
         """Click on the 'Book Surveillance Appointment' button."""
         self.safe_accept_dialog(self.book_surveillance_appointment_button)
         self.page.wait_for_timeout(500)  # Timeout to allow subject to update on the DB.
+
+    def click_discharge_from_surveillance_patient_choice_button(
+        self,
+    ) -> None:
+        """Click on the 'Discharge from Surveillance - Patient Choice' button."""
+        self.click(self.discharge_from_surveillance_patient_choice_button)
