@@ -86,6 +86,8 @@ class ContactWithPatientPage(BasePage):
             - 'Suitable for Radiological Test'
             - 'Close Episode - Patient Choice'
             - 'SSP Appointment Required'
+            - 'Discharge from Surveillance - No Contact'
+            -'No outcome'
         """
         self.outcome_dropdown.select_option(label=outcome)
 
@@ -129,6 +131,9 @@ class ContactWithPatientPage(BasePage):
                 - 'Close Episode - Patient Choice'
                 - 'SSP Appointment Required'
                 - 'Close Episode with Existing result'
+                - 'Discharge from Surveillance - No Contact'
+                - 'No outcome'
+
             patient_contacted (str): Indicates if the patient was contacted. Default is 'Yes'. Options include:
                 - 'Yes'
                 - 'No'
