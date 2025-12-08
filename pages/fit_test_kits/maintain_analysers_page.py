@@ -1,4 +1,4 @@
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 from pages.base_page import BasePage
 
 
@@ -9,6 +9,10 @@ class MaintainAnalysersPage(BasePage):
         super().__init__(page)
         self.page = page
         # Maintain Analysers - page locators, methods
+        self.analysers_table = page.locator("#analyserTableDiv")
+        self.create_new_analyser_button = page.get_by_role(
+            "button", name="Create New Analyser"
+        )
 
     def verify_maintain_analysers_title(self) -> None:
         """Verify the Maintain Analysers page title is displayed correctly."""
