@@ -640,6 +640,6 @@ def test_scenario_5(page: Page, general_properties: dict) -> None:
         "surveillance due date reason": "Discharge from Surveillance - Cannot Contact Patient",
     }
     subject_assertion(nhs_no, criteria)
-    
+
     # When I log out
     LogoutPage(page).log_out()
