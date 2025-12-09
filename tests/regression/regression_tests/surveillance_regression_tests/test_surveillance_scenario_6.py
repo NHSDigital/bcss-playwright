@@ -20,11 +20,10 @@ from utils.subject_assertion import subject_assertion
 from utils.user_tools import UserTools
 
 
-@pytest.mark.wip
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.surveillance_regression_tests
-def test_scenario_4(page: Page, general_properties: dict) -> None:
+def test_scenario_6(page: Page, general_properties: dict) -> None:
     """
     Scenario: 6: Discharge over-age patient for no contact
 
