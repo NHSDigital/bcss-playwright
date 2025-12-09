@@ -52,7 +52,7 @@ from utils.oracle.oracle_specific_functions.organisation_parameters import (
 
 @pytest.mark.vpn_required
 @pytest.mark.regression
-@pytest.mark.survelliance_regression_tests
+@pytest.mark.surveillance_regression_tests
 def test_scenario_1(page: Page, general_properties: dict) -> None:
     """
     Scenario: 1: Discharge for clinical decision (GP letter required)

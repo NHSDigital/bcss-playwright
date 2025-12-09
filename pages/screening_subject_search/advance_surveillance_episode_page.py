@@ -27,6 +27,12 @@ class AdvanceSurveillanceEpisodePage(AdvanceEpisodePage):
                 name="Discharge from Screening and Surveillance - Patient Choice",
             )
         )
+        self.discharge_from_screening_and_surveillance_no_patient_contact_button = (
+            self.page.get_by_role(
+                "button",
+                name="Discharge from Screening and Surveillance - No Patient Contact",
+            )
+        )
 
         self.book_surveillance_appointment_button = self.page.get_by_role(
             "button", name="Book Surveillance Appointment"
@@ -53,6 +59,14 @@ class AdvanceSurveillanceEpisodePage(AdvanceEpisodePage):
     ) -> None:
         """Click on the 'Discharge from Screening and Surveillance - Patient Choice' button."""
         self.click(self.discharge_from_screening_and_surveillance_patient_choice_button)
+
+    def click_discharge_from_screening_and_surveillance_no_patient_contact_button(
+        self,
+    ) -> None:
+        """Click on the 'Discharge from Screening and Surveillance - No Patient Contact' button."""
+        self.click(
+            self.discharge_from_screening_and_surveillance_no_patient_contact_button
+        )
 
     def click_book_surveillance_appointment_button(self) -> None:
         """Click on the 'Book Surveillance Appointment' button."""
