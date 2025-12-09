@@ -1,4 +1,4 @@
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page, expect, Locator
 from pages.base_page import BasePage
 
 
@@ -24,20 +24,36 @@ class SubjectDatasetsPage(BasePage):
         self.add_link = self.page.get_by_role("link", name="Add")
 
     def click_add_link(self) -> None:
-        """Clicks on the 'Add' link on the Subject Datasets Page."""
-        self.click(self.add_link)
+        """Clicks on the first 'Add' link on the Subject Datasets Page."""
+        self.click(self.add_link.first)
 
     def click_colonoscopy_show_datasets(self) -> None:
-        """Clicks on the 'Show Dataset' button for the Colonoscopy Assessment row on the Subject Datasets Page."""
-        self.click(self.colonoscopy_show_dataset_button)
+        """
+        Clicks on the 'Show Dataset(s)' button for the Colonoscopy Assessment row on the Subject Datasets Page.
+        If the button text is "Show Datasets", also clicks the first 'Add' link.
+        """
+        # Find the DatasetHeader div with Colonoscopy Assessment
+        header = self.page.locator(
+            "div.DatasetHeader h4:has-text('Colonoscopy Assessment')"
+        )
+        self.click_show_datasets_button(header)
 
     def click_investigation_show_datasets(self) -> None:
         """
         Clicks on the 'Show Dataset(s)' link for the Investigation row on the Subject Datasets Page.
-        If the button text is "Show Datasets", also clicks the 'Add' link.
+        If the button text is "Show Datasets", also clicks the first 'Add' link.
         """
         # Find the DatasetHeader div with Investigation
         header = self.page.locator("div.DatasetHeader h4:has-text('Investigation')")
+        self.click_show_datasets_button(header)
+
+    def click_show_datasets_button(self, header: Locator) -> None:
+        """
+        Clicks on the 'Show Dataset(s)' link for the specified header.
+        If the button text is "Show Datasets", also clicks the first 'Add' link.
+        Args:
+            header (Locator): The Locator for the DatasetHeader h4 element.
+        """
         header.wait_for(state="visible", timeout=10000)
         # Get the dataset count text from the span inside the h4
         dataset_count_text = header.locator("span.DatasetSubLabel").text_content()
@@ -49,7 +65,7 @@ class SubjectDatasetsPage(BasePage):
         show_link.wait_for(state="visible", timeout=10000)
         self.click(show_link)
         # If plural, also click Add
-        if dataset_count_text and "2 Datasets" in dataset_count_text:
+        if dataset_count_text and "Datasets" in dataset_count_text:
             self.click_add_link()
 
     def check_investigation_dataset_complete(self) -> None:
