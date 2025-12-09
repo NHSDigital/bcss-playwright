@@ -32,7 +32,7 @@ class SubjectDatasetsPage(BasePage):
         Clicks on the 'Show Dataset(s)' button for the Colonoscopy Assessment row on the Subject Datasets Page.
         If the button text is "Show Datasets", also clicks the first 'Add' link.
         """
-        # Find the DatasetHeader div with Investigation
+        # Find the DatasetHeader div with Colonoscopy Assessment
         header = self.page.locator(
             "div.DatasetHeader h4:has-text('Colonoscopy Assessment')"
         )
