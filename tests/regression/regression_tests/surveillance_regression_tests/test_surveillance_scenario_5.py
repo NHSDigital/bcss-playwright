@@ -23,13 +23,9 @@ from pages.screening_subject_search.diagnostic_test_outcome_page import (
     DiagnosticTestOutcomePage,
     OutcomeOfDiagnosticTest,
 )
-from pages.screening_subject_search.episode_events_and_notes_page import (
-    EpisodeEventsAndNotesPage,
-)
 from pages.screening_subject_search.reopen_episode_page import ReopenEpisodePage
 from utils.appointments import (
     AppointmentAttendance,
-    book_appointments,
     book_post_investigation_appointment,
 )
 from utils.calendar_picker import CalendarPicker
@@ -62,13 +58,12 @@ from pages.screening_subject_search.discharge_from_surveillance_page import (
 from utils.sspi_change_steps import SSPIChangeSteps
 
 
-@pytest.mark.wip
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.surveillance_regression_tests
 def test_scenario_5(page: Page, general_properties: dict) -> None:
     """
-        Discharge below/in-age patient for no contact
+        Scenario: 5:Discharge below/in-age patient for no contact
 
         X500-X505-A99-A59-A259-A315-A361-A323-A317-A318-A380-X513-X398-X387-X377-C203 [SSCL27b] X900-X600-X615-X625-X398-X387-X377-C203 [SSCL27a]
 
@@ -136,6 +131,7 @@ def test_scenario_5(page: Page, general_properties: dict) -> None:
         },
         user_role,
     )
+
     # When I receive an SSPI update to change their date of birth to "62" years old
     SSPIChangeSteps().sspi_update_to_change_dob_received(nhs_no, 62)
 
@@ -175,6 +171,7 @@ def test_scenario_5(page: Page, general_properties: dict) -> None:
 
     # And I record contact with the subject with outcome "Suitable for Endoscopic Test"
     ContactWithPatientPage(page).record_contact("Suitable for Endoscopic Test")
+
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
@@ -422,6 +419,7 @@ def test_scenario_5(page: Page, general_properties: dict) -> None:
         "X398",
         "Discharge from surveillance - no contact (letter to patient)",
     )
+
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
@@ -429,6 +427,7 @@ def test_scenario_5(page: Page, general_properties: dict) -> None:
             "latest event status": "X387 Discharged from Surveillance - Patient Letter Printed"
         },
     )
+
     # And there is a "X387" letter batch for my subject with the exact title "Discharge from surveillance - no contact (letter to GP)"
     # When I process the open "X387" letter batch for my subject
     batch_processing(
@@ -467,11 +466,13 @@ def test_scenario_5(page: Page, general_properties: dict) -> None:
         "surveillance due date reason": "Discharge from Surveillance - Cannot Contact Patient",
     }
     subject_assertion(nhs_no, criteria)
+
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     # And I reopen the subject's episode for "Reopen due to subject or patient decision"
     SubjectScreeningSummaryPage(page).click_reopen_surveillance_episode_button()
     ReopenEpisodePage(page).click_reopen_due_to_subject_or_patient_decision()
+
     # Then my subject has been updated as follows:
     criteria = {
         "calculated fobt due date": "Null",
@@ -503,20 +504,25 @@ def test_scenario_5(page: Page, general_properties: dict) -> None:
         "surveillance due date reason": "Reopened episode",
     }
     subject_assertion(nhs_no, criteria)
+
     # When I receive an SSPI update to change their date of birth to "43" years old
     SSPIChangeSteps().sspi_update_to_change_dob_received(nhs_no, 43)
+
     # Then my subject has been updated as follows:
     subject_assertion(nhs_no, {"subject age": "43"})
+
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     # And I advance the subject's episode for "Book Surveillance Appointment"
     SubjectScreeningSummaryPage(page).click_advance_surveillance_episode_button()
     AdvanceSurveillanceEpisodePage(page).click_book_surveillance_appointment_button()
+
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
         {"latest event status": "X600 Surveillance Appointment Invited"},
     )
+
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     # And I choose to book a practitioner clinic for my subject
@@ -525,11 +531,13 @@ def test_scenario_5(page: Page, general_properties: dict) -> None:
     # And I set the practitioner appointment date to "today"
     # And I book the earliest available post investigation appointment on this date
     book_post_investigation_appointment(page, "The Royal Hospital (Wolverhampton)")
+
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
         {"latest event status": "X610 Surveillance Appointment Made"},
     )
+
     # And there is a "X610" letter batch for my subject with the exact title "Surveillance Appointment Invitation Letter"
     # When I process the open "X610" letter batch for my subject
     batch_processing(
@@ -537,6 +545,7 @@ def test_scenario_5(page: Page, general_properties: dict) -> None:
         "X610",
         "Surveillance Appointment Invitation Letter",
     )
+
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
@@ -544,12 +553,14 @@ def test_scenario_5(page: Page, general_properties: dict) -> None:
             "latest event status": "X615 Surveillance Appointment Invitation Letter Printed "
         },
     )
+
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     # And I view the event history for the subject's latest episode
     # And I view the latest practitioner appointment in the subject's episode
     # And the practitioner DNAs the practitioner appointment
     AppointmentAttendance(page).mark_as_dna("Practitioner did not attend")
+
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
@@ -557,6 +568,7 @@ def test_scenario_5(page: Page, general_properties: dict) -> None:
             "latest event status": "X625 Practitioner did not attend Surveillance Appointment"
         },
     )
+
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     # And I select the advance episode option for "Discharge from Surveillance - No Patient Contact"
@@ -581,6 +593,7 @@ def test_scenario_5(page: Page, general_properties: dict) -> None:
         "X398",
         "Discharge from surveillance - no contact (letter to patient)",
     )
+
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
@@ -588,6 +601,7 @@ def test_scenario_5(page: Page, general_properties: dict) -> None:
             "latest event status": "X387 Discharged from Surveillance - Patient Letter Printed"
         },
     )
+
     # And there is a "X387" letter batch for my subject with the exact title "Discharge from surveillance - no contact (letter to GP)"
     # When I process the open "X387" letter batch for my subject
     batch_processing(
@@ -595,6 +609,7 @@ def test_scenario_5(page: Page, general_properties: dict) -> None:
         "X387",
         "Discharge from surveillance - no contact (letter to GP)",
     )
+
     # Then my subject has been updated as follows:
     criteria = {
         "calculated fobt due date": "2 years from episode end",
@@ -625,5 +640,6 @@ def test_scenario_5(page: Page, general_properties: dict) -> None:
         "surveillance due date reason": "Discharge from Surveillance - Cannot Contact Patient",
     }
     subject_assertion(nhs_no, criteria)
+    
     # When I log out
     LogoutPage(page).log_out()

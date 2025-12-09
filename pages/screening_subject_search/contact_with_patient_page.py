@@ -87,7 +87,7 @@ class ContactWithPatientPage(BasePage):
             - 'Close Episode - Patient Choice'
             - 'SSP Appointment Required'
             - 'Discharge from Surveillance - No Contact'
-            -'No outcome'
+            - 'No outcome'
         """
         self.outcome_dropdown.select_option(label=outcome)
 
