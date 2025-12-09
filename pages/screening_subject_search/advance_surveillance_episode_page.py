@@ -41,6 +41,12 @@ class AdvanceSurveillanceEpisodePage(AdvanceEpisodePage):
             "button",
             name="Discharge from Surveillance - Patient Choice",
         )
+        self.discharge_from_surveillance_no_patient_contact_button = (
+            self.page.get_by_role(
+                "button",
+                name="Discharge from Surveillance - No Patient Contact",
+            )
+        )
 
     def click_discharge_from_surveillance_clinical_decision_button(self) -> None:
         """Click on the 'Discharge from Surveillance - Clinical Decision' button."""
@@ -78,3 +84,9 @@ class AdvanceSurveillanceEpisodePage(AdvanceEpisodePage):
     ) -> None:
         """Click on the 'Discharge from Surveillance - Patient Choice' button."""
         self.click(self.discharge_from_surveillance_patient_choice_button)
+
+    def click_discharge_from_surveillance_no_patient_contact_button(
+        self,
+    ) -> None:
+        """Click on the 'Discharge from Surveillance - No Patient Contact' button."""
+        self.click(self.discharge_from_surveillance_no_patient_contact_button)
