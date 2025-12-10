@@ -119,7 +119,7 @@ def test_scenario_8(page: Page, general_properties: dict) -> None:
     > Check recall [SSCL30c]
     > Reopen episode for correction > X900 (3.1) [SSUN6]
     """
-    
+
     # Given I log in to BCSS "England" as user role "Specialist Screening Practitioner"
     user_role = UserTools.user_login(
         page, "Specialist Screening Practitioner at BCS009 & BCS001", True
