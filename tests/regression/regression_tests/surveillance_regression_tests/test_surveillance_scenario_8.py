@@ -63,7 +63,6 @@ from pages.screening_subject_search.diagnostic_test_outcome_page import (
 )
 
 
-@pytest.mark.wip
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.surveillance_regression_tests
@@ -276,6 +275,7 @@ def test_scenario_8(page: Page, general_properties: dict) -> None:
         "surveillance due date reason": "Reopened episode",
     }
     subject_assertion(nhs_no, criteria)
+
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
@@ -307,15 +307,6 @@ def test_scenario_8(page: Page, general_properties: dict) -> None:
         },
     )
 
-    # When I view the subject
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-
-    # Then I "can" postpone the subject's surveillance episode
-    SubjectScreeningSummaryPage(page).can_postpone_surveillance_episode()
-
-    # When I view the advance episode options
-    SubjectScreeningSummaryPage(page).click_advance_surveillance_episode_button()
-
     # And I select Diagnostic Test Type "Colonoscopy"
     AdvanceSurveillanceEpisodePage(page).select_test_type_dropdown_option("Colonoscopy")
 
@@ -335,12 +326,8 @@ def test_scenario_8(page: Page, general_properties: dict) -> None:
             "latest event status": "A59 Invited for Diagnostic Test",
         },
     )
-
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-
-    # Then I "can" postpone the subject's surveillance episode
-    SubjectScreeningSummaryPage(page).can_postpone_surveillance_episode()
 
     # When I select the advance episode option for "Attend Diagnostic Test"
     SubjectScreeningSummaryPage(page).click_advance_surveillance_episode_button()
@@ -503,6 +490,7 @@ def test_scenario_8(page: Page, general_properties: dict) -> None:
         "surveillance due date reason": "Reinstate Surveillance",
     }
     subject_assertion(nhs_no, criteria)
+
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
@@ -554,8 +542,6 @@ def test_scenario_8(page: Page, general_properties: dict) -> None:
         {"latest event status": "A99 Suitable for Endoscopic Test"},
     )
 
-    # When I view the advance episode options
-    SubjectScreeningSummaryPage(page).click_advance_surveillance_episode_button()
     # And I select Diagnostic Test Type "Colonoscopy"
     AdvanceSurveillanceEpisodePage(page).select_test_type_dropdown_option("Colonoscopy")
     # And I enter a Diagnostic Test First Offered Appointment Date of "today"
@@ -571,7 +557,6 @@ def test_scenario_8(page: Page, general_properties: dict) -> None:
     )
 
     # When I select the advance episode option for "Attend Diagnostic Test"
-    SubjectScreeningSummaryPage(page).click_advance_surveillance_episode_button()
     AdvanceSurveillanceEpisodePage(page).click_attend_diagnostic_test_button()
     # And I attend the subject's diagnostic test today
     AttendDiagnosticTestPage(page).click_calendar_button()
@@ -690,7 +675,6 @@ def test_scenario_8(page: Page, general_properties: dict) -> None:
     )
 
     # When I select the advance episode option for "Record other post-investigation contact"
-    SubjectScreeningSummaryPage(page).click_advance_surveillance_episode_button()
     AdvanceSurveillanceEpisodePage(
         page
     ).click_record_other_post_investigation_contact_button()
@@ -740,7 +724,8 @@ def test_scenario_8(page: Page, general_properties: dict) -> None:
         },
     )
 
-    # When I view the advance episode options
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     SubjectScreeningSummaryPage(page).click_advance_surveillance_episode_button()
 
     # And I select the advance episode option for "High-risk findings Result from Symptomatic Procedure"-recheck tomorrow
