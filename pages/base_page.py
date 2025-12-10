@@ -219,10 +219,7 @@ class BasePage:
             alerts_table.wait_for(state="visible")
 
         try:
-            self.page.wait_for_load_state("load")
             self.page.wait_for_load_state("domcontentloaded")
-            self.page.wait_for_load_state("networkidle")
-            locator.wait_for(state="attached")
             locator.wait_for(state="visible")
             locator.click()
 

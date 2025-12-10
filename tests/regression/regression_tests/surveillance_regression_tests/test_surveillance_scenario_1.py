@@ -280,7 +280,7 @@ def test_scenario_1(page: Page, general_properties: dict) -> None:
 
     # And I view the event history for the subject's latest episode
     SubjectScreeningSummaryPage(page).expand_episodes_list()
-    SubjectScreeningSummaryPage(page).click_first_surveillance_epsiode_link()
+    SubjectScreeningSummaryPage(page).click_first_surveillance_episode_link()
     # And I view the latest practitioner appointment in the subject's episode
     EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
 
@@ -437,7 +437,7 @@ def test_scenario_1(page: Page, general_properties: dict) -> None:
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     # And I view the event history for the subject's latest episode
     SubjectScreeningSummaryPage(page).expand_episodes_list()
-    SubjectScreeningSummaryPage(page).click_first_surveillance_epsiode_link()
+    SubjectScreeningSummaryPage(page).click_first_surveillance_episode_link()
 
     # And I view the latest practitioner appointment in the subject's episode
     EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
@@ -480,7 +480,7 @@ def test_scenario_1(page: Page, general_properties: dict) -> None:
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     # And I view the event history for the subject's latest episode
     SubjectScreeningSummaryPage(page).expand_episodes_list()
-    SubjectScreeningSummaryPage(page).click_first_surveillance_epsiode_link()
+    SubjectScreeningSummaryPage(page).click_first_surveillance_episode_link()
 
     # And I view the latest practitioner appointment in the subject's episode
     EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
