@@ -59,7 +59,7 @@ class SubjectScreeningSummaryPage(BasePage):
         self.first_fobt_episode_link = self.page.get_by_role(
             "link", name="FOBT Screening"
         ).first
-        self.first_surveillance_epsiode_link = self.page.get_by_role(
+        self.first_surveillance_episode_link = self.page.get_by_role(
             "link", name="Surveillance"
         ).first
         self.datasets_link = self.page.get_by_role("link", name="Datasets")
@@ -244,9 +244,9 @@ class SubjectScreeningSummaryPage(BasePage):
         """Click on the first FOBT episode link."""
         self.click(self.first_fobt_episode_link)
 
-    def click_first_surveillance_epsiode_link(self) -> None:
+    def click_first_surveillance_episode_link(self) -> None:
         """Click on the first Surveillance episode link."""
-        self.click(self.first_surveillance_epsiode_link)
+        self.click(self.first_surveillance_episode_link)
 
     def click_datasets_link(self) -> None:
         """Click on the 'Datasets' link."""
