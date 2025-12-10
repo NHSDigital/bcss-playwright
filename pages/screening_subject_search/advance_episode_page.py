@@ -31,6 +31,9 @@ class AdvanceEpisodePage(BasePage):
         )
         self.calendar_button = self.page.get_by_role("button", name="Calendar")
         self.test_type_dropdown = self.page.locator("[id^='UI_EXT_TEST_TYPE_']")
+        self.intended_extent_dropdown = self.page.locator(
+            "[id^='UI_INTENDED_EXTENT_TYPE_']"
+        )
         self.advance_checkbox_label = self.page.get_by_label(
             "There are some events available which should only be used in exceptional circumstances. If you wish to see them, check this box"
         )
@@ -185,6 +188,10 @@ class AdvanceEpisodePage(BasePage):
     def select_test_type_dropdown_option(self, text: str) -> None:
         """Select the test type from the dropdown."""
         self.test_type_dropdown.select_option(label=text)
+
+    def select_intended_extent_dropdown_option(self, text: str) -> None:
+        """Select the intended extent from the dropdown."""
+        self.intended_extent_dropdown.select_option(label=text)
 
     def click_invite_for_diagnostic_test_button(self) -> None:
         """Click the 'Invite for Diagnostic Test' button."""
