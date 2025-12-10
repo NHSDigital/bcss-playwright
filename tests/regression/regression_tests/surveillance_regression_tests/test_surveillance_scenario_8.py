@@ -68,25 +68,25 @@ from pages.screening_subject_search.diagnostic_test_outcome_page import (
 @pytest.mark.surveillance_regression_tests
 def test_scenario_8(page: Page, general_properties: dict) -> None:
     """
-            Scenario: 8:SSPI cease
+    Scenario: 8:SSPI cease
 
-        X500-X505-X92-C203 [SSCL30e] [SSUN7] X900-A99-A59-A259-X92-C203 [SSCL30e] [SSUN5] X900-A99-A59-A259-A315-A361-A323-A317-A348-A372-A373-A374-X92-C203 [SSCL30c] [SSUN6] X900
+    X500-X505-X92-C203 [SSCL30e] [SSUN7] X900-A99-A59-A259-X92-C203 [SSCL30e] [SSUN5] X900-A99-A59-A259-A315-A361-A323-A317-A348-A372-A373-A374-X92-C203 [SSCL30c] [SSUN6] X900
 
-        This scenario tests closure of a Surveillance episode, at various points, as a result of an SSPI cease.  Reopening a Surveillance episode from closure on X92 always reopens to X900, which is suitable for reopening after a postpone, but seems less suitable for reopening after the closure occurred later in the episode, as a result of an SSPI cease.
+    This scenario tests closure of a Surveillance episode, at various points, as a result of an SSPI cease.  Reopening a Surveillance episode from closure on X92 always reopens to X900, which is suitable for reopening after a postpone, but seems less suitable for reopening after the closure occurred later in the episode, as a result of an SSPI cease.
 
-        The cease/uncease rules for Surveillance are old and possibly due for an overhaul – and alas the reasoning behind them has been long since lost in the mists of time.
+    The cease/uncease rules for Surveillance are old and possibly due for an overhaul – and alas the reasoning behind them has been long since lost in the mists of time.
 
-        The first cease (before the subject has attended a diagnostic test) closes the episode for death: on uncease the surveillance due date and reason for change are not changed but left as null and "Ceased".  Presumably this is to allow user to investigate and possibly reopen the episode.  This uncease is done by re-registering the subject with a GP practice.
+    The first cease (before the subject has attended a diagnostic test) closes the episode for death: on uncease the surveillance due date and reason for change are not changed but left as null and "Ceased".  Presumably this is to allow user to investigate and possibly reopen the episode.  This uncease is done by re-registering the subject with a GP practice.
 
-        The second cease (after the subject has attended a diagnostic test, but the episode result is none of Cancer, LNPCP or High-risk findings) closes the episode for embarkation: on uncease the due date is set to the previous surveillance due date (rather than the calculated surveillance due date, which is also a little odd), and the reason set to "Reinstate surveillance".  The actual value of the due date is too difficult to check, because the previous surveillance due date field is nullified at the same time.  This uncease is done by changing the subject’s deduction code to one of the "not cease" codes.
+    The second cease (after the subject has attended a diagnostic test, but the episode result is none of Cancer, LNPCP or High-risk findings) closes the episode for embarkation: on uncease the due date is set to the previous surveillance due date (rather than the calculated surveillance due date, which is also a little odd), and the reason set to "Reinstate surveillance".  The actual value of the due date is too difficult to check, because the previous surveillance due date field is nullified at the same time.  This uncease is done by changing the subject’s deduction code to one of the "not cease" codes.
 
-        <i>At this point the subject has a diagnostic test with a result and a completed investigation dataset, but no outcome, and there is no Advance Episode option (or even an interrupt) to add one.  For the purposes of this scenario, the subject is invited for another test.</i>
+    <i>At this point the subject has a diagnostic test with a result and a completed investigation dataset, but no outcome, and there is no Advance Episode option (or even an interrupt) to add one.  For the purposes of this scenario, the subject is invited for another test.</i>
 
-        The third cease occurs when the episode has a result of High-risk findings.  This is another embarkation cease, and the uncease is done by reopening the episode.  Because the reopen also unceases the subject, the recall surveillance type is nullified.  Reopening a surveillance episode nullifies the calculated FOBT due date, and the FOBT due date change date and reason for change.
+    The third cease occurs when the episode has a result of High-risk findings.  This is another embarkation cease, and the uncease is done by reopening the episode.  Because the reopen also unceases the subject, the recall surveillance type is nullified.  Reopening a surveillance episode nullifies the calculated FOBT due date, and the FOBT due date change date and reason for change.
 
-        <i>Once again, there are only limited options on reopen, and it is impossible to redirect the episode to re-enter the symptomatic result.  This means the episode result cannot be “downgraded” at all.</i>
+    <i>Once again, there are only limited options on reopen, and it is impossible to redirect the episode to re-enter the symptomatic result.  This means the episode result cannot be “downgraded” at all.</i>
 
-        Scenario summary:
+    Scenario summary:
 
     > Run surveillance invitations for 1 subject > X500 (3.1)
     > SSPI update changes subject to in-age at recall
@@ -119,6 +119,7 @@ def test_scenario_8(page: Page, general_properties: dict) -> None:
     > Check recall [SSCL30c]
     > Reopen episode for correction > X900 (3.1) [SSUN6]
     """
+    
     # Given I log in to BCSS "England" as user role "Specialist Screening Practitioner"
     user_role = UserTools.user_login(
         page, "Specialist Screening Practitioner at BCS009 & BCS001", True
