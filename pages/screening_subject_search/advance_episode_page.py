@@ -142,6 +142,9 @@ class AdvanceEpisodePage(BasePage):
         self.date_of_symptomatic_procedure_input = self.page.get_by_role(
             "textbox", name="Date of Symptomatic Procedure"
         )
+        self.initiate_close_button = self.page.get_by_role(
+            "button", name="Initiate Close"
+        )
 
         # Contact recording locators
         self.contact_direction_dropdown = self.page.get_by_label("Contact Direction")
@@ -200,6 +203,10 @@ class AdvanceEpisodePage(BasePage):
     def click_other_post_investigation_button(self) -> None:
         """Click the 'Other Post-investigation' button."""
         self.safe_accept_dialog(self.other_post_investigation_button)
+
+    def click_initiate_close_button(self) -> None:
+        """Click the 'Initiate Close' button."""
+        self.safe_accept_dialog(self.initiate_close_button)
 
     def get_latest_event_status_cell(self, latest_event_status: str) -> Locator:
         """Get the cell containing the latest event status."""

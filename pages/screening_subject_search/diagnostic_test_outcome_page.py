@@ -1,8 +1,7 @@
-import logging
-from click import option
 from playwright.sync_api import Page, expect, Locator
 from pages.base_page import BasePage
 from enum import StrEnum
+from typing import List
 
 
 class ReferralProcedureType(StrEnum):
@@ -68,6 +67,22 @@ class DiagnosticTestOutcomePage(BasePage):
             option (str): option (str): The option to select from the Outcome Of Diagnostic Test options.
         """
         self.test_outcome_dropdown.select_option(option)
+
+    def test_outcome_dropdown_contains_options(self, options: List[str]) -> None:
+        """
+        Asserts that all provided options are present in the Outcome of Diagnostic Test dropdown.
+
+        Args:
+            options (List[str]): List of option strings to check.
+        """
+        dropdown_options = [
+            opt.inner_text()
+            for opt in self.test_outcome_dropdown.locator("option").all()
+        ]
+        for item in options:
+            assert (
+                item in dropdown_options
+            ), f"Dropdown is missing expected option: '{item}'"
 
     def verify_reason_for_symptomatic_referral(self, symptomatic_reason: str) -> None:
         """
