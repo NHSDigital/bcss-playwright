@@ -244,8 +244,8 @@ def test_scenario_10(page: Page, general_properties: dict) -> None:
     )
 
     # Then I confirm the "Investigation Dataset" section of the dataset contains the field "Actual Type of Test" with the value of "Flexible Sigmoidoscopy"
-    InvestigationDatasetsPage(page).does_field_contain_expected_value(
-        "Investigation Dataset", None, "Actual Type of Test", "Flexible Sigmoidoscopy"
+    DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
+        "Actual Type of Test", "Flexible Sigmoidoscopy"
     )
 
     # Then I get a confirmation prompt that "contains" "Are you sure you want to change the actual type of diagnostic test to Colonoscopy?"
@@ -262,8 +262,8 @@ def test_scenario_10(page: Page, general_properties: dict) -> None:
     )
 
     # Then I confirm the "Investigation Dataset" section of the dataset contains the field "Actual Type of Test" with the value of "Colonoscopy"
-    InvestigationDatasetsPage(page).does_field_contain_expected_value(
-        "Investigation Dataset", None, "Actual Type of Test", "Colonoscopy"
+    DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
+        "Actual Type of Test", "Colonoscopy"
     )
 
     # When I add the following bowel preparation drugs and values within the Investigation Dataset for this subject:
