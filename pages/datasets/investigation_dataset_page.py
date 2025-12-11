@@ -93,7 +93,9 @@ class InvestigationDatasetsPage(BasePage):
         self.visible_search_text_input = self.page.locator(
             'input[id^="UI_SEARCH_"]:visible'
         )
-        self.diagnostic_test_result = self.page.locator('#datasetContent > div:nth-child(1) > div:nth-child(7) > span.userInput')
+        self.diagnostic_test_result = self.page.locator(
+            "#datasetContent > div:nth-child(1) > div:nth-child(7) > span.userInput"
+        )
 
         # Repeat strings:
         self.bowel_preparation_administered_string = "Bowel Preparation Administered"
@@ -1198,7 +1200,6 @@ class InvestigationDatasetsPage(BasePage):
         logging.debug(
             f"START: does_field_contain_expected_value({dataset_area}, {dataset_subsection}, {field_name}, {expected_value})"
         )
-        field_and_value_found = False
         map_of_field_and_elements = self.map_fields_and_values(
             dataset_area, dataset_subsection
         )
@@ -1208,7 +1209,7 @@ class InvestigationDatasetsPage(BasePage):
             if actual_value.replace(" ", "") == "":
                 actual_value = ""
             if expected_value.lower() in actual_value.lower():
-                field_and_value_found = True
+                pass
             else:
                 raise ValueError(
                     f"Value not as expected. Expected: {expected_value}, Actual: '{actual_value}'"
@@ -1217,24 +1218,21 @@ class InvestigationDatasetsPage(BasePage):
             raise ValueError(
                 f"Field '{field_name}' not found in the dataset area '{dataset_area}' and subsection '{dataset_subsection}'."
             )
+        logging.info(
+            f"[UI ASSERTIONS COMPLETE] Value as expected. Expected: {expected_value}, Actual: '{actual_value}'"
+        )
         logging.debug("END: does_field_contain_expected_value")
-        if field_and_value_found:
-            logging.info(
-                f"[UI ASSERTIONS COMPLETE] Value as expected. Expected: {expected_value}, Actual: '{actual_value}'"
-            )
-        else:
-            raise ValueError(
-                f"[UI ASSERTIONS FAILED] Field '{field_name}' with expected value '{expected_value}' not found."
-            )
 
     def map_fields_and_values(
         self, dataset_section: str, dataset_subsection: str | None
     ) -> dict[str, str]:
         """
         Maps field labels to their values for a given dataset section and subsection.
+
         Args:
             dataset_section (str): The name of the dataset section.
             dataset_subsection (str | None): The name of the dataset subsection.
+
         Returns:
             dict[str, str]: A dictionary mapping field labels to their corresponding values.
         """
@@ -1245,49 +1243,60 @@ class InvestigationDatasetsPage(BasePage):
         fields_with_values = {}
 
         for field_label, element in fields_and_elements.items():
-            # Find all child elements
-            value_list = element.locator("xpath=.//*").all()
-            field_value = ""
-            if not value_list:
-                field_value = element.inner_text()
-            else:
-                for value_from_list in value_list:
-                    tag_name = value_from_list.evaluate(
-                        "el => el.tagName.toLowerCase()"
-                    )
-                    match tag_name:
-                        case "select":
-                            # Get selected option text
-                            selected_option = value_from_list.locator("option:checked")
-                            field_value += selected_option.inner_text()
-                        case "li":
-                            input_elem = value_from_list.locator("input")
-                            if input_elem.is_checked():
-                                label_elem = value_from_list.locator("label")
-                                field_value = label_elem.inner_text()
-                        case "input":
-                            input_type = value_from_list.get_attribute("type")
-                            if input_type == "text":
-                                field_value += value_from_list.input_value()
-                        case "p":
-                            field_value += value_from_list.inner_text()
-                        case _:
-                            logging.debug(
-                                f"tag type not specified, tag ignored = {tag_name}"
-                            )
-            fields_with_values[field_label] = field_value
+            fields_with_values[field_label] = self._extract_field_value(element)
 
         logging.debug("end: map_fields_and_values()")
         return fields_with_values
+
+    def _extract_field_value(self, element: Locator) -> str:
+        """
+        Extracts the value from a field element, handling different HTML tags.
+
+        Args:
+            element (Locator): The Playwright Locator for the field element.
+
+        Returns:
+            str: The extracted value as a string.
+        """
+        value_list = element.locator("xpath=.//*").all()
+        if not value_list:
+            return element.inner_text()
+        field_value = ""
+        for value_from_list in value_list:
+            tag_name = value_from_list.evaluate("el => el.tagName.toLowerCase()")
+            match tag_name:
+                case "select":
+                    selected_option = value_from_list.locator("option:checked")
+                    field_value += selected_option.inner_text()
+                    continue
+                case "li":
+                    input_elem = value_from_list.locator("input")
+                    if input_elem.is_checked():
+                        label_elem = value_from_list.locator("label")
+                        return label_elem.inner_text()
+                    continue
+                case "input":
+                    input_type = value_from_list.get_attribute("type")
+                    if input_type == "text":
+                        field_value += value_from_list.input_value()
+                    continue
+                case "p":
+                    field_value += value_from_list.inner_text()
+                    continue
+                case _:
+                    logging.debug(f"tag type not specified, tag ignored = {tag_name}")
+        return field_value
 
     def map_fields_and_elements(
         self, dataset_section: str, dataset_subsection: Optional[str] = None
     ) -> dict[str, Locator]:
         """
         Maps field labels to their corresponding Playwright Locator elements for a given dataset section and subsection.
+
         Args:
             dataset_section (str): The name of the dataset section.
             dataset_subsection (Optional[str]): The name of the dataset subsection, if any.
+
         Returns:
             dict[str, Locator]: A dictionary mapping field labels to their corresponding Locator elements.
         """
@@ -1311,7 +1320,31 @@ class InvestigationDatasetsPage(BasePage):
             )
 
         list_of_rows = section.locator(".noTableRow").all()
+        self._process_rows_for_field_mapping(
+            list_of_rows, fields_and_elements, previous_field, field_name, line_counter
+        )
 
+        logging.debug("end: map_fields_and_elements()")
+        return fields_and_elements
+
+    def _process_rows_for_field_mapping(
+        self,
+        list_of_rows: list,
+        fields_and_elements: dict,
+        previous_field: str,
+        field_name: str,
+        line_counter: int,
+    ) -> None:
+        """
+        Processes each row in the dataset section/subsection and maps field labels to their corresponding Locator elements.
+
+        Args:
+            list_of_rows (list): List of Playwright Locator rows in the section/subsection.
+            fields_and_elements (dict): Dictionary to store field label to Locator mappings.
+            previous_field (str): The previous field label encountered.
+            field_name (str): The current field label being processed.
+            line_counter (int): Counter for multi-line fields.
+        """
         for row in list_of_rows:
             elements_in_row = row.locator("xpath=.//*").all()
             element_to_map = None
@@ -1342,9 +1375,6 @@ class InvestigationDatasetsPage(BasePage):
                         element_to_map
                     )
                     line_counter += 1
-
-        logging.debug("end: map_fields_and_elements()")
-        return fields_and_elements
 
     def assert_test_result(self, expected_text: str) -> None:
         """
