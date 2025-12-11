@@ -93,6 +93,7 @@ class InvestigationDatasetsPage(BasePage):
         self.visible_search_text_input = self.page.locator(
             'input[id^="UI_SEARCH_"]:visible'
         )
+        self.diagnostic_test_result = self.page.locator('#datasetContent > div:nth-child(1) > div:nth-child(7) > span.userInput')
 
         # Repeat strings:
         self.bowel_preparation_administered_string = "Bowel Preparation Administered"
@@ -1221,6 +1222,10 @@ class InvestigationDatasetsPage(BasePage):
             logging.info(
                 f"[UI ASSERTIONS COMPLETE] Value as expected. Expected: {expected_value}, Actual: '{actual_value}'"
             )
+        else:
+            raise ValueError(
+                f"[UI ASSERTIONS FAILED] Field '{field_name}' with expected value '{expected_value}' not found."
+            )
 
     def map_fields_and_values(
         self, dataset_section: str, dataset_subsection: str | None
@@ -1250,25 +1255,26 @@ class InvestigationDatasetsPage(BasePage):
                     tag_name = value_from_list.evaluate(
                         "el => el.tagName.toLowerCase()"
                     )
-                    if tag_name == "select":
-                        # Get selected option text
-                        selected_option = value_from_list.locator("option:checked")
-                        field_value += selected_option.inner_text()
-                    elif tag_name == "li":
-                        input_elem = value_from_list.locator("input")
-                        if input_elem.is_checked():
-                            label_elem = value_from_list.locator("label")
-                            field_value = label_elem.inner_text()
-                    elif tag_name == "input":
-                        input_type = value_from_list.get_attribute("type")
-                        if input_type == "text":
-                            field_value += value_from_list.input_value()
-                    elif tag_name == "p":
-                        field_value += value_from_list.inner_text()
-                    else:
-                        logging.debug(
-                            f"tag type not specified, tag ignored = {tag_name}"
-                        )
+                    match tag_name:
+                        case "select":
+                            # Get selected option text
+                            selected_option = value_from_list.locator("option:checked")
+                            field_value += selected_option.inner_text()
+                        case "li":
+                            input_elem = value_from_list.locator("input")
+                            if input_elem.is_checked():
+                                label_elem = value_from_list.locator("label")
+                                field_value = label_elem.inner_text()
+                        case "input":
+                            input_type = value_from_list.get_attribute("type")
+                            if input_type == "text":
+                                field_value += value_from_list.input_value()
+                        case "p":
+                            field_value += value_from_list.inner_text()
+                        case _:
+                            logging.debug(
+                                f"tag type not specified, tag ignored = {tag_name}"
+                            )
             fields_with_values[field_label] = field_value
 
         logging.debug("end: map_fields_and_values()")
@@ -1339,6 +1345,17 @@ class InvestigationDatasetsPage(BasePage):
 
         logging.debug("end: map_fields_and_elements()")
         return fields_and_elements
+
+    def assert_test_result(self, expected_text: str) -> None:
+        """
+        Asserts that the text in the test result matches the expected text.
+        Args:
+            expected_text (str): The text expected to be found in the element.
+        """
+        actual_text = self.diagnostic_test_result.inner_text().strip()
+        assert (
+            actual_text.lower() == expected_text.lower()
+        ), f"Expected '{expected_text}', but found '{actual_text}'"
 
 
 def normalize_label(text: str) -> str:

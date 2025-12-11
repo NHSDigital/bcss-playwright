@@ -26,6 +26,7 @@ class HandoverIntoSymptomaticCarePage(BasePage):
         self.mdt_date_field = self.page.locator("#UI_MDT_DATE")
         self.site_dropdown = self.page.locator("#UI_NS_SITE_SELECT_LINK")
         self.date_responsibility_accepted_field = self.page.locator("#UI_OTHER_DATE")
+        self.select_locator = self.page.locator('select[id^="UI_RESULTS_"]:visible')
 
     def select_referral_dropdown_option(self, value: str) -> None:
         """
@@ -51,11 +52,10 @@ class HandoverIntoSymptomaticCarePage(BasePage):
             practitioner_index (int): The index of the non screening practitioner to select.
         """
         self.non_screening_practitioner_link.click()
-        select_locator = self.page.locator('select[id^="UI_RESULTS_"]:visible')
-        select_locator.first.wait_for(state="visible")
+        self.select_locator.first.wait_for(state="visible")
 
         # Find all option elements inside the select and click the one at the given index
-        option_elements = select_locator.first.locator("option")
+        option_elements = self.select_locator.first.locator("option")
         option_elements.nth(practitioner_index).wait_for(state="visible")
         self.click(option_elements.nth(practitioner_index))
 
@@ -82,11 +82,10 @@ class HandoverIntoSymptomaticCarePage(BasePage):
             consultant_index (int): The index of the consultant to select.
         """
         self.click(self.consultant_link)
-        select_locator = self.page.locator('select[id^="UI_RESULTS_"]:visible')
-        select_locator.first.wait_for(state="visible")
+        self.select_locator.first.wait_for(state="visible")
 
         # Find all option elements inside the select and click the one at the given index
-        option_elements = select_locator.first.locator("option")
+        option_elements = self.select_locator.first.locator("option")
         option_elements.nth(consultant_index).wait_for(state="visible")
         self.click(option_elements.nth(consultant_index))
 
@@ -140,11 +139,10 @@ class HandoverIntoSymptomaticCarePage(BasePage):
             value (str): The value of the option you want to select
         """
         self.click(self.site_dropdown)
-        select_locator = self.page.locator('select[id^="UI_RESULTS_"]:visible')
-        select_locator.first.wait_for(state="visible")
+        self.select_locator.first.wait_for(state="visible")
 
         # Find all option elements inside the select and click the one at the given index
-        option_elements = select_locator.first.locator("option")
+        option_elements = self.select_locator.first.locator("option")
         option_elements.nth(index).wait_for(state="visible")
         self.click(option_elements.nth(index))
 

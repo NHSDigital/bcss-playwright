@@ -373,7 +373,7 @@ def test_scenario_10(page: Page, general_properties: dict) -> None:
     )
 
     # Then the Investigation Dataset result message is "High-risk findings"
-    InvestigationDatasetsPage(page).expect_text_to_be_visible("High-risk findings")
+    InvestigationDatasetsPage(page).assert_test_result("High-risk findings")
 
     # Then I confirm the Polyp Algorithm Size for Polyp 1 is 10
     InvestigationDatasetsPage(page).assert_polyp_algorithm_size(1, "10")
