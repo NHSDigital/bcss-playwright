@@ -1266,21 +1266,17 @@ class InvestigationDatasetsPage(BasePage):
                 case "select":
                     selected_option = value_from_list.locator("option:checked")
                     field_value += selected_option.inner_text()
-                    continue
                 case "li":
                     input_elem = value_from_list.locator("input")
                     if input_elem.is_checked():
                         label_elem = value_from_list.locator("label")
                         return label_elem.inner_text()
-                    continue
                 case "input":
                     input_type = value_from_list.get_attribute("type")
                     if input_type == "text":
                         field_value += value_from_list.input_value()
-                    continue
                 case "p":
                     field_value += value_from_list.inner_text()
-                    continue
                 case _:
                     logging.debug(f"tag type not specified, tag ignored = {tag_name}")
         return field_value
@@ -1345,34 +1341,106 @@ class InvestigationDatasetsPage(BasePage):
         """
         for row in list_of_rows:
             elements_in_row = row.locator("xpath=.//*").all()
-            element_to_map = None
+            field_name, previous_field, element_to_map = (
+                self._extract_field_and_element(
+                    elements_in_row, field_name, previous_field, fields_and_elements
+                )
+            )
+            if element_to_map is None:
+                raise ValueError(
+                    f"Could not find element to map for field '{field_name}'"
+                )
+            line_counter = self._update_fields_and_elements(
+                fields_and_elements,
+                field_name,
+                previous_field,
+                element_to_map,
+                line_counter,
+            )
 
-            for element in elements_in_row:
-                element_class = element.get_attribute("class") or ""
-                if "label" in element_class:
-                    previous_field = field_name
-                    field_name = element.inner_text().lower().replace(" ?", "").strip()
-                    if field_name in fields_and_elements:
-                        name_counter = 2
-                        while f"{field_name} ({name_counter})" in fields_and_elements:
-                            name_counter += 1
-                        field_name = f"{field_name} ({name_counter})"
-                elif "userInput" in element_class:
-                    element_to_map = element
+    def _extract_field_and_element(
+        self,
+        elements_in_row: list,
+        field_name: str,
+        previous_field: str,
+        fields_and_elements: dict,
+    ) -> tuple[str, str, Optional[Locator]]:
+        """
+        Extracts the field name and element to map from the elements in a row.
 
-            if field_name.replace(" ", "") != "":
-                fields_and_elements[field_name] = element_to_map
-                line_counter = 2
-            else:
-                if (
-                    hasattr(self, "list_of_multi_line_fields")
-                    and previous_field in self.list_of_multi_line_fields
-                ):
-                    field_name = previous_field
-                    fields_and_elements[f"{field_name} ({line_counter})"] = (
-                        element_to_map
+        Args:
+            elements_in_row (list): List of Playwright Locator elements in the row.
+            field_name (str): The current field label being processed.
+            previous_field (str): The previous field label encountered.
+            fields_and_elements (dict): Dictionary to store field label to Locator mappings.
+
+        Returns:
+            tuple[str, str, Locator]: Updated field_name, previous_field, and element_to_map.
+        """
+        element_to_map = None
+        for element in elements_in_row:
+            element_class = element.get_attribute("class") or ""
+            if "label" in element_class:
+                previous_field = field_name
+                field_name = element.inner_text().lower().replace(" ?", "").strip()
+                if field_name in fields_and_elements:
+                    field_name = self._resolve_field_name_conflict(
+                        fields_and_elements, field_name
                     )
-                    line_counter += 1
+            elif "userInput" in element_class:
+                element_to_map = element
+        return field_name, previous_field, element_to_map
+
+    def _resolve_field_name_conflict(
+        self, fields_and_elements: dict, field_name: str
+    ) -> str:
+        """
+        Resolves field name conflicts by appending a counter.
+
+        Args:
+            fields_and_elements (dict): Dictionary to store field label to Locator mappings.
+            field_name (str): The field name to resolve.
+
+        Returns:
+            str: The resolved field name with a counter appended.
+        """
+        name_counter = 2
+        while f"{field_name} ({name_counter})" in fields_and_elements:
+            name_counter += 1
+        return f"{field_name} ({name_counter})"
+
+    def _update_fields_and_elements(
+        self,
+        fields_and_elements: dict,
+        field_name: str,
+        previous_field: str,
+        element_to_map: Locator,
+        line_counter: int,
+    ) -> int:
+        """
+        Updates the fields_and_elements dictionary with the field name and element, handling multi-line fields.
+
+        Args:
+            fields_and_elements (dict): Dictionary to store field label to Locator mappings.
+            field_name (str): The current field label being processed.
+            previous_field (str): The previous field label encountered.
+            element_to_map (Locator): The element to map.
+            line_counter (int): Counter for multi-line fields.
+
+        Returns:
+            int: The updated line_counter value.
+        """
+        if field_name.replace(" ", "") != "":
+            fields_and_elements[field_name] = element_to_map
+            return 2
+        if (
+            hasattr(self, "list_of_multi_line_fields")
+            and previous_field in self.list_of_multi_line_fields
+        ):
+            field_name = previous_field
+            fields_and_elements[f"{field_name} ({line_counter})"] = element_to_map
+            return line_counter + 1
+        return line_counter
 
     def assert_test_result(self, expected_text: str) -> None:
         """
