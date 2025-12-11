@@ -1208,9 +1208,7 @@ class InvestigationDatasetsPage(BasePage):
             actual_value = actual_value.replace("\xa0", "").replace("&nbsp;", "")
             if actual_value.replace(" ", "") == "":
                 actual_value = ""
-            if expected_value.lower() in actual_value.lower():
-                pass
-            else:
+            if expected_value.lower() not in actual_value.lower():
                 raise ValueError(
                     f"Value not as expected. Expected: {expected_value}, Actual: '{actual_value}'"
                 )
