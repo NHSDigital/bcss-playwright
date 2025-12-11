@@ -2,9 +2,7 @@ import pytest
 from playwright.sync_api import Page
 from classes.repositories.subject_repository import SubjectRepository
 from pages.organisations.organisations_page import OrganisationSwitchPage
-from pages.screening_subject_search.lnpcp_result_from_symptomatic_procedure_page import (
-    LnpcpResultFromSymptomaticProcedure,
-)
+from pages.screening_subject_search.high_risk_findings_result_from_symptomatic_procedure_page import HighRiskFindingsResultFromSymptomaticProcedure
 from pages.screening_subject_search.refer_to_mdt_page import ReferToMDTPage
 from pages.screening_subject_search.reopen_episode_page import ReopenEpisodePage
 from pages.screening_subject_search.reopen_surveillance_episode_page import (
@@ -61,7 +59,6 @@ from pages.screening_subject_search.diagnostic_test_outcome_page import (
     OutcomeOfDiagnosticTest,
     ReasonForSymptomaticReferral,
 )
-
 
 @pytest.mark.vpn_required
 @pytest.mark.regression
@@ -735,17 +732,17 @@ def test_scenario_8(page: Page, general_properties: dict) -> None:
     ).click_high_risk_findings_result_from_symptomatic_procedure_button()
 
     # And I set the Date of Symptomatic Procedure to "yesterday"
-    LnpcpResultFromSymptomaticProcedure(page).enter_date_of_symptomatic_procedure(
+    HighRiskFindingsResultFromSymptomaticProcedure(page).enter_date_of_symptomatic_procedure(
         datetime.today() - timedelta(days=1)
     )
     # And the Screening Interval is 36 months
-    LnpcpResultFromSymptomaticProcedure(page).assert_text_in_alert_textbox(
+    HighRiskFindingsResultFromSymptomaticProcedure(page).assert_text_in_alert_textbox(
         "recall interval of 36 months"
     )
     # And I select test number 1
-    LnpcpResultFromSymptomaticProcedure(page).select_test_number(1)
+    HighRiskFindingsResultFromSymptomaticProcedure(page).select_test_number(1)
     # And I save the Result from Symptomatic Procedure
-    LnpcpResultFromSymptomaticProcedure(page).click_save_button()
+    HighRiskFindingsResultFromSymptomaticProcedure(page).click_save_button()
 
     # Then my subject has been updated as follows:
     criteria = {
