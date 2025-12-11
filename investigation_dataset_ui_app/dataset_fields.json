@@ -352,7 +352,7 @@
       },
       {
         "key": "polyp appears fully resected endoscopically",
-        "type": "YesNoOptions",
+        "type": "YesNoUncertainOptions",
         "description": "Whether the polyp appears fully resected endoscopically",
         "optional": true
       }

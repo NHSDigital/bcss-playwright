@@ -93,11 +93,21 @@ class InvestigationDatasetsPage(BasePage):
         self.visible_search_text_input = self.page.locator(
             'input[id^="UI_SEARCH_"]:visible'
         )
+        self.diagnostic_test_result = self.page.locator(
+            "#datasetContent > div:nth-child(1) > div:nth-child(7) > span.userInput"
+        )
 
         # Repeat strings:
         self.bowel_preparation_administered_string = "Bowel Preparation Administered"
         self.antibiotics_administered_string = "Antibiotics Administered"
         self.other_drugs_administered_string = "Other Drugs Administered"
+
+        # Other:
+        self.list_of_multi_line_fields = [
+            "failure reasons",
+            "early complications",
+            "late complications",
+        ]
 
     def select_site_lookup_option(self, option: str) -> None:
         """
@@ -628,7 +638,7 @@ class InvestigationDatasetsPage(BasePage):
         Args:
             dataset_section_name (str): The name of the dataset section to locate.
         Returns:
-            Optioanl[Locator]: A Playwright Locator for the matching section if visible, or None if not found or not visible.
+            Optional[Locator]: A Playwright Locator for the matching section if visible, or None if not found or not visible.
         """
         logging.info(f"START: Looking for section '{dataset_section_name}'")
 
@@ -1171,6 +1181,17 @@ class InvestigationDatasetsPage(BasePage):
         elif drug_type == self.antibiotics_administered_string:
             locator_prefix = "#HILITE_spanAntibioticDosageUnit"
         return self.page.locator(f"{locator_prefix}{drug_number}")
+
+    def assert_test_result(self, expected_text: str) -> None:
+        """
+        Asserts that the text in the test result matches the expected text.
+        Args:
+            expected_text (str): The text expected to be found in the element.
+        """
+        actual_text = self.diagnostic_test_result.inner_text().strip()
+        assert (
+            actual_text.lower() == expected_text.lower()
+        ), f"Expected '{expected_text}', but found '{actual_text}'"
 
 
 def normalize_label(text: str) -> str:
