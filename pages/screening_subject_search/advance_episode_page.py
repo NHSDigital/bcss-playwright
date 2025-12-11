@@ -139,6 +139,11 @@ class AdvanceEpisodePage(BasePage):
                 "button", name="Redirect to Establish Attendance at Appointment"
             )
         )
+        self.high_risk_findings_result_from_symptomatic_procedure_button = (
+            self.page.get_by_role(
+                "button", name="High-risk findings Result from Symptomatic Procedure"
+            )
+        )
         self.date_of_symptomatic_procedure_input = self.page.get_by_role(
             "textbox", name="Date of Symptomatic Procedure"
         )
@@ -167,6 +172,9 @@ class AdvanceEpisodePage(BasePage):
         )
         self.lnpcp_result_from_symptomatic_procedure_button = self.page.get_by_role(
             "button", name="LNPCP Result from Symptomatic Procedure"
+        )
+        self.other_post_investigation_contact_required_button = self.page.get_by_role(
+            "button", name="Other Post-investigation Contact Required"
         )
 
     def click_suitable_for_endoscopic_test_button(self) -> None:
@@ -511,3 +519,15 @@ class AdvanceEpisodePage(BasePage):
         CalendarPicker(self.page).calendar_picker_ddmmyyyy(
             date, self.date_of_symptomatic_procedure_input
         )
+
+    def click_high_risk_findings_result_from_symptomatic_procedure_button(
+        self,
+    ) -> None:
+        """Click the 'High-risk findings Result from Symptomatic Procedure' button"""
+        self.safe_accept_dialog(
+            self.high_risk_findings_result_from_symptomatic_procedure_button
+        )
+
+    def click_other_post_investigation_contact_required_button(self) -> None:
+        """Click the 'Other Post Investigation Contact Required' button."""
+        self.safe_accept_dialog(self.other_post_investigation_contact_required_button)
