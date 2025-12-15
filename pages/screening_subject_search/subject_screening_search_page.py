@@ -244,7 +244,7 @@ class SubjectScreeningPage(BasePage):
         # Only click search if at least one field was filled
         if any([surname, forename, screening_status, episode_status]):
             self.click(self.search_button)
-            self.click(self.back_link)
+
 
 
 class ScreeningStatusSearchOptions(Enum):
