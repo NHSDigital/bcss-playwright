@@ -243,6 +243,9 @@ def test_scenario_10(page: Page, general_properties: dict) -> None:
         "Investigation Datasets"
     )
 
+    # And I open all minimized sections on the dataset
+    InvestigationDatasetsPage(page).open_all_minimized_sections()
+
     # Then I confirm the "Investigation Dataset" section of the dataset contains the field "Actual Type of Test" with the value of "Flexible Sigmoidoscopy"
     DatasetFieldUtil(page).assert_cell_to_right_has_expected_text(
         "Actual Type of Test", "Flexible Sigmoidoscopy"
@@ -256,7 +259,6 @@ def test_scenario_10(page: Page, general_properties: dict) -> None:
     )
 
     # When I set the following fields and values within the Investigation Dataset for this subject:
-    InvestigationDatasetsPage(page).click_show_endoscopy_information()
     DatasetFieldUtil(page).populate_select_locator_for_field(
         "Endoscopist defined extent", EndoscopyLocationOptions.APPENDIX
     )
@@ -267,10 +269,12 @@ def test_scenario_10(page: Page, general_properties: dict) -> None:
     )
 
     # When I add the following bowel preparation drugs and values within the Investigation Dataset for this subject:
-    drug_information = {
-        "drug_dose1": "3",
-        "drug_type1": DrugTypeOptions.MANNITOL,
-    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(
+        {
+            "drug_dose1": "3",
+            "drug_type1": DrugTypeOptions.MANNITOL,
+        }
+    )
 
     # And there is a clinician who meets the following criteria:
     user = User.from_user_role_type(user_role)
@@ -288,38 +292,46 @@ def test_scenario_10(page: Page, general_properties: dict) -> None:
     )
 
     # And I set the following fields and values within the Investigation Dataset for this subject:
-    general_information = {
-        "practitioner": 1,
-        "site": 1,
-        "testing clinician": person_name,
-        "aspirant endoscopist": None,
-    }
+    InvestigationDatasetCompletion(page).fill_out_general_information(
+        {
+            "practitioner": 1,
+            "site": 1,
+            "testing clinician": person_name,
+            "aspirant endoscopist": None,
+        }
+    )
 
-    endoscopy_information = {
-        "endoscope inserted": "yes",
-        "procedure type": "therapeutic",
-        "bowel preparation quality": BowelPreparationQualityOptions.GOOD,
-        "comfort during recovery": ComfortOptions.NO_DISCOMFORT,
-        "comfort during examination": ComfortOptions.NO_DISCOMFORT,
-        "scope imager used": YesNoOptions.YES,
-        "retroverted view": YesNoOptions.NO,
-        "start of intubation time": "09:00",
-        "start of extubation time": "09:30",
-        "end time of procedure": "10:00",
-        "scope id": "Autotest",
-        "insufflation": InsufflationOptions.AIR,
-        "outcome at time of procedure": OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
-        "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
-    }
+    InvestigationDatasetCompletion(page).fill_endoscopy_information(
+        {
+            "endoscope inserted": "yes",
+            "procedure type": "therapeutic",
+            "bowel preparation quality": BowelPreparationQualityOptions.GOOD,
+            "comfort during recovery": ComfortOptions.NO_DISCOMFORT,
+            "comfort during examination": ComfortOptions.NO_DISCOMFORT,
+            "scope imager used": YesNoOptions.YES,
+            "retroverted view": YesNoOptions.NO,
+            "start of intubation time": "09:00",
+            "start of extubation time": "09:30",
+            "end time of procedure": "10:00",
+            "scope id": "Autotest",
+            "insufflation": InsufflationOptions.AIR,
+            "outcome at time of procedure": OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
+            "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
+        }
+    )
 
     # And I set the following completion proof values within the Investigation Dataset for this subject:
-    completion_information = {"completion proof": CompletionProofOptions.VIDEO_APPENDIX}
+    InvestigationDatasetCompletion(page).fill_out_completion_information(
+        {"completion proof": CompletionProofOptions.VIDEO_APPENDIX}
+    )
 
     # And I set the following failure reasons within the Investigation Dataset for this subject:
-    failure_information = {"failure reasons": FailureReasonsOptions.NO_FAILURE_REASONS}
+    InvestigationDatasetCompletion(page).fill_out_failure_information(
+        {"failure reasons": FailureReasonsOptions.NO_FAILURE_REASONS}
+    )
 
-    # And I add new polyps 1-2 with the following fields and values within the Investigation Dataset for this subject:
-    polyp_information = [
+    # And I add new polyp 1 with the following fields and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_polyp_x_information(
         {
             "location": EndoscopyLocationOptions.CAECUM,
             "classification": PolypClassificationOptions.LST_NG,
@@ -327,6 +339,23 @@ def test_scenario_10(page: Page, general_properties: dict) -> None:
             "polyp access": PolypAccessOptions.EASY,
             "left in situ": YesNoOptions.NO,
         },
+        1,
+    )
+
+    # And I add intervention 1 for polyp 1 with the following fields and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_polyp_x_intervention(
+        {
+            "modality": PolypInterventionModalityOptions.EMR,
+            "device": PolypInterventionDeviceOptions.HOT_SNARE,
+            "excised": YesNoOptions.YES,
+            "retrieved": PolypInterventionRetrievedOptions.NO,
+            "excision technique": PolypInterventionExcisionTechniqueOptions.EN_BLOC,
+        },
+        1,
+    )
+
+    # And I add new polyp 2 with the following fields and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_polyp_x_information(
         {
             "location": EndoscopyLocationOptions.ASCENDING_COLON,
             "classification": PolypClassificationOptions.IIA,
@@ -334,46 +363,33 @@ def test_scenario_10(page: Page, general_properties: dict) -> None:
             "polyp access": PolypAccessOptions.EASY,
             "left in situ": YesNoOptions.NO,
         },
-    ]
-
-    # And I add intervention 1 for polyps 1-2 with the following fields and values within the Investigation Dataset for this subject:
-    polyp_intervention = [
-        [
-            {
-                "modality": PolypInterventionModalityOptions.EMR,
-                "device": PolypInterventionDeviceOptions.HOT_SNARE,
-                "excised": YesNoOptions.YES,
-                "retrieved": PolypInterventionRetrievedOptions.NO,
-                "excision technique": PolypInterventionExcisionTechniqueOptions.EN_BLOC,
-            }
-        ],
-        [
-            {
-                "modality": PolypInterventionModalityOptions.POLYPECTOMY,
-                "device": PolypInterventionDeviceOptions.HOT_SNARE,
-                "excised": YesNoOptions.YES,
-                "retrieved": PolypInterventionRetrievedOptions.NO,
-                "excision technique": PolypInterventionExcisionTechniqueOptions.PIECE_MEAL,
-                "polyp appears fully resected endoscopically": YesNoUncertainOptions.UNCERTAIN,
-            }
-        ],
-    ]
-
-    # And I mark the Investigation Dataset as completed
-    # When I press the save Investigation Dataset button
-    InvestigationDatasetsPage(page).click_show_endoscopy_information()
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        endoscopy_information=endoscopy_information,
-        drug_information=drug_information,
-        general_information=general_information,
-        failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_information=polyp_information,
-        polyp_intervention=polyp_intervention,
+        2,
     )
 
-    # Then the Investigation Dataset result message is "High-risk findings"
-    InvestigationDatasetsPage(page).assert_test_result("High-risk findings")
+    # And I add intervention 1 for polyp 2 with the following fields and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_polyp_x_intervention(
+        {
+            "modality": PolypInterventionModalityOptions.POLYPECTOMY,
+            "device": PolypInterventionDeviceOptions.HOT_SNARE,
+            "excised": YesNoOptions.YES,
+            "retrieved": PolypInterventionRetrievedOptions.NO,
+            "excision technique": PolypInterventionExcisionTechniqueOptions.PIECE_MEAL,
+            "polyp appears fully resected endoscopically": YesNoUncertainOptions.UNCERTAIN,
+        },
+        2,
+    )
+
+    # And I mark the Investigation Dataset as completed
+    InvestigationDatasetsPage(page).check_dataset_complete_checkbox()
+
+    # When I press the save Investigation Dataset button
+    # Then the Investigation Dataset result message, which I will cancel, is "High-risk findings"
+    InvestigationDatasetsPage(page).click_save_dataset_button_assert_dialog(
+        "High-risk findings"
+    )
+
+    # When I press the save Investigation Dataset button
+    InvestigationDatasetsPage(page).click_save_dataset_button()
 
     # Then I confirm the Polyp Algorithm Size for Polyp 1 is 10
     InvestigationDatasetsPage(page).assert_polyp_algorithm_size(1, "10")

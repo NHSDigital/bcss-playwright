@@ -363,7 +363,6 @@ class InvestigationDatasetCompletion:
 
         # Drug Information
         if drug_information is not None:
-            InvestigationDatasetsPage(self.page).click_show_drug_information()
             self.fill_out_drug_information(drug_information)
 
         if endoscopy_information:
@@ -373,9 +372,6 @@ class InvestigationDatasetCompletion:
         # Completion Proof Information
         if completion_information is not None:
             logging.info("Filling out completion proof information")
-            InvestigationDatasetsPage(
-                self.page
-            ).click_show_completion_proof_information()
             DatasetFieldUtil(self.page).populate_select_locator_for_field(
                 "Proof Parameters", completion_information["completion proof"]
             )
@@ -383,7 +379,6 @@ class InvestigationDatasetCompletion:
         # Failure Information
         if failure_information is not None:
             logging.info("Filling out failure information")
-            self.investigation_datasets_pom.click_show_failure_information()
             DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
                 self.failure_reasons_string,
                 "divFailureSection",
@@ -424,14 +419,6 @@ class InvestigationDatasetCompletion:
         """
         Populates the Suspected Findings section of the Investigation Dataset form.
         """
-        logging.info("Starting fill_out_suspected_findings")
-        try:
-            logging.info("About to click suspected findings details")
-            self.investigation_datasets_pom.click_show_suspected_findings_details()
-            logging.info("Clicked suspected findings details successfully")
-        except Exception as e:
-            logging.error(f"Error clicking on Show Suspected Findings Details: {e}")
-            raise
         for key, value in suspected_findings.items():
             match key:
                 case "extracolonic summary code":
@@ -500,12 +487,40 @@ class InvestigationDatasetCompletion:
                     self.page
                 ).select_aspirant_endoscopist_option_index(aspirant)
 
+    def fill_out_completion_information(self, completion_information: dict) -> None:
+        """
+        This method completes the Completion Proof Information section of the investigation dataset.
+        Args:
+            completion_information (dict): A dictionary containing completion proof parameters.
+        """
+        logging.info("Filling out completion proof information")
+        self.investigation_datasets_pom.click_show_completion_proof_information()
+        DatasetFieldUtil(self.page).populate_select_locator_for_field(
+            "Proof Parameters", completion_information["completion proof"]
+        )
+
+    def fill_out_failure_information(self, failure_information: dict) -> None:
+        """
+        This method completes the Failure Information section of the investigation dataset.
+        Args:
+            failure_information (dict): A dictionary containing failure reasons and related information.
+        """
+        logging.info("Filling out failure information")
+        DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
+            self.failure_reasons_string,
+            "divFailureSection",
+            failure_information["failure reasons"],
+        )
+
     def fill_out_contrast_tagging_and_drug_information(
         self, contrast_tagging_and_drug: dict
     ) -> None:
+        """
+        This method completes the Contrast, Tagging & Drug Information section of the investigation dataset.
+        Args:
+            contrast_tagging_and_drug (dict): A dictionary containing contrast, tagging agent, and drug information.
+        """
         logging.info("🧪 Filling out Contrast, Tagging & Drug Information")
-        self.investigation_datasets_pom.click_show_contrast_tagging_and_drug_information()
-
         # Use for loop and match-case for endoscopy_information fields
         for key, value in contrast_tagging_and_drug.items():
             match key:
@@ -635,9 +650,6 @@ class InvestigationDatasetCompletion:
         """
         logging.info("Filling out Radiology Information")
 
-        self.investigation_datasets_pom.click_show_radiology_information()
-        self.investigation_datasets_pom.click_show_radiology_failure_information()
-
         # Use for loop and match-case for radiology data fields
         for key, value in radiology_data.items():
             match key:
@@ -722,8 +734,6 @@ class InvestigationDatasetCompletion:
             endoscopy_information (dict): A dictionary containing the endoscopy information to be filled in the form.
         """
         # Endoscopy Information
-        self.investigation_datasets_pom.click_show_endoscopy_information()
-
         # Use for loop and match-case for endoscopy_information fields
         for key, value in endoscopy_information.items():
             match key:
