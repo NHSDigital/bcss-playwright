@@ -419,6 +419,7 @@ class InvestigationDatasetsPage(BasePage):
         It clicks on the save dataset button.
         """
         self.safe_accept_dialog(self.save_dataset_button)
+        self.page.wait_for_timeout(3000)  # 3 second timeout to allow page to update
 
     def click_save_dataset_button_assert_dialog(self, expected_text: str) -> None:
         """
@@ -427,7 +428,7 @@ class InvestigationDatasetsPage(BasePage):
         Args:
             expected_text (str): The expected text in the resultant dialog
         """
-        self.assert_dialog_text("High-risk findings")
+        self.assert_dialog_text(expected_text)
         self.click(self.save_dataset_button)
 
     def expect_text_to_be_visible(self, text: str) -> None:

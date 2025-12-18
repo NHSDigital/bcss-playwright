@@ -2,7 +2,9 @@ import pytest
 from playwright.sync_api import Page
 from classes.repositories.subject_repository import SubjectRepository
 from pages.organisations.organisations_page import OrganisationSwitchPage
-from pages.screening_subject_search.high_risk_findings_result_from_symptomatic_procedure_page import HighRiskFindingsResultFromSymptomaticProcedure
+from pages.screening_subject_search.high_risk_findings_result_from_symptomatic_procedure_page import (
+    HighRiskFindingsResultFromSymptomaticProcedure,
+)
 from pages.screening_subject_search.refer_to_mdt_page import ReferToMDTPage
 from pages.screening_subject_search.reopen_episode_page import ReopenEpisodePage
 from pages.screening_subject_search.reopen_surveillance_episode_page import (
@@ -59,6 +61,7 @@ from pages.screening_subject_search.diagnostic_test_outcome_page import (
     OutcomeOfDiagnosticTest,
     ReasonForSymptomaticReferral,
 )
+
 
 @pytest.mark.vpn_required
 @pytest.mark.regression
@@ -349,11 +352,21 @@ def test_scenario_8(page: Page, general_properties: dict) -> None:
     SubjectScreeningSummaryPage(page).click_datasets_link()
     SubjectDatasetsPage(page).click_investigation_show_datasets()
 
+    # Confirm on the investigation Datasets Page
+    InvestigationDatasetsPage(page).bowel_cancer_screening_page_title_contains_text(
+        "Investigation Datasets"
+    )
+
+    # And I open all minimized sections on the dataset
+    InvestigationDatasetsPage(page).open_all_minimized_sections()
+
     # And I add the following bowel preparation drugs and values within the Investigation Dataset for this subject:
-    drug_information = {
-        "drug_dose1": "3",
-        "drug_type1": DrugTypeOptions.MANNITOL,
-    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(
+        {
+            "drug_dose1": "3",
+            "drug_type1": DrugTypeOptions.MANNITOL,
+        }
+    )
 
     # And there is a clinician who meets the following criteria:
     user = User.from_user_role_type(user_role)
@@ -372,46 +385,49 @@ def test_scenario_8(page: Page, general_properties: dict) -> None:
     )
 
     # And I set the following fields and values within the Investigation Dataset for this subject:
-    general_information = {
-        "practitioner": 1,
-        "site": 1,
-        "testing clinician": person_name,
-        "aspirant endoscopist": None,
-    }
-
-    endoscopy_information = {
-        "endoscope inserted": "yes",
-        "procedure type": "diagnostic",
-        "bowel preparation quality": BowelPreparationQualityOptions.GOOD,
-        "comfort during recovery": ComfortOptions.NO_DISCOMFORT,
-        "comfort during examination": ComfortOptions.NO_DISCOMFORT,
-        "endoscopist defined extent": EndoscopyLocationOptions.DESCENDING_COLON,
-        "scope imager used": YesNoOptions.YES,
-        "retroverted view": YesNoOptions.NO,
-        "start of intubation time": "09:00",
-        "start of extubation time": "09:30",
-        "end time of procedure": "10:00",
-        "scope id": "Autotest",
-        "insufflation": InsufflationOptions.AIR,
-        "outcome at time of procedure": OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
-        "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
-    }
-
-    # And I set the following failure reasons within the Investigation Dataset for this subject:
-    failure_information = {"failure reasons": FailureReasonsOptions.PAIN}
-
-    # And I open all minimized sections on the dataset
-    # And I mark the Investigation Dataset as completed
-    # When I press the save Investigation Dataset button
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        endoscopy_information=endoscopy_information,
-        drug_information=drug_information,
-        general_information=general_information,
-        failure_information=failure_information,
+    InvestigationDatasetCompletion(page).fill_out_general_information(
+        {
+            "practitioner": 1,
+            "site": 1,
+            "testing clinician": person_name,
+            "aspirant endoscopist": None,
+        }
     )
 
-    # Then the Investigation Dataset result message is "No Result"
-    InvestigationDatasetsPage(page).expect_text_to_be_visible("No Result")
+    InvestigationDatasetCompletion(page).fill_endoscopy_information(
+        {
+            "endoscope inserted": "yes",
+            "procedure type": "diagnostic",
+            "bowel preparation quality": BowelPreparationQualityOptions.GOOD,
+            "comfort during recovery": ComfortOptions.NO_DISCOMFORT,
+            "comfort during examination": ComfortOptions.NO_DISCOMFORT,
+            "endoscopist defined extent": EndoscopyLocationOptions.DESCENDING_COLON,
+            "scope imager used": YesNoOptions.YES,
+            "retroverted view": YesNoOptions.NO,
+            "start of intubation time": "09:00",
+            "start of extubation time": "09:30",
+            "end time of procedure": "10:00",
+            "scope id": "Autotest",
+            "insufflation": InsufflationOptions.AIR,
+            "outcome at time of procedure": OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
+            "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
+        }
+    )
+
+    # And I set the following failure reasons within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_out_failure_information(
+        {"failure reasons": FailureReasonsOptions.PAIN}
+    )
+
+    # And I mark the Investigation Dataset as completed
+    InvestigationDatasetsPage(page).check_dataset_complete_checkbox()
+
+    # When I press the save Investigation Dataset button
+    # Then the Investigation Dataset result message, which I will cancel, is "No Result"
+    InvestigationDatasetsPage(page).click_save_dataset_button_assert_dialog("No Result")
+
+    # When I press the save Investigation Dataset button
+    InvestigationDatasetsPage(page).click_save_dataset_button()
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -527,6 +543,7 @@ def test_scenario_8(page: Page, general_properties: dict) -> None:
         "surveillance due date reason": "# Not checking - probably hasn't changed",
     }
     subject_assertion(nhs_no, criteria)
+
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
@@ -542,9 +559,11 @@ def test_scenario_8(page: Page, general_properties: dict) -> None:
 
     # And I select Diagnostic Test Type "Colonoscopy"
     AdvanceSurveillanceEpisodePage(page).select_test_type_dropdown_option("Colonoscopy")
+
     # And I enter a Diagnostic Test First Offered Appointment Date of "today"
     AdvanceSurveillanceEpisodePage(page).click_calendar_button()
     CalendarPicker(page).v1_calender_picker(datetime.today())
+
     # And I advance the subject's episode for "Invite for Diagnostic Test >>"
     AdvanceSurveillanceEpisodePage(page).click_invite_for_diagnostic_test_button()
 
@@ -556,10 +575,12 @@ def test_scenario_8(page: Page, general_properties: dict) -> None:
 
     # When I select the advance episode option for "Attend Diagnostic Test"
     AdvanceSurveillanceEpisodePage(page).click_attend_diagnostic_test_button()
+
     # And I attend the subject's diagnostic test today
     AttendDiagnosticTestPage(page).click_calendar_button()
     CalendarPicker(page).v1_calender_picker(datetime.today())
     AttendDiagnosticTestPage(page).click_save_button()
+
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
@@ -568,14 +589,22 @@ def test_scenario_8(page: Page, general_properties: dict) -> None:
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
     # And I edit the Investigation Dataset for this subject
     SubjectScreeningSummaryPage(page).click_datasets_link()
     SubjectDatasetsPage(page).click_investigation_show_datasets()
+
+    # And I open all minimized sections on the dataset
+    InvestigationDatasetsPage(page).open_all_minimized_sections()
+
     # And I add the following bowel preparation drugs and values within the Investigation Dataset for this subject
-    drug_information = {
-        "drug_dose1": "3",
-        "drug_type1": DrugTypeOptions.MANNITOL,
-    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(
+        {
+            "drug_dose1": "3",
+            "drug_type1": DrugTypeOptions.MANNITOL,
+        }
+    )
+
     # And there is a clinician who meets the following criteria:
     user = User.from_user_role_type(user_role)
     criteria = {
@@ -591,44 +620,51 @@ def test_scenario_8(page: Page, general_properties: dict) -> None:
     person_name = (
         f"{df['person_family_name'].iloc[0]} {df['person_given_name'].iloc[0]}"
     )
+
     # And I set the following fields and values within the Investigation Dataset for this subject:
-    general_information = {
-        "practitioner": 1,
-        "site": 1,
-        "testing clinician": person_name,
-        "aspirant endoscopist": None,
-    }
-    endoscopy_information = {
-        "endoscope inserted": "yes",
-        "procedure type": "diagnostic",
-        "bowel preparation quality": BowelPreparationQualityOptions.GOOD,
-        "comfort during recovery": ComfortOptions.NO_DISCOMFORT,
-        "comfort during examination": ComfortOptions.NO_DISCOMFORT,
-        "endoscopist defined extent": EndoscopyLocationOptions.DESCENDING_COLON,
-        "scope imager used": YesNoOptions.YES,
-        "retroverted view": YesNoOptions.NO,
-        "start of intubation time": "09:00",
-        "start of extubation time": "09:30",
-        "end time of procedure": "10:00",
-        "scope id": "Autotest",
-        "insufflation": InsufflationOptions.AIR,
-        "outcome at time of procedure": OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
-        "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
-    }
-    # And I set the following failure reasons within the Investigation Dataset for this subject:
-    failure_information = {"failure reasons": FailureReasonsOptions.PAIN}
-    # And I open all minimized sections on the dataset
-    # And I mark the Investigation Dataset as completed
-    # When I press the save Investigation Dataset button
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        endoscopy_information=endoscopy_information,
-        drug_information=drug_information,
-        general_information=general_information,
-        failure_information=failure_information,
+    InvestigationDatasetCompletion(page).fill_out_general_information(
+        {
+            "practitioner": 1,
+            "site": 1,
+            "testing clinician": person_name,
+            "aspirant endoscopist": None,
+        }
     )
-    # Then the Investigation Dataset result message is "No Result"
-    InvestigationDatasetsPage(page).expect_text_to_be_visible("No Result")
-    # Then my subject has been updated as follows:
+
+    InvestigationDatasetCompletion(page).fill_endoscopy_information(
+        {
+            "endoscope inserted": "yes",
+            "procedure type": "diagnostic",
+            "bowel preparation quality": BowelPreparationQualityOptions.GOOD,
+            "comfort during recovery": ComfortOptions.NO_DISCOMFORT,
+            "comfort during examination": ComfortOptions.NO_DISCOMFORT,
+            "endoscopist defined extent": EndoscopyLocationOptions.DESCENDING_COLON,
+            "scope imager used": YesNoOptions.YES,
+            "retroverted view": YesNoOptions.NO,
+            "start of intubation time": "09:00",
+            "start of extubation time": "09:30",
+            "end time of procedure": "10:00",
+            "scope id": "Autotest",
+            "insufflation": InsufflationOptions.AIR,
+            "outcome at time of procedure": OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
+            "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
+        }
+    )
+
+    # And I set the following failure reasons within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_out_failure_information(
+        {"failure reasons": FailureReasonsOptions.PAIN}
+    )
+
+    # And I mark the Investigation Dataset as completed
+    InvestigationDatasetsPage(page).check_dataset_complete_checkbox()
+
+    # When I press the save Investigation Dataset button
+    # Then the Investigation Dataset result message, which I will cancel, is "No Result"
+    InvestigationDatasetsPage(page).click_save_dataset_button_assert_dialog("No Result")
+
+    # When I press the save Investigation Dataset button
+    InvestigationDatasetsPage(page).click_save_dataset_button()
 
     subject_assertion(
         nhs_no,
@@ -732,9 +768,9 @@ def test_scenario_8(page: Page, general_properties: dict) -> None:
     ).click_high_risk_findings_result_from_symptomatic_procedure_button()
 
     # And I set the Date of Symptomatic Procedure to "yesterday"
-    HighRiskFindingsResultFromSymptomaticProcedure(page).enter_date_of_symptomatic_procedure(
-        datetime.today() - timedelta(days=1)
-    )
+    HighRiskFindingsResultFromSymptomaticProcedure(
+        page
+    ).enter_date_of_symptomatic_procedure(datetime.today() - timedelta(days=1))
     # And the Screening Interval is 36 months
     HighRiskFindingsResultFromSymptomaticProcedure(page).assert_text_in_alert_textbox(
         "recall interval of 36 months"

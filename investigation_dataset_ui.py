@@ -546,7 +546,23 @@ def show_section_with_imports(section_name: str) -> None:
         )
     else:
         import_block = ""
-    st.code(f"{import_block}{section_name} = {pretty_dict(result)}", language="python")
+    # Map section to correct fill method
+    fill_methods = {
+        "general_information": "fill_out_general_information",
+        "drug_information": "fill_out_drug_information",
+        "endoscopy_information": "fill_endoscopy_information",
+        "completion_information": "fill_out_completion_information",
+        "failure_information": "fill_out_failure_information",
+        "radiology_information": "fill_out_radiology_information",
+        "suspected_findings": "fill_out_suspected_findings",
+    }
+    method = fill_methods.get(section_name, f"fill_{section_name}")
+    st.code(
+        f"InvestigationDatasetCompletion(page).{method}({pretty_dict(result)})",
+        language="python",
+    )
+    if import_block:
+        st.code(import_block, language="python")
 
 
 def show_drug_group_section_with_imports(section_name: str) -> None:
@@ -569,6 +585,8 @@ def show_drug_group_section_with_imports(section_name: str) -> None:
             all_fields.extend(group["fields"])
             _render_drug_group(section_name, group, result)
 
+    # No special merging; each section is handled independently
+
     enums = get_enums_used(all_fields)
     if enums:
         import_block = (
@@ -576,7 +594,19 @@ def show_drug_group_section_with_imports(section_name: str) -> None:
         )
     else:
         import_block = ""
-    st.code(f"{import_block}{section_name} = {pretty_dict(result)}", language="python")
+    # Map section to correct fill method
+    fill_methods = {
+        "drug_information": "fill_out_drug_information",
+        "contrast_tagging_and_drug": "fill_out_contrast_tagging_and_drug_information",
+        "tagging_agent_given_drug_information": "fill_out_tagging_agent_given_drug_information",
+    }
+    method = fill_methods.get(section_name, f"fill_{section_name}")
+    st.code(
+        f"InvestigationDatasetCompletion(page).{method}({pretty_dict(result)})",
+        language="python",
+    )
+    if import_block:
+        st.code(import_block, language="python")
 
 
 def _render_single_entry_fields(fields: list, result: dict) -> None:
@@ -662,29 +692,63 @@ def show_polyp_information_and_intervention_and_histology() -> None:
     num_polyps = st.number_input(
         "Number of polyps", min_value=0, max_value=20, value=1, step=1
     )
-    polyp_information = []
-    polyp_intervention = []
-    polyp_histology = []
+    polyp_info_dicts = {}
+    polyp_histology_dicts = {}
+    polyp_interventions_dicts = {}
 
     for pi in range(1, num_polyps + 1):
         st.markdown(f"### Polyp {pi}")
-        polyp_information.append(_render_polyp_info(polyp_info_fields, pi))
-        polyp_intervention.append(_render_interventions(polyp_intervention_fields, pi))
-        polyp_histology.append(_render_histology(polyp_histology_fields, pi))
+        polyp_info = _render_polyp_info(polyp_info_fields, pi)
+        polyp_info_dicts[pi] = polyp_info
+        interventions = _render_interventions(polyp_intervention_fields, pi)
+        # If interventions is a list of length 1, store as dict, else as list
+        if isinstance(interventions, list) and len(interventions) == 1:
+            polyp_interventions_dicts[pi] = interventions[0]
+        else:
+            polyp_interventions_dicts[pi] = interventions
+        polyp_histology = _render_histology(polyp_histology_fields, pi)
+        polyp_histology_dicts[pi] = polyp_histology
 
     st.markdown("#### Output")
-    st.code(
-        f"{import_block}polyp_information = {pretty_list(polyp_information)}",
-        language="python",
-    )
-    st.code(
-        f"polyp_intervention = {pretty_list(polyp_intervention)}",
-        language="python",
-    )
-    st.code(
-        f"polyp_histology = {pretty_list(polyp_histology)}",
-        language="python",
-    )
+    output_blocks = []
+    for pi in range(1, num_polyps + 1):
+        info_dict = polyp_info_dicts[pi]
+        hist_dict = polyp_histology_dicts[pi]
+        intervention = polyp_interventions_dicts[pi]
+        code_lines = []
+        # Information
+        code_lines.append(
+            f"InvestigationDatasetCompletion(page).fill_polyp_x_information({pretty_dict(info_dict)}, {pi})"
+        )
+        # Intervention
+        if isinstance(intervention, list):
+            if len(intervention) > 1:
+                code_lines.append(
+                    f"InvestigationDatasetCompletion(page).fill_polyp_x_multiple_interventions({pretty_list(intervention)}, {pi})"
+                )
+            elif len(intervention) == 1 and isinstance(intervention[0], dict):
+                code_lines.append(
+                    f"InvestigationDatasetCompletion(page).fill_polyp_x_intervention({pretty_dict(intervention[0])}, {pi})"
+                )
+            else:
+                code_lines.append(f"# No intervention for polyp {pi}")
+        elif isinstance(intervention, dict):
+            code_lines.append(
+                f"InvestigationDatasetCompletion(page).fill_polyp_x_intervention({pretty_dict(intervention)}, {pi})"
+            )
+        else:
+            code_lines.append(f"# No intervention for polyp {pi}")
+        # Histology
+        if not hist_dict:
+            code_lines.append(f"# No histology for polyp {pi}")
+        else:
+            code_lines.append(
+                f"InvestigationDatasetCompletion(page).fill_polyp_x_histology({pretty_dict(hist_dict)}, {pi})"
+            )
+        output_blocks.append("\n".join(code_lines))
+        st.code("\n".join(code_lines), language="python")
+    if import_block:
+        st.code(import_block, language="python")
 
 
 def _render_polyp_info(fields: list, pi: int) -> dict:
@@ -718,7 +782,7 @@ def _render_interventions(fields: list, pi: int) -> list:
         f"Add interventions for polyp {pi}?", key=f"add_interventions_{pi}"
     )
     if not add_interventions:
-        return interventions
+        return []
     num_int = st.number_input(
         f"Number of interventions for polyp {pi}",
         min_value=0,
@@ -735,6 +799,8 @@ def _render_interventions(fields: list, pi: int) -> list:
             if val is not None:
                 int_dict[field["key"]] = val
         interventions.append(int_dict)
+    if len(interventions) == 1:
+        return interventions[0]
     return interventions
 
 
@@ -799,7 +865,7 @@ SECTION_RENDERERS = {
     "endoscopy_information": show_section_with_imports,
     "completion_information": show_section_with_imports,
     "failure_information": show_section_with_imports,
-    "polyp_information_and_intervention_and_histology": lambda _: show_polyp_information_and_intervention_and_histology(),  # If you want imports here, update similarly
+    "polyp_information_and_intervention_and_histology": lambda _: show_polyp_information_and_intervention_and_histology(),
     "contrast_tagging_and_drug": show_drug_group_section_with_imports,
     "tagging_agent_given_drug_information": show_drug_group_section_with_imports,
     "radiology_information": show_section_with_imports,

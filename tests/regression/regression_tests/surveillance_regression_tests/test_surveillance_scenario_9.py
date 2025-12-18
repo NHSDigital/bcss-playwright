@@ -233,11 +233,21 @@ def test_scenario_9(page: Page, general_properties: dict) -> None:
     SubjectScreeningSummaryPage(page).click_datasets_link()
     SubjectDatasetsPage(page).click_investigation_show_datasets()
 
+    # Confirm on the investigation Datasets Page
+    InvestigationDatasetsPage(page).bowel_cancer_screening_page_title_contains_text(
+        "Investigation Datasets"
+    )
+
+    # And I open all minimized sections on the dataset
+    InvestigationDatasetsPage(page).open_all_minimized_sections()
+
     # And I add the following bowel preparation drugs and values within the Investigation Dataset for this subject:
-    drug_information = {
-        "drug_dose1": "3",
-        "drug_type1": DrugTypeOptions.MANNITOL,
-    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(
+        {
+            "drug_dose1": "3",
+            "drug_type1": DrugTypeOptions.MANNITOL,
+        }
+    )
 
     # And there is a clinician who meets the following criteria:
     user = User.from_user_role_type(user_role)
@@ -256,48 +266,51 @@ def test_scenario_9(page: Page, general_properties: dict) -> None:
     )
 
     # And I set the following fields and values within the Investigation Dataset for this subject:
-    general_information = {
-        "practitioner": 1,
-        "site": 1,
-        "testing clinician": person_name,
-        "aspirant endoscopist": None,
-    }
+    InvestigationDatasetCompletion(page).fill_out_general_information(
+        {
+            "practitioner": 1,
+            "site": 1,
+            "testing clinician": person_name,
+            "aspirant endoscopist": None,
+        }
+    )
 
-    endoscopy_information = {
-        "endoscope inserted": "yes",
-        "procedure type": "diagnostic",
-        "bowel preparation quality": BowelPreparationQualityOptions.GOOD,
-        "comfort during recovery": ComfortOptions.NO_DISCOMFORT,
-        "comfort during examination": ComfortOptions.NO_DISCOMFORT,
-        "endoscopist defined extent": EndoscopyLocationOptions.DESCENDING_COLON,
-        "scope imager used": YesNoOptions.YES,
-        "retroverted view": YesNoOptions.NO,
-        "start of intubation time": "09:00",
-        "start of extubation time": "09:30",
-        "end time of procedure": "10:00",
-        "scope id": "Autotest",
-        "insufflation": InsufflationOptions.AIR,
-        "outcome at time of procedure": OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
-        "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
-    }
+    InvestigationDatasetCompletion(page).fill_endoscopy_information(
+        {
+            "endoscope inserted": "yes",
+            "procedure type": "diagnostic",
+            "bowel preparation quality": BowelPreparationQualityOptions.GOOD,
+            "comfort during recovery": ComfortOptions.NO_DISCOMFORT,
+            "comfort during examination": ComfortOptions.NO_DISCOMFORT,
+            "endoscopist defined extent": EndoscopyLocationOptions.DESCENDING_COLON,
+            "scope imager used": YesNoOptions.YES,
+            "retroverted view": YesNoOptions.NO,
+            "start of intubation time": "09:00",
+            "start of extubation time": "09:30",
+            "end time of procedure": "10:00",
+            "scope id": "Autotest",
+            "insufflation": InsufflationOptions.AIR,
+            "outcome at time of procedure": OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
+            "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
+        }
+    )
 
     # And I set the following failure reasons within the Investigation Dataset for this subject:
-    failure_information = {"failure reasons": FailureReasonsOptions.NO_FAILURE_REASONS}
-
-    # And I open all minimized sections on the dataset
-    # And I mark the Investigation Dataset as completed
-    # When I press the save Investigation Dataset button
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        endoscopy_information=endoscopy_information,
-        drug_information=drug_information,
-        general_information=general_information,
-        failure_information=failure_information,
+    InvestigationDatasetCompletion(page).fill_out_failure_information(
+        {"failure reasons": FailureReasonsOptions.NO_FAILURE_REASONS}
     )
 
-    # Then the Investigation Dataset result message is "Normal (No Abnormalities Found)"
-    InvestigationDatasetsPage(page).expect_text_to_be_visible(
+    # And I mark the Investigation Dataset as completed
+    InvestigationDatasetsPage(page).check_dataset_complete_checkbox()
+
+    # When I press the save Investigation Dataset button
+    # Then the Investigation Dataset result message, which I will cancel, is "Normal (No Abnormalities Found)"
+    InvestigationDatasetsPage(page).click_save_dataset_button_assert_dialog(
         "Normal (No Abnormalities Found)"
     )
+
+    # When I press the save Investigation Dataset button
+    InvestigationDatasetsPage(page).click_save_dataset_button()
 
     # And I confirm the Episode Result is "Normal (No Abnormalities Found)"
     EpisodeRepository().confirm_episode_result(

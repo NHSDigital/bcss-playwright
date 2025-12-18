@@ -16,10 +16,8 @@ from utils.oracle.oracle_specific_functions.organisation_parameters import (
     set_org_parameter_value,
     check_parameter,
 )
-from utils.oracle.oracle_specific_functions.screening_colonoscopist import (
-    build_accredited_screening_colonoscopist_query,
-    get_accredited_screening_colonoscopist_in_bcs001,
-)
+from classes.repositories.person_repository import PersonRepository
+from utils.oracle.oracle import OracleDB
 
 
 def test_allow_10_minute_colonsocopy_assessment_appointments(
@@ -56,17 +54,48 @@ def test_asc_with_current_resect_and_discard_accreditation(
     """
     UserTools.user_login(page, "BCSS Bureau Staff at X26")
 
-    current_df = build_accredited_screening_colonoscopist_query("Current")
-    if current_df.empty:
+    criteria = {
+        "Person has current role": "Accredited Screening Colonoscopist",
+        "Person has current role in organisation": "BCS001",
+        "Resect & Discard Accreditation Status": "Current",
+    }
+    query = PersonRepository().build_person_selection_query(
+        criteria=criteria, person=None, required_person_count=1, user=None, subject=None
+    )
+    logging.info(f"Final query: {query}")
+    current_df = OracleDB().execute_query(query)
+
+    if not current_df.empty:
         pytest.skip(
-            "No Accredited Screening Colonoscopist with current Resect & Discard accreditation found."
+            "Accredited Screening Colonoscopist with current Resect & Discard accreditation found."
         )
-    expired_df = build_accredited_screening_colonoscopist_query("Expiring soon")
-    if expired_df.empty:
+
+    criteria = {
+        "Person has current role": "Accredited Screening Colonoscopist",
+        "Person has current role in organisation": "BCS001",
+        "Resect & Discard Accreditation Status": "Expiring soon",
+    }
+    query = PersonRepository().build_person_selection_query(
+        criteria=criteria, person=None, required_person_count=1, user=None, subject=None
+    )
+    logging.info(f"Final query: {query}")
+    expired_df = OracleDB().execute_query(query)
+
+    if not expired_df.empty:
         pytest.skip(
-            "No Accredited Screening Colonoscopist with expiring Resect & Discard accreditation found."
+            "Accredited Screening Colonoscopist with expiring Resect & Discard accreditation found."
         )
-    person_df = get_accredited_screening_colonoscopist_in_bcs001()
+
+    criteria = {
+        "Person has current role": "Accredited Screening Colonoscopist",
+        "Person has current role in organisation": "BCS001",
+    }
+    query = PersonRepository().build_person_selection_query(
+        criteria=criteria, person=None, required_person_count=1, user=None, subject=None
+    )
+    logging.info(f"Final query: {query}")
+    person_df = OracleDB().execute_query(query)
+
     if person_df.empty:
         pytest.fail("No Accredited Screening Colonoscopist found in the database.")
 
@@ -75,10 +104,11 @@ def test_asc_with_current_resect_and_discard_accreditation(
 
     surname = person_df.iloc[0]["person_family_name"]
     forename = person_df.iloc[0]["person_given_name"]
+    person_id = person_df.iloc[0]["prs_id"]
     MaintainContactsPage(page).fill_surname_input_field(surname)
     MaintainContactsPage(page).fill_forenames_input_field(forename)
     MaintainContactsPage(page).click_search_button()
-    MaintainContactsPage(page).click_person_link_from_surname(surname)
+    MaintainContactsPage(page).select_person_by_id(person_id)
 
     EditContactPage(page).click_view_resect_and_discard_link()
     ResectAndDiscardAccreditationHistoryPage(page).verify_heading_is_correct()

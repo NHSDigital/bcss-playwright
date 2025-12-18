@@ -65,3 +65,14 @@ class MaintainContactsPage(BasePage):
             forename (str): The forename of the subject
         """
         self.click(self.page.get_by_role("link", name=forename).last)
+
+    def select_person_by_id(self, person_id: int) -> None:
+        """
+        Selects a person by their unique person ID by clicking the corresponding link.
+        Requires a search to have been conducted and returned at least one result.
+        Args:
+            person_id (int): The unique ID of the person to select
+        """
+        href_selector = f"a[href*='{person_id}']"
+        person_link = self.page.locator(href_selector).first
+        self.click(person_link)
