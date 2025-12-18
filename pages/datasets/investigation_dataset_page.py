@@ -424,7 +424,7 @@ class InvestigationDatasetsPage(BasePage):
     def click_save_dataset_button_assert_dialog(self, expected_text: str) -> None:
         """
         Clicks on the save dataset button and performs an assertion of the resulting dialog text.
-        Once done dismissed the dialog.
+        Once done it dismisses the dialog.
         Args:
             expected_text (str): The expected text in the resultant dialog
         """
