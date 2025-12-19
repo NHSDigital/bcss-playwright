@@ -2,6 +2,7 @@ from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 from utils.calendar_picker import CalendarPicker
 from datetime import datetime
+from typing import List
 
 
 class ContactWithPatientPage(BasePage):
@@ -148,6 +149,21 @@ class ContactWithPatientPage(BasePage):
         self.select_patient_contacted_dropdown_option(patient_contacted)
         self.select_outcome_dropdown_option(outcome)
         self.click_save_button()
+
+    def outcome_dropdown_contains_options(self, options: List[str]) -> None:
+        """
+        Asserts that all provided options are present in the Outcome of Diagnostic Test dropdown.
+
+        Args:
+            options (List[str]): List of option strings to check.
+        """
+        dropdown_options = [
+            opt.inner_text() for opt in self.outcome_dropdown.locator("option").all()
+        ]
+        for item in options:
+            assert (
+                item in dropdown_options
+            ), f"Dropdown is missing expected option: '{item}'"
 
     def verify_contact_with_patient_page_is_displayed(self) -> None:
         """Verify that the 'Contact With Patient' page is displayed."""

@@ -84,6 +84,24 @@ class DiagnosticTestOutcomePage(BasePage):
                 item in dropdown_options
             ), f"Dropdown is missing expected option: '{item}'"
 
+    def reason_for_onward_referral_dropdown_contains_options(
+        self, options: List[str]
+    ) -> None:
+        """
+        Asserts that all provided options are present in the Outcome of Diagnostic Test dropdown.
+
+        Args:
+            options (List[str]): List of option strings to check.
+        """
+        dropdown_options = [
+            opt.inner_text()
+            for opt in self.reason_for_onward_referral_dropdown.locator("option").all()
+        ]
+        for item in options:
+            assert (
+                item in dropdown_options
+            ), f"Dropdown is missing expected option: '{item}'"
+
     def verify_reason_for_symptomatic_referral(self, symptomatic_reason: str) -> None:
         """
         Verify reason for symptomatic referral is visible.
