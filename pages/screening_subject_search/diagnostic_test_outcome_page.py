@@ -154,6 +154,7 @@ class OutcomeOfDiagnosticTest(StrEnum):
     REFER_SURVEILLANCE = "20365"
     INVESTIGATION_COMPLETE = "20360"
     REFER_ANOTHER_DIAGNOSTIC_TEST = "20364"
+    REFER_MDT = "20367"
 
 
 class ReasonForSymptomaticReferral(StrEnum):
