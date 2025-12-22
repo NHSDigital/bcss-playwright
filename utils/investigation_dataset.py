@@ -82,6 +82,7 @@ class InvestigationDatasetCompletion:
         self.failure_reasons_string = "Failure Reasons"
         self.excision_technique_string = "Excision Technique"
         self.outcome_at_time_of_procedure_string = "Outcome at time of procedure"
+        self.proof_parameters_string = "Proof Parameters"
 
         self.investigation_datasets_pom = InvestigationDatasetsPage(self.page)
 
@@ -203,7 +204,7 @@ class InvestigationDatasetCompletion:
         self.investigation_datasets_pom.click_show_completion_proof_information()
         # Completion Proof Information
         DatasetFieldUtil(self.page).populate_select_locator_for_field(
-            "Proof Parameters", CompletionProofOptions.PHOTO_ILEO
+            self.proof_parameters_string, CompletionProofOptions.PHOTO_ILEO
         )
 
     def investigation_datasets_failure_reason(self) -> None:
@@ -373,7 +374,7 @@ class InvestigationDatasetCompletion:
         if completion_information is not None:
             logging.info("Filling out completion proof information")
             DatasetFieldUtil(self.page).populate_select_locator_for_field(
-                "Proof Parameters", completion_information["completion proof"]
+                self.proof_parameters_string, completion_information["completion proof"]
             )
 
         # Failure Information
@@ -496,7 +497,7 @@ class InvestigationDatasetCompletion:
         logging.info("Filling out completion proof information")
         self.investigation_datasets_pom.click_show_completion_proof_information()
         DatasetFieldUtil(self.page).populate_select_locator_for_field(
-            "Proof Parameters", completion_information["completion proof"]
+            self.proof_parameters_string, completion_information["completion proof"]
         )
 
     def fill_out_failure_information(self, failure_information: dict) -> None:
