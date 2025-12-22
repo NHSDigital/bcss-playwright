@@ -1,4 +1,4 @@
-from playwright.sync_api import Page, expect, Locator
+from playwright.sync_api import Page, expect, Locator, TimeoutError
 from pages.base_page import BasePage
 
 
@@ -74,12 +74,12 @@ class SubjectDatasetsPage(BasePage):
             try:
                 self.add_link.first.wait_for(state="visible", timeout=2000)
                 self.click_add_link()
-            except:
+            except TimeoutError:
                 try:
                     self.view_link.first.wait_for(state="visible", timeout=2000)
                     self.click_view_link()
                 except Exception:
-                    raise Exception(
+                    raise TimeoutError(
                         "Neither 'Add' nor 'View' link was found after clicking 'Show Datasets'."
                     )
 
