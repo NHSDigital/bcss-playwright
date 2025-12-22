@@ -668,6 +668,51 @@ def _render_drug_entry(fields: list, index: int, result: dict) -> None:
         result[dose_field["key"]] = ddose
 
 
+def _polyp_output_block(
+    pi: int, info_dict: dict, intervention: object, hist_dict: dict
+) -> str:
+    """
+    Generate the code block for a polyp's information, intervention(s), and histology.
+    Args:
+        pi (int): The polyp index (1-based).
+        info_dict (dict): The polyp information dictionary.
+        intervention (object): The polyp intervention(s), can be dict or list of dicts.
+        hist_dict (dict): The polyp histology dictionary.
+    Returns:
+        str: The generated code block.
+    """
+    code_lines = []
+    code_lines.append(
+        f"InvestigationDatasetCompletion(page).fill_polyp_x_information({pretty_dict(info_dict)}, {pi})"
+    )
+    # Intervention
+    if isinstance(intervention, list):
+        if len(intervention) > 1:
+            code_lines.append(
+                f"InvestigationDatasetCompletion(page).fill_polyp_x_multiple_interventions({pretty_list(intervention)}, {pi})"
+            )
+        elif len(intervention) == 1 and isinstance(intervention[0], dict):
+            code_lines.append(
+                f"InvestigationDatasetCompletion(page).fill_polyp_x_intervention({pretty_dict(intervention[0])}, {pi})"
+            )
+        else:
+            code_lines.append(f"# No intervention for polyp {pi}")
+    elif isinstance(intervention, dict):
+        code_lines.append(
+            f"InvestigationDatasetCompletion(page).fill_polyp_x_intervention({pretty_dict(intervention)}, {pi})"
+        )
+    else:
+        code_lines.append(f"# No intervention for polyp {pi}")
+    # Histology
+    if not hist_dict:
+        code_lines.append(f"# No histology for polyp {pi}")
+    else:
+        code_lines.append(
+            f"InvestigationDatasetCompletion(page).fill_polyp_x_histology({pretty_dict(hist_dict)}, {pi})"
+        )
+    return "\n".join(code_lines)
+
+
 def show_polyp_information_and_intervention_and_histology() -> None:
     """
     Show the Polyp Information, Intervention & Histology section, allowing multiple polyps and interventions.
@@ -682,12 +727,11 @@ def show_polyp_information_and_intervention_and_histology() -> None:
     # Collect all fields for import analysis
     all_fields = polyp_info_fields + polyp_intervention_fields + polyp_histology_fields
     enums = get_enums_used(all_fields)
-    if enums:
-        import_block = (
-            enum_import_string + new_indented_line_string.join(sorted(enums)) + "\n)\n"
-        )
-    else:
-        import_block = ""
+    import_block = (
+        enum_import_string + new_indented_line_string.join(sorted(enums)) + "\n)\n"
+        if enums
+        else ""
+    )
 
     num_polyps = st.number_input(
         "Number of polyps", min_value=0, max_value=20, value=1, step=1
@@ -698,55 +742,22 @@ def show_polyp_information_and_intervention_and_histology() -> None:
 
     for pi in range(1, num_polyps + 1):
         st.markdown(f"### Polyp {pi}")
-        polyp_info = _render_polyp_info(polyp_info_fields, pi)
-        polyp_info_dicts[pi] = polyp_info
+        polyp_info_dicts[pi] = _render_polyp_info(polyp_info_fields, pi)
         interventions = _render_interventions(polyp_intervention_fields, pi)
-        # If interventions is a list of length 1, store as dict, else as list
-        if isinstance(interventions, list) and len(interventions) == 1:
-            polyp_interventions_dicts[pi] = interventions[0]
-        else:
-            polyp_interventions_dicts[pi] = interventions
-        polyp_histology = _render_histology(polyp_histology_fields, pi)
-        polyp_histology_dicts[pi] = polyp_histology
+        polyp_interventions_dicts[pi] = (
+            interventions[0]
+            if isinstance(interventions, list) and len(interventions) == 1
+            else interventions
+        )
+        polyp_histology_dicts[pi] = _render_histology(polyp_histology_fields, pi)
 
     st.markdown("#### Output")
-    output_blocks = []
     for pi in range(1, num_polyps + 1):
         info_dict = polyp_info_dicts[pi]
         hist_dict = polyp_histology_dicts[pi]
         intervention = polyp_interventions_dicts[pi]
-        code_lines = []
-        # Information
-        code_lines.append(
-            f"InvestigationDatasetCompletion(page).fill_polyp_x_information({pretty_dict(info_dict)}, {pi})"
-        )
-        # Intervention
-        if isinstance(intervention, list):
-            if len(intervention) > 1:
-                code_lines.append(
-                    f"InvestigationDatasetCompletion(page).fill_polyp_x_multiple_interventions({pretty_list(intervention)}, {pi})"
-                )
-            elif len(intervention) == 1 and isinstance(intervention[0], dict):
-                code_lines.append(
-                    f"InvestigationDatasetCompletion(page).fill_polyp_x_intervention({pretty_dict(intervention[0])}, {pi})"
-                )
-            else:
-                code_lines.append(f"# No intervention for polyp {pi}")
-        elif isinstance(intervention, dict):
-            code_lines.append(
-                f"InvestigationDatasetCompletion(page).fill_polyp_x_intervention({pretty_dict(intervention)}, {pi})"
-            )
-        else:
-            code_lines.append(f"# No intervention for polyp {pi}")
-        # Histology
-        if not hist_dict:
-            code_lines.append(f"# No histology for polyp {pi}")
-        else:
-            code_lines.append(
-                f"InvestigationDatasetCompletion(page).fill_polyp_x_histology({pretty_dict(hist_dict)}, {pi})"
-            )
-        output_blocks.append("\n".join(code_lines))
-        st.code("\n".join(code_lines), language="python")
+        code_block = _polyp_output_block(pi, info_dict, intervention, hist_dict)
+        st.code(code_block, language="python")
     if import_block:
         st.code(import_block, language="python")
 
