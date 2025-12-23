@@ -51,7 +51,11 @@ def subject_assertion(
     failed_criteria = []
     criteria_keys = [key for key in criteria if key != nhs_number_string]
     for key in criteria_keys:
+        # Always include keys that start with 'which' (case-insensitive) in the query
         single_criteria = {nhs_number_string: nhs_number, key: criteria[key]}
+        for k in criteria_keys:
+            if k.lower().startswith("which") and k != key:
+                single_criteria[k] = criteria[k]
         query, bind_vars = builder.build_subject_selection_query(
             criteria=single_criteria,
             user=user,
@@ -64,13 +68,10 @@ def subject_assertion(
             subject_nhs_number_string not in df.columns
             or nhs_number not in df[subject_nhs_number_string].values
         ):
-            actual_value = (
-                df[key].iloc[0] if key in df.columns and not df.empty else "<missing>"
-            )
             logging.warning(
-                f"[ASSERTION MISMATCH] Key: '{key}' | Expected: '{criteria[key]}' | Actual: '{actual_value}'"
+                f"[ASSERTION MISMATCH] Key: '{key}' | Expected: '{criteria[key]}'"
             )
-            failed_criteria.append((key, criteria[key], actual_value))
+            failed_criteria.append((key, criteria[key]))
 
     if failed_criteria:
         log_message = (

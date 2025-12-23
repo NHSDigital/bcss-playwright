@@ -1,8 +1,10 @@
 import logging
-from typing import Optional
+from typing import Optional, Any
 from utils.oracle.oracle import OracleDB
 from classes.kits.kit_service_management_record import KitServiceManagementRecord
 from classes.entities.kit_service_management_entity import KitServiceManagementEntity
+import numpy as np
+from decimal import Decimal
 
 
 class KitServiceManagementRepository:
@@ -284,6 +286,22 @@ class KitServiceManagementRepository:
             if entity.put_attempts is not None:
                 params["put_attempts"] = entity.put_attempts
 
+            params = {k: _sanitize_param(v) for k, v in params.items()}
             self.oracle_db.update_or_insert_data_to_table(sql_query, params)
         except Exception as ex:
             raise RuntimeError(f"Error updating KIT_QUEUE record: {ex}")
+
+
+def _sanitize_param(val: Any) -> Any:
+    """
+    Sanitizes a parameter value for database operations.
+    Args:
+        val: The parameter value to sanitize.
+    Returns:
+        The sanitized parameter value.
+    """
+    if isinstance(val, np.generic):
+        return val.item()
+    if isinstance(val, Decimal):
+        return float(val)
+    return val

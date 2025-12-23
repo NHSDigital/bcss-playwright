@@ -329,7 +329,7 @@ Examples include `"yes_no"` and `"therapeutic_diagnostic"`, which are handled as
 
 1. Choose a unique string for `"type"` (e.g., `"yes_no"`, `"therapeutic_diagnostic"`).
 2. In your JSON field definition, set `"type"` to this string.
-3. Ensure your `render_field` function in `investigation_dataset_ui.py` has a case for your custom type, rendering the appropriate widget (usually a dropdown/selectbox).
+3. Ensure your `render_field` function in `investigation_dataset_ui.py` has a case for your custom type, rendering the appropriate widget (dropdown, radio, etc.).
    - For `"yes_no"`, the UI will show a dropdown with "yes" and "no".
    - For `"therapeutic_diagnostic"`, the UI will show a dropdown with "therapeutic" and "diagnostic".
 4. You can add more custom types by extending the `render_field` function with new cases in the `match-case` or `if` dispatch.

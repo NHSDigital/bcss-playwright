@@ -96,6 +96,7 @@ class InvestigationDatasetsPage(BasePage):
         self.diagnostic_test_result = self.page.locator(
             "#datasetContent > div:nth-child(1) > div:nth-child(7) > span.userInput"
         )
+        self.show_details_links = self.page.locator('a:has-text("Show details")')
 
         # Repeat strings:
         self.bowel_preparation_administered_string = "Bowel Preparation Administered"
@@ -361,10 +362,13 @@ class InvestigationDatasetsPage(BasePage):
 
     def click_show_completion_proof_information(self) -> None:
         """
-        This method is designed to click on the show completion proof information link.
-        It clicks on the show completion proof information link.
+        Clicks on the show completion proof information link if it contains the text "show" (case-insensitive).
         """
-        self.click(self.show_completion_proof_information_details)
+        if (
+            "show"
+            in self.show_completion_proof_information_details.inner_text().lower()
+        ):
+            self.click(self.show_completion_proof_information_details)
 
     def click_show_failure_information(self) -> None:
         """
@@ -415,6 +419,17 @@ class InvestigationDatasetsPage(BasePage):
         It clicks on the save dataset button.
         """
         self.safe_accept_dialog(self.save_dataset_button)
+        self.page.wait_for_timeout(3000)  # 3 second timeout to allow page to update
+
+    def click_save_dataset_button_assert_dialog(self, expected_text: str) -> None:
+        """
+        Clicks on the save dataset button and performs an assertion of the resulting dialog text.
+        Once done it dismisses the dialog.
+        Args:
+            expected_text (str): The expected text in the resultant dialog
+        """
+        self.assert_dialog_text(expected_text)
+        self.click(self.save_dataset_button)
 
     def expect_text_to_be_visible(self, text: str) -> None:
         """
@@ -1192,6 +1207,24 @@ class InvestigationDatasetsPage(BasePage):
         assert (
             actual_text.lower() == expected_text.lower()
         ), f"Expected '{expected_text}', but found '{actual_text}'"
+
+    def open_all_details_tabs(self) -> None:
+        """
+        Clicks all visible "Show details" links on the page to open all details tabs.
+        """
+        count = self.show_details_links.count()
+        for i in range(count):
+            link = self.show_details_links.nth(i)
+            if link.is_visible():
+                self.click(link)
+
+    def open_all_minimized_sections(self) -> None:
+        """
+        Opens all the minimized sections in the investigation dataset form.
+        """
+        self.open_all_details_tabs()
+        # Then do it again to get the internal sections
+        self.open_all_details_tabs()
 
 
 def normalize_label(text: str) -> str:
