@@ -411,7 +411,7 @@ def test_scenario_11(page: Page, general_properties: dict) -> None:
         3,
     )
 
-    # And I add intervention 1 for polyp 2 with the following fields and values within the Investigation Dataset for this subject:
+    # And I add intervention 1 for polyp 3 with the following fields and values within the Investigation Dataset for this subject:
     InvestigationDatasetCompletion(page).fill_polyp_x_intervention(
         {
             "modality": PolypInterventionModalityOptions.POLYPECTOMY,
@@ -424,7 +424,7 @@ def test_scenario_11(page: Page, general_properties: dict) -> None:
         3,
     )
 
-    # And I update histology details for polyp 2 with the following fields and values within the Investigation Dataset for this subject:
+    # And I update histology details for polyp 3 with the following fields and values within the Investigation Dataset for this subject:
     InvestigationDatasetCompletion(page).fill_polyp_x_histology(
         {
             "pathology lost": YesNoOptions.YES,
