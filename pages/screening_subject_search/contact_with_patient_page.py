@@ -186,3 +186,18 @@ class ContactWithPatientPage(BasePage):
             f"Missing expected dropdown values in the outcome options: {missing}."
             f"Actual options: {actual_options}"
         )
+
+    def patient_outcome_dropdown_contains_options(self, options: List[str]) -> None:
+        """
+        Asserts that all provided options are present in the Patient Outcome dropdown.
+
+        Args:
+            options (List[str]): List of option strings to check.
+        """
+        dropdown_options = [
+            opt.inner_text() for opt in self.outcome_dropdown.locator("option").all()
+        ]
+        for item in options:
+            assert (
+                item in dropdown_options
+            ), f"Dropdown is missing expected option: '{item}'"
