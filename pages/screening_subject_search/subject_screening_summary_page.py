@@ -87,6 +87,9 @@ class SubjectScreeningSummaryPage(BasePage):
         self.postpone_surveillance_episode_button = self.page.get_by_role(
             "button", name="Postpone Surveillance Episode"
         )
+        self.uncease_subject_button = self.page.get_by_role(
+            "button", name="Uncease Subject"
+        )
 
         # List of Subject Episodes - page filters
         self.view_events_link = self.page.get_by_role("link", name="events")
@@ -509,6 +512,10 @@ class SubjectScreeningSummaryPage(BasePage):
             expect(self.postpone_surveillance_episode_button).to_be_visible()
         else:
             expect(self.postpone_surveillance_episode_button).not_to_be_visible()
+
+    def click_uncease_subject_button(self) -> None:
+        """Click the 'Uncease Subject' button."""
+        self.click(self.uncease_subject_button)
 
 
 class ChangeScreeningStatusOptions(StrEnum):
