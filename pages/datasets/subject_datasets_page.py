@@ -1,4 +1,4 @@
-from playwright.sync_api import Page, expect, Locator
+from playwright.sync_api import Page, expect, Locator, TimeoutError
 from pages.base_page import BasePage
 
 
@@ -22,10 +22,15 @@ class SubjectDatasetsPage(BasePage):
             .get_by_role("link")
         )
         self.add_link = self.page.get_by_role("link", name="Add")
+        self.view_link = self.page.get_by_role("link", name="View")
 
     def click_add_link(self) -> None:
         """Clicks on the first 'Add' link on the Subject Datasets Page."""
         self.click(self.add_link.first)
+
+    def click_view_link(self) -> None:
+        """Clicks on the first 'View' link on the Subject Datasets Page."""
+        self.click(self.view_link.first)
 
     def click_colonoscopy_show_datasets(self) -> None:
         """
@@ -64,9 +69,19 @@ class SubjectDatasetsPage(BasePage):
         show_link = container.locator("a:has-text('Show Dataset')")
         show_link.wait_for(state="visible", timeout=10000)
         self.click(show_link)
-        # If plural, also click Add
+        # If plural, also click Add or View depending on visibility
         if dataset_count_text and "Datasets" in dataset_count_text:
-            self.click_add_link()
+            try:
+                self.add_link.first.wait_for(state="visible", timeout=2000)
+                self.click_add_link()
+            except TimeoutError:
+                try:
+                    self.view_link.first.wait_for(state="visible", timeout=2000)
+                    self.click_view_link()
+                except Exception:
+                    raise TimeoutError(
+                        "Neither 'Add' nor 'View' link was found after clicking 'Show Datasets'."
+                    )
 
     def check_investigation_dataset_complete(self) -> None:
         """

@@ -491,7 +491,8 @@ class InvestigationDatasetsPage(BasePage):
         This method is designed to click on the edit dataset button.
         It clicks on the edit dataset button.
         """
-        self.click(self.edit_dataset_button)
+        if self.edit_dataset_button.is_visible():
+            self.click(self.edit_dataset_button)
 
     def assert_polyp_algorithm_size(
         self, polyp_number: int, expected_value: Optional[str]
