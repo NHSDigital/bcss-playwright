@@ -12,10 +12,12 @@ from pages.base_page import BasePage
 from pages.screening_practitioner_appointments import book_appointment_page
 from pages.screening_practitioner_appointments.appointment_detail_page import AppointmentDetailPage
 from pages.screening_subject_search import subject_screening_search_page
+from pages.screening_subject_search import subject_screening_summary_page
+from pages.screening_subject_search.advance_lynch_episode_page import AdvanceLynchEpisodePage
 from pages.screening_subject_search.episode_events_and_notes_page import EpisodeEventsAndNotesPage
 from pages.screening_subject_search.subject_screening_summary_page import SubjectScreeningSummaryPage
 from utils import screening_subject_page_searcher
-from utils.appointments import book_appointments
+from utils.appointments import AppointmentAttendance, book_appointments
 from utils.lynch_utils import LynchUtils
 from utils.oracle.oracle import OracleDB
 from utils.user_tools import UserTools
@@ -66,11 +68,11 @@ def test_scenario_1(page: Page) -> None:
     > Check recall [SSCL4b(J9)]
     """
     # Given I log in to BCSS "England" as user role "Hub Manager"
-    user_role = UserTools.user_login(
-        page, "Hub Manager State Registered at BCS01", return_role_type=True
-    )
-    if user_role is None:
-        raise ValueError("User cannot be assigned to a UserRoleType")
+    # user_role = UserTools.user_login(
+    #     page, "Hub Manager State Registered at BCS01", return_role_type=True
+    # )
+    # if user_role is None:
+    #     raise ValueError("User cannot be assigned to a UserRoleType")
 
     #     # When I receive Lynch diagnosis "EPCAM" for a new subject in my hub aged "25" with diagnosis date "1 year ago" and no last colonoscopy date
 
@@ -157,79 +159,216 @@ def test_scenario_1(page: Page) -> None:
     # # Then my subject has been updated as follows:
     # subject_assertion(nhs_no, {"latest event status": "G2 Lynch Pre-invitation Sent"})
 
+    # When I run Timed Events for my subject
+    # OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
+    # # Then my subject has been updated as follows:
+    # subject_assertion(
+    #     nhs_no,
+    #     {
+    #         "latest event status": "G3 Lynch Surveillance Colonoscopy Assessment Appointment Required"
+    #     },
+    # )
+    # # When I view the subject
+    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # # And I view the practitioner appointment booking screen
+    # SubjectScreeningSummaryPage(page).click_book_practitioner_clinic_button()
+    # # And I select "BCS001" as the screening centre where the practitioner appointment will be held
+    # # And I set the practitioner appointment date to "today"
+    # # And I book the "earliest" available practitioner appointment on this date
+    # book_appointments(
+    #     page,
+    #     "BCS001 - Wolverhampton Bowel Cancer Screening Centre",
+    #     "The Royal Hospital (Wolverhampton)",
+    # )
+    # # Then my subject has been updated as follows:
+    # subject_assertion(
+    #     nhs_no,
+    #     {
+    #         "latest event status": "A183 1st Colonoscopy Assessment Appointment Requested"
+    #     },
+    # )
+    # # And there is a "A183" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment (Lynch)"
+    # # When I process the open "A183" letter batch for my subject
+    # batch_processing(
+    #     page,
+    #     "A183",
+    #     "Practitioner Clinic 1st Appointment (Lynch)",
+
+    # )
+    # # Then my subject has been updated as follows:
+    # subject_assertion(
+    #     nhs_no,
+    #     {"latest event status": "A25 1st Colonoscopy Assessment Appointment Letter Sent"},
+    # )
+    # # When I switch users to BCSS "England" as user role "Screening Centre Manager"
+
+    # LogoutPage(page).log_out(close_page=False)
+    # BasePage(page).go_to_log_in_page()
+    UserTools.user_login(page, "Screening Centre Manager at BCS001")
+    # # And I view the subject
+
+    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # # And I view the event history for the subject's latest episode
+    # SubjectScreeningSummaryPage(page).expand_episodes_list()
+    # SubjectScreeningSummaryPage(page).click_first_lynch_surveillance_episode_link()
+    # # And I view the latest practitioner appointment in the subject's episode
+    # EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
+
+    # # And I attend the subject's practitioner appointment "today"
+    # AppointmentDetailPage(page).mark_appointment_as_attended(datetime.today())
+    # # Then my subject has been updated as follows:
+    # subject_assertion(
+    #     nhs_no,
+    #     {"latest event status": "J10 Attended Colonoscopy Assessment Appointment"},
+    # )
+
+    # When I view the subject
     nhs_no = "9426510028"
+    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # # And I view the advance episode options
+    # SubjectScreeningSummaryPage(page).click_advance_lynch_surveillance_episode_button()
+    # # And I select Subsequent Assessment Appointment Required reason "SC interpreter DNA"
+    # AdvanceLynchEpisodePage(
+    #     page
+    # ).click_and_select_subsequent_assessment_appointment_required("SC interpreter DNA")
+    # # Then my subject has been updated as follows:
+
+    # subject_assertion(
+    #     nhs_no,
+    #     {"latest event status": "J1 Subsequent Assessment Appointment Required"},
+    # )
+    # # When I view the subject
+    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # # And I view the practitioner appointment booking screen
+    # SubjectScreeningSummaryPage(page).click_book_practitioner_clinic_button()
+    # # And I select "BCS001" as the screening centre where the practitioner appointment will be held
+    # # And I set the practitioner appointment date to "today"
+    # # And I book the "earliest" available practitioner appointment on this date
+    # book_appointments(
+    #     page,
+    #     "BCS001 - Wolverhampton Bowel Cancer Screening Centre",
+    #     "The Royal Hospital (Wolverhampton)",
+    # )
+    # # Then my subject has been updated as follows:
+    # subject_assertion(
+    #     nhs_no,
+    #     {"latest event status": "J34 Subsequent Appointment Requested"},
+    # )
+    # # And there is a "J34" letter batch for my subject with the exact title "Practitioner Clinic 1st Subsequent Appointment (Lynch)"
+    # # When I process the open "J34" letter batch for my subject
+    # batch_processing(
+    #     page,
+    #     "J34",
+    #     "Practitioner Clinic 1st Subsequent Appointment (Lynch)",
+    # )
+    # # Then my subject has been updated as follows:
+    # subject_assertion(
+    #     nhs_no,
+    #     {"latest event status": "J35 Subsequent Appointment Booked, letter sent"},
+    # )
+    # When I view the subject
+    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # # And I view the event history for the subject's latest episode
+    # # And I view the latest practitioner appointment in the subject's episode
+    # # And The subject DNAs the practitioner appointment
+    # AppointmentAttendance(page).mark_as_dna("Patient did not attend")
+    # # Then my subject has been updated as follows:
+    # subject_assertion(
+    #     nhs_no,
+    #     {"latest event status": "J36 Subsequent Appointment Non-attendance (Patient)"},
+    # )
+    # # And there is a "J36" letter batch for my subject with the exact title "Practitioner Clinic 1st Subsequent Appointment Non Attendance (Patient) (Lynch)"
+    # # When I process the open "J36" letter batch for my subject
+    # batch_processing(
+    #     page,
+    #     "J36",
+    #     "Practitioner Clinic 1st Subsequent Appointment Non Attendance (Patient) (Lynch)",
+    # )
+    # # Then my subject has been updated as follows:
+    # subject_assertion(
+    #     nhs_no,
+    #     {"latest event status": "J27 Appointment Non-attendance Letter Sent (Patient)"},
+    # )
+    # # When I view the subject
+    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # # And I view the practitioner appointment booking screen
+    # SubjectScreeningSummaryPage(page).click_book_practitioner_clinic_button()
+    # # And I select "BCS001" as the screening centre where the practitioner appointment will be held
+    # # And I set the practitioner appointment date to "today"
+    # # And I book the "earliest" available practitioner appointment on this date
+    # book_appointments(
+    #     page,
+    #     "BCS001 - Wolverhampton Bowel Cancer Screening Centre",
+    #     "The Royal Hospital (Wolverhampton)",
+    # )
+    # # Then my subject has been updated as follows:
+    # subject_assertion(
+    #     nhs_no,
+    #     {"latest event status": "J37 Subsequent Appointment Requested following a DNA"},
+    # )
+    # # And there is a "J37" letter batch for my subject with the exact title "Practitioner Clinic 2nd Subsequent Appointment (Lynch)"
+    # # When I process the open "J37" letter batch for my subject
+    # batch_processing(
+    #     page,
+    #     "J37",
+    #     "Practitioner Clinic 2nd Subsequent Appointment (Lynch)",
+    # )
+    # # Then my subject has been updated as follows:
+    # subject_assertion(
+    #     nhs_no,
+    #     {
+    #         "latest event status": "J38 Subsequent Appointment Booked, letter sent following a DNA"
+    #     },
+    # )
+    # # When I view the event history for the subject's latest episode
+    # screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # SubjectScreeningSummaryPage(page).expand_episodes_list()
+    # SubjectScreeningSummaryPage(page).click_first_lynch_surveillance_episode_link()
+    # # And I view the latest practitioner appointment in the subject's episode
+    # EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
+    # # And The subject cancels the practitioner appointment  with reason "Patient Cancelled to Consider"
+    # AppointmentDetailPage(page).check_cancel_radio()
+    # AppointmentDetailPage(page).select_reason_for_cancellation_option("Patient Cancelled to Consider")
+    # AppointmentDetailPage(page).click_save_button()
+    # AppointmentDetailPage(page).verify_text_visible("Appointment cancelled successfully")
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "J14 Appointment Cancelled following a DNA (Patient to Consider)"
+        },
+    )
+
+    # And there is a "J14" letter batch for my subject with the exact title "Practitioner Clinic Appointment Cancellation (Patient to Consider) (Lynch)"
+    # When I process the open "J14" letter batch for my subject
+    batch_processing(
+        page,
+        "J14",
+        "Practitioner Clinic 2nd Appt Cancelled (Patient To Consider) (Lynch)",
+    )
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "J23 Appointment Cancellation letter sent following a DNA (Patient to Consider)"
+        },
+    )
     # When I run Timed Events for my subject
     OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
-    # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "latest event status": "G3 Lynch Surveillance Colonoscopy Assessment Appointment Required"
-        },
-    )
-    # When I view the subject
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-    pytest.skip("Skipping remainder of test until Lynch utils are complete")
-    # And I view the practitioner appointment booking screen
-    subject_screening_search_page.go_to_practitioner_appointment_booking_page(page)
-    # And I select "BCS001" as the screening centre where the practitioner appointment will be held
-    book_appointment_page.select_screening_centre(
-        page, "BCS001 - Wolverhampton Bowel Cancer Screening Centre"
-    )
-    # And I set the practitioner appointment date to "today"
-    # And I book the "earliest" available practitioner appointment on this date
-    book_appointments(
+    # Then there is a "J23" letter batch for my subject with the exact title "Subject Discharge (Refused Appointment) (Lynch)"
+    # When I process the open "J23" letter batch for my subject
+    batch_processing(
         page,
-        "BCS001 - Wolverhampton Bowel Cancer Screening Centre",
-        "The Royal Hospital (Wolverhampton)",
+        "J23",
+        "Subject Discharge (Refused Appointment) (Lynch)",
     )
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
         {
-            "latest event status": "A183 1st Colonoscopy Assessment Appointment Requested"
+            "latest event status": "J8 Patient discharge sent (refused colonoscopy assessment appointment) "
         },
     )
-    # And there is a "A183" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment (Lynch)"
-    batch_processing.assert_letter_batch_exists(
-        nhs_no,
-        "A183",
-        exact_title="Practitioner Clinic 1st Appointment (Lynch)",
-    )
-    # When I process the open "A183" letter batch for my subject
-    batch_processing.process_open_letter_batch(
-        nhs_no,
-        "A183",
-    )
-    # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {"latest event status": "A25 1st Colonoscopy Assessment Appointment Letter Sent"},
-    )
-    # When I switch users to BCSS "England" as user role "Screening Centre Manager"
-
-    LogoutPage(page).log_out(close_page=False)
-    BasePage(page).go_to_log_in_page()
-    UserTools.user_login(page, "Screening Centre Manager at BCS001")
-    # And I view the event history for the subject's latest episode
-    SubjectScreeningSummaryPage(page).expand_episodes_list()
-    # SubjectScreeningSummaryPage(page).click_first_fobt_episode_link()-check this is FOBT link
-    # And I view the latest practitioner appointment in the subject's episode
-    EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
-
-    # And I attend the subject's practitioner appointment "today"
-    AppointmentDetailPage(page).mark_appointment_as_attended(datetime.today())
-    # Then my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {"latest event status": "J10 Attended Colonoscopy Assessment Appointment"},
-    )
-
-    # When I view the subject
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-    # And I view the advance episode options
-    # SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()--lynch equivalent
-    # And I select Subsequent Assessment Appointment Required reason "SC interpreter DNA"
-    # LynchUtils(page).advance_episode_for_subsequent_assessment_appointment_required(
-    #     reason="SC interpreter DNA"
-    # )
+# NEXT IS 204
