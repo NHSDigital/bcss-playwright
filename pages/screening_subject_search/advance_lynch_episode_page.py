@@ -13,7 +13,9 @@ class AdvanceLynchEpisodePage(AdvanceEpisodePage):
         self.review_suitability_for_lynch_surveillance_button = page.get_by_role(
             "button", name="Review suitability for Lynch Surveillance"
         )
-        self.refer_for_clinician_review_button = page.get_by_role('button', name='Refer for Clinician Review')
+        self.refer_for_clinician_review_button = page.get_by_role(
+            "button", name="Refer for Clinician Review"
+        )
 
     def click_review_suitability_for_lynch_surveillance_button(self) -> None:
         """Click on the 'Review suitability for Lynch Surveillance' button."""
@@ -23,4 +25,3 @@ class AdvanceLynchEpisodePage(AdvanceEpisodePage):
     def click_refer_for_clinician_review_button(self) -> None:
         """Click on the 'Refer for Clinician Review' button."""
         self.safe_accept_dialog(self.refer_for_clinician_review_button)
-        
