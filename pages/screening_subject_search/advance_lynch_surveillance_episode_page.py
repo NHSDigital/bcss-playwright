@@ -2,7 +2,7 @@ from playwright.sync_api import Page
 from pages.screening_subject_search.advance_episode_page import AdvanceEpisodePage
 
 
-class AdvanceLynchEpisodePage(AdvanceEpisodePage):
+class AdvanceLynchSurveillanceEpisodePage(AdvanceEpisodePage):
     """Advance Lynch Episode Page locators, and methods for interacting with the page."""
 
     def __init__(self, page: Page):
