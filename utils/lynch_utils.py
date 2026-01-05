@@ -32,7 +32,8 @@ class LynchUtils:
     def __init__(self, page: Page):
         self.page = page
 
-    def insert_validated_lynch_patient_from_new_subject_with_age(self,
+    def insert_validated_lynch_patient_from_new_subject_with_age(
+        self,
         age: str,
         gene: str,
         when_diagnosis_took_place: str,
@@ -267,9 +268,11 @@ class LynchUtils:
         general_repository = GeneralRepository()
         general_repository.process_new_lynch_patients()
 
-    def set_lynch_invitation_rate(self, rate):
+    def set_lynch_invitation_rate(self, rate: float) -> None:
         """
         Sets the Lynch invitation rate for all screening centres.
+        Args:
+            rate (float): The new invitation rate to set.
         """
         db = OracleDB()
         connection = db.connect_to_db()
@@ -288,7 +291,10 @@ class LynchUtils:
             db.disconnect_from_db(connection)
 
     def run_lynch_invitations(self):
-        logging.info("Starting Lynch invitations")
+        """
+        Executes the pkg_lynch.p_invite_lynch_subjects stored procedure to send invitations to Lynch subjects.
+        """
+        logging.debug("Starting Lynch invitations")
         general_repository = GeneralRepository()
         general_repository.run_lynch_invitations()
-        logging.info("Finished Lynch invitations")
+        logging.debug("Finished Lynch invitations")
