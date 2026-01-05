@@ -31,7 +31,7 @@ from datetime import datetime
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.lynch_regression_tests
-def test_scenario_1(page: Page) -> None:
+def lynch_test_scenario_1(page: Page) -> None:
     """
     Scenario: 1 - Patient refuses colonoscopy assessment appointment
 
