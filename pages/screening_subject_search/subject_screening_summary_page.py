@@ -500,7 +500,7 @@ class SubjectScreeningSummaryPage(BasePage):
 
     def click_postpone_surveillance_episode_button(self) -> None:
         """Click the 'Postpose Surveillance Episode' button."""
-        self.click(self.postpone_surveillance_episode_button)
+        self.safe_accept_dialog(self.postpone_surveillance_episode_button)
 
     def can_postpone_surveillance_episode(self, able_to_click: bool = True) -> None:
         """
