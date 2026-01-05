@@ -72,6 +72,9 @@ class SubjectScreeningSummaryPage(BasePage):
         self.advance_surveillance_episode_button = self.page.get_by_role(
             "button", name="Advance Surveillance Episode"
         )
+        self.advance_lynch_surveillance_episode_button = self.page.get_by_role(
+            "button", name="Advance Lynch Surveillance Episode"
+        )
         self.additional_care_note_link = self.page.get_by_role("link", name="(AN)")
         self.temporary_address_icon = self.page.get_by_role(
             "link", name="The person has a current"
@@ -274,6 +277,10 @@ class SubjectScreeningSummaryPage(BasePage):
     def click_advance_surveillance_episode_button(self) -> None:
         """Click on the 'Advance Surveillance Episode' button."""
         self.click(self.advance_surveillance_episode_button)
+
+    def click_advance_lynch_surveillance_episode_button(self) -> None:
+        """Click on the 'Advance Lynch Surveillance Episode' button."""
+        self.click(self.advance_lynch_surveillance_episode_button)
 
     def verify_additional_care_note_visible(self) -> None:
         """Verifies that the '(AN)' link is visible."""
