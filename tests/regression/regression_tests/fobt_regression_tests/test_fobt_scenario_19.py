@@ -15,7 +15,7 @@ from utils.oracle.oracle import OracleDB
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.fobt_regression_tests
-def test_scenario_19(page: Page) -> None:
+def test_fobt_scenario_19(page: Page) -> None:
     """
     Scenario: 19: Late response receive a kit
 

@@ -93,7 +93,7 @@ from classes.repositories.subject_repository import SubjectRepository
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.fobt_regression_tests
-def test_scenario_14(page: Page) -> None:
+def test_fobt_scenario_14(page: Page) -> None:
     """
         Scenario: 14: LNPCP result from symptomatic procedure
 

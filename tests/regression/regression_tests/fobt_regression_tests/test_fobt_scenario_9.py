@@ -44,7 +44,7 @@ from pages.screening_subject_search.contact_with_patient_page import (
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.fobt_regression_tests
-def test_scenario_9(page: Page) -> None:
+def test_fobt_scenario_9(page: Page) -> None:
     """
     Scenario: 9: Discharge in-age FOBT subject for patient choice, cancelled diagnostic test so "No result"
 

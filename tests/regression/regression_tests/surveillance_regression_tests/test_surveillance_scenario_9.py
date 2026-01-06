@@ -63,7 +63,7 @@ from utils.user_tools import UserTools
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.surveillance_regression_tests
-def test_scenario_9(page: Page, general_properties: dict) -> None:
+def test_surveillance_scenario_9(page: Page, general_properties: dict) -> None:
     """
     Scenario: 9: Normal result from diagnostic tests
 

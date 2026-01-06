@@ -38,7 +38,7 @@ from utils.oracle.oracle import OracleDB
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.fobt_regression_tests
-def test_scenario_6(page: Page) -> None:
+def test_fobt_scenario_6(page: Page) -> None:
     """
     Scenario: 6: Non-agreement to diagnostic tests
 

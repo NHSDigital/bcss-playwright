@@ -38,7 +38,7 @@ from pages.screening_subject_search.record_diagnosis_date_page import (
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.fobt_regression_tests
-def test_scenario_4(page: Page) -> None:
+def test_fobt_scenario_4(page: Page) -> None:
     """
     Scenario: 4: Screening Centre discharges patient prior to colonoscopy assessment
 

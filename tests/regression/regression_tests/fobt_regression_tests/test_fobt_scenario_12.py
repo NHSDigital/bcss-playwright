@@ -77,7 +77,7 @@ from pages.screening_subject_search.contact_with_patient_page import (
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.fobt_regression_tests
-def test_scenario_12(page: Page) -> None:
+def test_fobt_scenario_12(page: Page) -> None:
     """
     Scenario: 12: Abnormal result from symptomatic procedure, then refer for another diagnostic test
 

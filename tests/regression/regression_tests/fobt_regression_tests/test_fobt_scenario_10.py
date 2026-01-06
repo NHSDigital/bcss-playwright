@@ -72,7 +72,7 @@ from pages.screening_subject_search.reopen_fobt_screening_episode_page import (
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.fobt_regression_tests
-def test_scenario_10(page: Page) -> None:
+def test_fobt_scenario_10(page: Page) -> None:
     """
     Scenario: 10: Normal result from diagnostic tests
 

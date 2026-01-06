@@ -56,7 +56,7 @@ from pages.screening_subject_search.diagnostic_test_outcome_page import (
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.surveillance_regression_tests
-def test_scenario_4(page: Page) -> None:
+def test_surveillance_scenario_4(page: Page) -> None:
     """
     Scenario: 4: Discharge for patient decision, after diagnostic test
 

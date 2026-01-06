@@ -66,7 +66,7 @@ from pages.screening_subject_search.diagnostic_test_outcome_page import (
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.surveillance_regression_tests
-def test_scenario_8(page: Page, general_properties: dict) -> None:
+def test_surveillance_scenario_8(page: Page, general_properties: dict) -> None:
     """
     Scenario: 8:SSPI cease
 

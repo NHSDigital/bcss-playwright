@@ -74,7 +74,7 @@ from pages.screening_subject_search.diagnostic_test_outcome_page import (
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.fobt_regression_tests
-def test_scenario_8(page: Page) -> None:
+def test_fobt_scenario_8(page: Page) -> None:
     """
     Scenario: 8: Discharge for no contact, diagnostic test result of "No result"
 

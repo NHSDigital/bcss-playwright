@@ -41,7 +41,7 @@ from pages.screening_subject_search.reopen_surveillance_episode_page import (
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.surveillance_regression_tests
-def test_scenario_2(page: Page, general_properties: dict) -> None:
+def test_surveillance_scenario_2(page: Page, general_properties: dict) -> None:
     """
     Scenario: 2: Discharge for clinical decision (no GP letter)
 

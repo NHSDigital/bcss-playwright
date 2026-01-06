@@ -99,7 +99,7 @@ from utils.sspi_change_steps import SSPIChangeSteps
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.fobt_regression_tests
-def test_scenario_18(page: Page) -> None:
+def test_fobt_scenario_18(page: Page) -> None:
     """
     Scenario: 18: Cancer from symptomatic procedure
 

@@ -97,6 +97,7 @@ class InvestigationDatasetsPage(BasePage):
             "#datasetContent > div:nth-child(1) > div:nth-child(7) > span.userInput"
         )
         self.show_details_links = self.page.locator('a:has-text("Show details")')
+        self.warning_messages = self.page.locator("#UI_DIV_ADVICE_MESSAGE")
 
         # Repeat strings:
         self.bowel_preparation_administered_string = "Bowel Preparation Administered"
@@ -1226,6 +1227,24 @@ class InvestigationDatasetsPage(BasePage):
         self.open_all_details_tabs()
         # Then do it again to get the internal sections
         self.open_all_details_tabs()
+
+    def get_warning_message(self) -> str | None:
+        """
+        Returns the warning message displayed at the top of the investigation dataset, or None if not present.
+        """
+        if self.warning_messages.count() > 0:
+            return self.warning_messages.first.inner_text().strip()
+        return None
+
+    def message_is_displayed(self, expected_message: str) -> None:
+        """
+        Asserts that the expected warning message is displayed at the top of the investigation dataset.
+        Args:
+            expected_message (str): The expected warning message text.
+        """
+        actual_message = self.get_warning_message()
+        assert actual_message is not None and expected_message in actual_message, \
+            f"Actual warning message displayed is: {actual_message}"
 
 
 def normalize_label(text: str) -> str:
