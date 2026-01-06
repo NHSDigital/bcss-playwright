@@ -67,3 +67,26 @@ class GeneralRepository:
             )
 
         logging.debug("[END] process_new_lynch_patients")
+
+    def run_lynch_invitations(self):
+        """
+        Executes the pkg_lynch.p_invite_lynch_subjects stored procedure to send invitations to Lynch subjects.
+        Raises:
+            oracledb.DatabaseError: If there is an error executing the stored procedure.
+        """
+        logging.debug("[START] run_lynch_invitations")
+        try:
+            self.oracle_db.execute_stored_procedure(
+                "pkg_lynch.p_invite_lynch_subjects",
+                in_params=None,
+                out_params=[oracledb.CURSOR],
+            )
+        except Exception as e:
+            logging.error(
+                "Error executing pkg_lynch.p_invite_lynch_subjects", exc_info=True
+            )
+            raise oracledb.DatabaseError(
+                f"Error executing pkg_lynch.p_invite_lynch_subjects: {e}"
+            )
+
+        logging.debug("[END] run_lynch_invitations")
