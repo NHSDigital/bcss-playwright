@@ -34,6 +34,7 @@ class ColonoscopyDatasetsPage(BasePage):
         self.dataset_complete_radio_button_no = self.page.get_by_role(
             "radio", name="No"
         )
+        self.edit_dataset_button = self.page.get_by_role("button", name="Edit Dataset")
 
     def save_dataset(self) -> None:
         """Clicks the Save Dataset button on the colonoscopy datasets page."""
@@ -71,6 +72,11 @@ class ColonoscopyDatasetsPage(BasePage):
     def click_dataset_complete_radio_button_no(self) -> None:
         """Clicks the 'No' radio button for the dataset complete option."""
         self.dataset_complete_radio_button_no.check()
+
+    def click_edit_dataset_button(self) -> None:
+        """Clicks the 'Edit Dataset' button if it is visible."""
+        if self.edit_dataset_button.first.is_visible():
+            self.click(self.edit_dataset_button.first)
 
 
 class AsaGradeOptions(Enum):
