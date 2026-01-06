@@ -179,7 +179,7 @@ def test_search_screening_subject_by_status_call(page: Page) -> None:
 @pytest.mark.smoke
 def test_search_screening_subject_by_status_inactive(page: Page) -> None:
     """
-    Confirms screening subjects can be searched for, using the screening status (call) by doing the following:
+    Confirms screening subjects can be searched for, using the screening status (Inactive) by doing the following:
     - Clear filters
     - Select status from dropdown
     - Pressing Tab is required after text input, to make the search button become active.
@@ -195,7 +195,7 @@ def test_search_screening_subject_by_status_inactive(page: Page) -> None:
 @pytest.mark.smoke
 def test_search_screening_subject_by_status_opt_in(page: Page) -> None:
     """
-    Confirms screening subjects can be searched for, using the screening status (call) by doing the following:
+    Confirms screening subjects can be searched for, using the screening status (opt-in) by doing the following:
     - Clear filters
     - Select status from dropdown
     - Pressing Tab is required after text input, to make the search button become active.
@@ -211,7 +211,7 @@ def test_search_screening_subject_by_status_opt_in(page: Page) -> None:
 @pytest.mark.smoke
 def test_search_screening_subject_by_status_recall(page: Page) -> None:
     """
-    Confirms screening subjects can be searched for, using the screening status (call) by doing the following:
+    Confirms screening subjects can be searched for, using the screening status (recall) by doing the following:
     - Clear filters
     - Select status from dropdown
     - Pressing Tab is required after text input, to make the search button become active.
@@ -227,7 +227,7 @@ def test_search_screening_subject_by_status_recall(page: Page) -> None:
 @pytest.mark.smoke
 def test_search_screening_subject_by_status_self_referral(page: Page) -> None:
     """
-    Confirms screening subjects can be searched for, using the screening status (call) by doing the following:
+    Confirms screening subjects can be searched for, using the screening status (self-referral) by doing the following:
     - Clear filters
     - Select status from dropdown
     - Pressing Tab is required after text input, to make the search button become active.
@@ -245,7 +245,7 @@ def test_search_screening_subject_by_status_self_referral(page: Page) -> None:
 @pytest.mark.smoke
 def test_search_screening_subject_by_status_surveillance(page: Page) -> None:
     """
-    Confirms screening subjects can be searched for, using the screening status (call) by doing the following:
+    Confirms screening subjects can be searched for, using the screening status (surveillance) by doing the following:
     - Clear filters
     - Select status from dropdown
     - Pressing Tab is required after text input, to make the search button become active.
@@ -263,7 +263,7 @@ def test_search_screening_subject_by_status_surveillance(page: Page) -> None:
 @pytest.mark.smoke
 def test_search_screening_subject_by_status_seeking_further_data(page: Page) -> None:
     """
-    Confirms screening subjects can be searched for, using the screening status (call) by doing the following:
+    Confirms screening subjects can be searched for, using the screening status (seeking further data) by doing the following:
     - Clear filters
     - Select status from dropdown
     - Pressing Tab is required after text input, to make the search button become active.
@@ -281,7 +281,7 @@ def test_search_screening_subject_by_status_seeking_further_data(page: Page) -> 
 @pytest.mark.smoke
 def test_search_screening_subject_by_status_ceased(page: Page) -> None:
     """
-    Confirms screening subjects can be searched for, using the screening status (call) by doing the following:
+    Confirms screening subjects can be searched for, using the screening status (ceased) by doing the following:
     - Clear filters
     - Select status from dropdown
     - Pressing Tab is required after text input, to make the search button become active.
@@ -297,7 +297,7 @@ def test_search_screening_subject_by_status_ceased(page: Page) -> None:
 @pytest.mark.smoke
 def test_search_screening_subject_by_status_lynch_surveillance(page: Page) -> None:
     """
-    Confirms screening subjects can be searched for, using the screening status (call) by doing the following:
+    Confirms screening subjects can be searched for, using the screening status (lynch surveillance) by doing the following:
     - Clear filters
     - Select status from dropdown
     - Pressing Tab is required after text input, to make the search button become active.
@@ -315,7 +315,7 @@ def test_search_screening_subject_by_status_lynch_surveillance(page: Page) -> No
 @pytest.mark.smoke
 def test_search_screening_subject_by_status_lynch_self_referral(page: Page) -> None:
     """
-    Confirms screening subjects can be searched for, using the screening status (call) by doing the following:
+    Confirms screening subjects can be searched for, using the screening status (lynch self referral) by doing the following:
     - Clear filters
     - Select status from dropdown
     - Pressing Tab is required after text input, to make the search button become active.
@@ -336,7 +336,7 @@ def test_search_screening_subject_by_latest_episode_status_open_paused(
     page: Page,
 ) -> None:
     """
-    Confirms screening subjects can be searched for, using the screening status (call) by doing the following:
+    Confirms screening subjects can be searched for, using the episode status (open/paused) by doing the following:
     - Clear filters
     - Select status from dropdown
     - Pressing Tab is required after text input, to make the search button become active.
@@ -354,7 +354,7 @@ def test_search_screening_subject_by_latest_episode_status_open_paused(
 @pytest.mark.smoke
 def test_search_screening_subject_by_latest_episode_status_closed(page: Page) -> None:
     """
-    Confirms screening subjects can be searched for, using the screening status (call) by doing the following:
+    Confirms screening subjects can be searched for, using the episode status (closed) by doing the following:
     - Clear filters
     - Select status from dropdown
     - Pressing Tab is required after text input, to make the search button become active.
@@ -374,7 +374,7 @@ def test_search_screening_subject_by_latest_episode_status_no_episode(
     page: Page,
 ) -> None:
     """
-    Confirms screening subjects can be searched for, using the screening status (call) by doing the following:
+    Confirms screening subjects can be searched for, using the episode status (no episode) by doing the following:
     - Clear filters
     - Select status from dropdown
     - Pressing Tab is required after text input, to make the search button become active.
@@ -415,7 +415,7 @@ def test_search_screening_subject_by_gp_practice(
     page: Page, general_properties: dict
 ) -> None:
     """
-    Confirms screening subjects can be searched for, using the search area (home hub) by doing the following:
+    Confirms screening subjects can be searched for, using the search area (gp practice) by doing the following:
     - Clear filters
     - Select screening status "recall" (searching by search area requires another search option to be selected)
     - Select "GP Practice" option from dropdown

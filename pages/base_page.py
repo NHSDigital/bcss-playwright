@@ -205,6 +205,15 @@ class BasePage:
         """Click the Base Page 'Screening Subject Search' link."""
         self.click(self.screening_subject_search_page)
 
+    def go_to_page(self, navigation_steps: list[str]) -> None:
+        """Clicks the navigation links in the list provided.
+        Args:
+            navigation_steps (list[str]): the links you want to navigate through in order
+        """
+        for intended_page in navigation_steps:
+            self.page.get_by_role("link", name=intended_page).click()
+            logging.info(f"navigated to {intended_page}")
+
     def click(self, locator: Locator) -> None:
         # Alerts table locator
         alerts_table = locator.get_by_role("table", name="cockpitalertbox")

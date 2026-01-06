@@ -1,6 +1,10 @@
+import logging
 import pytest
 from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
+from pages.reports.operational.communication_type_by_gp_practice_page import (
+    CommunicationTypeByGpPracticePage,
+)
 from pages.reports.reports_page import ReportsPage
 from utils.date_time_utils import DateTimeUtils
 from utils.user_tools import UserTools
@@ -517,3 +521,19 @@ def test_operational_reports_screening_practitioner_appointments(
     expect(ReportsPage(page).common_report_timestamp_element).to_contain_text(
         report_timestamp
     )
+
+
+def test_report_communication_type_for_gp_practices(page: Page) -> None:
+    """
+    Navigate to the Operational Reports and Communication Type for GP, select Wolverhampton Bowel Cancer Screening Centre.
+    On the results page assert the page title and report generated on and selected GP Practices
+    """
+    BasePage(page).go_to_page(["Operational Reports", "Communication Type for GP"])
+
+    CommunicationTypeByGpPracticePage(page).select_screening_centre(
+        "Wolverhampton Bowel Cancer Screening Centre"
+    )
+
+    for gp_practice_code in ["C81002", "M87041"]:
+        expect(page.locator("#listReportDataTable")).to_contain_text(gp_practice_code)
+        logging.info(f"results include the GP practice code {gp_practice_code}")
