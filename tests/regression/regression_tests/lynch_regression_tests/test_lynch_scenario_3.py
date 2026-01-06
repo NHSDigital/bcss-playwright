@@ -21,7 +21,7 @@ from utils.user_tools import UserTools
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.lynch_regression_tests
-def test_scenario_3(page: Page) -> None:
+def test_lynch_scenario_3(page: Page) -> None:
     """
     Scenario: 3 - DNA colonoscopy assessment twice
 

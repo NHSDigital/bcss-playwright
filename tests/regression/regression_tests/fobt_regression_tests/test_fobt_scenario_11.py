@@ -76,7 +76,7 @@ from pages.login.select_job_role_page import SelectJobRolePage
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.fobt_regression_tests
-def test_scenario_11(page: Page) -> None:
+def test_fobt_scenario_11(page: Page) -> None:
     """
     Scenario: 11: Abnormal result from diagnostic tests
 

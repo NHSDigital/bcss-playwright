@@ -21,6 +21,7 @@ from pages.screening_subject_search.reopen_surveillance_episode_page import (
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
+from utils.batch_processing import batch_processing
 from utils import screening_subject_page_searcher
 from utils.generate_health_check_forms_util import GenerateHealthCheckFormsUtil
 from utils.sspi_change_steps import SSPIChangeSteps
@@ -34,11 +35,11 @@ from utils.user_tools import UserTools
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.surveillance_regression_tests
-def test_surveillance_scenario_7a(page: Page, general_properties: dict) -> None:
+def test_surveillance_scenario_7b(page: Page, general_properties: dict) -> None:
     """
-    Scenario: 7a: Postpone from X500
+    Scenario: 7b: Postpone from X505
 
-    X500-X92-C203 [SSCL30] X900-A99
+    X500-X505-X92-C203 [SSCL30] X900-A99
 
     This scenario does work, but only if you manage to invite a subject with a Surveillance due date that is in the past but less than a year ago, so we don't trip over the validation for the future date.  These are not immediately available in a cloud dev/test database, so before it can be run, Surveillance invitations must be manually run to a date within the last year.  Because this somewhat limits the usefulness of this scenario, it is flagged to be ignored by default.
 
@@ -48,6 +49,8 @@ def test_surveillance_scenario_7a(page: Page, general_properties: dict) -> None:
 
     > Run surveillance invitations for 1 subject > X500 (3.1)
     > SSPI update changes subject to in-age at recall
+    > Complete the colonoscopy assessment dataset - not fit for colonoscopy
+    > Process X500 letter batch > X505 (3.1)
     > Postpone the episode > X92
     > Check recall [SSCL30]
     > Reopen the episode > X900 (3.1)
@@ -91,6 +94,33 @@ def test_surveillance_scenario_7a(page: Page, general_properties: dict) -> None:
     # Then my subject has been updated as follows:
     subject_assertion(nhs_no, {"subject age": "72"})
 
+    # And there is a "X500" letter batch for my subject with the exact title "Surveillance Selection"
+    # When I process the open "X500" letter batch for my subject
+    batch_processing(
+        page,
+        "X500",
+        "Surveillance Selection",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(nhs_no, {"latest event status": "X505 HealthCheck Form Printed"})
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # And I edit the Colonoscopy Assessment Dataset for this subject
+    SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_colonoscopy_show_datasets()
+
+    # And I update the Colonoscopy Assessment Dataset with the following values:
+    ColonoscopyDatasetsPage(page).select_fit_for_colonoscopy_option(
+        FitForColonoscopySspOptions.NO
+    )
+    ColonoscopyDatasetsPage(page).click_dataset_complete_radio_button_no()
+
+    # And I save the Colonoscopy Assessment Dataset
+    ColonoscopyDatasetsPage(page).save_dataset()
+
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
@@ -127,7 +157,7 @@ def test_surveillance_scenario_7a(page: Page, general_properties: dict) -> None:
             "lynch due date": "Null",
             "lynch due date date of change": "Unchanged",
             "lynch due date reason": "Unchanged",
-            "pre-interrupt event status": "X500 Selected For Surveillance",
+            "pre-interrupt event status": "X505 HealthCheck Form Printed",
             "screening due date": "Null",
             "screening due date date of change": "Unchanged",
             "screening due date reason": "Unchanged",
@@ -189,19 +219,22 @@ def test_surveillance_scenario_7a(page: Page, general_properties: dict) -> None:
     SubjectDatasetsPage(page).click_colonoscopy_show_datasets()
 
     # And I update the Colonoscopy Assessment Dataset with the following values:
-    ColonoscopyDatasetsPage(page).select_fit_for_colonoscopy_option(
-        FitForColonoscopySspOptions.YES
-    )
+    ColonoscopyDatasetsPage(page).click_edit_dataset_button()
     ColonoscopyDatasetsPage(page).click_dataset_complete_radio_button_yes()
 
     # And I save the Colonoscopy Assessment Dataset
     ColonoscopyDatasetsPage(page).save_dataset()
 
-    # And I view the subject
+    # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
     # And I advance the subject's episode for "Suitable for Endoscopic Test"
+    # Then I get a confirmation prompt that "contains" "If there has been further discussion regarding the patient's suitability for a colonoscopy then the colonoscopy assessment dataset will be updated with this further review"
     SubjectScreeningSummaryPage(page).click_advance_surveillance_episode_button()
+    AdvanceSurveillanceEpisodePage(page).assert_dialog_text(
+        "If there has been further discussion regarding the patient's suitability for a colonoscopy then the colonoscopy assessment dataset will be updated with this further review",
+        True,
+    )
     AdvanceSurveillanceEpisodePage(page).click_suitable_for_endoscopic_test_button()
 
     # Then my subject has been updated as follows:

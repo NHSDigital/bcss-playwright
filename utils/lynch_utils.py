@@ -290,7 +290,7 @@ class LynchUtils:
         finally:
             db.disconnect_from_db(connection)
 
-    def run_lynch_invitations(self):
+    def run_lynch_invitations(self) -> None:
         """
         Executes the pkg_lynch.p_invite_lynch_subjects stored procedure to send invitations to Lynch subjects.
         """

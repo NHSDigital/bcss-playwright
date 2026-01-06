@@ -85,7 +85,7 @@ from utils.appointments import AppointmentAttendance
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.fobt_regression_tests
-def test_scenario_16(page: Page) -> None:
+def test_fobt_scenario_16(page: Page) -> None:
     """
     Scenario: 16: Close on existing LNPCP result (subject contacted)
 

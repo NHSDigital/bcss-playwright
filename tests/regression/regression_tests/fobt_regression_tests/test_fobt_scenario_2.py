@@ -18,7 +18,7 @@ from pages.logout.log_out_page import LogoutPage
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.fobt_regression_tests
-def test_scenario_2(page: Page) -> None:
+def test_fobt_scenario_2(page: Page) -> None:
     """
     Scenario: 2: Normal kit reading
 

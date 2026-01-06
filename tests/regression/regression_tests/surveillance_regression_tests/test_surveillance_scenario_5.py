@@ -61,7 +61,7 @@ from utils.sspi_change_steps import SSPIChangeSteps
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.surveillance_regression_tests
-def test_scenario_5(page: Page, general_properties: dict) -> None:
+def test_surveillance_scenario_5(page: Page, general_properties: dict) -> None:
     """
         Scenario: 5:Discharge below/in-age patient for no contact
 

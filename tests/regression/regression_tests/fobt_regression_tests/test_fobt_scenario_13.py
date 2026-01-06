@@ -85,7 +85,7 @@ from pages.organisations.organisations_page import OrganisationSwitchPage
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.fobt_regression_tests
-def test_scenario_13(page: Page) -> None:
+def test_fobt_scenario_13(page: Page) -> None:
     """
     Scenario: 13: LNPCP result from diagnostic tests
 
