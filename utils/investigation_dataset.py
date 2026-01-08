@@ -1156,6 +1156,38 @@ class InvestigationDatasetCompletion:
                         value,
                     )
 
+    def fill_out_other_findings_information(self, other_findings: dict) -> None:
+        """
+        This method completes the Other Findings section of the investigation dataset.
+        Args:
+            other_findings (dict): A dictionary containing other findings field keys and their values.
+        """
+        logging.info("Filling out Other Findings Information")
+
+        InvestigationDatasetsPage(self.page).click_show_other_findings_information()
+
+        # Use for loop and match-case for other findings fields
+        other_findings_map = {
+            "location": ("#UI_OTHER_LOCATION{}", True),
+            "diagnosis": ("#UI_OTHER_DIAGNOSIS{}", True),
+        }
+
+        for key, value in other_findings.items():
+            for prefix, (selector_template, is_select) in other_findings_map.items():
+                if key.startswith(prefix):
+                    index = key[len(prefix) :]
+                    if is_select:
+                        logging.info(
+                            f"Adding {prefix.replace('_', ' ')} {index}: {to_enum_name_or_value(value)}"
+                        )
+                        self.page.select_option(selector_template.format(index), value)
+                    else:
+                        logging.info(
+                            f"Adding {prefix.replace('_', ' ')} {index}: {value}"
+                        )
+                        self.page.fill(selector_template.format(index), value)
+                    break
+
     def click_show_histology_details_if_present(self, polyp_number: int) -> None:
         """
         This method checks if the relevant "Show details" link for a polyp histology is present.

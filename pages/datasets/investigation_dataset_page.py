@@ -38,6 +38,7 @@ class InvestigationDatasetsPage(BasePage):
         self.aspirant_endoscopist_not_present = self.page.locator(
             "#UI_ASPIRANT_ENDOSCOPIST_NR"
         )
+        self.show_other_findings_information = self.page.locator("#anchorOtherFindings")
         self.show_drug_information_detail = self.page.locator("#anchorDrug")
         self.show_suspected_findings = self.page.locator("#anchorRadiologyFindings")
         self.drug_type_option1 = self.page.locator("#UI_BOWEL_PREP_DRUG1")
@@ -370,6 +371,13 @@ class InvestigationDatasetsPage(BasePage):
             in self.show_completion_proof_information_details.inner_text().lower()
         ):
             self.click(self.show_completion_proof_information_details)
+
+    def click_show_other_findings_information(self) -> None:
+        """
+        Clicks on the show other findings information link if it contains the text "show" (case-insensitive).
+        """
+        if "show" in self.show_other_findings_information.inner_text().lower():
+            self.click(self.show_other_findings_information)
 
     def click_show_failure_information(self) -> None:
         """
@@ -1243,8 +1251,9 @@ class InvestigationDatasetsPage(BasePage):
             expected_message (str): The expected warning message text.
         """
         actual_message = self.get_warning_message()
-        assert actual_message is not None and expected_message in actual_message, \
-            f"Actual warning message displayed is: {actual_message}"
+        assert (
+            actual_message is not None and expected_message in actual_message
+        ), f"Actual warning message displayed is: {actual_message}"
 
 
 def normalize_label(text: str) -> str:
@@ -1757,6 +1766,58 @@ class PolypTypeLeftInSituOptions(StrEnum):
 
     INFLAMMATORY_POLYP = "17300~Sub Type Not Applicable"
     LYMPHOID_FOLLICLE = "200599~Sub Type Not Applicable"
+
+
+class OtherFindingsLocationOptions(StrEnum):
+    """Enum for Other Findings Location options"""
+
+    ANUS = "17231~Scope not inserted clinical reason~204338"
+    RECTUM = "17232~Scope not inserted clinical reason~204338"
+    SIGMOID_COLON = "17233"
+    DESCENDING_COLON = "17234"
+    SPLENIC_FLEXURE = "17235"
+    TRANSVERSE_COLON = "17236"
+    HEPATIC_FLEXURE = "17237"
+    ASCENDING_COLON = "17238"
+    CAECUM = "17239~Colonoscopy Complete"
+    ILEUM = "17240~Colonoscopy Complete"
+    ANASTOMOSIS = "17241~Colonoscopy Complete"
+    LEFT_COLON = "17244~Large Bowel Area"
+    ENTIRE_COLON = "17245~Large Bowel Area"
+    RIGHT_COLON = "200619~Large Bowel Area"
+    PATCHY_AREAS = "200618~Large Bowel Area"
+
+
+class OtherFindingsDiagnosisOptions(StrEnum):
+    """Enum for Other Findings Diagnosis options"""
+
+    ANAL_FISSURE = "16011~anus or rectum"
+    ANGIODYSPLASIA = "16007~Large Bowel Areas"
+    ATTENUATED_FAMILIAL_ADENOMATOUS_POLYPOSIS = "204403~Large Bowel Areas"
+    BENIGN_SUBMUSCOSAL_LESION = "16015"
+    COWDENS_SYNDROME = "204404~Large Bowel Areas"
+    DIVERTICULOSISIS = "16008~Large Bowel Areas"
+    FISTULA = "16019"
+    FAMILIAL_ADENOMATOUS_POLYPOSIS = "17648~Large Bowel Areas"
+    HAEMORRHOIDS = "16009"
+    ILETIS = "16055"
+    INFLAMMATORY_BOWEL_DISEASE = "200585~Large Bowel Areas"
+    ISCHAEMIC_COLITIS = "16065"
+    JUVENILE_POLYPOSIS = "204405~Large Bowel Areas"
+    LYMPHOMA = "16070"
+    MELANOSIS = "16014"
+    MUCOSAL_PROLAPSE = "16018"
+    MUT_YH_POLYPOSIS = "204406~Large Bowel Areas"
+    OBSTRUCTION_OF_COLON = "203071"
+    OTHER_MALIGNANT_TUMOR = "200584"
+    PARASITES = "16062"
+    PEUTZ_JEGHERS_SYNDROME = "204407~Large Bowel Areas"
+    PNEUMATOSIS_COLI = "16078"
+    POST_OPERATIVE_APPEARANCE = "16079"
+    PSEUDOMEMBRANOUS_COLITIS = "16063"
+    RADIATION_ENTEROCOLITIS = "16066~Large Bowel Areas~204339"
+    SOLITARY_RECAL_ULCER_SYNDROME = "16067"
+    STRICTURE = "16006"
 
 
 # Registry of all known Enums to search when matching string values
