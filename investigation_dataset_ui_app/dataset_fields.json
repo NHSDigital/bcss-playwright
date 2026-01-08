@@ -601,5 +601,28 @@
         "optional": false
       }
     ]
+  },
+  "other_findings": {
+    "groups": [
+      {
+        "label": "Other Findings",
+        "fields": [
+          {
+            "key": "locationX",
+            "type": "OtherFindingsLocationOptions",
+            "description": "Other Findings Location",
+            "optional": true,
+            "multiple": true
+          },
+          {
+            "key": "diagnosisX",
+            "type": "OtherFindingsDiagnosisOptions",
+            "description": "Other Findings Diagnosis",
+            "optional": true,
+            "multiple": true
+          }
+        ]
+      }
+    ]
   }
 }

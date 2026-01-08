@@ -29,6 +29,8 @@ from pages.datasets.investigation_dataset_page import (
     PolypReasonLeftInSituOptions,
     AntibioticsAdministeredDrugTypeOptions,
     OtherDrugsAdministeredDrugTypeOptions,
+    OtherFindingsDiagnosisOptions,
+    OtherFindingsLocationOptions,
     IVContrastAdministeredOptions,
     TaggingAgentDrugAdministeredOptions,
     AdditionalBowelPrepAdministeredOptions,
@@ -79,6 +81,8 @@ ENUM_MAP = {
     "PolypReasonLeftInSituOptions": PolypReasonLeftInSituOptions,
     "AntibioticsAdministeredDrugTypeOptions": AntibioticsAdministeredDrugTypeOptions,
     "OtherDrugsAdministeredDrugTypeOptions": OtherDrugsAdministeredDrugTypeOptions,
+    "OtherFindingsDiagnosisOptions": OtherFindingsDiagnosisOptions,
+    "OtherFindingsLocationOptions": OtherFindingsLocationOptions,
     "IVContrastAdministeredOptions": IVContrastAdministeredOptions,
     "TaggingAgentDrugAdministeredOptions": TaggingAgentDrugAdministeredOptions,
     "AdditionalBowelPrepAdministeredOptions": AdditionalBowelPrepAdministeredOptions,
@@ -849,6 +853,7 @@ SECTIONS = [
     "tagging_agent_given_drug_information",
     "radiology_information",
     "suspected_findings",
+    "other_findings",
 ]
 
 SECTION_LABELS = {
@@ -862,6 +867,7 @@ SECTION_LABELS = {
     "tagging_agent_given_drug_information": "Tagging Agent Given Drug Information",
     "radiology_information": "Radiology Information",
     "suspected_findings": "Suspected Findings",
+    "other_findings": "Other Findings",
 }
 
 # --- Main section selection ---
@@ -881,6 +887,7 @@ SECTION_RENDERERS = {
     "tagging_agent_given_drug_information": show_drug_group_section_with_imports,
     "radiology_information": show_section_with_imports,
     "suspected_findings": show_section_with_imports,
+    "other_findings": show_drug_group_section_with_imports,
 }
 
 selected_key = next(k for k, v in SECTION_LABELS.items() if v == section)
