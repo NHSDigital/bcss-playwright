@@ -1,4 +1,3 @@
-from tkinter import N
 import oracledb
 import os
 from dotenv import load_dotenv

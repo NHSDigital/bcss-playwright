@@ -1,23 +1,54 @@
+from datetime import datetime, timedelta
 import logging
 import pytest
 from playwright.sync_api import Page
+from classes.repositories.episode_repository import EpisodeRepository
 from classes.repositories.general_repository import GeneralRepository
 from pages.base_page import BasePage
+from pages.datasets.colonoscopy_dataset_page import (
+    ColonoscopyDatasetsPage,
+    FitForColonoscopySspOptions,
+)
+from pages.datasets.investigation_dataset_page import InvestigationDatasetsPage
+from pages.datasets.subject_datasets_page import SubjectDatasetsPage
 from pages.logout.log_out_page import LogoutPage
+from pages.screening_practitioner_appointments.appointment_detail_page import (
+    AppointmentDetailPage,
+)
 from pages.screening_subject_search.advance_lynch_surveillance_episode_page import (
     AdvanceLynchSurveillanceEpisodePage,
+)
+from pages.screening_subject_search.attend_diagnostic_test_page import (
+    AttendDiagnosticTestPage,
+)
+from pages.screening_subject_search.contact_with_patient_page import (
+    ContactWithPatientPage,
+)
+from pages.screening_subject_search.diagnostic_test_outcome_page import (
+    DiagnosticTestOutcomePage,
+    OutcomeOfDiagnosticTest,
+)
+from pages.screening_subject_search.episode_events_and_notes_page import (
+    EpisodeEventsAndNotesPage,
 )
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
 from utils import screening_subject_page_searcher
+from utils.appointments import book_appointments
 from utils.batch_processing import batch_processing
+from utils.calendar_picker import CalendarPicker
+from utils.datasets.investigation_datasets import get_normal_smokescreen_information
+from utils.investigation_dataset import InvestigationDatasetCompletion
 from utils.lynch_utils import LynchUtils
 from utils.oracle.oracle import OracleDB
+from utils.sspi_change_steps import SSPIChangeSteps
 from utils.subject_assertion import subject_assertion
 from utils.user_tools import UserTools
 
 
+@pytest.mark.wip
+@pytest.mark.usefixtures("setup_org_and_appointments")
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.lynch_regression_tests
@@ -140,4 +171,321 @@ def test_lynch_scenario_11(page: Page) -> None:
     # When I run Timed Events for my subject
     OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
     # Then my subject has been updated as follows:
-    subject_assertion(nhs_no, {"latest event status": "G3 Lynch Invitation DueThen my subject has been updated as follows:"})
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "G3 Lynch Invitation DueThen my subject has been updated as follows:"
+        },
+    )
+    # When Comment:
+    logging.info("making sure the subject is above the Lynch age range at recall")
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # And I receive an SSPI update to change their date of birth to "85" years old
+    SSPIChangeSteps().sspi_update_to_change_dob_received(nhs_no, 85)
+    # When Comment:
+    logging.info("Progress the episode through to closure")
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # And I view the practitioner appointment booking screen
+    SubjectScreeningSummaryPage(page).click_book_practitioner_clinic_button()
+
+    # And I select "BCS001" as the screening centre where the practitioner appointment will be held
+    # And I set the practitioner appointment date to "today"
+    # And I book the "earliest" available practitioner appointment on this date
+    book_appointments(
+        page,
+        "BCS001 - Wolverhampton Bowel Cancer Screening Centre",
+        "The Royal Hospital (Wolverhampton)",
+    )
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A183 1st Colonoscopy Assessment Appointment Requested",
+        },
+    )
+    # And there is a "A183" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment (Lynch)"
+    # When I process the open "A183" letter batch for my subject
+    batch_processing(page, "A183", "Practitioner Clinic 1st Appointment (Lynch)")
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked, letter sent",
+        },
+    )
+
+    # When I switch users to BCSS "England" as user role "Screening Centre Manager"
+    LogoutPage(page).log_out(close_page=False)
+    BasePage(page).go_to_log_in_page()
+    user_role=UserTools.user_login(page, "Screening Centre Manager at BCS001", True)
+    if user_role is None:
+        raise ValueError("User cannot be assigned to a UserRoleType")
+
+    # And I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # And I view the event history for the subject's latest episode
+    SubjectScreeningSummaryPage(page).expand_episodes_list()
+    SubjectScreeningSummaryPage(page).click_first_lynch_surveillance_episode_link()
+
+    # And I view the latest practitioner appointment in the subject's episode
+    EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
+
+    # And I attend the subject's practitioner appointment "yesterday"
+    AppointmentDetailPage(page).mark_appointment_as_attended(
+        datetime.today() - timedelta(days=1)
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "J10 Attended Colonoscopy Assessment Appointment",
+        },
+    )
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # And I edit the Colonoscopy Assessment Dataset for this subject
+    SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_colonoscopy_show_datasets()
+
+    # And I update the Colonoscopy Assessment Dataset with the following values:
+    ColonoscopyDatasetsPage(page).select_fit_for_colonoscopy_option(
+        FitForColonoscopySspOptions.YES
+    )
+    ColonoscopyDatasetsPage(page).click_dataset_complete_radio_button_yes()
+
+    # And I save the Colonoscopy Assessment Dataset
+    ColonoscopyDatasetsPage(page).save_dataset()
+    # And I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # And I advance the subject's episode for "Suitable for Endoscopic Test"
+    SubjectScreeningSummaryPage(page).click_advance_lynch_surveillance_episode_button()
+    AdvanceLynchSurveillanceEpisodePage(
+        page
+    ).click_suitable_for_endoscopic_test_button()
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A99 Suitable for Endoscopic Test",
+        },
+    )
+
+    # When I view the advance episode options
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    SubjectScreeningSummaryPage(page).click_advance_lynch_surveillance_episode_button()
+
+    # And I select Diagnostic Test Type "Colonoscopy"
+    AdvanceLynchSurveillanceEpisodePage(page).select_test_type_dropdown_option(
+        "Colonoscopy"
+    )
+
+    # And I enter a Diagnostic Test First Offered Appointment Date of "today"
+    AdvanceLynchSurveillanceEpisodePage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+
+    # And I advance the subject's episode for "Invite for Diagnostic Test >>"
+    AdvanceLynchSurveillanceEpisodePage(page).click_invite_for_diagnostic_test_button()
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A59 Invited for Diagnostic Test",
+        },
+    )
+
+    # When I select the advance episode option for "Attend Diagnostic Test"
+    AdvanceLynchSurveillanceEpisodePage(page).click_attend_diagnostic_test_button()
+
+    # When I attend the subject's diagnostic test
+    AttendDiagnosticTestPage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today())
+    AttendDiagnosticTestPage(page).click_save_button()
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A259 Attended Diagnostic Test",
+        },
+    )
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # And I edit the Investigation Dataset for this subject
+    SubjectScreeningSummaryPage(page).click_datasets_link()
+    SubjectDatasetsPage(page).click_investigation_show_datasets()
+
+    # Confirm on the investigation Datasets Page
+    InvestigationDatasetsPage(page).bowel_cancer_screening_page_title_contains_text(
+        "Investigation Datasets"
+    )
+
+    # Then message "WARNING - Resect & Discard is not appropriate for a Lynch patient." is displayed at the top of the investigation dataset
+    InvestigationDatasetsPage(page).message_is_displayed(
+        "WARNING - Resect & Discard is not appropriate for a Lynch patient."
+    )
+
+    # And I open all minimized sections on the dataset
+    InvestigationDatasetsPage(page).open_all_minimized_sections()
+
+    # When I apply the "Normal_Smokescreen" Investigation Dataset Scenario
+    (
+        general_information,
+        drug_information,
+        endoscopy_information,
+        failure_information,
+        completion_information,
+    ) = get_normal_smokescreen_information()
+    InvestigationDatasetCompletion(page).fill_out_drug_information(drug_information)
+    InvestigationDatasetCompletion(page).fill_out_general_information(
+        general_information
+    )
+    InvestigationDatasetCompletion(page).fill_endoscopy_information(
+        endoscopy_information
+    )
+    InvestigationDatasetCompletion(page).fill_out_failure_information(
+        failure_information
+    )
+    InvestigationDatasetCompletion(page).fill_out_completion_information(
+        completion_information
+    )
+
+    # And I mark the Investigation Dataset as completed
+    InvestigationDatasetsPage(page).check_dataset_complete_checkbox()
+
+    # Then the Investigation Dataset result message, which I will cancel, is "Normal (No Abnormalities Found)"
+    InvestigationDatasetsPage(page).click_save_dataset_button_assert_dialog(
+        "Normal (No Abnormalities Found)"
+    )
+
+    # When I press the save Investigation Dataset button
+    InvestigationDatasetsPage(page).click_save_dataset_button()
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest episode accumulated result": "Normal (No Abnormalities Found)",
+        },
+    )
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # And I select the advance episode option for "Enter Diagnostic Test Outcome"
+    SubjectScreeningSummaryPage(page).click_advance_lynch_surveillance_episode_button()
+    AdvanceLynchSurveillanceEpisodePage(
+        page
+    ).click_enter_diagnostic_test_outcome_button()
+
+    # And I select Outcome of Investigation Complete
+    DiagnosticTestOutcomePage(page).select_test_outcome_option(
+        OutcomeOfDiagnosticTest.INVESTIGATION_COMPLETE
+    )
+
+    # And I save the Diagnostic Test Outcome
+    DiagnosticTestOutcomePage(page).click_save_button()
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A315 Diagnostic Test Outcome Entered",
+        },
+    )
+
+    # And I confirm the Episode Result is "Normal (No Abnormalities Found)"
+    EpisodeRepository().confirm_episode_result(
+        nhs_no, "Normal (No Abnormalities Found)"
+    )
+
+    # When I advance the subject's episode for "Other Post-investigation Contact Required"
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    SubjectScreeningSummaryPage(page).click_advance_lynch_surveillance_episode_button()
+    AdvanceLynchSurveillanceEpisodePage(
+        page
+    ).click_other_post_investigation_contact_required_button()
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A361 Other Post-investigation Contact Required",
+        },
+    )
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # And I select the advance episode option for "Record other post-investigation contact"
+    SubjectScreeningSummaryPage(page).click_advance_lynch_surveillance_episode_button()
+    AdvanceLynchSurveillanceEpisodePage(
+        page
+    ).click_record_other_post_investigation_contact_button()
+
+    # And I record contact with the subject with outcome "Post-investigation Appointment Not Required"
+    ContactWithPatientPage(page).record_post_investigation_appointment_not_required()
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest episode includes event status": "A317 Post-investigation Contact Made",
+            "latest event status": "A318 Post-investigation Appointment NOT Required - Result Letter Created",
+        },
+    )
+
+    # When there is a "A318" letter batch for my subject with the exact title "Result Letters - No Post-investigation Appointment (Lynch)"
+    # And I process the open "A318" letter batch for my subject
+    batch_processing(
+        page, "A318", "Result Letters - No Post-investigation Appointment (Lynch)"
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "Which diagnostic test": "Latest not-void test in latest episode",
+            "Calculated FOBT Due Date": "Null",
+            "Calculated Lynch due date": "2 years from Diagnostic Test",
+            "Calculated Surveillance Due Date": "Null",
+            "Ceased confirmation date": "Today",
+            "Ceased confirmation details": "Outside screening population at recall.",
+            "Ceased confirmation user ID": "User's ID",
+            "Clinical reason for cease": "Null",
+            "Latest episode accumulated result": "Normal (No Abnormalities Found)",
+            "Latest episode recall calculation method": "Diagnostic Test Date",
+            "Latest episode recall episode type": "Lynch Surveillance",
+            "Latest episode recall surveillance type": "Null",
+            "Latest episode status reason": "Episode Complete",
+            "Latest event status": "S61 Normal (No Abnormalities Found)",
+            "Lynch due date": "Null",
+            "Lynch due date date of change": "Today",
+            "Lynch due date reason": "Ceased",
+            "Lynch incident episode": "Latest episode",
+            "Screening due date": "Null",
+            "Screening due date date of change": "Unchanged",
+            "Screening due date reason": "Unchanged",
+            "Screening status": "Ceased",
+            "Screening status date of change": "Today",
+            "Screening status reason": "Outside Screening Population",
+            "Surveillance due date": "Null",
+            "Surveillance due date date of change": "Unchanged",
+            "Surveillance due date reason": "Unchanged",
+        },
+        user_role,
+    )
+
+    LogoutPage(page).log_out()
