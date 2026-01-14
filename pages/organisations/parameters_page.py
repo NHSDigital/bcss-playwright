@@ -1,17 +1,19 @@
+from typing import Optional
 from playwright.sync_api import Page
 from pages.base_page import BasePage
-from typing import List
 from utils.table_util import TableUtils
 import logging
+import pandas as pd
 from utils.oracle.oracle_specific_functions.organisation_parameters import (
     get_org_parameter_value,
+    get_national_parameter_value,
 )
-from datetime import datetime
+from datetime import datetime, timedelta
 from utils.calendar_picker import CalendarPicker
 
 
 class ParametersPage(BasePage):
-    """Organisations Page locators, and methods for interacting with the page."""
+    """Parameters Page locators, and methods for interacting with the page."""
 
     def __init__(self, page: Page):
         super().__init__(page)
@@ -98,6 +100,9 @@ class ParametersPage(BasePage):
         """Clicks the 'Add new parameter value' button."""
         self.click(self.add_new_parameter_value_button)
 
+    def select_new_parameter_value(self, new_parameter_value: str) -> None:
+        self.parameter_value_input_field.select_option(label=new_parameter_value)
+
     def enter_new_parameter_value(self, new_value: str) -> None:
         """Enters a new value into the parameter value input field."""
         self.parameter_value_input_field.fill(new_value)
@@ -107,6 +112,10 @@ class ParametersPage(BasePage):
         CalendarPicker(self.page).calendar_picker_ddmmyyyy(
             new_date, self.parameter_effective_from_date_input_field
         )
+
+    def enter_new_parameter_effective_from_date_str(self, new_date: str) -> None:
+        """Enters a new effective from date (string) into the parameter effective from date input field."""
+        self.parameter_effective_from_date_input_field.fill(new_date)
 
     def enter_parameter_reason(self, reason: str) -> None:
         """Enters a reason into the parameter reason input field."""
@@ -120,19 +129,92 @@ class ParametersPage(BasePage):
         """Clicks the 'Save' button and accepts the confirmation dialog."""
         self.safe_accept_dialog(self.save_button)
 
-    def enter_new_parameter_details(
-        self, new_value: str, new_date: datetime, reason: str
-    ) -> None:
+    def complete_parameter_page_form(self, criteria: dict) -> None:
         """
-        Enters new parameter details.
+        Completes the parameter page form with the provided details.
         Args:
-            new_value (str): The new value for the parameter.
-            new_date (datetime): The effective from date for the new parameter value.
-            reason (str): The reason for the change.
+            criteria (dict): A dictionary containing the details to enter into the form.
         """
-        self.enter_new_parameter_value(new_value)
-        self.enter_new_parameter_effective_from_date(new_date)
-        self.enter_parameter_reason(reason)
+        for field, value in criteria.items():
+            match field:
+                case "input value":
+                    self.enter_new_parameter_value(value)
+                case "select value":
+                    self.select_new_parameter_value(value)
+                case "effective from date":
+                    if isinstance(value, datetime):
+                        self.enter_new_parameter_effective_from_date(value)
+                    elif isinstance(value, str):
+                        self.enter_new_parameter_effective_from_date_str(value)
+                case "reason for change":
+                    self.enter_parameter_reason(value)
+
+    def get_next_available_date(self) -> datetime:
+        if not (
+            most_recent_date := ParameterDetails(
+                self.page
+            ).get_most_recent_parameter_date()
+        ):
+            most_recent_date = datetime.today()
+        if most_recent_date < datetime.today():
+            most_recent_date = datetime.today()
+        return most_recent_date + timedelta(days=1)
+
+    def select_screening_centre_parameters_organisation(self, org: str) -> None:
+        """
+        Selects the organisation for screening centre parameters.
+        """
+        self.click(self.page.get_by_role("link", name=org))
+
+
+class ParameterDetails(BasePage):
+
+    def __init__(self, page: Page):
+        super().__init__(page)
+        self.parameters_table = TableUtils(self.page, "#displayRS")
+        self.warning_messages = self.page.locator("th.warningHeader")
+
+    def get_most_recent_parameter_date(self) -> Optional[datetime]:
+        """
+        Gets the datetime of the most recent parameter value showing in the parameter details table.
+
+        Args:
+            None
+        Returns:
+            datetime: The datetime of the most recent parameter value showing in the parameter details table.
+        """
+        num_rows = self.parameters_table.get_row_count()
+
+        most_recent_date = self.parameters_table.get_cell_value(
+            "Effective From Date", num_rows
+        )
+        if most_recent_date == "":
+            return None
+        return datetime.strptime(most_recent_date, "%d/%m/%Y")
+
+    def get_most_recent_value_of_parameter(self, effective_from_date: datetime) -> str:
+        """
+        Gets the most value of a parameter from the parameters table.
+
+        Args:
+            effective_from_date (datetime): The date to look for.
+        Returns:
+            str: The most recent value of the parameter.
+        """
+        date_text = datetime.strftime(effective_from_date, "%d/%m/%Y")
+
+        row_index = self.parameters_table.get_row_index(
+            "Effective From Date", date_text
+        )
+        if row_index is None:
+            raise ValueError(f"Parameter with date {date_text} not found in table.")
+        return self.parameters_table.get_cell_value("Value", row_index)
+
+    def search_for_warning(self, message: str) -> bool:
+        for warning_index in range(self.warning_messages.count()):
+            if self.warning_messages.nth(warning_index).inner_text().strip() == message:
+                return True
+        return False
 
 
 class Parameter:
@@ -154,6 +236,60 @@ class Parameter:
         self.current_value = ParametersPage(self.page).get_current_value_of_parameter(
             self.param_id
         )
-        self.current_value_db = get_org_parameter_value(int(self.param_id), "23159")[
-            "val"
-        ].values[0]
+        self.current_value_db = self.get_current_value_from_db()
+        self.national_parameter_value = get_national_parameter_value(int(self.param_id))
+
+    def get_current_value_from_db(self) -> str:
+        """Gets the current value of the parameter from the database.
+
+        Returns:
+            str: The current value of the parameter from the database.
+        """
+        # First check for organisation parameters
+        param_df = get_org_parameter_value(int(self.param_id), "23159")
+        if not param_df.empty:
+            return param_df["val"].values[0]
+        else:
+            # Then check for screening centre parameters
+            param_df2 = get_org_parameter_value(int(self.param_id), "23162")
+            if not param_df2.empty:
+                return param_df2["val"].values[0]
+            else:
+                # Otherwise use the national default value
+                return get_national_parameter_value(int(self.param_id))
+
+    def get_add_to_time_value(self, time_str: str, add_minutes: int) -> str:
+        """
+        Adds minutes to a "hh:mm" formatted time string and returns the new time string.
+        Args:
+            time_str (str): Time in "hh:mm" format.
+            add_minutes (int): Minutes to add.
+        Returns:
+            str: New time in "hh:mm" format.
+        """
+
+        def to_minutes(time_str: str) -> int:
+            """
+            Converts "hh:mm" formatted string to total minutes.
+            Args:
+                time_str (str): Time in "hh:mm" format.
+            Returns:
+                int: Total minutes.
+            """
+            h, m = map(int, time_str.split(":"))
+            return h * 60 + m
+
+        def to_hh_mm(minutes: int) -> str:
+            """
+            Converts total minutes to "hh:mm" formatted string.
+            Args:
+                minutes (int): Total minutes.
+            Returns:
+                str: Time in "hh:mm" format.
+            """
+            h = minutes // 60
+            m = minutes % 60
+            return f"{h:02d}:{m:02d}"
+
+        total_minutes = to_minutes(time_str) + add_minutes
+        return to_hh_mm(total_minutes)

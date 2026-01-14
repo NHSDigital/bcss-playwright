@@ -286,7 +286,7 @@ class BasePage:
                     expected_text in actual_text
                 ), f"Expected dialog to contain '{expected_text}', but got '{actual_text}'"
             except AssertionError as e:
-                self._dialog_assertion_error = e
+                raise AssertionError(f"Dialog text assertion failed: {e}") from e
             if accept:
                 try:
                     dialog.accept()
