@@ -3,7 +3,7 @@ from numpy.ma.testutils import assert_equal
 from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 from pages.organisations import organisations_and_site_details_page
-from pages.organisations.organisations_page import OrganisationsPage
+from pages.organisations.organisations_page import OrganisationSwitchPage, OrganisationsPage
 from pages.organisations.parameters_page import (
     ParametersPage,
     Parameter,
@@ -37,7 +37,6 @@ class TestParameterChanges:
     def setup(self, page):
         self.page = page
 
-    @pytest.mark.wip
     def test_parameter_pages(self) -> None:
         """
         Test various interactions on the Organisation Parameters page, including adding new parameter values
@@ -359,6 +358,7 @@ class TestParameterChanges:
         # Finally, I log out
         LogoutPage(self.page).log_out()
 
+    @pytest.mark.wip
     def test_parameter_212(self) -> None:
         """ """
         # Given I log in to BCSS "England" as user role "Screening Centre Manager"
@@ -389,10 +389,60 @@ class TestParameterChanges:
         UserTools.user_login(self.page, "Hub Manager at BCS01")
 
         # Then i go to screening centre parameters page
+        BasePage(self.page).go_to_organisations_page()
+        OrganisationsPage(self.page).go_to_screening_centre_parameters_page()
+        ParametersPage(self.page).select_screening_centre_parameters_organisation("BCS001")
         # I am able to view Parameter ID "212" as a hub manager
+        ParametersPage(self.page).click_parameter_id_link(chosen_parameter.param_id)
         # I "cannot" add a new parameter value
-
+        assert ParametersPage(
+            self.page
+        ).add_new_parameter_value_button.is_hidden(), "Add New Parameter Value button is visible, but should be hidden for Hub Manager"
+        logging.info(
+            "[UI ASSERTIONS COMPLETE] 'Add New Parameter Value' button is hidden for Hub Manager"
+        )
         # When I switch users to BCSS "England" as user role "BCSS Support - SC"
+        LogoutPage(self.page).log_out(close_page=False)
+        BasePage(self.page).go_to_log_in_page()
+        UserTools.user_login(self.page, "BCSS Support - SC at BCS001")
+
+        # Then i go to organisation parameters page
+        BasePage(self.page).go_to_organisations_page()
+        OrganisationsPage(self.page).go_to_organisation_parameters_page()
+
+        # I am able to view Parameter ID "212" as a support user
+        ParametersPage(self.page).click_parameter_id_link(chosen_parameter.param_id)
+
+        # I "can" add a new parameter value
+        assert ParametersPage(
+            self.page
+        ).add_new_parameter_value_button.is_visible(), "Add New Parameter Value button is hidden, but should be visible for BCSS Support - SC"
+        logging.info(
+            "[UI ASSERTIONS COMPLETE] 'Add New Parameter Value' button is visible for BCSS Support - SC"
+        )
+
+        # When I switch users to BCSS "England" as user role "BCSS Support - HUB"
+        LogoutPage(self.page).log_out(close_page=False)
+        BasePage(self.page).go_to_log_in_page()
+        UserTools.user_login(self.page, "BCSS Support - HUB")
+        OrganisationSwitchPage(self.page).select_organisation_by_id("BCS01")
+        OrganisationSwitchPage(self.page).click_continue()
+
+        # Then i go to organisation parameters page
+        BasePage(self.page).go_to_organisations_page()
+        OrganisationsPage(self.page).go_to_screening_centre_parameters_page()
+        ParametersPage(self.page).select_screening_centre_parameters_organisation("BCS001")
+
+        # I am able to view Parameter ID "212" as a support user
+        ParametersPage(self.page).click_parameter_id_link(chosen_parameter.param_id)
+
+        # I "can" add a new parameter value
+        assert ParametersPage(
+            self.page
+        ).add_new_parameter_value_button.is_visible(), "Add New Parameter Value button is hidden, but should be visible for BCSS Support - HUB"
+        logging.info(
+            "[UI ASSERTIONS COMPLETE] 'Add New Parameter Value' button is visible for BCSS Support - HUB"
+        )
 
         LogoutPage(self.page).log_out()
 
