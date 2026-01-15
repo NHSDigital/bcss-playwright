@@ -10,6 +10,8 @@ from utils.oracle.oracle_specific_functions.organisation_parameters import (
 from datetime import datetime, timedelta
 from utils.calendar_picker import CalendarPicker
 
+displayrs_str = "#displayRS"
+
 
 class ParametersPage(BasePage):
     """Parameters Page locators, and methods for interacting with the page."""
@@ -17,8 +19,8 @@ class ParametersPage(BasePage):
     def __init__(self, page: Page):
         super().__init__(page)
 
-        self.parameters_table = TableUtils(self.page, "#displayRS")
-        self.parameters_output_table = TableUtils(self.page, "#displayRS")
+        self.parameters_table = TableUtils(self.page, displayrs_str)
+        self.parameters_output_table = TableUtils(self.page, displayrs_str)
         self.add_new_parameter_value_button = self.page.get_by_role(
             "button", name="Add new parameter value"
         )
@@ -195,7 +197,7 @@ class ParameterDetails(BasePage):
 
     def __init__(self, page: Page):
         super().__init__(page)
-        self.parameters_table = TableUtils(self.page, "#displayRS")
+        self.parameters_table = TableUtils(self.page, displayrs_str)
         self.warning_messages = self.page.locator("th.warningHeader")
 
     def get_most_recent_parameter_date(self) -> Optional[datetime]:
