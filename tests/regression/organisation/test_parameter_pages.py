@@ -145,7 +145,7 @@ def test_parameter_pages(page: Page) -> None:
         "[UI ASSERTIONS COMPLETE] Warning messages displayed for incorrect parameter value type"
     )
 
-    # When I go pack to rgw "Organisation Parameters" page
+    # When I go pack to "Organisation Parameters" page
     ParametersPage(page).click_back_button()
     ParametersPage(page).click_back_button()
 
@@ -348,10 +348,10 @@ def test_parameter_pages(page: Page) -> None:
 def test_parameter_212(page: Page) -> None:
     """
     Test viewing and adding new values for Parameter ID "212" across different user roles.
-    1. Log in as "Screening Centre Manager" and verify inability to add new parameter value.
-    2. Switch to "Hub Manager" and verify inability to add new parameter value.
-    3. Switch to "BCSS Support - SC" and verify ability to add new parameter value.
-    4. Switch to "BCSS Support - HUB" and verify ability to add new parameter value.
+    1. Log in as "Screening Centre Manager" and verify inability to edit new parameter value.
+    2. Switch to "Hub Manager" and verify inability to edit new parameter value.
+    3. Switch to "BCSS Support - SC" and verify ability to edit new parameter value.
+    4. Switch to "BCSS Support - HUB" and verify ability to edit new parameter value.
     5. Log out.
     """
     # Given I log in to BCSS "England" as user role "Screening Centre Manager"
