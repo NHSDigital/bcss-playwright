@@ -268,19 +268,41 @@ class Parameter:
 
     def get_current_value_from_db(self) -> str:
         """
-        Gets the current value of the parameter from the database.
+        Gets the current value of the parameter from the database, using the most recent effective_from date.
         Returns:
             str: The current value of the parameter from the database.
         """
+        now = datetime.now()
         # First check for organisation parameters
         param_df = get_org_parameter_value(int(self.param_id), "23159")
         if not param_df.empty:
-            return param_df["val"].values[0]
-        else:
-            # Then check for screening centre parameters
-            param_df2 = get_org_parameter_value(int(self.param_id), "23162")
-            if not param_df2.empty:
-                return param_df2["val"].values[0]
-            else:
-                # Otherwise use the national default value
-                return get_national_parameter_value(int(self.param_id))
+            # Convert effective_from to datetime
+            param_df["effective_from"] = param_df["effective_from"].apply(
+                lambda x: (
+                    x
+                    if isinstance(x, datetime)
+                    else datetime.strptime(x, "%Y-%m-%dT%H:%M")
+                )
+            )
+            # Filter for dates <= now
+            valid_rows = param_df[param_df["effective_from"] <= now]
+            if not valid_rows.empty:
+                # Get the row with the latest effective_from
+                latest_row = valid_rows.loc[valid_rows["effective_from"].idxmax()]
+                return str(latest_row["val"])
+        # Then check for screening centre parameters
+        param_df2 = get_org_parameter_value(int(self.param_id), "23162")
+        if not param_df2.empty:
+            param_df2["effective_from"] = param_df2["effective_from"].apply(
+                lambda x: (
+                    x
+                    if isinstance(x, datetime)
+                    else datetime.strptime(x, "%Y-%m-%dT%H:%M")
+                )
+            )
+            valid_rows2 = param_df2[param_df2["effective_from"] <= now]
+            if not valid_rows2.empty:
+                latest_row2 = valid_rows2.loc[valid_rows2["effective_from"].idxmax()]
+                return str(latest_row2["val"])
+        # Otherwise use the national default value
+        return get_national_parameter_value(int(self.param_id))

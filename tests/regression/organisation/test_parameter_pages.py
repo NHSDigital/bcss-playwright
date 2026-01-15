@@ -16,6 +16,7 @@ import logging
 from pages.logout.log_out_page import LogoutPage
 
 
+@pytest.mark.vpn_required
 @pytest.mark.regression
 def test_parameter_pages(page: Page) -> None:
     """
@@ -212,13 +213,13 @@ def test_parameter_pages(page: Page) -> None:
             "reason for change": "",
         }
     )
-    ParametersPage(page).click_save_button_and_accept_dialog()
 
     # Then I get a confirmation prompt that contains "The fields 'Parameter Value', 'Effective From Date' and 'Reason For Change or Addition' are mandatory."
     ParametersPage(page).assert_dialog_text(
         "The fields 'Parameter Value', 'Effective From Date' and 'Reason For Change or Addition' are mandatory.",
         True,
     )
+    ParametersPage(page).click_save_button()
 
     # When I go back to the "Organisation Parameters" page
     ParametersPage(page).click_back_button()
