@@ -106,8 +106,8 @@ def get_national_parameter_value(param_id: int) -> str:
         param_id (int): The ID of the national parameter to retrieve.
     """
     query = """SELECT p.default_value
-		FROM parameters p
-		WHERE p.param_id = :param_id"""
+    FROM parameters p
+	WHERE p.param_id = :param_id"""
     params = {"param_id": param_id}
     df = OracleDB().execute_query(query, params)
     if not df.empty:
