@@ -12,15 +12,12 @@ from pages.datasets.colonoscopy_dataset_page import (
 from pages.datasets.investigation_dataset_page import (
     BowelPreparationQualityOptions,
     ComfortOptions,
-    CompletionProofOptions,
     DrugTypeOptions,
     EndoscopyLocationOptions,
     FailureReasonsOptions,
     InsufflationOptions,
     InvestigationDatasetsPage,
     LateOutcomeOptions,
-    OtherFindingsDiagnosisOptions,
-    OtherFindingsLocationOptions,
     OutcomeAtTimeOfProcedureOptions,
     YesNoOptions,
 )
@@ -41,13 +38,18 @@ from pages.screening_subject_search.contact_with_patient_page import (
 from pages.screening_subject_search.diagnostic_test_outcome_page import (
     DiagnosticTestOutcomePage,
     OutcomeOfDiagnosticTest,
+    ReasonForSymptomaticReferral,
 )
 from pages.screening_subject_search.episode_events_and_notes_page import (
     EpisodeEventsAndNotesPage,
 )
+from pages.screening_subject_search.non_neoplastic_result_from_symptomatic_procedure_page import (
+    NonNeoplasticResultFromSymptomaticProcedurePage,
+)
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
+from pages.screening_subject_search.refer_to_mdt_page import ReferToMDTPage
 from utils import screening_subject_page_searcher
 from utils.appointments import book_appointments
 from utils.batch_processing import batch_processing
@@ -60,7 +62,6 @@ from utils.subject_assertion import subject_assertion
 from utils.user_tools import UserTools
 
 
-@pytest.mark.wip
 @pytest.mark.usefixtures("setup_org_and_appointments")
 @pytest.mark.vpn_required
 @pytest.mark.regression
@@ -242,9 +243,7 @@ def test_lynch_scenario_14(page: Page) -> None:
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
     LogoutPage(page).log_out(close_page=False)
     BasePage(page).go_to_log_in_page()
-    user_role = UserTools.user_login(page, "Screening Centre Manager at BCS001", True)
-    if user_role is None:
-        raise ValueError("User cannot be assigned to a UserRoleType")
+    UserTools.user_login(page, "Screening Centre Manager at BCS001")
 
     # And I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -323,7 +322,7 @@ def test_lynch_scenario_14(page: Page) -> None:
         nhs_no,
         {
             "which diagnostic test": "Latest test in latest episode",
-            "diagnostic test proposed type": "Colonsocopy",
+            "diagnostic test proposed type": "Colonoscopy",
             "diagnostic test confirmed type": "Null",
             "diagnostic test intended extent": "Null",
             "latest event status": "A59 Invited for Diagnostic Test",
@@ -353,8 +352,8 @@ def test_lynch_scenario_14(page: Page) -> None:
         nhs_no,
         {
             "which diagnostic test": "Latest test in latest episode",
-            "diagnostic test proposed type": "Colonsocopy",
-            "diagnostic test confirmed type": "Colonsocopy",
+            "diagnostic test proposed type": "Colonoscopy",
+            "diagnostic test confirmed type": "Colonoscopy",
             "diagnostic test intended extent": "Null",
             "latest event status": "A259 Attended Diagnostic Test",
         },
@@ -435,8 +434,8 @@ def test_lynch_scenario_14(page: Page) -> None:
     # And I press the save Investigation Dataset button
     InvestigationDatasetsPage(page).click_save_dataset_button()
 
-    # Then I confirm the Episode Result is "No result"
-    EpisodeRepository().confirm_episode_result(nhs_no, "No result")
+    # Then I confirm the Episode Result is "No Result"
+    EpisodeRepository().confirm_episode_result(nhs_no, "No Result")
 
     logging.info(
         "Progress the episode via post-investigation telephone contact to referral for symptomatic"
@@ -450,5 +449,209 @@ def test_lynch_scenario_14(page: Page) -> None:
     AdvanceLynchSurveillanceEpisodePage(
         page
     ).click_enter_diagnostic_test_outcome_button()
+
+    # Then I confirm the Outcome Of Diagnostic Test dropdown has the following options:
+    DiagnosticTestOutcomePage(page).test_outcome_dropdown_contains_options(
+        [
+            "Failed Test - Refer Another",
+            "Refer Symptomatic",
+        ],
+    )
+
+    # When I select Outcome of Diagnostic Test "Refer Symptomatic"
+    DiagnosticTestOutcomePage(page).select_test_outcome_option(
+        OutcomeOfDiagnosticTest.REFER_SYMPTOMATIC
+    )
+
+    # Then the text "Diagnostic Test Date resulting in a recall due date" is not visible
+    DiagnosticTestOutcomePage(page).text_is_visible(
+        "Diagnostic Test Date resulting in a recall due date", False
+    )
+
+    # When I select Reason for Symptomatic Referral value "Suspected Cancer Surgery"
+    DiagnosticTestOutcomePage(page).select_reason_for_symptomatic_referral_option(
+        ReasonForSymptomaticReferral.SUSPECTED_CANCER_SURGERY
+    )
+
+    # And I save the Diagnostic Test Outcome information
+    DiagnosticTestOutcomePage(page).click_save_button()
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {"latest event status": "A315 Diagnostic Test Outcome Entered"},
+    )
+
+    # When I advance the subject's episode for "Other Post-investigation Contact Required"
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    SubjectScreeningSummaryPage(page).click_advance_lynch_surveillance_episode_button()
+    AdvanceLynchSurveillanceEpisodePage(
+        page
+    ).click_other_post_investigation_contact_required_button()
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {"latest event status": "A361 Other Post-investigation Contact Required"},
+    )
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # And I select the advance episode option for "Record other post-investigation contact"
+    SubjectScreeningSummaryPage(page).click_advance_lynch_surveillance_episode_button()
+    AdvanceLynchSurveillanceEpisodePage(
+        page
+    ).click_record_other_post_investigation_contact_button()
+
+    # Then I confirm the patient outcome dropdown has the following options:
+    ContactWithPatientPage(page).patient_outcome_dropdown_contains_options(
+        [
+            "Post-investigation Appointment Not Required",
+            "Post-investigation Appointment Required",
+            "No outcome",
+        ]
+    )
+
+    # When I record contact with the subject with outcome "Post-investigation Appointment Not Required"
+    ContactWithPatientPage(page).record_post_investigation_appointment_not_required()
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest episode includes event status": "A323 Post-investigation Appointment NOT Required",
+            "latest event status": "A317 Post-investigation Contact Made ",
+        },
+    )
+
+    # When I select the advance episode option for "MDT Referral Required"
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    SubjectScreeningSummaryPage(page).click_advance_lynch_surveillance_episode_button()
+    AdvanceLynchSurveillanceEpisodePage(page).click_mdt_referral_required_button()
+
+    # And I enter simple MDT information
+    ReferToMDTPage(page).enter_date_in_mdt_discussion_date_field(datetime.today())
+    ReferToMDTPage(page).select_mdt_location_lookup(1)
+    ReferToMDTPage(page).click_record_mdt_appointment_button()
+    page.wait_for_timeout(500)  # Timeout to allow subject to update in the DB.
+
+    #  Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {"latest event status": "A348 MDT Referral Required"},
+    )
+
+    # And there is a "A348" letter batch for my subject with the exact title "GP Letter Indicating Referral to MDT (Lynch)"
+    # When I process the open "A348" letter batch for my subject
+    batch_processing(
+        page,
+        "A348",
+        "GP Letter Indicating Referral to MDT (Lynch)",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A372 Refer Symptomatic, GP Letter Printed",
+        },
+    )
+
+    logging.info("Symptomatic procedure of non-neoplastic")
+
+    # When I view the advance episode options
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    SubjectScreeningSummaryPage(page).click_advance_lynch_surveillance_episode_button()
+
+    # Then I "can" advance the subject's episode for "Non-neoplastic and Other Non-bowel Cancer Result"
+    AdvanceLynchSurveillanceEpisodePage(
+        page
+    ).non_neoplastic_and_other_non_bowel_cancer_result_button.is_visible()
+
+    # And I select the advance episode option for "Non-neoplastic and Other Non-bowel Cancer Result"
+    AdvanceLynchSurveillanceEpisodePage(
+        page
+    ).click_non_neoplastic_and_other_non_bowel_cancer_result_button()
+
+    # And I set the Date of Symptomatic Procedure to "2 days ago"
+    NonNeoplasticResultFromSymptomaticProcedurePage(
+        page
+    ).enter_date_of_symptomatic_procedure(datetime.today() - timedelta(days=2))
+
+    # And the Screening Interval is 24 months
+    NonNeoplasticResultFromSymptomaticProcedurePage(page).assert_text_in_alert_textbox(
+        "recall interval of 24 months"
+    )
+
+    # And I select test number 1
+    NonNeoplasticResultFromSymptomaticProcedurePage(page).select_test_number(1)
+
+    # And I save the Result from Symptomatic Procedure
+    NonNeoplasticResultFromSymptomaticProcedurePage(page).click_save_button()
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "which diagnostic test": "Latest not-void test in latest episode",
+            "latest episode accumulated result": "Abnormal",
+            "latest event status": "A373 Symptomatic result recorded",
+            "symptomatic procedure date": "2 days ago",
+            "symptomatic procedure result": "Non-neoplastic",
+        },
+    )
+
+    # When I advance the subject's episode for "Return to Lynch after symptomatic referral"
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    SubjectScreeningSummaryPage(page).click_advance_lynch_surveillance_episode_button()
+    AdvanceLynchSurveillanceEpisodePage(
+        page
+    ).click_return_to_lynch_after_symptomatic_referral_button()
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A377 Return to Lynch after symptomatic referral",
+        },
+    )
+
+    # And there is a "A377" letter batch for my subject with the exact title "Return to Lynch after symptomatic referral"
+    # When I process the open "A377" letter batch for my subject
+    batch_processing(
+        page,
+        "A377",
+        "Return to Lynch after symptomatic referral",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "which diagnostic test": "Latest not-void test in latest episode",
+            "calculated fobt due date": "Null",
+            "calculated lynch due date": "2 years from Symptomatic Procedure",
+            "calculated surveillance due date": "Unchanged",
+            "latest episode accumulated result": "Abnormal",
+            "latest episode recall calculation method": "Symptomatic Procedure date",
+            "latest episode recall episode type": "Lynch Surveillance",
+            "latest episode status": "Closed",
+            "latest episode status reason": "Episode Complete",
+            "latest event status": "A65 Abnormal/No Result",
+            "screening due date": "Null",
+            "screening due date date of change": "Null",
+            "screening due date reason": "Null",
+            "symptomatic procedure date": "2 days ago",
+            "symptomatic procedure result": "Non-neoplastic",
+            "screening referral type": "Null",
+            "screening status": "Lynch Surveillance",
+            "screening status date of change": "Unchanged",
+            "screening status reason": "Lynch Surveillance",
+            "surveillance due date": "Null",
+            "surveillance due date date of change": "Unchanged",
+            "surveillance due date reason": "Unchanged",
+        },
+    )
 
     LogoutPage(page).log_out()
