@@ -229,3 +229,40 @@ class DateTimeUtils:
         except ValueError:
             # Handles February 29 for non-leap years
             return today.replace(month=2, day=28, year=today.year - age)
+
+    @staticmethod
+    def add_time_to_time_string(time_str: str, add_minutes: int) -> str:
+        """
+        Adds minutes to a "hh:mm" formatted time string and returns the new time string.
+        Args:
+            time_str (str): Time in "hh:mm" format.
+            add_minutes (int): Minutes to add.
+        Returns:
+            str: New time in "hh:mm" format.
+        """
+
+        def to_minutes(time_str: str) -> int:
+            """
+            Converts "hh:mm" formatted string to total minutes.
+            Args:
+                time_str (str): Time in "hh:mm" format.
+            Returns:
+                int: Total minutes.
+            """
+            h, m = map(int, time_str.split(":"))
+            return h * 60 + m
+
+        def to_hh_mm(minutes: int) -> str:
+            """
+            Converts total minutes to "hh:mm" formatted string.
+            Args:
+                minutes (int): Total minutes.
+            Returns:
+                str: Time in "hh:mm" format.
+            """
+            h = minutes // 60
+            m = minutes % 60
+            return f"{h:02d}:{m:02d}"
+
+        total_minutes = to_minutes(time_str) + add_minutes
+        return to_hh_mm(total_minutes)

@@ -52,7 +52,7 @@ class TableUtils:
 
         # Extract first-row headers (general headers)
         header_texts = headers.evaluate_all("ths => ths.map(th => th.innerText.trim())")
-        logging.info(f"First Row Headers Found: {header_texts}")
+        logging.debug(f"First Row Headers Found: {header_texts}")
 
         # Attempt to extract a second row of headers (commonly used for filters or alternate titles)
         second_row_headers = self.table.locator(
@@ -65,7 +65,7 @@ class TableUtils:
             for h in second_row_headers
         ):
             header_texts = second_row_headers
-        logging.info(f"Second Row Headers Found: {second_row_headers}")
+        logging.debug(f"Second Row Headers Found: {second_row_headers}")
 
         for index, header in enumerate(header_texts):
             if column_name.strip().lower() == header.strip().lower():
@@ -394,4 +394,30 @@ class TableUtils:
 
         logging.info(
             f"Verified: label '{label_text}' has expected text '{expected_text}'"
+        )
+
+    def get_row_index(self, column_name: str, row_value: str) -> int:
+        """
+        Returns the 1-based index of the first row where the specified column contains the given value.
+        Args:
+            column_name (str): The name of the column to search in.
+            row_value (str): The value to match in the specified column.
+        Returns:
+            int: The 1-based index of the matching row, or -1 if not found.
+        """
+        column_index = self.get_column_index(column_name)
+        if column_index == -1:
+            raise ValueError(f"Column '{column_name}' not found in table")
+
+        row_count = self.get_row_count()
+        for row_index in range(row_count):
+            cell_locator = self.page.locator(
+                f"{self.table_id} > tbody tr:nth-child({row_index+1}) td:nth-child({column_index})"
+            )
+            if cell_locator.count() > 0:
+                cell_text = cell_locator.first.inner_text().strip()
+                if cell_text == row_value:
+                    return row_index + 1  # 1-based index
+        raise ValueError(
+            f"No row found with the value '{row_value}' in the column '{column_name}'."
         )
