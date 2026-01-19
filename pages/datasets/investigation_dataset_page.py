@@ -99,6 +99,9 @@ class InvestigationDatasetsPage(BasePage):
         )
         self.show_details_links = self.page.locator('a:has-text("Show details")')
         self.warning_messages = self.page.locator("#UI_DIV_ADVICE_MESSAGE")
+        self.resect_and_discard_message = self.page.locator(
+            "#UI_DIV_RESECT_DISCARD_MESSAGE"
+        )
 
         # Repeat strings:
         self.bowel_preparation_administered_string = "Bowel Preparation Administered"
@@ -760,26 +763,36 @@ class InvestigationDatasetsPage(BasePage):
         list_of_sections = dataset_section.locator(".DatasetSubSection").all()
         for section in list_of_sections:
             header = section.locator("h5")
-            if (
-                header
-                and header.inner_text().strip().lower()
-                == dataset_subsection_name.strip().lower()
-            ):
-                sub_section_found = section
-                break
+            visible_headers = [
+                header.nth(i)
+                for i in range(header.count())
+                if header.nth(i).is_visible()
+            ]
+            for hdr in visible_headers:
+                if (
+                    hdr.inner_text().strip().lower()
+                    == dataset_subsection_name.strip().lower()
+                ):
+                    sub_section_found = section
+                    break
 
         # If not found, search through .DatasetSubSectionGroup
         if sub_section_found is None:
             list_of_sections = dataset_section.locator(".DatasetSubSectionGroup").all()
             for section in list_of_sections:
                 header = section.locator("h5")
-                if (
-                    header
-                    and header.inner_text().strip().lower()
-                    == dataset_subsection_name.strip().lower()
-                ):
-                    sub_section_found = section
-                    break
+                visible_headers = [
+                    header.nth(i)
+                    for i in range(header.count())
+                    if header.nth(i).is_visible()
+                ]
+                for hdr in visible_headers:
+                    if (
+                        hdr.inner_text().strip().lower()
+                        == dataset_subsection_name.strip().lower()
+                    ):
+                        sub_section_found = section
+                        break
 
         logging.info(
             f"Dataset subsection '{dataset_section_name}', '{dataset_subsection_name}' found: {sub_section_found is not None}"
@@ -1254,6 +1267,33 @@ class InvestigationDatasetsPage(BasePage):
         assert (
             actual_message is not None and expected_message in actual_message
         ), f"Actual warning message displayed is: {actual_message}"
+
+    def get_resect_and_discard_message(self) -> str | None:
+        """
+        Retrieves the 'Resect and Discard' message if present.
+        Returns:
+            str | None: The message text if found, otherwise None.
+        """
+        logging.debug("START: get_resect_and_discard_message")
+        message = None
+        if self.resect_and_discard_message.count() > 0:
+            message = self.resect_and_discard_message.first.inner_text().strip()
+            logging.debug(f"R&D message found: {message}")
+        logging.debug("END: get_resect_and_discard_message")
+        return message
+
+    def assert_resect_and_discard_message(self, expected_message: str | None) -> None:
+        """
+        Asserts that the 'Resect and Discard' message matches the expected message.
+        Args:
+            expected_message (str | None): The expected message text, or None if no message is expected.
+        Raises:
+            AssertionError: If the actual message does not match the expected message.
+        """
+        resect_and_discard_message = self.get_resect_and_discard_message()
+        assert (
+            resect_and_discard_message == expected_message
+        ), f"Expected R&D message '{expected_message}', but found '{resect_and_discard_message}'"
 
 
 def normalize_label(text: str) -> str:
