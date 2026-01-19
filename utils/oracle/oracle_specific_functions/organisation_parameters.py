@@ -97,3 +97,20 @@ def check_parameter(param_id: int, org_id: str, expected_param_value: str) -> bo
 
     logging.warning(f"Parameter {param_id} is not set correctly, updating parameter.")
     return False
+
+
+def get_national_parameter_value(param_id: int) -> str:
+    """
+    Retrieves the default value of a national parameter from the database.
+    Args:
+        param_id (int): The ID of the national parameter to retrieve.
+    """
+    query = """SELECT p.default_value
+    FROM parameters p
+    WHERE p.param_id = :param_id"""
+    params = {"param_id": param_id}
+    df = OracleDB().execute_query(query, params)
+    if not df.empty:
+        return df.iloc[0]["default_value"]
+    else:
+        raise ValueError(f"Parameter ID {param_id} not found in parameters table.")
