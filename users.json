@@ -154,6 +154,14 @@
       "Wolverhampton SC"
     ]
   },
+  "BCSS Support - HUB": {
+    "username": "BCSS306",
+    "role_id": 202245,
+    "org_code": "BCS01",
+    "roles": [
+      "Midlands and North West Bowel Cancer Screening Programme Hub, BCSS Hub Support"
+    ]
+  },
   "BCSS Bureau Staff at X26": {
     "username": "BCSS33",
     "role_id": 5042,
