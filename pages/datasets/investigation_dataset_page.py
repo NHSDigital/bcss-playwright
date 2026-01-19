@@ -753,46 +753,44 @@ class InvestigationDatasetsPage(BasePage):
         )
 
         dataset_section = self.get_dataset_section(dataset_section_name)
-
-        sub_section_found = None
-
         if dataset_section is None:
             raise ValueError(f"Dataset section '{dataset_section_name}' was not found.")
 
-        # First, search through .DatasetSubSection
-        list_of_sections = dataset_section.locator(".DatasetSubSection").all()
-        for section in list_of_sections:
-            header = section.locator("h5")
-            visible_headers = [
-                header.nth(i)
-                for i in range(header.count())
-                if header.nth(i).is_visible()
-            ]
-            for hdr in visible_headers:
-                if (
-                    hdr.inner_text().strip().lower()
-                    == dataset_subsection_name.strip().lower()
-                ):
-                    sub_section_found = section
-                    break
+        def find_visible_subsection(
+            sections: List[Locator], subsection_name: str
+        ) -> Optional[Locator]:
+            """
+            Helper function to find a visible subsection by its header text.
+            Args:
+                sections (List[Locator]): List of section Locators to search through.
+                subsection_name (str): The name of the subsection to find.
+            Returns:
+                Optional[Locator]: The Locator of the found subsection, or None if not found.
+            """
+            for section in sections:
+                header = section.locator("h5")
+                for i in range(header.count()):
+                    hdr = header.nth(i)
+                    if (
+                        hdr.is_visible()
+                        and hdr.inner_text().strip().lower()
+                        == subsection_name.strip().lower()
+                    ):
+                        return section
+            return None
+
+        # Search through .DatasetSubSection
+        subsections = dataset_section.locator(".DatasetSubSection").all()
+        sub_section_found = find_visible_subsection(
+            subsections, dataset_subsection_name
+        )
 
         # If not found, search through .DatasetSubSectionGroup
         if sub_section_found is None:
-            list_of_sections = dataset_section.locator(".DatasetSubSectionGroup").all()
-            for section in list_of_sections:
-                header = section.locator("h5")
-                visible_headers = [
-                    header.nth(i)
-                    for i in range(header.count())
-                    if header.nth(i).is_visible()
-                ]
-                for hdr in visible_headers:
-                    if (
-                        hdr.inner_text().strip().lower()
-                        == dataset_subsection_name.strip().lower()
-                    ):
-                        sub_section_found = section
-                        break
+            group_sections = dataset_section.locator(".DatasetSubSectionGroup").all()
+            sub_section_found = find_visible_subsection(
+                group_sections, dataset_subsection_name
+            )
 
         logging.info(
             f"Dataset subsection '{dataset_section_name}', '{dataset_subsection_name}' found: {sub_section_found is not None}"
