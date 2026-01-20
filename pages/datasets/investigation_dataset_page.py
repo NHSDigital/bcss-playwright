@@ -99,6 +99,9 @@ class InvestigationDatasetsPage(BasePage):
         )
         self.show_details_links = self.page.locator('a:has-text("Show details")')
         self.warning_messages = self.page.locator("#UI_DIV_ADVICE_MESSAGE")
+        self.resect_and_discard_message = self.page.locator(
+            "#UI_DIV_RESECT_DISCARD_MESSAGE"
+        )
 
         # Repeat strings:
         self.bowel_preparation_administered_string = "Bowel Preparation Administered"
@@ -750,36 +753,44 @@ class InvestigationDatasetsPage(BasePage):
         )
 
         dataset_section = self.get_dataset_section(dataset_section_name)
-
-        sub_section_found = None
-
         if dataset_section is None:
             raise ValueError(f"Dataset section '{dataset_section_name}' was not found.")
 
-        # First, search through .DatasetSubSection
-        list_of_sections = dataset_section.locator(".DatasetSubSection").all()
-        for section in list_of_sections:
-            header = section.locator("h5")
-            if (
-                header
-                and header.inner_text().strip().lower()
-                == dataset_subsection_name.strip().lower()
-            ):
-                sub_section_found = section
-                break
+        def find_visible_subsection(
+            sections: List[Locator], subsection_name: str
+        ) -> Optional[Locator]:
+            """
+            Helper function to find a visible subsection by its header text.
+            Args:
+                sections (List[Locator]): List of section Locators to search through.
+                subsection_name (str): The name of the subsection to find.
+            Returns:
+                Optional[Locator]: The Locator of the found subsection, or None if not found.
+            """
+            for section in sections:
+                header = section.locator("h5")
+                for i in range(header.count()):
+                    hdr = header.nth(i)
+                    if (
+                        hdr.is_visible()
+                        and hdr.inner_text().strip().lower()
+                        == subsection_name.strip().lower()
+                    ):
+                        return section
+            return None
+
+        # Search through .DatasetSubSection
+        subsections = dataset_section.locator(".DatasetSubSection").all()
+        sub_section_found = find_visible_subsection(
+            subsections, dataset_subsection_name
+        )
 
         # If not found, search through .DatasetSubSectionGroup
         if sub_section_found is None:
-            list_of_sections = dataset_section.locator(".DatasetSubSectionGroup").all()
-            for section in list_of_sections:
-                header = section.locator("h5")
-                if (
-                    header
-                    and header.inner_text().strip().lower()
-                    == dataset_subsection_name.strip().lower()
-                ):
-                    sub_section_found = section
-                    break
+            group_sections = dataset_section.locator(".DatasetSubSectionGroup").all()
+            sub_section_found = find_visible_subsection(
+                group_sections, dataset_subsection_name
+            )
 
         logging.info(
             f"Dataset subsection '{dataset_section_name}', '{dataset_subsection_name}' found: {sub_section_found is not None}"
@@ -1254,6 +1265,33 @@ class InvestigationDatasetsPage(BasePage):
         assert (
             actual_message is not None and expected_message in actual_message
         ), f"Actual warning message displayed is: {actual_message}"
+
+    def get_resect_and_discard_message(self) -> str | None:
+        """
+        Retrieves the 'Resect and Discard' message if present.
+        Returns:
+            str | None: The message text if found, otherwise None.
+        """
+        logging.debug("START: get_resect_and_discard_message")
+        message = None
+        if self.resect_and_discard_message.count() > 0:
+            message = self.resect_and_discard_message.first.inner_text().strip()
+            logging.debug(f"R&D message found: {message}")
+        logging.debug("END: get_resect_and_discard_message")
+        return message
+
+    def assert_resect_and_discard_message(self, expected_message: str | None) -> None:
+        """
+        Asserts that the 'Resect and Discard' message matches the expected message.
+        Args:
+            expected_message (str | None): The expected message text, or None if no message is expected.
+        Raises:
+            AssertionError: If the actual message does not match the expected message.
+        """
+        resect_and_discard_message = self.get_resect_and_discard_message()
+        assert (
+            resect_and_discard_message == expected_message
+        ), f"Expected R&D message '{expected_message}', but found '{resect_and_discard_message}'"
 
 
 def normalize_label(text: str) -> str:
