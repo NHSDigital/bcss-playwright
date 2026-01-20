@@ -445,37 +445,34 @@ class InvestigationDatasetCompletion:
                     - "fit for subsequent endoscopic referral" (Optional[str]): Enum value for referral fitness.
                     - "aspirant endoscopist" (Optional[int or None]): Index for aspirant dropdown, or None to mark absence.
         """
-        self.investigation_datasets_pom.select_site_lookup_option_index(
-            general_information["site"]
-        )
-        self.investigation_datasets_pom.select_practitioner_option_index(
-            general_information["practitioner"]
-        )
-        testing_clinician = general_information["testing clinician"]
-        if isinstance(testing_clinician, int):
-            self.investigation_datasets_pom.select_testing_clinician_option_index(
-                testing_clinician
-            )
-        elif isinstance(testing_clinician, str):
-            self.investigation_datasets_pom.select_testing_clinician_from_name(
-                testing_clinician
-            )
-
-        if general_information.get("reporting radiologist") is not None:
-            InvestigationDatasetsPage(
-                self.page
-            ).select_reporting_radiologist_option_index(
-                general_information["reporting radiologist"]
-            )
-
-        if (
-            general_information.get("fit for subsequent endoscopic referral")
-            is not None
-        ):
-            DatasetFieldUtil(self.page).populate_select_locator_for_field(
-                "Fit for Subsequent Endoscopic Referral",
-                general_information["fit for subsequent endoscopic referral"],
-            )
+        for key, value in general_information.items():
+            match key:
+                case "site":
+                    self.investigation_datasets_pom.select_site_lookup_option_index(
+                        value
+                    )
+                case "practitioner":
+                    self.investigation_datasets_pom.select_practitioner_option_index(
+                        value
+                    )
+                case "testing clinician":
+                    if isinstance(value, int):
+                        self.investigation_datasets_pom.select_testing_clinician_option_index(
+                            value
+                        )
+                    elif isinstance(value, str):
+                        self.investigation_datasets_pom.select_testing_clinician_from_name(
+                            value
+                        )
+                case "reporting radiologist":
+                    InvestigationDatasetsPage(
+                        self.page
+                    ).select_reporting_radiologist_option_index(value)
+                case "fit for subsequent endoscopic referral":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Fit for Subsequent Endoscopic Referral",
+                        value,
+                    )
 
         if "aspirant endoscopist" in general_information:
             aspirant = general_information["aspirant endoscopist"]
