@@ -36,6 +36,9 @@ class AdvanceLynchSurveillanceEpisodePage(AdvanceEpisodePage):
         self.last_colonoscopy_date_field = self.page.locator(
             "input[type='text'][id^='UI_APPT_DATE_']"
         )
+        self.return_to_lynch_after_symptomatic_referral_button = self.page.get_by_role(
+            "button", name="Return to Lynch after symptomatic referral"
+        )
 
     def click_review_suitability_for_lynch_surveillance_button(self) -> None:
         """Click on the 'Review suitability for Lynch Surveillance' button."""
@@ -73,3 +76,7 @@ class AdvanceLynchSurveillanceEpisodePage(AdvanceEpisodePage):
         CalendarPicker(self.page).calendar_picker_ddmmyyyy(
             date, self.last_colonoscopy_date_field
         )
+
+    def click_return_to_lynch_after_symptomatic_referral_button(self) -> None:
+        """Click on the 'Return to Lynch after symptomatic referral' button."""
+        self.safe_accept_dialog(self.return_to_lynch_after_symptomatic_referral_button)
