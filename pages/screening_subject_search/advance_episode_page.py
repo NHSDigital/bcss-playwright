@@ -538,3 +538,18 @@ class AdvanceEpisodePage(BasePage):
     def click_other_post_investigation_contact_required_button(self) -> None:
         """Click the 'Other Post Investigation Contact Required' button."""
         self.safe_accept_dialog(self.other_post_investigation_contact_required_button)
+
+    def can_advance_episode(self, advance_option: str, can_or_cannot: bool) -> None:
+        """
+        Asserts whether a subject's episode can be advanced using a specified option
+        Args:
+            advance_option (str): The advance episode option to check
+            can_or_cannot (bool): True if the option should be visible, False otherwise
+        Raises:
+            AssertionError: If the visibility of the option does not match the expected value
+        """
+        advance_option_locator = self.page.get_by_role("button", name=advance_option)
+        if can_or_cannot:
+            assert advance_option_locator.is_visible()
+        else:
+            assert advance_option_locator.is_hidden()

@@ -1629,6 +1629,7 @@ class PolypReasonLeftInSituOptions(StrEnum):
     REQUIRES_SURGICAL_RESECTION = "200558"
     CANNOT_FIND_POLYP_ON_WITHDRAWAL = "200559"
     CLINICAL_DECISION_NOT_TO_EXCISE = "203082"
+    DIAGNOSTIC_PROCEDURE = "200560~diagnostic procedure only"
 
 
 class AntibioticsAdministeredDrugTypeOptions(StrEnum):
