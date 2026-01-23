@@ -142,7 +142,9 @@ class DatasetFieldUtil:
 
         if self._check_table_row(scope, text, expected_text):
             return
-        if self._check_span_structure(scope, text, expected_text):
+        elif self._check_span_structure(scope, text, expected_text):
+            return
+        elif self._check_classic_table_cells(scope, text, expected_text):
             return
 
         raise AssertionError(
@@ -253,6 +255,39 @@ class DatasetFieldUtil:
             logging.info(f"The span next to '{text}' contains '{expected_text}'")
             return True
         return False
+
+    def _check_classic_table_cells(
+        self, scope: Locator | Page, text: str, expected_text: str
+    ) -> bool:
+        """
+        Checks for classic table cell layout: <td class="screenTableLabelCell">Label</td>
+        followed by <td class="screenTableInputCell">Value</td>.
+        Args:
+            scope (Locator): The Playwright locator to scope the search.
+            text (str): The label text to search for.
+            expected_text (str): The expected value in the adjacent right-hand cell.
+        Returns:
+            bool: True if the expected text is found and matches, False otherwise.
+        """
+        label_cell = scope.locator(f'td.screenTableLabelCell:has-text("{text}")').first
+        if label_cell.count() == 0 or not label_cell.is_visible():
+            return False
+
+        # Find the next sibling td with class screenTableInputCell
+        input_cell = label_cell.locator(
+            'xpath=following-sibling::td[contains(@class,"screenTableInputCell")]'
+        ).first
+        if input_cell.count() == 0 or not input_cell.is_visible():
+            return False
+
+        actual_text = input_cell.inner_text().strip()
+        assert (
+            actual_text == expected_text
+        ), f'Expected "{expected_text}" but found "{actual_text}" in cell next to "{text}".'
+        logging.info(
+            f'The classic table cell next to "{text}" contains "{expected_text}"'
+        )
+        return True
 
     def assert_select_to_right_has_values(
         self, text: str, expected_values: List[str], div: Optional[str] = None
