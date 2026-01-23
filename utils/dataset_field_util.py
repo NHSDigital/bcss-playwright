@@ -140,15 +140,14 @@ class DatasetFieldUtil:
         logging.info(f"Checking that the cell next to {text} contains {expected_text}")
         scope = self.page.locator(f"div#{div}") if div else self.page
 
-        if self._check_table_row(scope, text, expected_text):
+        if (
+            self._check_table_row(scope, text, expected_text)
+            or self._check_span_structure(scope, text, expected_text)
+            or self._check_classic_table_cells(scope, text, expected_text)
+        ):
             return
-        elif self._check_span_structure(scope, text, expected_text):
-            return
-        elif self._check_classic_table_cells(scope, text, expected_text):
-            return
-
         raise AssertionError(
-            f'Could not find a visible row or span with text "{text}".'
+            f'Could not find a visible row, span, or table cell with text "{text}".'
         )
 
     def _check_table_row(
