@@ -64,8 +64,8 @@ def test_set_lynch_invitation_rate(
 
     set_lynch_invitation_rate_page = SetLynchInvitationRatesPage(page)
 
-    wolverhampton_invitation_rate = str(random.randrange(1, 9))
-    coventry_invitation_rate = str(random.randrange(1, 9))
+    wolverhampton_invitation_rate = str(random.randint(1, 9))
+    coventry_invitation_rate = str(random.randint(1, 9))
 
     set_lynch_invitation_rate_page.set_lynch_invitation_rate(
         "2", wolverhampton_invitation_rate
