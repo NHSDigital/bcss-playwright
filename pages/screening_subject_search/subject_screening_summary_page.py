@@ -118,6 +118,9 @@ class SubjectScreeningSummaryPage(BasePage):
         self.reopen_surveillance_episode_button = self.page.get_by_role(
             "button", name="Reopen Surveillance Episode"
         )
+        self.reopen_lynch_surveillance_episode_button = self.page.get_by_role(
+            "button", name="Reopen Lynch Surveillance Episode"
+        )
         self.reopen_for_correction_button = self.page.get_by_role(
             "button", name="Reopen episode for correction"
         )
@@ -464,6 +467,10 @@ class SubjectScreeningSummaryPage(BasePage):
     def click_reopen_surveillance_episode_button(self) -> None:
         """Click on the 'Reopen Surveillance Episode' button"""
         self.click(self.reopen_surveillance_episode_button)
+
+    def click_reopen_lynch_surveillance_episode_button(self) -> None:
+        """Click on the 'Reopen Lynch Surveillance Episode' button"""
+        self.click(self.reopen_lynch_surveillance_episode_button)
 
     def reopen_fobt_screening_episode(self) -> None:
         """
