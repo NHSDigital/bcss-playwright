@@ -38,7 +38,7 @@ from datetime import datetime
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.fobt_regression_tests
-def test_scenario_3(page: Page) -> None:
+def test_fobt_scenario_3(page: Page) -> None:
     """
     Scenario: 3: Patient refuses colonoscopy assessment appointment
 

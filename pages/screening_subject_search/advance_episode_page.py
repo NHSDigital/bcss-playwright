@@ -31,6 +31,9 @@ class AdvanceEpisodePage(BasePage):
         )
         self.calendar_button = self.page.get_by_role("button", name="Calendar")
         self.test_type_dropdown = self.page.locator("[id^='UI_EXT_TEST_TYPE_']")
+        self.intended_extent_dropdown = self.page.locator(
+            "[id^='UI_INTENDED_EXTENT_TYPE_']"
+        )
         self.advance_checkbox_label = self.page.get_by_label(
             "There are some events available which should only be used in exceptional circumstances. If you wish to see them, check this box"
         )
@@ -136,8 +139,16 @@ class AdvanceEpisodePage(BasePage):
                 "button", name="Redirect to Establish Attendance at Appointment"
             )
         )
+        self.high_risk_findings_result_from_symptomatic_procedure_button = (
+            self.page.get_by_role(
+                "button", name="High-risk findings Result from Symptomatic Procedure"
+            )
+        )
         self.date_of_symptomatic_procedure_input = self.page.get_by_role(
             "textbox", name="Date of Symptomatic Procedure"
+        )
+        self.initiate_close_button = self.page.get_by_role(
+            "button", name="Initiate Close"
         )
 
         # Contact recording locators
@@ -165,6 +176,9 @@ class AdvanceEpisodePage(BasePage):
         self.lnpcp_result_from_symptomatic_procedure_button = self.page.get_by_role(
             "button", name="LNPCP Result from Symptomatic Procedure"
         )
+        self.other_post_investigation_contact_required_button = self.page.get_by_role(
+            "button", name="Other Post-investigation Contact Required"
+        )
 
     def click_suitable_for_endoscopic_test_button(self) -> None:
         """Click the 'Suitable for Endoscopic Test' button."""
@@ -177,6 +191,10 @@ class AdvanceEpisodePage(BasePage):
     def select_test_type_dropdown_option(self, text: str) -> None:
         """Select the test type from the dropdown."""
         self.test_type_dropdown.select_option(label=text)
+
+    def select_intended_extent_dropdown_option(self, text: str) -> None:
+        """Select the intended extent from the dropdown."""
+        self.intended_extent_dropdown.select_option(label=text)
 
     def click_invite_for_diagnostic_test_button(self) -> None:
         """Click the 'Invite for Diagnostic Test' button."""
@@ -193,6 +211,10 @@ class AdvanceEpisodePage(BasePage):
     def click_other_post_investigation_button(self) -> None:
         """Click the 'Other Post-investigation' button."""
         self.safe_accept_dialog(self.other_post_investigation_button)
+
+    def click_initiate_close_button(self) -> None:
+        """Click the 'Initiate Close' button."""
+        self.safe_accept_dialog(self.initiate_close_button)
 
     def get_latest_event_status_cell(self, latest_event_status: str) -> Locator:
         """Get the cell containing the latest event status."""
@@ -504,3 +526,15 @@ class AdvanceEpisodePage(BasePage):
         CalendarPicker(self.page).calendar_picker_ddmmyyyy(
             date, self.date_of_symptomatic_procedure_input
         )
+
+    def click_high_risk_findings_result_from_symptomatic_procedure_button(
+        self,
+    ) -> None:
+        """Click the 'High-risk findings Result from Symptomatic Procedure' button"""
+        self.safe_accept_dialog(
+            self.high_risk_findings_result_from_symptomatic_procedure_button
+        )
+
+    def click_other_post_investigation_contact_required_button(self) -> None:
+        """Click the 'Other Post Investigation Contact Required' button."""
+        self.safe_accept_dialog(self.other_post_investigation_contact_required_button)

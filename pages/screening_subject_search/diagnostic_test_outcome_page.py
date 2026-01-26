@@ -1,8 +1,7 @@
-import logging
-from click import option
 from playwright.sync_api import Page, expect, Locator
 from pages.base_page import BasePage
 from enum import StrEnum
+from typing import List
 
 
 class ReferralProcedureType(StrEnum):
@@ -39,7 +38,7 @@ class DiagnosticTestOutcomePage(BasePage):
         self.test_outcome_dropdown = self.page.get_by_label(
             "Outcome of Diagnostic Test"
         )
-        self.reason_for_sympptomatic_referral_dropdown = self.page.get_by_label(
+        self.reason_for_symptomatic_referral_dropdown = self.page.get_by_label(
             "Reason for Symptomatic Referral"
         )
         self.save_button = self.page.get_by_role("button", name="Save")
@@ -69,6 +68,60 @@ class DiagnosticTestOutcomePage(BasePage):
         """
         self.test_outcome_dropdown.select_option(option)
 
+    def test_outcome_dropdown_contains_options(self, options: List[str]) -> None:
+        """
+        Asserts that all provided options are present in the Outcome of Diagnostic Test dropdown.
+
+        Args:
+            options (List[str]): List of option strings to check.
+        """
+        dropdown_options = [
+            opt.inner_text()
+            for opt in self.test_outcome_dropdown.locator("option").all()
+        ]
+        for item in options:
+            assert (
+                item in dropdown_options
+            ), f"Dropdown is missing expected option: '{item}'"
+
+    def reason_for_onward_referral_dropdown_contains_options(
+        self, options: List[str]
+    ) -> None:
+        """
+        Asserts that all provided options are present in the Outcome of Diagnostic Test dropdown.
+
+        Args:
+            options (List[str]): List of option strings to check.
+        """
+        dropdown_options = [
+            opt.inner_text()
+            for opt in self.reason_for_onward_referral_dropdown.locator("option").all()
+        ]
+        for item in options:
+            assert (
+                item in dropdown_options
+            ), f"Dropdown is missing expected option: '{item}'"
+
+    def reason_for_symptomatic_referral_dropdown_contains_options(
+        self, options: List[str]
+    ) -> None:
+        """
+        Asserts that all provided options are present in the Reason for Symptomatic Referral dropdown.
+
+        Args:
+            options (List[str]): List of option strings to check.
+        """
+        dropdown_options = [
+            opt.inner_text()
+            for opt in self.reason_for_symptomatic_referral_dropdown.locator(
+                "option"
+            ).all()
+        ]
+        for item in options:
+            assert (
+                item in dropdown_options
+            ), f"Dropdown is missing expected option: '{item}'"
+
     def verify_reason_for_symptomatic_referral(self, symptomatic_reason: str) -> None:
         """
         Verify reason for symptomatic referral is visible.
@@ -86,7 +139,7 @@ class DiagnosticTestOutcomePage(BasePage):
         Args:
             option (str): option (str): The option to select from the Reason For Symptomatic Referral options.
         """
-        self.reason_for_sympptomatic_referral_dropdown.select_option(option)
+        self.reason_for_symptomatic_referral_dropdown.select_option(option)
 
     def click_save_button(self) -> None:
         """Click the 'Save' button."""
@@ -121,6 +174,7 @@ class OutcomeOfDiagnosticTest(StrEnum):
     REFER_SURVEILLANCE = "20365"
     INVESTIGATION_COMPLETE = "20360"
     REFER_ANOTHER_DIAGNOSTIC_TEST = "20364"
+    REFER_MDT = "20367"
 
 
 class ReasonForSymptomaticReferral(StrEnum):

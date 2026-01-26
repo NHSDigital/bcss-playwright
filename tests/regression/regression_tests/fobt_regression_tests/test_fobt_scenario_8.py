@@ -19,6 +19,11 @@ from pages.datasets.investigation_dataset_page import (
     IVContrastAdministeredOptions,
     FailureReasonsOptions,
     InvestigationDatasetsPage,
+    BowelPreparationQualityOptions,
+    ComfortOptions,
+    EndoscopyLocationOptions,
+    InsufflationOptions,
+    OutcomeAtTimeOfProcedureOptions,
 )
 from pages.datasets.subject_datasets_page import SubjectDatasetsPage
 from utils.user_tools import UserTools
@@ -34,11 +39,6 @@ from pages.screening_subject_search.contact_with_patient_page import (
 from utils.calendar_picker import CalendarPicker
 from pages.screening_subject_search.attend_diagnostic_test_page import (
     AttendDiagnosticTestPage,
-)
-from utils.datasets.investigation_datasets import (
-    get_default_general_information,
-    get_default_drug_information,
-    get_default_endoscopy_information,
 )
 from utils.oracle.oracle import OracleDB
 from utils.oracle.subject_selector import SubjectSelector
@@ -74,7 +74,7 @@ from pages.screening_subject_search.diagnostic_test_outcome_page import (
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.fobt_regression_tests
-def test_scenario_8(page: Page) -> None:
+def test_fobt_scenario_8(page: Page) -> None:
     """
     Scenario: 8: Discharge for no contact, diagnostic test result of "No result"
 
@@ -227,7 +227,14 @@ def test_scenario_8(page: Page) -> None:
         page=page,
         batch_type="A183",
         batch_description="Practitioner Clinic 1st Appointment",
-        latest_event_status="A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked, letter sent"
+        },
     )
 
     # And there is a "A183" letter batch for my subject with the exact title "GP Result (Abnormal)"
@@ -235,7 +242,14 @@ def test_scenario_8(page: Page) -> None:
         page=page,
         batch_type="A183",
         batch_description="GP Result (Abnormal)",
-        latest_event_status="A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked, letter sent"
+        },
     )
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
@@ -336,6 +350,8 @@ def test_scenario_8(page: Page) -> None:
     user_role = UserTools.switch_user(
         page, "Screening Centre Manager", remember_user=True
     )
+    if user_role is None:
+        raise ValueError("User cannot be assigned to a UserRoleType")
 
     # And I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -383,7 +399,14 @@ def test_scenario_8(page: Page) -> None:
         page=page,
         batch_type="A397",
         batch_description="Discharge from screening round - no contact (letter to patient)",
-        latest_event_status="A391 - Patient Discharge Letter Printed - No Patient Contact",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A391 Patient Discharge Letter Printed - No Patient Contact"
+        },
     )
 
     # And there is a "A391" letter batch for my subject with the exact title "Discharge from screening round - no contact (letter to GP)"
@@ -392,7 +415,6 @@ def test_scenario_8(page: Page) -> None:
         page=page,
         batch_type="A391",
         batch_description="Discharge from screening round - no contact (letter to GP)",
-        latest_event_status="A351 - GP Discharge Letter Printed - No Patient Contact",
     )
 
     # Then my subject has been updated as follows:
@@ -527,63 +549,73 @@ def test_scenario_8(page: Page) -> None:
     SubjectScreeningSummaryPage(page).click_datasets_link()
     SubjectDatasetsPage(page).click_investigation_show_datasets()
 
+    # Confirm on the investigation Datasets Page
+    InvestigationDatasetsPage(page).bowel_cancer_screening_page_title_contains_text(
+        "Investigation Datasets"
+    )
+
+    # And I open all minimized sections on the dataset
+    InvestigationDatasetsPage(page).open_all_minimized_sections()
+
     # And I set the following fields and values within the Investigation Dataset for this subject:
-    general_information = {
-        "site": 1,
-        "practitioner": 1,
-        "testing clinician": 1,
-        "reporting radiologist": 2,
-        "fit for subsequent endoscopic referral": YesNoOptions.YES,
-    }
+    InvestigationDatasetCompletion(page).fill_out_general_information(
+        {
+            "site": 1,
+            "practitioner": 1,
+            "testing clinician": 1,
+            "reporting radiologist": 2,
+            "fit for subsequent endoscopic referral": YesNoOptions.YES,
+        }
+    )
 
     # And I set the following fields and values within the Contrast, Tagging & Drug Information:
     # And I add the following Additional Bowel Preparation drugs and values within the Investigation Dataset for this subject:
-    contrast_tagging_and_drug = {
-        "iv buscopan administered": IVBuscopanAdministeredOptions.NO,
-        "contraindicated": YesNoOptions.NO,
-        "iv contrast administered": IVContrastAdministeredOptions.NO,
-        "tagging agent given": TaggingAgentDrugAdministeredOptions.YES,
-        "additional bowel preparation administered": AdditionalBowelPrepAdministeredOptions.YES,
-        "drug_type1": DrugTypeOptions.PICOLAX,
-        "drug_dose1": "1",
-    }
+    InvestigationDatasetCompletion(page).fill_out_contrast_tagging_and_drug_information(
+        {
+            "iv buscopan administered": IVBuscopanAdministeredOptions.NO,
+            "contraindicated": YesNoOptions.NO,
+            "iv contrast administered": IVContrastAdministeredOptions.NO,
+            "tagging agent given": TaggingAgentDrugAdministeredOptions.YES,
+            "additional bowel preparation administered": AdditionalBowelPrepAdministeredOptions.YES,
+            "drug_type1": DrugTypeOptions.PICOLAX,
+            "drug_dose1": "1",
+        }
+    )
 
     # And I add the following "Tagging Agent Given" drugs and doses within the Investigation Dataset for this subject:
-    # 	| Gastrografin | 1 |
-    tagging_agent_given_drug_information = {
-        "drug_type1": DrugTypeOptions.GASTROGRAFIN,
-        "drug_dose1": "1",
-    }
+    InvestigationDatasetCompletion(page).fill_out_tagging_agent_given_drug_information(
+        {"drug_type1": DrugTypeOptions.GASTROGRAFIN, "drug_dose1": "1"}
+    )
 
     # 	And I set the following fields and values within the Radiology Information:
-    # 	And I set the following fields and values within the Radiology Information:
-    radiology_information = {
-        "examination quality": ExaminationQualityOptions.GOOD,
-        "scan position": ScanPositionOptions.DUAL,
-        "procedure outcome": ProcedureOutcomeOptions.LEAVE_DEPARTMENT,
-        "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
-        "segmental inadequacy": SegmentalInadequacyOptions.NO,
-        "intracolonic summary code": IntracolonicSummaryCodeOptions.CX_INADEQUATE_STUDY,
-    }
-
-    suspected_findings = {
-        "extracolonic summary code": ExtracolonicSummaryCodeOptions.E4_IMPORTANT_REQUIRES_ACTION,
-    }
+    InvestigationDatasetCompletion(page).fill_out_radiology_information(
+        {
+            "examination quality": ExaminationQualityOptions.GOOD,
+            "scan position": ScanPositionOptions.DUAL,
+            "procedure outcome": ProcedureOutcomeOptions.LEAVE_DEPARTMENT,
+            "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
+            "segmental inadequacy": SegmentalInadequacyOptions.NO,
+            "intracolonic summary code": IntracolonicSummaryCodeOptions.CX_INADEQUATE_STUDY,
+        }
+    )
+    InvestigationDatasetCompletion(page).fill_out_suspected_findings(
+        {
+            "extracolonic summary code": ExtracolonicSummaryCodeOptions.E4_IMPORTANT_REQUIRES_ACTION,
+        }
+    )
 
     # And I set the following radiology failure reasons within the Investigation Dataset for this subject:
     # 	| No failure reasons | NOTE - this can be left as default - there is only one option
 
-    # And I open all minimized sections on the dataset
     # And I mark the Investigation Dataset as completed
+    InvestigationDatasetsPage(page).check_dataset_complete_checkbox()
+
     # When I press the save Investigation Dataset button
-    # And I press OK on my confirmation prompt
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        general_information=general_information,
-        contrast_tagging_and_drug=contrast_tagging_and_drug,
-        tagging_agent_given_drug_information=tagging_agent_given_drug_information,
-        radiology_information=radiology_information,
-        suspected_findings=suspected_findings,
-    )
+    # Then the Investigation Dataset result message, which I will cancel, is "Abnormal"
+    InvestigationDatasetsPage(page).click_save_dataset_button_assert_dialog("Abnormal")
+
+    # When I press the save Investigation Dataset button
+    InvestigationDatasetsPage(page).click_save_dataset_button()
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -662,7 +694,14 @@ def test_scenario_8(page: Page) -> None:
         page=page,
         batch_type="A410",
         batch_description="Post-Investigation Appointment Invitation Letter",
-        latest_event_status="A415 - Post-investigation Appointment Invitation Letter Printed",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A415 Post-investigation Appointment Invitation Letter Printed"
+        },
     )
 
     # When I view the subject
@@ -698,7 +737,11 @@ def test_scenario_8(page: Page) -> None:
         page=page,
         batch_type="A430",
         batch_description="Result Letters Following Post-investigation Appointment",
-        latest_event_status="A395 - Refer Another Diagnostic Test",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no, {"latest event status": "A395 Refer Another Diagnostic Test"}
     )
 
     # When I view the subject
@@ -818,10 +861,23 @@ def test_scenario_8(page: Page) -> None:
     SubjectScreeningSummaryPage(page).click_datasets_link()
     SubjectDatasetsPage(page).click_investigation_show_datasets()
 
+    # Confirm on the investigation Datasets Page
+    InvestigationDatasetsPage(page).bowel_cancer_screening_page_title_contains_text(
+        "Investigation Datasets"
+    )
+
+    # And I open all minimized sections on the dataset
+    InvestigationDatasetsPage(page).open_all_minimized_sections()
+
     # 	And I open all minimized sections on the dataset
     # 	And I add the following bowel preparation drugs and values within the Investigation Dataset for this subject:
     # 	| Mannitol | 3 |
-    drug_information = get_default_drug_information()
+    InvestigationDatasetCompletion(page).fill_out_drug_information(
+        {
+            "drug_dose1": "3",
+            "drug_type1": DrugTypeOptions.MANNITOL,
+        }
+    )
 
     # 	And I set the following fields and values within the Investigation Dataset for this subject:
     # 	| Screening Site               | (Pick first option) |
@@ -843,29 +899,50 @@ def test_scenario_8(page: Page) -> None:
     # 	| Insufflation                 | Air                 |
     # 	| Outcome at time of procedure | Leave department    |
     # 	| Late outcome                 | No complications    |
-    general_information = get_default_general_information()
-    endoscopy_information = get_default_endoscopy_information()
-    endoscopy_information["procedure type"] = "diagnostic"
+    InvestigationDatasetCompletion(page).fill_out_general_information(
+        {
+            "practitioner": 1,
+            "site": 1,
+            "testing clinician": 1,
+            "aspirant endoscopist": None,
+        }
+    )
+
+    InvestigationDatasetCompletion(page).fill_endoscopy_information(
+        {
+            "endoscope inserted": "yes",
+            "procedure type": "diagnostic",
+            "bowel preparation quality": BowelPreparationQualityOptions.GOOD,
+            "comfort during recovery": ComfortOptions.NO_DISCOMFORT,
+            "comfort during examination": ComfortOptions.NO_DISCOMFORT,
+            "endoscopist defined extent": EndoscopyLocationOptions.DESCENDING_COLON,
+            "scope imager used": YesNoOptions.YES,
+            "retroverted view": YesNoOptions.NO,
+            "start of intubation time": "09:00",
+            "start of extubation time": "09:30",
+            "end time of procedure": "10:00",
+            "scope id": "Autotest",
+            "insufflation": InsufflationOptions.AIR,
+            "outcome at time of procedure": OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
+            "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
+        }
+    )
 
     # 	And I set the following failure reasons within the Investigation Dataset for this subject:
     # 	| Pain |
-    failure_information = {
-        "failure reasons": FailureReasonsOptions.PAIN,
-    }
-
-    # 	And I mark the Investigation Dataset as completed
-    # 	And I press the save Investigation Dataset button
-    # When I press the save Investigation Dataset button
-    # 	And I press OK on my confirmation prompt
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        general_information=general_information,
-        drug_information=drug_information,
-        endoscopy_information=endoscopy_information,
-        failure_information=failure_information,
+    InvestigationDatasetCompletion(page).fill_out_failure_information(
+        {"failure reasons": FailureReasonsOptions.PAIN}
     )
 
+    # And I mark the Investigation Dataset as completed
+    InvestigationDatasetsPage(page).check_dataset_complete_checkbox()
+
+    # When I press the save Investigation Dataset button
     # Then the Investigation Dataset result message, which I will cancel, is "No Result"
-    InvestigationDatasetsPage(page).expect_text_to_be_visible("No Result")
+    InvestigationDatasetsPage(page).click_save_dataset_button_assert_dialog("No Result")
+
+    # When I press the save Investigation Dataset button
+    InvestigationDatasetsPage(page).click_save_dataset_button()
 
     # Then my subject has been updated as follows:
     criteria = {
@@ -940,7 +1017,11 @@ def test_scenario_8(page: Page) -> None:
         page=page,
         batch_type="A318",
         batch_description="Result Letters - No Post-investigation Appointment",
-        latest_event_status="A380 - Failed Diagnostic Test - Refer Another",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no, {"latest event status": "A380 Failed Diagnostic Test - Refer Another"}
     )
 
     # When I view the subject
@@ -959,17 +1040,23 @@ def test_scenario_8(page: Page) -> None:
     }
     subject_assertion(nhs_no, criteria)
 
-    # # And there is a "A397" letter batch for my subject with the exact title "Discharge from screening round - no contact (letter to patient)"
-    # # When I process the open "A397" letter batch for my subject
-    # # Then my subject has been updated as follows:
+    # And there is a "A397" letter batch for my subject with the exact title "Discharge from screening round - no contact (letter to patient)"
+    # When I process the open "A397" letter batch for my subject
     batch_processing(
         page=page,
         batch_type="A397",
         batch_description="Discharge from screening round - no contact (letter to patient)",
-        latest_event_status="A391 - Patient Discharge Letter Printed - No Patient Contact",
     )
 
-    # # When I receive an SSPI update to change their date of birth to "73" years old
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A391 Patient Discharge Letter Printed - No Patient Contact"
+        },
+    )
+
+    # When I receive an SSPI update to change their date of birth to "73" years old
     SSPIChangeSteps().sspi_update_to_change_dob_received(nhs_no, 73)
 
     # Then my subject has been updated as follows:
@@ -984,7 +1071,6 @@ def test_scenario_8(page: Page) -> None:
         page=page,
         batch_type="A391",
         batch_description="Discharge from screening round - no contact (letter to GP)",
-        latest_event_status="A351 - GP Discharge Letter Printed - No Patient Contact",
     )
 
     # Then my subject has been updated as follows:

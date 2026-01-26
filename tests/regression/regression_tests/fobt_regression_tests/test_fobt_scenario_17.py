@@ -84,7 +84,7 @@ from pages.organisations.organisations_page import OrganisationSwitchPage
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.fobt_regression_tests
-def test_scenario_17(page: Page) -> None:
+def test_fobt_scenario_17(page: Page) -> None:
     """
         Scenario: 17: Unsuitable for symptomatic (cease)
 
@@ -229,8 +229,16 @@ def test_scenario_17(page: Page) -> None:
         page=page,
         batch_description="Practitioner Clinic 1st Appointment",
         batch_type="A183",
-        latest_event_status="A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
     )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked, letter sent"
+        },
+    )
+
     # When I switch users to BCSS "England" as user role "Specialist Screening Practitioner"
     LogoutPage(page).log_out(close_page=False)
     BasePage(page).go_to_log_in_page()
@@ -344,17 +352,27 @@ def test_scenario_17(page: Page) -> None:
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
     # And I edit the Investigation Dataset for this subject
     SubjectScreeningSummaryPage(page).click_datasets_link()
-    # And I open all minimized sections on the dataset
     SubjectDatasetsPage(page).click_investigation_show_datasets()
-    # And I mark the Investigation Dataset as completed
-    # When I press the save Investigation Dataset button
+
+    # Confirm on the investigation Datasets Page
+    InvestigationDatasetsPage(page).bowel_cancer_screening_page_title_contains_text(
+        "Investigation Datasets"
+    )
+
+    # And I open all minimized sections on the dataset
+    InvestigationDatasetsPage(page).open_all_minimized_sections()
+
     # And I add the following bowel preparation drugs and values within the Investigation Dataset for this subject:
-    drug_information = {
-        "drug_dose1": "3",
-        "drug_type1": DrugTypeOptions.MANNITOL,
-    }
+    InvestigationDatasetCompletion(page).fill_out_drug_information(
+        {
+            "drug_dose1": "3",
+            "drug_type1": DrugTypeOptions.MANNITOL,
+        }
+    )
+
     # And there is a clinician who meets the following criteria:
     user = User.from_user_role_type(user_role)
     criteria = {
@@ -370,38 +388,49 @@ def test_scenario_17(page: Page) -> None:
     person_name = (
         f"{df["person_family_name"].iloc[0]} {df["person_given_name"].iloc[0]}"
     )
+
     # And I set the following fields and values within the Investigation Dataset for this subject:
-    endoscopy_information = {
-        "endoscope inserted": "yes",
-        "procedure type": "therapeutic",
-        "bowel preparation quality": BowelPreparationQualityOptions.GOOD,
-        "comfort during recovery": ComfortOptions.NO_DISCOMFORT,
-        "comfort during examination": ComfortOptions.NO_DISCOMFORT,
-        "endoscopist defined extent": EndoscopyLocationOptions.APPENDIX,
-        "scope imager used": YesNoOptions.YES,
-        "retroverted view": YesNoOptions.NO,
-        "start of intubation time": "09:00",
-        "start of extubation time": "09:30",
-        "end time of procedure": "10:00",
-        "scope id": "Autotest",
-        "insufflation": InsufflationOptions.AIR,
-        "outcome at time of procedure": OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
-        "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
-    }
-    general_information = {
-        "practitioner": 1,
-        "site": 1,
-        "testing clinician": person_name,
-        "aspirant endoscopist": None,
-    }
+    InvestigationDatasetCompletion(page).fill_out_general_information(
+        {
+            "practitioner": 1,
+            "site": 1,
+            "testing clinician": person_name,
+            "aspirant endoscopist": None,
+        }
+    )
+
+    InvestigationDatasetCompletion(page).fill_endoscopy_information(
+        {
+            "endoscope inserted": "yes",
+            "procedure type": "therapeutic",
+            "bowel preparation quality": BowelPreparationQualityOptions.GOOD,
+            "comfort during recovery": ComfortOptions.NO_DISCOMFORT,
+            "comfort during examination": ComfortOptions.NO_DISCOMFORT,
+            "endoscopist defined extent": EndoscopyLocationOptions.APPENDIX,
+            "scope imager used": YesNoOptions.YES,
+            "retroverted view": YesNoOptions.NO,
+            "start of intubation time": "09:00",
+            "start of extubation time": "09:30",
+            "end time of procedure": "10:00",
+            "scope id": "Autotest",
+            "insufflation": InsufflationOptions.AIR,
+            "outcome at time of procedure": OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
+            "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
+        }
+    )
 
     # And I set the following completion proof values within the Investigation Dataset for this subject:
-    completion_information = {"completion proof": CompletionProofOptions.VIDEO_APPENDIX}
+    InvestigationDatasetCompletion(page).fill_out_completion_information(
+        {"completion proof": CompletionProofOptions.VIDEO_APPENDIX}
+    )
 
     # And I set the following failure reasons within the Investigation Dataset for this subject:
-    failure_information = {"failure reasons": FailureReasonsOptions.NO_FAILURE_REASONS}
-    # And I add new polyp 1-3 with the following fields and values within the Investigation Dataset for this subject:
-    polyp_information = [
+    InvestigationDatasetCompletion(page).fill_out_failure_information(
+        {"failure reasons": FailureReasonsOptions.NO_FAILURE_REASONS}
+    )
+
+    # And I add new polyp 1 with the following fields and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_polyp_x_information(
         {
             "location": EndoscopyLocationOptions.ANASTOMOSIS,
             "classification": PolypClassificationOptions.IP,
@@ -409,53 +438,22 @@ def test_scenario_17(page: Page) -> None:
             "estimate of whole polyp size": "11",
             "left in situ": YesNoOptions.NO,
         },
+        1,
+    )
+
+    # And I add interventions 1 for polyp 1 with the following fields and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_polyp_x_intervention(
         {
-            "location": EndoscopyLocationOptions.CAECUM,
-            "classification": PolypClassificationOptions.LST_NG,
-            "estimate of whole polyp size": "5",
-            "polyp access": PolypAccessOptions.EASY,
-            "left in situ": YesNoOptions.NO,
+            "modality": PolypInterventionModalityOptions.POLYPECTOMY,
+            "excised": YesNoOptions.YES,
+            "device": PolypInterventionDeviceOptions.HOT_SNARE,
+            "retrieved": PolypInterventionRetrievedOptions.YES,
         },
-        {
-            "location": EndoscopyLocationOptions.HEPATIC_FLEXURE,
-            "classification": PolypClassificationOptions.LST_NG,
-            "polyp access": PolypAccessOptions.EASY,
-            "estimate of whole polyp size": "21",
-            "left in situ": YesNoOptions.NO,
-        },
-    ]
-    # And I add intervention for 3 polyps with the following fields and values within the Investigation Dataset for this subject:
-    polyp_intervention = [
-        [
-            {
-                "modality": PolypInterventionModalityOptions.POLYPECTOMY,
-                "excised": YesNoOptions.YES,
-                "device": PolypInterventionDeviceOptions.HOT_SNARE,
-                "retrieved": PolypInterventionRetrievedOptions.YES,
-            }
-        ],
-        [
-            {
-                "modality": PolypInterventionModalityOptions.EMR,
-                "device": PolypInterventionDeviceOptions.HOT_SNARE,
-                "excised": YesNoOptions.YES,
-                "retrieved": PolypInterventionRetrievedOptions.YES,
-                "excision technique": PolypInterventionExcisionTechniqueOptions.EN_BLOC,
-            }
-        ],
-        [
-            {
-                "modality": PolypInterventionModalityOptions.POLYPECTOMY,
-                "device": PolypInterventionDeviceOptions.HOT_SNARE,
-                "excised": YesNoOptions.YES,
-                "retrieved": PolypInterventionRetrievedOptions.YES,
-                "excision technique": PolypInterventionExcisionTechniqueOptions.PIECE_MEAL,
-                "polyp appears fully resected endoscopically": YesNoOptions.YES,
-            }
-        ],
-    ]
-    # And I add histology for 3 polyps with the following fields and values within the Investigation Dataset for this subject:
-    polyp_histology = [
+        1,
+    )
+
+    # And I add histology 1 for polyp 1 with the following fields and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_polyp_x_histology(
         {
             "date of reporting": datetime.today(),
             "date of receipt": datetime.today(),
@@ -468,6 +466,35 @@ def test_scenario_17(page: Page) -> None:
             "polyp dysplasia": PolypDysplasiaOptions.NOT_REPORTED,
             "polyp carcinoma": YesNoUncertainOptions.NO,
         },
+        1,
+    )
+
+    # And I add new polyp 2 with the following fields and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_polyp_x_information(
+        {
+            "location": EndoscopyLocationOptions.CAECUM,
+            "classification": PolypClassificationOptions.LST_NG,
+            "estimate of whole polyp size": "5",
+            "polyp access": PolypAccessOptions.EASY,
+            "left in situ": YesNoOptions.NO,
+        },
+        2,
+    )
+
+    # And I add interventions 1 for polyp 2 with the following fields and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_polyp_x_intervention(
+        {
+            "modality": PolypInterventionModalityOptions.EMR,
+            "device": PolypInterventionDeviceOptions.HOT_SNARE,
+            "excised": YesNoOptions.YES,
+            "retrieved": PolypInterventionRetrievedOptions.YES,
+            "excision technique": PolypInterventionExcisionTechniqueOptions.EN_BLOC,
+        },
+        2,
+    )
+
+    # And I add histology 1 for polyp 2 with the following fields and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_polyp_x_histology(
         {
             "date of reporting": datetime.today(),
             "date of receipt": datetime.today(),
@@ -480,87 +507,127 @@ def test_scenario_17(page: Page) -> None:
             "polyp dysplasia": PolypDysplasiaOptions.NOT_REPORTED,
             "polyp carcinoma": YesNoUncertainOptions.NO,
         },
+        2,
+    )
+
+    # And I add new polyp 3 with the following fields and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_polyp_x_information(
+        {
+            "location": EndoscopyLocationOptions.HEPATIC_FLEXURE,
+            "classification": PolypClassificationOptions.LST_NG,
+            "polyp access": PolypAccessOptions.EASY,
+            "estimate of whole polyp size": "21",
+            "left in situ": YesNoOptions.NO,
+        },
+        3,
+    )
+
+    # And I add interventions 1 for polyp 3 with the following fields and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_polyp_x_intervention(
+        {
+            "modality": PolypInterventionModalityOptions.POLYPECTOMY,
+            "device": PolypInterventionDeviceOptions.HOT_SNARE,
+            "excised": YesNoOptions.YES,
+            "retrieved": PolypInterventionRetrievedOptions.YES,
+            "excision technique": PolypInterventionExcisionTechniqueOptions.PIECE_MEAL,
+            "polyp appears fully resected endoscopically": YesNoOptions.YES,
+        },
+        3,
+    )
+
+    # And I add histology 1 for polyp 3 with the following fields and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_polyp_x_histology(
         {
             "pathology lost": YesNoOptions.YES,
             "reason pathology lost": ReasonPathologyLostOptions.LOST_IN_TRANSIT,
         },
-    ]
+        3,
+    )
+
+    # And I mark the Investigation Dataset as completed
+    InvestigationDatasetsPage(page).check_dataset_complete_checkbox()
+
     # When I press the save Investigation Dataset button
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        endoscopy_information=endoscopy_information,
-        drug_information=drug_information,
-        general_information=general_information,
-        failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_information=polyp_information,
-        polyp_intervention=polyp_intervention,
-        polyp_histology=polyp_histology,
-    )
     # Then the Investigation Dataset result message, which I will cancel, is "LNPCP"
-    InvestigationDatasetsPage(page).expect_text_to_be_visible("LNPCP")
-    # Then I confirm the Polyp Algorithm Size for Polyp 1,2 and 3 are 13,4,21 respectively
-    expected_size = 1
-    expected_value = "13"
+    InvestigationDatasetsPage(page).click_save_dataset_button_assert_dialog("LNPCP")
 
-    InvestigationDatasetsPage(page).assert_polyp_algorithm_size(
-        expected_size, expected_value
-    )
+    # When I press the save Investigation Dataset button
+    InvestigationDatasetsPage(page).click_save_dataset_button()
 
+    # Then I confirm the Polyp Algorithm Size for Polyp 1 is 13
+    InvestigationDatasetsPage(page).assert_polyp_algorithm_size(1, "13")
+
+    # Then I confirm the Polyp Algorithm Size for Polyp 2 is 4
     InvestigationDatasetsPage(page).assert_polyp_algorithm_size(2, "4")
 
+    # Then I confirm the Polyp Algorithm Size for Polyp 3 is 21
     InvestigationDatasetsPage(page).assert_polyp_algorithm_size(3, "21")
-    # And I confirm the Polyp Category for Polyp 1,2,3 are "Advanced colorectal polyp", "Premalignant polyp" and "LNPCP" respectively
+
+    # And I confirm the Polyp Category for Polyp 1 is "Advanced colorectal polyp"
     InvestigationDatasetsPage(page).assert_polyp_category(
         1, "Advanced colorectal polyp"
     )
 
+    # And I confirm the Polyp Category for Polyp 2 is "Premalignant polyp"
     InvestigationDatasetsPage(page).assert_polyp_category(2, "Premalignant polyp")
 
+    # And I confirm the Polyp Category for Polyp 3 is "LNPCP"
     InvestigationDatasetsPage(page).assert_polyp_category(3, "LNPCP")
-    # And I confirm the Episode Result is "Abnormal"
-    episode_result = "LNPCP"
-    EpisodeRepository().confirm_episode_result(nhs_no, episode_result)
+
+    # And I confirm the Episode Result is "LNPCP"
+    EpisodeRepository().confirm_episode_result(nhs_no, "LNPCP")
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
     # And I advance the subject's episode for "Enter Diagnostic Test Outcome"
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
     AdvanceFOBTScreeningEpisodePage(page).click_enter_diagnostic_test_outcome_button()
+
     # And I select Outcome of Diagnostic Test "Refer Symptomatic"
     DiagnosticTestOutcomePage(page).select_test_outcome_option(
         OutcomeOfDiagnosticTest.REFER_SYMPTOMATIC
     )
+
     # And I select Reason for Symptomatic Referral value "Corrective Surgery"
     DiagnosticTestOutcomePage(page).select_reason_for_symptomatic_referral_option(
         ReasonForSymptomaticReferral.CORRECTIVE_SURGERY
     )
+
     # And I save the Diagnostic Test Outcome information
     DiagnosticTestOutcomePage(page).click_save_button()
+
     # Then my subject has been updated as follows:
     criteria = {"latest event status": "A315 Diagnostic Test Outcome Entered"}
     subject_assertion(
         nhs_no,
         criteria,
     )
+
     # When I advance the subject's episode for "Post-investigation Appointment Required"
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
     AdvanceFOBTScreeningEpisodePage(
         page
     ).click_post_investigation_appointment_required_button()
-    #    Then my subject has been updated as follows:
+
+    # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
         {
             "latest event status": "A360 Post-investigation Appointment Required",
         },
     )
+
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
     # And I choose to book a practitioner clinic for my subject
     SubjectScreeningSummaryPage(page).click_book_practitioner_clinic_button()
+
     #  And I set the practitioner appointment date to "today"
     # And I book the "earliest" available practitioner appointment on this date
     book_post_investigation_appointment(page, "The Royal Hospital (Wolverhampton)")
+
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
@@ -568,16 +635,15 @@ def test_scenario_17(page: Page) -> None:
             "latest event status": "A410 Post-investigation Appointment Made",
         },
     )
+
     # And there is a "A410" letter batch for my subject with the exact title "Post-Investigation Appointment Invitation Letter"
     # When I process the open "A410 - Post-Investigation Appointment Invitation Letter" letter batch for my subject
-    letter_code = "A410"
-    letter_type = "Post-Investigation Appointment Invitation Letter"
-
     batch_processing(
         page,
-        letter_code,
-        letter_type,
+        "A410",
+        "Post-Investigation Appointment Invitation Letter",
     )
+
     # Then my subject has been updated as follows:
     criteria = {
         "latest event status": "A415 Post-investigation Appointment Invitation Letter Printed"
@@ -586,15 +652,20 @@ def test_scenario_17(page: Page) -> None:
         nhs_no,
         criteria,
     )
+
     #  When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
     # And I view the event history for the subject's latest episode
     SubjectScreeningSummaryPage(page).expand_episodes_list()
     SubjectScreeningSummaryPage(page).click_first_fobt_episode_link()
+
     # And I view the latest practitioner appointment in the subject's episode
     EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
+
     # And I attend the subject's practitioner appointment "today"
     AppointmentDetailPage(page).mark_appointment_as_attended(datetime.today())
+
     # Then my subject has been updated as follows:
     criteria = {
         "latest episode includes event status": "A416 Post-investigation Appointment Attended ",
@@ -607,19 +678,23 @@ def test_scenario_17(page: Page) -> None:
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
     # When I select the advance episode option for "MDT Referral Required"
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
     AdvanceFOBTScreeningEpisodePage(page).click_mdt_referral_required_button()
-    # # And I enter simple MDT information
+
+    # And I enter simple MDT information
     ReferToMDTPage(page).enter_date_in_mdt_discussion_date_field(datetime.today())
     ReferToMDTPage(page).select_mdt_location_lookup(1)
     ReferToMDTPage(page).click_record_mdt_appointment_button()
-    #  Then my subject has been updated as follows:
+
+    # Then my subject has been updated as follows:
     criteria = {"latest event status": "A348 MDT Referral Required"}
     subject_assertion(
         nhs_no,
         criteria,
     )
+
     # And there is a "A348" letter batch for my subject with the exact title "GP Letter Indicating Referral to MDT"
     # When I process the open "A348" letter batch for my subject
     batch_processing(
@@ -627,6 +702,7 @@ def test_scenario_17(page: Page) -> None:
         "A348",
         "GP Letter Indicating Referral to MDT",
     )
+
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
@@ -637,9 +713,11 @@ def test_scenario_17(page: Page) -> None:
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
-    # # And I select the advance episode option for "Patient Unfit, Handover into Symptomatic Care"
+
+    # And I select the advance episode option for "Patient Unfit, Handover into Symptomatic Care"
     SubjectScreeningSummaryPage(page).click_advance_fobt_screening_episode_button()
     AdvanceFOBTScreeningEpisodePage(page).click_handover_into_symptomatic_care_button()
+
     # And I fill in Handover into Symptomatic Care form for Patient Unfit for Treatment and Cease from programme
     HandoverIntoSymptomaticCarePage(page).select_referral_dropdown_option(
         "Referral to Patient's GP Practice"
@@ -656,10 +734,12 @@ def test_scenario_17(page: Page) -> None:
             "latest event status": "A357 Patient Unfit, Handover into Symptomatic Care",
         },
     )
+
     # And there is a "A357" letter batch for my subject with the exact title "Handover into Symptomatic Care, Patient Unfit"
     SubjectRepository().there_is_letter_batch_for_subject(
         nhs_no, "A357", "Handover into Symptomatic Care, Patient Unfit", True
     )
+
     # When I switch users to BCSS "England" as user role "Hub Manager"
     LogoutPage(page).log_out(close_page=False)
     BasePage(page).go_to_log_in_page()
@@ -693,6 +773,7 @@ def test_scenario_17(page: Page) -> None:
     OrganisationSwitchPage(page).click_continue()
     if user_role is None:
         raise ValueError("User role is none")
+
     # And I process the open "A357 - Handover into Symptomatic Care, Patient Unfit" letter batch for my subject
     batch_processing(
         page,

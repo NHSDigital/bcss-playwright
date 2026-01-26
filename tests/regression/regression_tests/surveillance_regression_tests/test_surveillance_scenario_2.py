@@ -41,7 +41,7 @@ from pages.screening_subject_search.reopen_surveillance_episode_page import (
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.surveillance_regression_tests
-def test_scenario_2(page: Page, general_properties: dict) -> None:
+def test_surveillance_scenario_2(page: Page, general_properties: dict) -> None:
     """
     Scenario: 2: Discharge for clinical decision (no GP letter)
 
@@ -163,7 +163,7 @@ def test_scenario_2(page: Page, general_properties: dict) -> None:
 
     # And I view the event history for the subject's latest episode
     SubjectScreeningSummaryPage(page).expand_episodes_list()
-    SubjectScreeningSummaryPage(page).click_first_surveillance_epsiode_link()
+    SubjectScreeningSummaryPage(page).click_first_surveillance_episode_link()
 
     # And I view the latest practitioner appointment in the subject's episode
     EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
@@ -227,7 +227,7 @@ def test_scenario_2(page: Page, general_properties: dict) -> None:
 
     # And I view the event history for the subject's latest episode
     SubjectScreeningSummaryPage(page).expand_episodes_list()
-    SubjectScreeningSummaryPage(page).click_first_surveillance_epsiode_link()
+    SubjectScreeningSummaryPage(page).click_first_surveillance_episode_link()
 
     # And I view the latest practitioner appointment in the subject's episode
     EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
@@ -404,7 +404,7 @@ def test_scenario_2(page: Page, general_properties: dict) -> None:
 
     # And I view the event history for the subject's latest episode
     SubjectScreeningSummaryPage(page).expand_episodes_list()
-    SubjectScreeningSummaryPage(page).click_first_surveillance_epsiode_link()
+    SubjectScreeningSummaryPage(page).click_first_surveillance_episode_link()
 
     # And I view the latest practitioner appointment in the subject's episode
     EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()

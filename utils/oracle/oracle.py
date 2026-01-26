@@ -1,4 +1,3 @@
-from tkinter import N
 import oracledb
 import os
 from dotenv import load_dotenv
@@ -74,12 +73,12 @@ class OracleDB:
 
             for subject_id in subject_ids:
                 try:
-                    logging.info(
+                    logging.debug(
                         f"[ORACLE] Attempting to execute stored procedure: 'bcss_timed_events', [{subject_id}, 'Y']"
                     )
                     cursor = conn.cursor()
                     cursor.callproc("bcss_timed_events", [subject_id, "Y"])
-                    logging.info("Stored procedure execution successful!")
+                    logging.debug("Stored procedure execution successful!")
                 except Exception as spExecutionError:
                     logging.error(
                         f"[ORACLE] Failed to execute stored procedure with execution error: {spExecutionError}"
@@ -104,7 +103,7 @@ class OracleDB:
             subject_id (str): The subject id for the provided nhs number
         """
         conn = self.connect_to_db()
-        logging.info(
+        logging.debug(
             f"[ORACLE] Attempting to get subject_id from nhs number: {nhs_number}"
         )
         cursor = conn.cursor()
@@ -113,7 +112,7 @@ class OracleDB:
         )
         result = cursor.fetchall()
         subject_id = result[0][0]
-        logging.info(f"Able to extract subject ID: {subject_id}")
+        logging.debug(f"Able to extract subject ID: {subject_id}")
         return subject_id
 
     def populate_ui_approved_users_table(
@@ -182,11 +181,11 @@ class OracleDB:
         try:
             if parameters:
                 params_str = pprint.pformat(parameters, indent=2)
-                logging.info(
+                logging.debug(
                     f"[ORACLE] Executing query: {query} with parameters:\n{params_str}"
                 )
             else:
-                logging.info(f"[ORACLE] Executing query: {query}")
+                logging.debug(f"[ORACLE] Executing query: {query}")
             df = (
                 pd.read_sql(query, engine)
                 if parameters == None
@@ -222,13 +221,13 @@ class OracleDB:
         if conn is None:
             conn = self.connect_to_db()
         try:
-            logging.info(f"[ORACLE] Executing stored procedure: {procedure}")
+            logging.debug(f"[ORACLE] Executing stored procedure: {procedure}")
             cursor = conn.cursor()
             params = self._prepare_params(cursor, in_params, out_params)
             cursor.callproc(procedure, params)
             results = self._collect_outputs(params, out_params, in_params)
             conn.commit()
-            logging.info("[ORACLE] Stored procedure execution successful")
+            logging.debug("[ORACLE] Stored procedure execution successful")
             return results
         except Exception as executionError:
             raise RuntimeError(
@@ -307,7 +306,7 @@ class OracleDB:
         conn = self.connect_to_db()
         try:
             logging.debug("Attempting to insert/update table")
-            logging.info(
+            logging.debug(
                 f"[ORACLE] Executing query: {statement} with parameters:\n{pprint.pformat(params, indent=2)}"
             )
             cursor = conn.cursor()

@@ -85,7 +85,7 @@ from pages.organisations.organisations_page import OrganisationSwitchPage
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.fobt_regression_tests
-def test_scenario_13(page: Page) -> None:
+def test_fobt_scenario_13(page: Page) -> None:
     """
     Scenario: 13: LNPCP result from diagnostic tests
 
@@ -212,7 +212,14 @@ def test_scenario_13(page: Page) -> None:
         page,
         "A183",
         "Practitioner Clinic 1st Appointment",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked, letter sent"
+        },
     )
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
@@ -348,6 +355,14 @@ def test_scenario_13(page: Page) -> None:
     SubjectScreeningSummaryPage(page).click_datasets_link()
     SubjectDatasetsPage(page).click_investigation_show_datasets()
 
+    # Confirm on the investigation Datasets Page
+    InvestigationDatasetsPage(page).bowel_cancer_screening_page_title_contains_text(
+        "Investigation Datasets"
+    )
+
+    # And I open all minimized sections on the dataset
+    InvestigationDatasetsPage(page).open_all_minimized_sections()
+
     # And there is a clinician who meets the following criteria:
     user = User.from_user_role_type(user_role)
     criteria = {
@@ -365,43 +380,54 @@ def test_scenario_13(page: Page) -> None:
     )
 
     # And I add the following bowel preparation drugs and values within the Investigation Dataset for this subject:
-    drug_information = {"drug_type1": DrugTypeOptions.MANNITOL, "drug_dose1": "3"}
+    InvestigationDatasetCompletion(page).fill_out_drug_information(
+        {
+            "drug_dose1": "3",
+            "drug_type1": DrugTypeOptions.MANNITOL,
+        }
+    )
 
     # And I set the following fields and values within the Investigation Dataset for this subject:
-    general_information = {
-        "site": 1,
-        "practitioner": 1,
-        "testing clinician": person_name,
-        "aspirant endoscopist": None,
-    }
-    endoscopy_information = {
-        "endoscope inserted": "yes",
-        "procedure type": "therapeutic",
-        "bowel preparation quality": BowelPreparationQualityOptions.GOOD,
-        "comfort during examination": ComfortOptions.NO_DISCOMFORT,
-        "comfort during recovery": ComfortOptions.NO_DISCOMFORT,
-        "endoscopist defined extent": EndoscopyLocationOptions.APPENDIX,
-        "scope imager used": YesNoOptions.YES,
-        "retroverted view": YesNoOptions.NO,
-        "start of intubation time": "09:00",
-        "start of extubation time": "09:30",
-        "end time of procedure": "10:00",
-        "scope id": "Autotest",
-        "insufflation": InsufflationOptions.AIR,
-        "outcome at time of procedure": OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
-        "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
-    }
+    InvestigationDatasetCompletion(page).fill_out_general_information(
+        {
+            "practitioner": 1,
+            "site": 1,
+            "testing clinician": person_name,
+            "aspirant endoscopist": None,
+        }
+    )
+    InvestigationDatasetCompletion(page).fill_endoscopy_information(
+        {
+            "endoscope inserted": "yes",
+            "procedure type": "therapeutic",
+            "bowel preparation quality": BowelPreparationQualityOptions.GOOD,
+            "comfort during examination": ComfortOptions.NO_DISCOMFORT,
+            "comfort during recovery": ComfortOptions.NO_DISCOMFORT,
+            "endoscopist defined extent": EndoscopyLocationOptions.APPENDIX,
+            "scope imager used": YesNoOptions.YES,
+            "retroverted view": YesNoOptions.NO,
+            "start of intubation time": "09:00",
+            "start of extubation time": "09:30",
+            "end time of procedure": "10:00",
+            "scope id": "Autotest",
+            "insufflation": InsufflationOptions.AIR,
+            "outcome at time of procedure": OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
+            "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
+        }
+    )
 
     # And I set the following completion proof values within the Investigation Dataset for this subject:
-    completion_information = {"completion proof": CompletionProofOptions.VIDEO_APPENDIX}
+    InvestigationDatasetCompletion(page).fill_out_completion_information(
+        {"completion proof": CompletionProofOptions.VIDEO_APPENDIX}
+    )
 
     # And I set the following failure reasons within the Investigation Dataset for this subject:
-    failure_information = {"failure reasons": FailureReasonsOptions.ADHESION}
+    InvestigationDatasetCompletion(page).fill_out_failure_information(
+        {"failure reasons": FailureReasonsOptions.ADHESION}
+    )
 
     # And I add new polyp 1 with the following fields and values within the Investigation Dataset for this subject:
-    # And I add new polyp 2 with the following fields and values within the Investigation Dataset for this subject:
-    # And I add new polyp 3 with the following fields and values within the Investigation Dataset for this subject:
-    polyp_information = [
+    InvestigationDatasetCompletion(page).fill_polyp_x_information(
         {
             "location": EndoscopyLocationOptions.ANASTOMOSIS,
             "classification": PolypClassificationOptions.IP,
@@ -409,59 +435,22 @@ def test_scenario_13(page: Page) -> None:
             "polyp access": PolypAccessOptions.EASY,
             "left in situ": YesNoOptions.NO,
         },
-        {
-            "location": EndoscopyLocationOptions.CAECUM,
-            "classification": PolypClassificationOptions.LST_NG,
-            "estimate of whole polyp size": "5",
-            "polyp access": PolypAccessOptions.EASY,
-            "left in situ": YesNoOptions.NO,
-        },
-        {
-            "location": EndoscopyLocationOptions.HEPATIC_FLEXURE,
-            "classification": PolypClassificationOptions.LST_NG,
-            "estimate of whole polyp size": "21",
-            "polyp access": PolypAccessOptions.EASY,
-            "left in situ": YesNoOptions.NO,
-        },
-    ]
+        1,
+    )
 
     # And I add intervention 1 for polyp 1 with the following fields and values within the Investigation Dataset for this subject:
-    # And I add intervention 1 for polyp 2 with the following fields and values within the Investigation Dataset for this subject:
-    # And I add intervention 1 for polyp 3 with the following fields and values within the Investigation Dataset for this subject:
-    polyp_intervention = [
-        [
-            {
-                "modality": PolypInterventionModalityOptions.POLYPECTOMY,
-                "device": PolypInterventionDeviceOptions.HOT_SNARE,
-                "excised": YesNoOptions.YES,
-                "retrieved": PolypInterventionRetrievedOptions.YES,
-            }
-        ],
-        [
-            {
-                "modality": PolypInterventionModalityOptions.EMR,
-                "device": PolypInterventionDeviceOptions.HOT_SNARE,
-                "excised": YesNoOptions.YES,
-                "retrieved": PolypInterventionRetrievedOptions.YES,
-                "excision technique": PolypInterventionExcisionTechniqueOptions.EN_BLOC,
-            }
-        ],
-        [
-            {
-                "modality": PolypInterventionModalityOptions.POLYPECTOMY,
-                "device": PolypInterventionDeviceOptions.HOT_SNARE,
-                "excised": YesNoOptions.YES,
-                "retrieved": PolypInterventionRetrievedOptions.YES,
-                "excision technique": PolypInterventionExcisionTechniqueOptions.PIECE_MEAL,
-                "polyp appears fully resected endoscopically": YesNoOptions.YES,
-            }
-        ],
-    ]
+    InvestigationDatasetCompletion(page).fill_polyp_x_intervention(
+        {
+            "modality": PolypInterventionModalityOptions.POLYPECTOMY,
+            "device": PolypInterventionDeviceOptions.HOT_SNARE,
+            "excised": YesNoOptions.YES,
+            "retrieved": PolypInterventionRetrievedOptions.YES,
+        },
+        1,
+    )
 
     # And I update histology details for polyp 1 with the following fields and values within the Investigation Dataset for this subject:
-    # And I update histology details for polyp 2 with the following fields and values within the Investigation Dataset for this subject:
-    # And I update histology details for polyp 3 with the following fields and values within the Investigation Dataset for this subject:
-    polyp_histology = [
+    InvestigationDatasetCompletion(page).fill_polyp_x_histology(
         {
             "date of receipt": datetime.today(),
             "date of reporting": datetime.today(),
@@ -474,6 +463,35 @@ def test_scenario_13(page: Page) -> None:
             "polyp dysplasia": PolypDysplasiaOptions.NOT_REPORTED,
             "polyp carcinoma": YesNoUncertainOptions.NO,
         },
+        1,
+    )
+
+    # And I add new polyp 2 with the following fields and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_polyp_x_information(
+        {
+            "location": EndoscopyLocationOptions.CAECUM,
+            "classification": PolypClassificationOptions.LST_NG,
+            "estimate of whole polyp size": "5",
+            "polyp access": PolypAccessOptions.EASY,
+            "left in situ": YesNoOptions.NO,
+        },
+        2,
+    )
+
+    # And I add intervention 1 for polyp 2 with the following fields and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_polyp_x_intervention(
+        {
+            "modality": PolypInterventionModalityOptions.EMR,
+            "device": PolypInterventionDeviceOptions.HOT_SNARE,
+            "excised": YesNoOptions.YES,
+            "retrieved": PolypInterventionRetrievedOptions.YES,
+            "excision technique": PolypInterventionExcisionTechniqueOptions.EN_BLOC,
+        },
+        2,
+    )
+
+    # And I update histology details for polyp 2 with the following fields and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_polyp_x_histology(
         {
             "date of receipt": datetime.today(),
             "date of reporting": datetime.today(),
@@ -486,26 +504,52 @@ def test_scenario_13(page: Page) -> None:
             "polyp dysplasia": PolypDysplasiaOptions.NOT_REPORTED,
             "polyp carcinoma": YesNoUncertainOptions.NO,
         },
+        2,
+    )
+
+    # And I add new polyp 3 with the following fields and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_polyp_x_information(
+        {
+            "location": EndoscopyLocationOptions.HEPATIC_FLEXURE,
+            "classification": PolypClassificationOptions.LST_NG,
+            "estimate of whole polyp size": "21",
+            "polyp access": PolypAccessOptions.EASY,
+            "left in situ": YesNoOptions.NO,
+        },
+        3,
+    )
+
+    # And I add intervention 1 for polyp 3 with the following fields and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_polyp_x_intervention(
+        {
+            "modality": PolypInterventionModalityOptions.POLYPECTOMY,
+            "device": PolypInterventionDeviceOptions.HOT_SNARE,
+            "excised": YesNoOptions.YES,
+            "retrieved": PolypInterventionRetrievedOptions.YES,
+            "excision technique": PolypInterventionExcisionTechniqueOptions.PIECE_MEAL,
+            "polyp appears fully resected endoscopically": YesNoOptions.YES,
+        },
+        3,
+    )
+
+    # And I update histology details for polyp 3 with the following fields and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_polyp_x_histology(
         {
             "pathology lost": YesNoOptions.YES,
             "reason pathology lost": ReasonPathologyLostOptions.LOST_IN_TRANSIT,
         },
-    ]
-
-    # When I press the save Investigation Dataset button
-    InvestigationDatasetCompletion(page).complete_dataset_with_args(
-        general_information=general_information,
-        drug_information=drug_information,
-        endoscopy_information=endoscopy_information,
-        failure_information=failure_information,
-        completion_information=completion_information,
-        polyp_information=polyp_information,
-        polyp_intervention=polyp_intervention,
-        polyp_histology=polyp_histology,
+        3,
     )
 
+    # And I mark the Investigation Dataset as completed
+    InvestigationDatasetsPage(page).check_dataset_complete_checkbox()
+
+    # When I press the save Investigation Dataset button
     # Then the Investigation Dataset result message, which I will cancel, is "LNPCP"
-    InvestigationDatasetsPage(page).expect_text_to_be_visible("LNPCP")
+    InvestigationDatasetsPage(page).click_save_dataset_button_assert_dialog("LNPCP")
+
+    # When I press the save Investigation Dataset button
+    InvestigationDatasetsPage(page).click_save_dataset_button()
 
     # Then I confirm the Polyp Algorithm Size for Polyp 1 is 13
     InvestigationDatasetsPage(page).assert_polyp_algorithm_size(1, "13")

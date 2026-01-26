@@ -42,7 +42,7 @@ from pages.datasets.colonoscopy_dataset_page import (
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.fobt_regression_tests
-def test_scenario_7(page: Page) -> None:
+def test_fobt_scenario_7(page: Page) -> None:
     """
     Scenario: 7: Patient is unsuitable for diagnostic tests
 

@@ -59,8 +59,11 @@ class SubjectScreeningSummaryPage(BasePage):
         self.first_fobt_episode_link = self.page.get_by_role(
             "link", name="FOBT Screening"
         ).first
-        self.first_surveillance_epsiode_link = self.page.get_by_role(
+        self.first_surveillance_episode_link = self.page.get_by_role(
             "link", name="Surveillance"
+        ).first
+        self.first_lynch_surveillance_episode_link = self.page.get_by_role(
+            "link", name="Lynch Surveillance"
         ).first
         self.datasets_link = self.page.get_by_role("link", name="Datasets")
         self.advance_fobt_screening_episode_button = self.page.get_by_role(
@@ -68,6 +71,9 @@ class SubjectScreeningSummaryPage(BasePage):
         )
         self.advance_surveillance_episode_button = self.page.get_by_role(
             "button", name="Advance Surveillance Episode"
+        )
+        self.advance_lynch_surveillance_episode_button = self.page.get_by_role(
+            "button", name="Advance Lynch Surveillance Episode"
         )
         self.additional_care_note_link = self.page.get_by_role("link", name="(AN)")
         self.temporary_address_icon = self.page.get_by_role(
@@ -86,6 +92,9 @@ class SubjectScreeningSummaryPage(BasePage):
         )
         self.postpone_surveillance_episode_button = self.page.get_by_role(
             "button", name="Postpone Surveillance Episode"
+        )
+        self.uncease_subject_button = self.page.get_by_role(
+            "button", name="Uncease Subject"
         )
 
         # List of Subject Episodes - page filters
@@ -244,9 +253,13 @@ class SubjectScreeningSummaryPage(BasePage):
         """Click on the first FOBT episode link."""
         self.click(self.first_fobt_episode_link)
 
-    def click_first_surveillance_epsiode_link(self) -> None:
+    def click_first_surveillance_episode_link(self) -> None:
         """Click on the first Surveillance episode link."""
-        self.click(self.first_surveillance_epsiode_link)
+        self.click(self.first_surveillance_episode_link)
+
+    def click_first_lynch_surveillance_episode_link(self) -> None:
+        """Click on the first Lynch Surveillance episode link."""
+        self.click(self.first_lynch_surveillance_episode_link)
 
     def click_datasets_link(self) -> None:
         """Click on the 'Datasets' link."""
@@ -264,6 +277,10 @@ class SubjectScreeningSummaryPage(BasePage):
     def click_advance_surveillance_episode_button(self) -> None:
         """Click on the 'Advance Surveillance Episode' button."""
         self.click(self.advance_surveillance_episode_button)
+
+    def click_advance_lynch_surveillance_episode_button(self) -> None:
+        """Click on the 'Advance Lynch Surveillance Episode' button."""
+        self.click(self.advance_lynch_surveillance_episode_button)
 
     def verify_additional_care_note_visible(self) -> None:
         """Verifies that the '(AN)' link is visible."""
@@ -497,7 +514,7 @@ class SubjectScreeningSummaryPage(BasePage):
 
     def click_postpone_surveillance_episode_button(self) -> None:
         """Click the 'Postpose Surveillance Episode' button."""
-        self.click(self.postpone_surveillance_episode_button)
+        self.safe_accept_dialog(self.postpone_surveillance_episode_button)
 
     def can_postpone_surveillance_episode(self, able_to_click: bool = True) -> None:
         """
@@ -509,6 +526,10 @@ class SubjectScreeningSummaryPage(BasePage):
             expect(self.postpone_surveillance_episode_button).to_be_visible()
         else:
             expect(self.postpone_surveillance_episode_button).not_to_be_visible()
+
+    def click_uncease_subject_button(self) -> None:
+        """Click the 'Uncease Subject' button."""
+        self.click(self.uncease_subject_button)
 
 
 class ChangeScreeningStatusOptions(StrEnum):

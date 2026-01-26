@@ -38,6 +38,7 @@ class InvestigationDatasetsPage(BasePage):
         self.aspirant_endoscopist_not_present = self.page.locator(
             "#UI_ASPIRANT_ENDOSCOPIST_NR"
         )
+        self.show_other_findings_information = self.page.locator("#anchorOtherFindings")
         self.show_drug_information_detail = self.page.locator("#anchorDrug")
         self.show_suspected_findings = self.page.locator("#anchorRadiologyFindings")
         self.drug_type_option1 = self.page.locator("#UI_BOWEL_PREP_DRUG1")
@@ -93,11 +94,26 @@ class InvestigationDatasetsPage(BasePage):
         self.visible_search_text_input = self.page.locator(
             'input[id^="UI_SEARCH_"]:visible'
         )
+        self.diagnostic_test_result = self.page.locator(
+            "#datasetContent > div:nth-child(1) > div:nth-child(7) > span.userInput"
+        )
+        self.show_details_links = self.page.locator('a:has-text("Show details")')
+        self.warning_messages = self.page.locator("#UI_DIV_ADVICE_MESSAGE")
+        self.resect_and_discard_message = self.page.locator(
+            "#UI_DIV_RESECT_DISCARD_MESSAGE"
+        )
 
         # Repeat strings:
         self.bowel_preparation_administered_string = "Bowel Preparation Administered"
         self.antibiotics_administered_string = "Antibiotics Administered"
         self.other_drugs_administered_string = "Other Drugs Administered"
+
+        # Other:
+        self.list_of_multi_line_fields = [
+            "failure reasons",
+            "early complications",
+            "late complications",
+        ]
 
     def select_site_lookup_option(self, option: str) -> None:
         """
@@ -351,10 +367,20 @@ class InvestigationDatasetsPage(BasePage):
 
     def click_show_completion_proof_information(self) -> None:
         """
-        This method is designed to click on the show completion proof information link.
-        It clicks on the show completion proof information link.
+        Clicks on the show completion proof information link if it contains the text "show" (case-insensitive).
         """
-        self.click(self.show_completion_proof_information_details)
+        if (
+            "show"
+            in self.show_completion_proof_information_details.inner_text().lower()
+        ):
+            self.click(self.show_completion_proof_information_details)
+
+    def click_show_other_findings_information(self) -> None:
+        """
+        Clicks on the show other findings information link if it contains the text "show" (case-insensitive).
+        """
+        if "show" in self.show_other_findings_information.inner_text().lower():
+            self.click(self.show_other_findings_information)
 
     def click_show_failure_information(self) -> None:
         """
@@ -405,6 +431,17 @@ class InvestigationDatasetsPage(BasePage):
         It clicks on the save dataset button.
         """
         self.safe_accept_dialog(self.save_dataset_button)
+        self.page.wait_for_timeout(3000)  # 3 second timeout to allow page to update
+
+    def click_save_dataset_button_assert_dialog(self, expected_text: str) -> None:
+        """
+        Clicks on the save dataset button and performs an assertion of the resulting dialog text.
+        Once done it dismisses the dialog.
+        Args:
+            expected_text (str): The expected text in the resultant dialog
+        """
+        self.assert_dialog_text(expected_text)
+        self.click(self.save_dataset_button)
 
     def expect_text_to_be_visible(self, text: str) -> None:
         """
@@ -466,7 +503,8 @@ class InvestigationDatasetsPage(BasePage):
         This method is designed to click on the edit dataset button.
         It clicks on the edit dataset button.
         """
-        self.click(self.edit_dataset_button)
+        if self.edit_dataset_button.is_visible():
+            self.click(self.edit_dataset_button)
 
     def assert_polyp_algorithm_size(
         self, polyp_number: int, expected_value: Optional[str]
@@ -628,7 +666,7 @@ class InvestigationDatasetsPage(BasePage):
         Args:
             dataset_section_name (str): The name of the dataset section to locate.
         Returns:
-            Optioanl[Locator]: A Playwright Locator for the matching section if visible, or None if not found or not visible.
+            Optional[Locator]: A Playwright Locator for the matching section if visible, or None if not found or not visible.
         """
         logging.info(f"START: Looking for section '{dataset_section_name}'")
 
@@ -715,36 +753,44 @@ class InvestigationDatasetsPage(BasePage):
         )
 
         dataset_section = self.get_dataset_section(dataset_section_name)
-
-        sub_section_found = None
-
         if dataset_section is None:
             raise ValueError(f"Dataset section '{dataset_section_name}' was not found.")
 
-        # First, search through .DatasetSubSection
-        list_of_sections = dataset_section.locator(".DatasetSubSection").all()
-        for section in list_of_sections:
-            header = section.locator("h5")
-            if (
-                header
-                and header.inner_text().strip().lower()
-                == dataset_subsection_name.strip().lower()
-            ):
-                sub_section_found = section
-                break
+        def find_visible_subsection(
+            sections: List[Locator], subsection_name: str
+        ) -> Optional[Locator]:
+            """
+            Helper function to find a visible subsection by its header text.
+            Args:
+                sections (List[Locator]): List of section Locators to search through.
+                subsection_name (str): The name of the subsection to find.
+            Returns:
+                Optional[Locator]: The Locator of the found subsection, or None if not found.
+            """
+            for section in sections:
+                header = section.locator("h5")
+                for i in range(header.count()):
+                    hdr = header.nth(i)
+                    if (
+                        hdr.is_visible()
+                        and hdr.inner_text().strip().lower()
+                        == subsection_name.strip().lower()
+                    ):
+                        return section
+            return None
+
+        # Search through .DatasetSubSection
+        subsections = dataset_section.locator(".DatasetSubSection").all()
+        sub_section_found = find_visible_subsection(
+            subsections, dataset_subsection_name
+        )
 
         # If not found, search through .DatasetSubSectionGroup
         if sub_section_found is None:
-            list_of_sections = dataset_section.locator(".DatasetSubSectionGroup").all()
-            for section in list_of_sections:
-                header = section.locator("h5")
-                if (
-                    header
-                    and header.inner_text().strip().lower()
-                    == dataset_subsection_name.strip().lower()
-                ):
-                    sub_section_found = section
-                    break
+            group_sections = dataset_section.locator(".DatasetSubSectionGroup").all()
+            sub_section_found = find_visible_subsection(
+                group_sections, dataset_subsection_name
+            )
 
         logging.info(
             f"Dataset subsection '{dataset_section_name}', '{dataset_subsection_name}' found: {sub_section_found is not None}"
@@ -1171,6 +1217,81 @@ class InvestigationDatasetsPage(BasePage):
         elif drug_type == self.antibiotics_administered_string:
             locator_prefix = "#HILITE_spanAntibioticDosageUnit"
         return self.page.locator(f"{locator_prefix}{drug_number}")
+
+    def assert_test_result(self, expected_text: str) -> None:
+        """
+        Asserts that the text in the test result matches the expected text.
+        Args:
+            expected_text (str): The text expected to be found in the element.
+        """
+        actual_text = self.diagnostic_test_result.inner_text().strip()
+        assert (
+            actual_text.lower() == expected_text.lower()
+        ), f"Expected '{expected_text}', but found '{actual_text}'"
+
+    def open_all_details_tabs(self) -> None:
+        """
+        Clicks all visible "Show details" links on the page to open all details tabs.
+        """
+        count = self.show_details_links.count()
+        for i in range(count):
+            link = self.show_details_links.nth(i)
+            if link.is_visible():
+                self.click(link)
+
+    def open_all_minimized_sections(self) -> None:
+        """
+        Opens all the minimized sections in the investigation dataset form.
+        """
+        self.open_all_details_tabs()
+        # Then do it again to get the internal sections
+        self.open_all_details_tabs()
+
+    def get_warning_message(self) -> str | None:
+        """
+        Returns the warning message displayed at the top of the investigation dataset, or None if not present.
+        """
+        if self.warning_messages.count() > 0:
+            return self.warning_messages.first.inner_text().strip()
+        return None
+
+    def message_is_displayed(self, expected_message: str) -> None:
+        """
+        Asserts that the expected warning message is displayed at the top of the investigation dataset.
+        Args:
+            expected_message (str): The expected warning message text.
+        """
+        actual_message = self.get_warning_message()
+        assert (
+            actual_message is not None and expected_message in actual_message
+        ), f"Actual warning message displayed is: {actual_message}"
+
+    def get_resect_and_discard_message(self) -> str | None:
+        """
+        Retrieves the 'Resect and Discard' message if present.
+        Returns:
+            str | None: The message text if found, otherwise None.
+        """
+        logging.debug("START: get_resect_and_discard_message")
+        message = None
+        if self.resect_and_discard_message.count() > 0:
+            message = self.resect_and_discard_message.first.inner_text().strip()
+            logging.debug(f"R&D message found: {message}")
+        logging.debug("END: get_resect_and_discard_message")
+        return message
+
+    def assert_resect_and_discard_message(self, expected_message: str | None) -> None:
+        """
+        Asserts that the 'Resect and Discard' message matches the expected message.
+        Args:
+            expected_message (str | None): The expected message text, or None if no message is expected.
+        Raises:
+            AssertionError: If the actual message does not match the expected message.
+        """
+        resect_and_discard_message = self.get_resect_and_discard_message()
+        assert (
+            resect_and_discard_message == expected_message
+        ), f"Expected R&D message '{expected_message}', but found '{resect_and_discard_message}'"
 
 
 def normalize_label(text: str) -> str:
@@ -1683,6 +1804,58 @@ class PolypTypeLeftInSituOptions(StrEnum):
 
     INFLAMMATORY_POLYP = "17300~Sub Type Not Applicable"
     LYMPHOID_FOLLICLE = "200599~Sub Type Not Applicable"
+
+
+class OtherFindingsLocationOptions(StrEnum):
+    """Enum for Other Findings Location options"""
+
+    ANUS = "17231~Scope not inserted clinical reason~204338"
+    RECTUM = "17232~Scope not inserted clinical reason~204338"
+    SIGMOID_COLON = "17233"
+    DESCENDING_COLON = "17234"
+    SPLENIC_FLEXURE = "17235"
+    TRANSVERSE_COLON = "17236"
+    HEPATIC_FLEXURE = "17237"
+    ASCENDING_COLON = "17238"
+    CAECUM = "17239~Colonoscopy Complete"
+    ILEUM = "17240~Colonoscopy Complete"
+    ANASTOMOSIS = "17241~Colonoscopy Complete"
+    LEFT_COLON = "17244~Large Bowel Area"
+    ENTIRE_COLON = "17245~Large Bowel Area"
+    RIGHT_COLON = "200619~Large Bowel Area"
+    PATCHY_AREAS = "200618~Large Bowel Area"
+
+
+class OtherFindingsDiagnosisOptions(StrEnum):
+    """Enum for Other Findings Diagnosis options"""
+
+    ANAL_FISSURE = "16011~anus or rectum"
+    ANGIODYSPLASIA = "16007~Large Bowel Areas"
+    ATTENUATED_FAMILIAL_ADENOMATOUS_POLYPOSIS = "204403~Large Bowel Areas"
+    BENIGN_SUBMUSCOSAL_LESION = "16015"
+    COWDENS_SYNDROME = "204404~Large Bowel Areas"
+    DIVERTICULOSISIS = "16008~Large Bowel Areas"
+    FISTULA = "16019"
+    FAMILIAL_ADENOMATOUS_POLYPOSIS = "17648~Large Bowel Areas"
+    HAEMORRHOIDS = "16009"
+    ILETIS = "16055"
+    INFLAMMATORY_BOWEL_DISEASE = "200585~Large Bowel Areas"
+    ISCHAEMIC_COLITIS = "16065"
+    JUVENILE_POLYPOSIS = "204405~Large Bowel Areas"
+    LYMPHOMA = "16070"
+    MELANOSIS = "16014"
+    MUCOSAL_PROLAPSE = "16018"
+    MUT_YH_POLYPOSIS = "204406~Large Bowel Areas"
+    OBSTRUCTION_OF_COLON = "203071"
+    OTHER_MALIGNANT_TUMOR = "200584"
+    PARASITES = "16062"
+    PEUTZ_JEGHERS_SYNDROME = "204407~Large Bowel Areas"
+    PNEUMATOSIS_COLI = "16078"
+    POST_OPERATIVE_APPEARANCE = "16079"
+    PSEUDOMEMBRANOUS_COLITIS = "16063"
+    RADIATION_ENTEROCOLITIS = "16066~Large Bowel Areas~204339"
+    SOLITARY_RECAL_ULCER_SYNDROME = "16067"
+    STRICTURE = "16006"
 
 
 # Registry of all known Enums to search when matching string values

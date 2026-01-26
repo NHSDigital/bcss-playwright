@@ -82,6 +82,7 @@ class InvestigationDatasetCompletion:
         self.failure_reasons_string = "Failure Reasons"
         self.excision_technique_string = "Excision Technique"
         self.outcome_at_time_of_procedure_string = "Outcome at time of procedure"
+        self.proof_parameters_string = "Proof Parameters"
 
         self.investigation_datasets_pom = InvestigationDatasetsPage(self.page)
 
@@ -203,7 +204,7 @@ class InvestigationDatasetCompletion:
         self.investigation_datasets_pom.click_show_completion_proof_information()
         # Completion Proof Information
         DatasetFieldUtil(self.page).populate_select_locator_for_field(
-            "Proof Parameters", CompletionProofOptions.PHOTO_ILEO
+            self.proof_parameters_string, CompletionProofOptions.PHOTO_ILEO
         )
 
     def investigation_datasets_failure_reason(self) -> None:
@@ -363,7 +364,6 @@ class InvestigationDatasetCompletion:
 
         # Drug Information
         if drug_information is not None:
-            InvestigationDatasetsPage(self.page).click_show_drug_information()
             self.fill_out_drug_information(drug_information)
 
         if endoscopy_information:
@@ -373,17 +373,13 @@ class InvestigationDatasetCompletion:
         # Completion Proof Information
         if completion_information is not None:
             logging.info("Filling out completion proof information")
-            InvestigationDatasetsPage(
-                self.page
-            ).click_show_completion_proof_information()
             DatasetFieldUtil(self.page).populate_select_locator_for_field(
-                "Proof Parameters", completion_information["completion proof"]
+                self.proof_parameters_string, completion_information["completion proof"]
             )
 
         # Failure Information
         if failure_information is not None:
             logging.info("Filling out failure information")
-            self.investigation_datasets_pom.click_show_failure_information()
             DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
                 self.failure_reasons_string,
                 "divFailureSection",
@@ -424,14 +420,6 @@ class InvestigationDatasetCompletion:
         """
         Populates the Suspected Findings section of the Investigation Dataset form.
         """
-        logging.info("Starting fill_out_suspected_findings")
-        try:
-            logging.info("About to click suspected findings details")
-            self.investigation_datasets_pom.click_show_suspected_findings_details()
-            logging.info("Clicked suspected findings details successfully")
-        except Exception as e:
-            logging.error(f"Error clicking on Show Suspected Findings Details: {e}")
-            raise
         for key, value in suspected_findings.items():
             match key:
                 case "extracolonic summary code":
@@ -457,37 +445,34 @@ class InvestigationDatasetCompletion:
                     - "fit for subsequent endoscopic referral" (Optional[str]): Enum value for referral fitness.
                     - "aspirant endoscopist" (Optional[int or None]): Index for aspirant dropdown, or None to mark absence.
         """
-        self.investigation_datasets_pom.select_site_lookup_option_index(
-            general_information["site"]
-        )
-        self.investigation_datasets_pom.select_practitioner_option_index(
-            general_information["practitioner"]
-        )
-        testing_clinician = general_information["testing clinician"]
-        if isinstance(testing_clinician, int):
-            self.investigation_datasets_pom.select_testing_clinician_option_index(
-                testing_clinician
-            )
-        elif isinstance(testing_clinician, str):
-            self.investigation_datasets_pom.select_testing_clinician_from_name(
-                testing_clinician
-            )
-
-        if general_information.get("reporting radiologist") is not None:
-            InvestigationDatasetsPage(
-                self.page
-            ).select_reporting_radiologist_option_index(
-                general_information["reporting radiologist"]
-            )
-
-        if (
-            general_information.get("fit for subsequent endoscopic referral")
-            is not None
-        ):
-            DatasetFieldUtil(self.page).populate_select_locator_for_field(
-                "Fit for Subsequent Endoscopic Referral",
-                general_information["fit for subsequent endoscopic referral"],
-            )
+        for key, value in general_information.items():
+            match key:
+                case "site":
+                    self.investigation_datasets_pom.select_site_lookup_option_index(
+                        value
+                    )
+                case "practitioner":
+                    self.investigation_datasets_pom.select_practitioner_option_index(
+                        value
+                    )
+                case "testing clinician":
+                    if isinstance(value, int):
+                        self.investigation_datasets_pom.select_testing_clinician_option_index(
+                            value
+                        )
+                    elif isinstance(value, str):
+                        self.investigation_datasets_pom.select_testing_clinician_from_name(
+                            value
+                        )
+                case "reporting radiologist":
+                    InvestigationDatasetsPage(
+                        self.page
+                    ).select_reporting_radiologist_option_index(value)
+                case "fit for subsequent endoscopic referral":
+                    DatasetFieldUtil(self.page).populate_select_locator_for_field(
+                        "Fit for Subsequent Endoscopic Referral",
+                        value,
+                    )
 
         if "aspirant endoscopist" in general_information:
             aspirant = general_information["aspirant endoscopist"]
@@ -500,12 +485,40 @@ class InvestigationDatasetCompletion:
                     self.page
                 ).select_aspirant_endoscopist_option_index(aspirant)
 
+    def fill_out_completion_information(self, completion_information: dict) -> None:
+        """
+        This method completes the Completion Proof Information section of the investigation dataset.
+        Args:
+            completion_information (dict): A dictionary containing completion proof parameters.
+        """
+        logging.info("Filling out completion proof information")
+        self.investigation_datasets_pom.click_show_completion_proof_information()
+        DatasetFieldUtil(self.page).populate_select_locator_for_field(
+            self.proof_parameters_string, completion_information["completion proof"]
+        )
+
+    def fill_out_failure_information(self, failure_information: dict) -> None:
+        """
+        This method completes the Failure Information section of the investigation dataset.
+        Args:
+            failure_information (dict): A dictionary containing failure reasons and related information.
+        """
+        logging.info("Filling out failure information")
+        DatasetFieldUtil(self.page).populate_select_locator_for_field_inside_div(
+            self.failure_reasons_string,
+            "divFailureSection",
+            failure_information["failure reasons"],
+        )
+
     def fill_out_contrast_tagging_and_drug_information(
         self, contrast_tagging_and_drug: dict
     ) -> None:
+        """
+        This method completes the Contrast, Tagging & Drug Information section of the investigation dataset.
+        Args:
+            contrast_tagging_and_drug (dict): A dictionary containing contrast, tagging agent, and drug information.
+        """
         logging.info("🧪 Filling out Contrast, Tagging & Drug Information")
-        self.investigation_datasets_pom.click_show_contrast_tagging_and_drug_information()
-
         # Use for loop and match-case for endoscopy_information fields
         for key, value in contrast_tagging_and_drug.items():
             match key:
@@ -635,9 +648,6 @@ class InvestigationDatasetCompletion:
         """
         logging.info("Filling out Radiology Information")
 
-        self.investigation_datasets_pom.click_show_radiology_information()
-        self.investigation_datasets_pom.click_show_radiology_failure_information()
-
         # Use for loop and match-case for radiology data fields
         for key, value in radiology_data.items():
             match key:
@@ -722,8 +732,6 @@ class InvestigationDatasetCompletion:
             endoscopy_information (dict): A dictionary containing the endoscopy information to be filled in the form.
         """
         # Endoscopy Information
-        self.investigation_datasets_pom.click_show_endoscopy_information()
-
         # Use for loop and match-case for endoscopy_information fields
         for key, value in endoscopy_information.items():
             match key:
@@ -1144,6 +1152,38 @@ class InvestigationDatasetCompletion:
                         f"divTumourFindings{polyp_number}_1",
                         value,
                     )
+
+    def fill_out_other_findings_information(self, other_findings: dict) -> None:
+        """
+        This method completes the Other Findings section of the investigation dataset.
+        Args:
+            other_findings (dict): A dictionary containing other findings field keys and their values.
+        """
+        logging.info("Filling out Other Findings Information")
+
+        InvestigationDatasetsPage(self.page).click_show_other_findings_information()
+
+        # Use for loop and match-case for other findings fields
+        other_findings_map = {
+            "location": ("#UI_OTHER_LOCATION{}", True),
+            "diagnosis": ("#UI_OTHER_DIAGNOSIS{}", True),
+        }
+
+        for key, value in other_findings.items():
+            for prefix, (selector_template, is_select) in other_findings_map.items():
+                if key.startswith(prefix):
+                    index = key[len(prefix) :]
+                    if is_select:
+                        logging.info(
+                            f"Adding {prefix.replace('_', ' ')} {index}: {to_enum_name_or_value(value)}"
+                        )
+                        self.page.select_option(selector_template.format(index), value)
+                    else:
+                        logging.info(
+                            f"Adding {prefix.replace('_', ' ')} {index}: {value}"
+                        )
+                        self.page.fill(selector_template.format(index), value)
+                    break
 
     def click_show_histology_details_if_present(self, polyp_number: int) -> None:
         """

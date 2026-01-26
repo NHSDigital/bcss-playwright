@@ -228,10 +228,7 @@ class BasePage:
             alerts_table.wait_for(state="visible")
 
         try:
-            self.page.wait_for_load_state("load")
             self.page.wait_for_load_state("domcontentloaded")
-            self.page.wait_for_load_state("networkidle")
-            locator.wait_for(state="attached")
             locator.wait_for(state="visible")
             locator.click()
 
@@ -298,7 +295,7 @@ class BasePage:
                     expected_text in actual_text
                 ), f"Expected dialog to contain '{expected_text}', but got '{actual_text}'"
             except AssertionError as e:
-                self._dialog_assertion_error = e
+                raise AssertionError(f"Dialog text assertion failed: {e}") from e
             if accept:
                 try:
                     dialog.accept()
@@ -330,3 +327,16 @@ class BasePage:
             locator.select_option(option)
         except Exception as e:
             logging.error(f"Option selection failed: {e}")
+
+    def text_is_visible(self, text: str, is_visible: bool = True) -> None:
+        """
+        Checks whether the given text is visible on the page.
+        Args:
+            text (str): The text to check for visibility.
+            is_visible (bool): If True, asserts text is visible; if False, asserts it is not visible.
+        """
+        locator = self.page.get_by_text(text, exact=True)
+        if is_visible:
+            expect(locator).to_be_visible()
+        else:
+            expect(locator).not_to_be_visible()

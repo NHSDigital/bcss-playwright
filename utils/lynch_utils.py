@@ -3,6 +3,7 @@ import random
 from datetime import datetime, timedelta, date
 from dateutil.relativedelta import relativedelta
 from typing import Optional
+from playwright.sync_api import Page
 
 from classes.date.date_description_utils import DateDescriptionUtils
 from classes.repositories.general_repository import GeneralRepository
@@ -27,8 +28,12 @@ LAST_COLONOSCOPY_DATE_DESCRIPTION = "Last colonoscopy date description"
 
 
 class LynchUtils:
-    @staticmethod
+
+    def __init__(self, page: Page):
+        self.page = page
+
     def insert_validated_lynch_patient_from_new_subject_with_age(
+        self,
         age: str,
         gene: str,
         when_diagnosis_took_place: str,
@@ -64,14 +69,12 @@ class LynchUtils:
                 days = int(parts[2])
             else:
                 years = int(age)
-                days = random.randint(0, 363)
+                days = 0
                 plus_or_minus = PLUS
         except Exception:
             raise SelectionBuilderException("Invalid age format", age)
 
-        date_of_birth = datetime.today().date().replace(
-            day=15, month=10
-        ) - relativedelta(years=years)
+        date_of_birth = datetime.today().date() - relativedelta(years=years)
         if plus_or_minus in [MINUS, LESS]:
             date_of_birth += timedelta(days=days)
         else:
@@ -264,3 +267,34 @@ class LynchUtils:
         """
         general_repository = GeneralRepository()
         general_repository.process_new_lynch_patients()
+
+    def set_lynch_invitation_rate(self, rate: float) -> None:
+        """
+        Sets the Lynch invitation rate for all screening centres.
+        Args:
+            rate (float): The new invitation rate to set.
+        """
+        db = OracleDB()
+        connection = db.connect_to_db()
+        try:
+            sql = (
+                "UPDATE lynch_invitation_rate lir "
+                "SET lir.audit_reason = 'AUTO TEST', "
+                "lir.datestamp = systimestamp, "
+                "lir.rate = :rate"
+            )
+            with connection.cursor() as cursor:
+                cursor.execute(sql, {"rate": rate})
+                connection.commit()
+                logging.info(f"Rows affected: {cursor.rowcount}")
+        finally:
+            db.disconnect_from_db(connection)
+
+    def run_lynch_invitations(self) -> None:
+        """
+        Executes the pkg_lynch.p_invite_lynch_subjects stored procedure to send invitations to Lynch subjects.
+        """
+        logging.debug("Starting Lynch invitations")
+        general_repository = GeneralRepository()
+        general_repository.run_lynch_invitations()
+        logging.debug("Finished Lynch invitations")
