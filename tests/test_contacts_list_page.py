@@ -1,5 +1,6 @@
+import logging
 import pytest
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
 from pages.contacts_list.contacts_list_page import ContactsListPage
 from pages.contacts_list.view_contacts_page import ViewContactsPage
@@ -54,3 +55,25 @@ def test_contacts_list_page_navigation(page: Page) -> None:
     # Return to main menu
     BasePage(page).click_main_menu_link()
     BasePage(page).main_menu_header_is_displayed()
+
+
+def test_view_contacts_accredited_screening_colonoscopist(page: Page) -> None:
+    """
+    Navigate to contact list, search for Accredited* role and BCS001 organisation and select the role link next to a contact.
+    Expects the View Details page to have the role Accredited Screening Colonoscopist.
+    """
+
+    BasePage(page).go_to_page(["View Contacts"])
+    ViewContactsPage(page).search_by_job_role_and_organisation_code(
+        "Accredited*", "BCS001"
+    )
+
+    page.get_by_role(
+        "row",
+        name="Legroom Sensitive Accredited Screening Colonoscopist BCS001 Wolverhampton Bowel Cancer Screening Centre",
+        exact=True,
+    ).get_by_role("link").click()
+    expect(page.locator('form[name="frm"]')).to_contain_text(
+        "Accredited Screening Colonoscopist"
+    )
+    logging.info("results contain name Legroom Sensitive")
