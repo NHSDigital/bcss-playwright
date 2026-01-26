@@ -133,7 +133,7 @@ def book_appointments(page: Page, screening_centre: str, site: str) -> None:
 
 
 def book_post_investigation_appointment(
-    page: Page, site: str, appointment_date:datetime=datetime.today()
+    page: Page, site: str, appointment_date: datetime = datetime.today()
 ) -> None:
     """
     Book a post-investigation appointment for a subject.
@@ -159,6 +159,7 @@ def book_post_investigation_appointment(
     )
 
     overlap_message = "Overlaps a Post Investigation, Surveillance appointment or Colonoscopy Assessment appointment"
+    appointment_too_early_message = "Appointment before earliest start time"
     screening_practitioner_index = 1  # Start with the first practitioner
     appointment_start_time = "08:00"
 
@@ -176,7 +177,10 @@ def book_post_investigation_appointment(
             dialog_message = (
                 book_appointments_page.click_save_button_and_return_message()
             )
-            if dialog_message is None or overlap_message not in dialog_message:
+            if dialog_message is None or (
+                overlap_message not in dialog_message
+                and appointment_too_early_message not in dialog_message
+            ):
                 # Success or no overlap dialog
                 page.wait_for_timeout(
                     500
