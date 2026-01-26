@@ -18,17 +18,30 @@ class SetLynchInvitationRatesPage(BasePage):
         )
 
     def get_lynch_invitation_rate(self, screening_centre_id: str) -> Locator:
+        """
+        This returns the locator for the Lynch Invitation rate for the specified Screening Centre ID
+
+        Args:
+            screening_centre_id (str): the screening centre id to use
+        """
         return self.page.locator(f'[id="{screening_centre_id}"]')
 
     def set_lynch_invitation_rate(self, screening_centre_id: str, rate: str) -> None:
         """
         set lynch invitation rate
+
+        Args:
+            screening_centre_id (str): the screening centre id to use
+            rate (str): the rate to set
         """
         self.get_lynch_invitation_rate(screening_centre_id).fill(rate)
 
         logging.info(f"input {rate } for screening centre id {screening_centre_id} ")
 
     def click_set_rates(self) -> None:
+        """
+        clicks the set rates button
+        """
         self.page.get_by_role("button", name="Set Rates").click()
         expect(self.page.locator("#alert")).to_contain_text("×Successfully updated")
         logging.info("click set rates")

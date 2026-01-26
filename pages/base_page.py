@@ -206,7 +206,9 @@ class BasePage:
         self.click(self.screening_subject_search_page)
 
     def go_to_page(self, navigation_steps: list[str]) -> None:
-        """Clicks the navigation links in the list provided.
+        """
+        Clicks the navigation links in the list provided.
+
         Args:
             navigation_steps (list[str]): the links you want to navigate through in order
         """
