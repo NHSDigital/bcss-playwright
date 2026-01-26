@@ -541,7 +541,7 @@ class AdvanceEpisodePage(BasePage):
 
     def can_advance_episode(self, advance_option: str, can_or_cannot: bool) -> None:
         """
-        Asserted whether a subject's episode can be advanced using a specified option
+        Asserts whether a subject's episode can be advanced using a specified option
         Args:
             advance_option (str): The advance episode option to check
             can_or_cannot (bool): True if the option should be visible, False otherwise
