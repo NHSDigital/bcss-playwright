@@ -1,6 +1,10 @@
+import datetime
+import uuid
 import pytest
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 from pages.base_page import BasePage
+from pages.fit_test_kits.create_new_analyser_page import CreateNewAnalyserPage
+from pages.fit_test_kits.edit_analyser_page import EditAnalyserPage
 from pages.fit_test_kits.fit_test_kits_page import FITTestKitsPage
 from pages.fit_test_kits.fit_rollout_summary_page import FITRolloutSummaryPage
 from pages.fit_test_kits.log_devices_page import LogDevicesPage
@@ -98,3 +102,47 @@ def test_fit_test_kits_page_navigation(page: Page, general_properties: dict) -> 
     # Return to main menu
     BasePage(page).click_main_menu_link()
     BasePage(page).main_menu_header_is_displayed()
+
+
+def test_add_and_edit_a_new_analyser(page: Page) -> None:
+    """Create a new analyser and then edit it to have an end date of tomorrow"""
+    today = datetime.date.today()
+    unique_id = str(uuid.uuid4())[:8]
+    analyser_code = f"AUTO{unique_id}"
+    analyser_name = f"Autotest{unique_id}"
+    serial_number = f"SN{unique_id}"
+    BasePage(page).go_to_page(["Maintain Analysers"])
+
+    maintain_analysers_page = MaintainAnalysersPage(page)
+    maintain_analysers_page.create_new_analyser_button.click()
+    create_new_analyser_page = CreateNewAnalyserPage(page)
+    create_new_analyser_page.analyser_code_textbox.fill(analyser_code)
+    create_new_analyser_page.analyser_name_textbox.fill(analyser_name)
+    create_new_analyser_page.serial_number_textbox.fill(serial_number)
+    create_new_analyser_page.start_date_textbox.fill(today.strftime("%d/%m/%Y"))
+    create_new_analyser_page.select_analyser_from_lookup("PLEDIA")
+    create_new_analyser_page.software_version_textbox.fill("1")
+    create_new_analyser_page.software_start_date_textbox.fill(
+        today.strftime("%d/%m/%Y")
+    )
+    create_new_analyser_page.software_start_time_textbox.fill("08:00")
+    create_new_analyser_page.save_button.click()
+
+    expect(maintain_analysers_page.analysers_table).to_contain_text(analyser_code)
+    edit_button = page.get_by_role(
+        "row",
+        name=f"BCS01 {analyser_code} {analyser_name} {today.strftime("%d %b %Y")} End Date Edit",
+        exact=True,
+    ).locator("#edit")
+    edit_button.click()
+    tomorrow = today + datetime.timedelta(days=1)
+    edit_analyser_page = EditAnalyserPage(page)
+    edit_analyser_page.end_date_textbox.fill(tomorrow.strftime("%d/%m/%Y"))
+    edit_analyser_page.save_button.click()
+    expect(
+        page.get_by_role(
+            "row",
+            name=f"BCS01 {analyser_code} {analyser_name} {today.strftime("%d %b %Y")} {tomorrow.strftime("%d %b %Y")} Edit",
+            exact=True,
+        )
+    ).to_be_visible()
