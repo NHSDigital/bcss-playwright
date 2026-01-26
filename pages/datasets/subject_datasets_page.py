@@ -72,11 +72,11 @@ class SubjectDatasetsPage(BasePage):
         # If plural, also click Add or View depending on visibility
         if dataset_count_text and "Datasets" in dataset_count_text:
             try:
-                self.add_link.first.wait_for(state="visible", timeout=2000)
+                self.add_link.first.wait_for(state="visible", timeout=5000)
                 self.click_add_link()
             except TimeoutError:
                 try:
-                    self.view_link.first.wait_for(state="visible", timeout=2000)
+                    self.view_link.first.wait_for(state="visible", timeout=5000)
                     self.click_view_link()
                 except Exception:
                     raise TimeoutError(
