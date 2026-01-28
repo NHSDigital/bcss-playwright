@@ -10,6 +10,7 @@ from pages.call_and_recall.create_a_plan_page import CreateAPlanPage
 from pages.call_and_recall.generate_invitations_page import GenerateInvitationsPage
 from playwright.sync_api import Page
 from utils.batch_processing import batch_processing
+from utils.oracle.oracle_specific_functions.subject_batch import there_is_letter_batch
 
 
 @pytest.mark.smokescreen
@@ -61,7 +62,7 @@ def test_compartment_1(page: Page, smokescreen_properties: dict) -> None:
     CallAndRecallPage(page).go_to_generate_invitations_page()
     logging.info("Generating invitations based on the invitations plan")
     GenerateInvitationsPage(page).click_generate_invitations_button()
-    self_referrals_available = GenerateInvitationsPage(
+    GenerateInvitationsPage(
         page
     ).wait_for_invitation_generation_complete(
         int(smokescreen_properties["c1_daily_invitation_rate"])
@@ -69,20 +70,40 @@ def test_compartment_1(page: Page, smokescreen_properties: dict) -> None:
 
     # Print the batch of Pre-Invitation Letters - England
     logging.info("Compartment 1 - Process S1 Batch")
-    if self_referrals_available:
+
+    if there_is_letter_batch("S83", "Invitation & Test Kit (Self-referral) (FIT)"):
+        logging.info(
+            "Compartment 1 - Process S83 Invitation & Test Kit (Self-referral) (FIT)"
+        )
+        batch_processing(
+            page,
+            "S83",
+            "Invitation & Test Kit (Self-referral) (FIT)",
+            "S84 - Invitation and Test Kit Sent (Self-referral)",
+        )
+    else:
+        logging.warning(
+            "Skipping S83 Invitation & Test Kit (Self-referral) (FIT) as no self referral invitations were generated"
+        )
+    batch_processing(
+        page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent", True
+    )
+
+    if there_is_letter_batch("S1", "Pre-invitation (FIT) (digital leaflet)"):
+        logging.info(
+            "Compartment 1 - Process S1 Digital Leaflet Batch"
+        )
         batch_processing(
             page,
             "S1",
             "Pre-invitation (FIT) (digital leaflet)",
             "S9 - Pre-invitation Sent",
         )
+
     else:
         logging.warning(
-            "Skipping S1 Pre-invitation (FIT) (digital leaflet) as no self referral invitations were generated"
+            "Skipping S1 Pre-invitation (FIT) (digital leaflet) as no digital leaflet invitations were generated"
         )
-    batch_processing(
-        page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent", True
-    )
 
     # Print the batch of Invitation & Test Kit Letters - England
     logging.info("Compartment 1 - Process S9 Batch")
