@@ -160,8 +160,13 @@ def test_fobt_scenario_17(page: Page) -> None:
     batch_processing(
         page=page,
         batch_type="S9",
-        latest_event_status="S10 - Invitation & Test Kit Sent",
         batch_description="Invitation & Test Kit (FIT)",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {"latest event status": "S10 Invitation & Test Kit Sent"},
     )
 
     # When I log my subject's latest unlogged FIT kit

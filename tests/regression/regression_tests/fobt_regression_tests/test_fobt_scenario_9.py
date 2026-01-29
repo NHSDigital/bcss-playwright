@@ -160,12 +160,18 @@ def test_fobt_scenario_9(page: Page) -> None:
 
     # And there is a "A183" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment"
     # When I process the open "A183 - Practitioner Clinic 1st Appointment" letter batch for my subject
-    # Then my subject has been updated as follows:
     batch_processing(
         page,
         "A183",
         "Practitioner Clinic 1st Appointment",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked, letter sent",
+        },
     )
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
@@ -207,7 +213,6 @@ def test_fobt_scenario_9(page: Page) -> None:
         page,
         "A183",
         "GP Result (Abnormal)",
-        "J10 - Attended Colonoscopy Assessment Appointment",
     )
 
     # Then my subject has been updated as follows:
@@ -322,7 +327,14 @@ def test_fobt_scenario_9(page: Page) -> None:
         page,
         "A396",
         "Discharge from screening round - patient decision (letter to patient)",
-        "A392 - Patient Discharge Letter Printed - Patient Choice",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A392 Patient Discharge Letter Printed - Patient Choice",
+        },
     )
 
     # And there is a "A392" letter batch for my subject with the exact title "Discharge from screening round - patient decision (letter to GP)"
@@ -331,7 +343,6 @@ def test_fobt_scenario_9(page: Page) -> None:
         page,
         "A392",
         "Discharge from screening round - patient decision (letter to GP)",
-        "A350 - Letter of Non-agreement to Continue with Investigation sent to GP",
     )
 
     # Then my subject has been updated as follows:
@@ -363,4 +374,5 @@ def test_fobt_scenario_9(page: Page) -> None:
         "surveillance due date reason": "Unchanged",
     }
     subject_assertion(nhs_no, criteria)
+
     LogoutPage(page).log_out()
