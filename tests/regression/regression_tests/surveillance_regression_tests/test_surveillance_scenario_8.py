@@ -594,6 +594,11 @@ def test_surveillance_scenario_8(page: Page, general_properties: dict) -> None:
     SubjectScreeningSummaryPage(page).click_datasets_link()
     SubjectDatasetsPage(page).click_investigation_show_datasets()
 
+    # Confirm on the investigation Datasets Page
+    InvestigationDatasetsPage(page).bowel_cancer_screening_page_title_contains_text(
+        "Investigation Datasets"
+    )
+
     # And I open all minimized sections on the dataset
     InvestigationDatasetsPage(page).open_all_minimized_sections()
 

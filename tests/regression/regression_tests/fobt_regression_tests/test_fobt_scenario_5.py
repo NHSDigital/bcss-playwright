@@ -9,6 +9,7 @@ from utils.call_and_recall_utils import CallAndRecallUtils
 from utils import screening_subject_page_searcher
 from utils.batch_processing import batch_processing
 from utils.fit_kit import FitKitLogged, FitKitGeneration
+from utils.oracle.oracle import OracleDB
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
@@ -131,26 +132,37 @@ def test_fobt_scenario_5(page: Page) -> None:
 
     # Then there is a "S1" letter batch for my subject with the exact title "Pre-invitation (FIT)"
     # When I process the open "S1" letter batch for my subject
+    batch_processing(page, "S1", "Pre-invitation (FIT)")
+
     # Then my subject has been updated as follows:
-    batch_processing(
-        page,
-        "S1",
-        "Pre-invitation (FIT)",
-        "S9 - Pre-invitation Sent",
-        True,
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S9 Pre-invitation Sent",
+        },
     )
 
     # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
+
     # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
     # When I process the open "S9" letter batch for my subject
-    # # Then my subject has been updated as follows:
     batch_processing(
         page,
         "S9",
         "Invitation & Test Kit (FIT)",
-        "S10 - Invitation & Test Kit Sent",
-        True,
     )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S10 Invitation & Test Kit Sent",
+        },
+    )
+
+    # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
 
     # When I log my subject's latest unlogged FIT kit
     fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
@@ -201,12 +213,18 @@ def test_fobt_scenario_5(page: Page) -> None:
 
     # And there is a "A183" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment"
     # When I process the open "A183 - Practitioner Clinic 1st Appointment" letter batch for my subject
-    # Then my subject has been updated as follows:
     batch_processing(
         page,
         "A183",
         "Practitioner Clinic 1st Appointment",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked, letter sent",
+        },
     )
 
     # And there is a "A183" letter batch for my subject with the exact title "GP Result (Abnormal)"
@@ -214,7 +232,14 @@ def test_fobt_scenario_5(page: Page) -> None:
         page,
         "A183",
         "GP Result (Abnormal)",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked, letter sent",
+        },
     )
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
@@ -232,12 +257,18 @@ def test_fobt_scenario_5(page: Page) -> None:
 
     # And there is a "J11" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment Non Attendance (Patient)"
     # When I process the open "J11" letter batch for my subject
-    # Then my subject has been updated as follows:
     batch_processing(
         page,
         "J11",
         "Practitioner Clinic 1st Appointment Non Attendance (Patient)",
-        "J27 - Appointment Non-attendance Letter Sent (Patient)",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "J27 Appointment Non-attendance Letter Sent (Patient)",
+        },
     )
 
     # When I view the subject
@@ -265,12 +296,18 @@ def test_fobt_scenario_5(page: Page) -> None:
 
     # And there is a "A184" letter batch for my subject with the exact title "Practitioner Clinic 2nd Appointment"
     # When I process the open "A184 - Practitioner Clinic 2nd Appointment" letter batch for my subject
-    # Then my subject has been updated as follows:
     batch_processing(
         page,
         "A184",
         "Practitioner Clinic 2nd Appointment",
-        "A26 - 2nd Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A26 2nd Colonoscopy Assessment Appointment Booked, letter sent",
+        },
     )
 
     # When I view the subject
@@ -291,12 +328,18 @@ def test_fobt_scenario_5(page: Page) -> None:
 
     # And there is a "A185" letter batch for my subject with the exact title "Patient Discharge (Non Attendance of Practitioner Clinic)"
     # When I process the open "A185" letter batch for my subject
-    # Then my subject has been updated as follows:
     batch_processing(
         page,
         "A185",
         "Patient Discharge (Non Attendance of Practitioner Clinic)",
-        "A37 - Patient Discharge Sent (Non-attendance at Colonoscopy Assessment Appointment)",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A37 - Patient Discharge Sent (Non-attendance at Colonoscopy Assessment Appointment)",
+        },
     )
 
     # When I switch users to BCSS "England" as user role "Hub Manager"
@@ -306,12 +349,18 @@ def test_fobt_scenario_5(page: Page) -> None:
 
     # And there is a "A37" letter batch for my subject with the exact title "GP Discharge (Non Attendance of Practitioner Clinic)"
     # And I process the open "A37" letter batch for my subject
-    # Then my subject has been updated as follows:
     batch_processing(
         page,
         "A37",
         "GP Discharge (Non Attendance of Practitioner Clinic)",
-        "P202 - Waiting Completion of Outstanding Events",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "P202 Waiting Completion of Outstanding Events",
+        },
     )
 
     # When I view the subject
@@ -328,29 +377,6 @@ def test_fobt_scenario_5(page: Page) -> None:
 
     # And I save Diagnosis Date Information
     RecordDiagnosisDatePage(page).click_save_button()
-
-    # The steps below have been commented out because it appears that the A50 event is not currently being created when the diagnosis date is recorded.
-    # The final assertion (line 353) passes without these steps so this needs to be investigated and fixed when Kate and Rob return from leave.
-
-    # # Then my subject has been updated as follows:
-    # subject_assertion(
-    #     nhs_no,
-    #     {
-    #         "latest episode diagnosis date reason": "Null",
-    #         "latest episode has diagnosis date": "Yes",
-    #         "latest episode includes event status": "A50 Diagnosis date recorded",
-    #         "latest event status": "P202 Waiting Completion of Outstanding Events",
-    #     },
-    # )
-
-    # # When I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
-    # # Then my subject has been updated as follows:
-    # batch_processing(
-    #     page,
-    #     "A183",
-    #     "GP Result (Abnormal)",
-    #     "A166 - GP Discharge Sent (No show for Colonoscopy Assessment Appointment)",
-    # )
 
     subject_assertion(
         nhs_no,
@@ -382,3 +408,5 @@ def test_fobt_scenario_5(page: Page) -> None:
             "surveillance due date reason": "Unchanged",
         },
     )
+
+    LogoutPage(page).log_out()

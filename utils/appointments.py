@@ -137,10 +137,8 @@ def book_post_investigation_appointment(
 ) -> None:
     """
     Book a post-investigation appointment for a subject.
-    If appointment_date is not provided, sets the appointment date to today and the start time to '08:00'.
-    If a dialog about overlapping appointments is triggered, increases the start time by 15 minutes and retries.
-    If all times for a practitioner are exhausted, tries the next practitioner.
-    Loops until a successful booking or all practitioners are exhausted.
+    Tries each practitioner for the current time slot, then increases the time by 30 minutes and repeats,
+    until a booking is successful or all slots before 17:00 are exhausted.
     Args:
         page (Page): The Playwright page object.
         site (str): The name of the site.
@@ -159,42 +157,37 @@ def book_post_investigation_appointment(
     )
 
     overlap_message = "Overlaps a Post Investigation, Surveillance appointment or Colonoscopy Assessment appointment"
+    colonoscopy_overlap_message = (
+        "Overlaps a colonoscopy assessment practitioner clinic appointment"
+    )
     appointment_too_early_message = "Appointment before earliest start time"
-    screening_practitioner_index = 1  # Start with the first practitioner
-    appointment_start_time = "08:00"
 
-    while screening_practitioner_index <= number_of_practitioners:
-        book_appointments_page.select_screening_practitioner_dropdown_option(
-            screening_practitioner_index
-        )
+    hour, minute = 8, 0  # Start at 08:00
+
+    while hour < 17:
+        current_time = f"{hour:02d}:{minute:02d}"
         book_appointments_page.enter_appointment_date(appointment_date)
-
-        hour, minute = map(int, appointment_start_time.split(":"))
-
-        while True:
-            current_time = f"{hour:02d}:{minute:02d}"
-            book_appointments_page.enter_appointment_start_time(current_time)
+        book_appointments_page.enter_appointment_start_time(current_time)
+        for screening_practitioner_index in range(1, number_of_practitioners + 1):
+            book_appointments_page.select_screening_practitioner_dropdown_option(
+                screening_practitioner_index
+            )
             dialog_message = (
                 book_appointments_page.click_save_button_and_return_message()
             )
             if dialog_message is None or (
                 overlap_message not in dialog_message
                 and appointment_too_early_message not in dialog_message
+                and colonoscopy_overlap_message not in dialog_message
             ):
                 # Success or no overlap dialog
-                page.wait_for_timeout(
-                    500
-                )  # Timeout to allow subject updates to take place
+                page.wait_for_timeout(500)
                 return
-            # Increase time by 15 minutes
-            minute += 15
-            if minute >= 60:
-                hour += 1
-                minute -= 60
-            if hour >= 17:
-                # Try next practitioner
-                screening_practitioner_index += 1
-                break  # Break inner while loop to try next practitioner
+        # Increase time by 30 minutes after all practitioners tried for this slot
+        minute += 30
+        if minute >= 60:
+            hour += 1
+            minute -= 60
 
     raise ValueError(
         "Could not book appointment before 17:00 for any practitioner due to overlaps."

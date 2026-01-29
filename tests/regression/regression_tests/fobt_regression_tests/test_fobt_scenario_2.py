@@ -9,6 +9,7 @@ from utils.call_and_recall_utils import CallAndRecallUtils
 from utils import screening_subject_page_searcher
 from utils.batch_processing import batch_processing
 from utils.fit_kit import FitKitLogged, FitKitGeneration
+from utils.oracle.oracle import OracleDB
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
@@ -116,33 +117,32 @@ def test_fobt_scenario_2(page: Page) -> None:
 
     # Then there is a "S1" letter batch for my subject with the exact title "Pre-invitation (FIT)"
     # When I process the open "S1" letter batch for my subject
-    # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
-    batch_processing(
-        page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent", True
-    )
+    batch_processing(page, "S1", "Pre-invitation (FIT)")
 
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
         {
-            "latest event status": "S9 - Pre-invitation Sent",
+            "latest event status": "S9 Pre-invitation Sent",
         },
     )
 
+    # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
+
+    # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
     # When I process the open "S9" letter batch for my subject
     batch_processing(
         page,
         "S9",
         "Invitation & Test Kit (FIT)",
-        "S10 - Invitation & Test Kit Sent",
-        True,
     )
 
     # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no,
         {
-            "latest event status": "S10 - Invitation & Test Kit Sent",
+            "latest event status": "S10 Invitation & Test Kit Sent",
         },
     )
 
@@ -190,9 +190,18 @@ def test_fobt_scenario_2(page: Page) -> None:
         page,
         "S2",
         "Subject Result (Normal)",
-        "S158 - Subject Discharge Sent (Normal)",
-        True,
     )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S158 Subject Discharge Sent (Normal)",
+        },
+    )
+
+    # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -208,9 +217,10 @@ def test_fobt_scenario_2(page: Page) -> None:
         page,
         "S158",
         "GP Result (Normal)",
-        "S159 - GP Discharge Sent (Normal)",
-        True,
     )
+
+    # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
 
     # Then my subject has been updated as follows:
     subject_assertion(

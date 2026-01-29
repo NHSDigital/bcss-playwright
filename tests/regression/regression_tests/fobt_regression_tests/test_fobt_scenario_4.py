@@ -10,6 +10,7 @@ from utils.call_and_recall_utils import CallAndRecallUtils
 from utils import screening_subject_page_searcher
 from utils.batch_processing import batch_processing
 from utils.fit_kit import FitKitLogged, FitKitGeneration
+from utils.oracle.oracle import OracleDB
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
@@ -148,14 +149,18 @@ def test_fobt_scenario_4(page: Page) -> None:
 
     # Then there is a "S1" letter batch for my subject with the exact title "Pre-invitation (FIT)"
     # When I process the open "S1" letter batch for my subject
+    batch_processing(page, "S1", "Pre-invitation (FIT)")
+
     # Then my subject has been updated as follows:
-    batch_processing(
-        page,
-        "S1",
-        "Pre-invitation (FIT)",
-        "S9 - Pre-invitation Sent",
-        True,
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S9 Pre-invitation Sent",
+        },
     )
+
+    # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -163,17 +168,24 @@ def test_fobt_scenario_4(page: Page) -> None:
     # And I receive an SSPI update to change their date of birth to "45" years old
     SSPIChangeSteps().sspi_update_to_change_dob_received(nhs_no, 45)
 
-    # When I run Timed Events for my subject
     # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
     # When I process the open "S9" letter batch for my subject
-    # # Then my subject has been updated as follows:
     batch_processing(
         page,
         "S9",
         "Invitation & Test Kit (FIT)",
-        "S10 - Invitation & Test Kit Sent",
-        True,
     )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S10 Invitation & Test Kit Sent",
+        },
+    )
+
+    # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
 
     # When I log my subject's latest unlogged FIT kit
     fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
@@ -301,22 +313,34 @@ def test_fobt_scenario_4(page: Page) -> None:
 
     # And there is a "A183" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment"
     # When I process the open "A183 - Practitioner Clinic 1st Appointment" letter batch for my subject
-    # Then my subject has been updated as follows:
     batch_processing(
         page,
         "A183",
         "Practitioner Clinic 1st Appointment",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked",
+        },
     )
 
     # And there is a "A183" letter batch for my subject with the exact title "GP Result (Abnormal)"
     # When I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
-    # Then my subject has been updated as follows:
     batch_processing(
         page,
         "A183",
         "GP Result (Abnormal)",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+        },
     )
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
@@ -352,14 +376,23 @@ def test_fobt_scenario_4(page: Page) -> None:
     )
 
     # When I process the open "J4" letter batch for my subject
-    # # Then my subject has been updated as follows:
+    # Then my subject has been updated as follows:
     batch_processing(
         page,
         "J4",
         "Practitioner Clinic 1st Appt Cancelled (Patient To Consider)",
-        "J22 - Appointment Cancellation letter sent (Patient to Consider)",
-        True,
     )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "J22 Appointment Cancellation Letter Sent (Patient to Consider)",
+        },
+    )
+
+    # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
 
     # When I switch users to BCSS "England" as user role "Hub Manager"
     LogoutPage(page).log_out(close_page=False)
@@ -391,12 +424,18 @@ def test_fobt_scenario_4(page: Page) -> None:
 
     # And there is a "J20" letter batch for my subject with the exact title "Practitioner Clinic 1st Appt Cancelled (Patient To Reschedule)"
     # When I process the open "J20" letter batch for my subject
-    # Then my subject has been updated as follows:
     batch_processing(
         page,
         "J20",
         "Practitioner Clinic 1st Appt Cancelled (Patient To Reschedule)",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked",
+        },
     )
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
@@ -423,15 +462,20 @@ def test_fobt_scenario_4(page: Page) -> None:
     # And I press OK on my confirmation prompt
     AppointmentDetailPage(page).click_save_button(accept_dialog=True)
 
-    # Then my subject has been updated as follows:
     # And there is a "J24" letter batch for my subject with the exact title "Subject Discharge (Screening Centre)"
     # When I process the open "J24 - Subject Discharge (Screening Centre)" letter batch for my subject
-    # Then my subject has been updated as follows:
     batch_processing(
         page,
         "J24",
         "Subject Discharge (Screening Centre)",
-        "J25 - Patient discharge sent (Screening Centre discharge patient)",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "J25 Patient discharge sent (Screening Centre discharge patient)",
+        },
     )
 
     # When I switch users to BCSS "England" as user role "Hub Manager"
@@ -441,12 +485,18 @@ def test_fobt_scenario_4(page: Page) -> None:
 
     # And there is a "J25" letter batch for my subject with the exact title "GP Discharge (Discharged By Screening Centre)"
     # And I process the open "J25" letter batch for my subject
-    # Then my subject has been updated as follows:
     batch_processing(
         page,
         "J25",
         "GP Discharge (Discharged By Screening Centre)",
-        "P202 - Waiting Completion of Outstanding Events",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "P202 - Waiting Completion of Outstanding Events",
+        },
     )
 
     # When I view the subject

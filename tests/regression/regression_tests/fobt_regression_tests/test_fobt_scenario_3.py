@@ -10,6 +10,7 @@ from utils.fit_kit import FitKitGeneration, FitKitLogged
 from utils import screening_subject_page_searcher
 from utils.sspi_change_steps import SSPIChangeSteps
 from utils.appointments import book_appointments
+from utils.oracle.oracle import OracleDB
 from pages.base_page import BasePage
 from pages.logout.log_out_page import LogoutPage
 from pages.screening_subject_search.subject_screening_summary_page import (
@@ -136,20 +137,33 @@ def test_fobt_scenario_3(page: Page) -> None:
 
     # Then there is a "S1" letter batch for my subject with the exact title "Pre-invitation (FIT)"
     # When I process the open "S1" letter batch for my subject
+    batch_processing(page, "S1", "Pre-invitation (FIT)")
+
     # Then my subject has been updated as follows:
-    # When I run Timed Events for my subject
-    batch_processing(
-        page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent", True
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S9 Pre-invitation Sent",
+        },
     )
+
+    # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
 
     # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
     # When I process the open "S9" letter batch for my subject
-    # Then my subject has been updated as follows:
     batch_processing(
         page,
         "S9",
         "Invitation & Test Kit (FIT)",
-        "S10 - Invitation & Test Kit Sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S10 Invitation & Test Kit Sent",
+        },
     )
 
     # When I log my subject's latest unlogged FIT kit
@@ -219,7 +233,14 @@ def test_fobt_scenario_3(page: Page) -> None:
         page,
         "A183",
         "Practitioner Clinic 1st Appointment",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked, letter sent",
+        },
     )
 
     # When I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
@@ -227,8 +248,18 @@ def test_fobt_scenario_3(page: Page) -> None:
         page,
         "A183",
         "GP Result (Abnormal)",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
     )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked, letter sent",
+        },
+    )
+
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
     # Then my subject has been updated as follows:
     SubjectScreeningSummaryPage(page).expand_episodes_list()
@@ -291,7 +322,14 @@ def test_fobt_scenario_3(page: Page) -> None:
         page,
         "J18",
         "Practitioner Clinic 1st Appt Cancelled (Screening Centre)",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked, letter sent",
+        },
     )
 
     cancel_appointment_and_processes_batches(page, nhs_no)
@@ -307,7 +345,6 @@ def test_fobt_scenario_3(page: Page) -> None:
         page,
         "J8",
         "GP Discharge (Refusal of Practitioner Clinic Appointment)",
-        "J9 - GP discharge letter sent (refusal of colonoscopy assessment appointment)",
     )
 
     # Then my subject has been updated as follows:
@@ -409,7 +446,14 @@ def test_fobt_scenario_3(page: Page) -> None:
         page,
         "J33",
         "Redirected Assessment Appointment",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked, letter sent",
+        },
     )
 
     cancel_appointment_and_processes_batches(page, nhs_no)
@@ -427,7 +471,6 @@ def test_fobt_scenario_3(page: Page) -> None:
         page,
         "J8",
         "GP Discharge (Refusal of Practitioner Clinic Appointment)",
-        "J9 - GP discharge letter sent (refusal of colonoscopy assessment appointment)",
     )
 
     # Then my subject has been updated as follows:
@@ -501,9 +544,18 @@ def cancel_appointment_and_processes_batches(page: Page, nhs_no: str) -> None:
         page,
         "J4",
         "Practitioner Clinic 1st Appt Cancelled (Patient To Consider)",
-        "J22 - Appointment Cancellation letter sent (Patient to Consider)",
-        True,
     )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "J22 Appointment Cancellation letter sent (Patient to Consider)",
+        },
+    )
+
+    # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
 
     # Then there is a "J22" letter batch for my subject with the exact title "Subject Discharge (Refused Appointment)"
     # When I process the open "J22" letter batch for my subject
@@ -511,5 +563,14 @@ def cancel_appointment_and_processes_batches(page: Page, nhs_no: str) -> None:
         page,
         "J22",
         "Subject Discharge (Refused Appointment)",
-        "J8 - Patient discharge sent (refused colonoscopy assessment appointment)",
     )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "J8 Patient discharge sent (refused colonoscopy assessment appointment)",
+        },
+    )
+
+    LogoutPage(page).log_out()

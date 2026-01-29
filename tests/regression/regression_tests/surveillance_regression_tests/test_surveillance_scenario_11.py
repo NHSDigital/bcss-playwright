@@ -543,6 +543,7 @@ def test_surveillance_scenario_11(page: Page, general_properties: dict) -> None:
     ).click_record_other_post_investigation_contact_button()
 
     # And I confirm the patient outcome dropdown has the following options:
+    ContactWithPatientPage(page).verify_contact_with_patient_page_is_displayed()
     ContactWithPatientPage(page).outcome_dropdown_contains_options(
         [
             "Post-investigation Appointment Not Required",

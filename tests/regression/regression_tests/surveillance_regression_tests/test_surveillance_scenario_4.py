@@ -215,13 +215,13 @@ def test_surveillance_scenario_4(page: Page) -> None:
     SubjectScreeningSummaryPage(page).click_datasets_link()
     SubjectDatasetsPage(page).click_investigation_show_datasets()
 
-    # And I open all minimized sections on the dataset
-    InvestigationDatasetsPage(page).open_all_minimized_sections()
-
     # Confirm on the investigation Datasets Page
     InvestigationDatasetsPage(page).bowel_cancer_screening_page_title_contains_text(
         "Investigation Datasets"
     )
+
+    # And I open all minimized sections on the dataset
+    InvestigationDatasetsPage(page).open_all_minimized_sections()
 
     # And I add the following bowel preparation drugs and values within the Investigation Dataset for this subject:
     InvestigationDatasetCompletion(page).fill_out_drug_information(
