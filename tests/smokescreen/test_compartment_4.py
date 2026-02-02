@@ -30,6 +30,7 @@ from datetime import datetime
 from utils.oracle.oracle_specific_functions.subject_appointment import (
     get_subjects_for_appointments,
 )
+from utils.subject_assertion import subject_assertion
 from utils.nhs_number_tools import NHSNumberTools
 import logging
 
@@ -120,6 +121,10 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
                 BookAppointmentPage(page).appointment_partially_available_colour,
             ],
         )
+
+        BookAppointmentPage(page).bowel_cancer_screening_page_title_contains_text(
+            "Book Appointment"
+        )
         BookAppointmentPage(page).appointments_table.click_first_input_in_column(
             "Appt/Slot Time"
         )
@@ -139,19 +144,27 @@ def test_compartment_4(page: Page, smokescreen_properties: dict) -> None:
         page,
         "A183",
         "Practitioner Clinic 1st Appointment",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+    subject_assertion(
+        nhs_number,
+        {
+            "latest event status": "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent"
+        },
     )
 
     batch_processing(
         page,
         "A183",
         "GP Result (Abnormal)",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
     )
 
-    SubjectScreeningSummaryPage(page).expand_episodes_list()
-    SubjectScreeningSummaryPage(page).click_first_fobt_episode_link()
-    EpisodeEventsAndNotesPage(page).expected_episode_event_is_displayed(
-        "A167 - GP Abnormal FOBT Result Sent"
+    subject_assertion(
+        nhs_number,
+        {
+            "latest episode includes event status": "A167 GP Abnormal FOBT Result Sent",
+            "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked, letter sent",
+        },
     )
+
     LogoutPage(page).log_out()

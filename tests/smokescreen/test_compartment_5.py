@@ -25,9 +25,6 @@ from pages.screening_practitioner_appointments.appointment_detail_page import (
 from pages.screening_subject_search.attend_diagnostic_test_page import (
     AttendDiagnosticTestPage,
 )
-from pages.screening_subject_search.episode_events_and_notes_page import (
-    EpisodeEventsAndNotesPage,
-)
 from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
@@ -44,7 +41,7 @@ from utils.oracle.oracle_specific_functions.subject_appointment import (
 )
 from utils import screening_subject_page_searcher
 from utils.appointments import AppointmentAttendance
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
 
 
