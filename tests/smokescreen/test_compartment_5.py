@@ -2,17 +2,8 @@ import pytest
 from playwright.sync_api import Page
 from pages.logout.log_out_page import LogoutPage
 from pages.base_page import BasePage
-from pages.screening_practitioner_appointments.appointment_calendar_page import (
-    AppointmentCalendarPage,
-)
 from pages.screening_practitioner_appointments.appointment_detail_page import (
     AppointmentDetailPage,
-)
-from pages.screening_practitioner_appointments.screening_practitioner_appointments_page import (
-    ScreeningPractitionerAppointmentsPage,
-)
-from pages.screening_practitioner_appointments.screening_practitioner_day_view_page import (
-    ScreeningPractitionerDayViewPage,
 )
 from pages.datasets.subject_datasets_page import (
     SubjectDatasetsPage,
@@ -28,14 +19,8 @@ from pages.screening_subject_search.subject_screening_summary_page import (
 from pages.screening_subject_search.advance_fobt_screening_episode_page import (
     AdvanceFOBTScreeningEpisodePage,
 )
-from pages.screening_practitioner_appointments.screening_practitioner_day_view_page import (
-    ScreeningPractitionerDayViewPage,
-)
 from pages.screening_practitioner_appointments.appointment_detail_page import (
     AppointmentDetailPage,
-)
-from pages.screening_practitioner_appointments.appointment_calendar_page import (
-    AppointmentCalendarPage,
 )
 from pages.screening_subject_search.attend_diagnostic_test_page import (
     AttendDiagnosticTestPage,
@@ -54,7 +39,9 @@ from utils.calendar_picker import CalendarPicker
 from utils.oracle.oracle_specific_functions.subject_appointment import (
     get_subjects_with_booked_appointments,
 )
-from datetime import datetime, timedelta
+from utils import screening_subject_page_searcher
+from utils.appointments import AppointmentAttendance
+from datetime import datetime
 import logging
 
 
@@ -87,38 +74,9 @@ def test_compartment_5(page: Page, smokescreen_properties: dict) -> None:
             f"\nAttending appointment for:\nSubject Name: {name_from_util}\nSubject NHS no: {nhs_no}\nSubject Appointment Date: {date_from_util}"
         )
 
-        BasePage(page).go_to_screening_practitioner_appointments_page()
-        ScreeningPractitionerAppointmentsPage(page).go_to_view_appointments_page()
-        AppointmentCalendarPage(page).select_appointment_type_dropdown(
-            smokescreen_properties["c5_eng_appointment_type"]
-        )
-        AppointmentCalendarPage(page).select_screening_centre_dropdown(
-            smokescreen_properties["c5_eng_screening_centre"]
-        )
-        AppointmentCalendarPage(page).select_site_dropdown(
-            smokescreen_properties["c5_eng_site"]
-        )
+        screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
 
-        AppointmentCalendarPage(page).click_view_appointments_on_this_day_button()
-
-        ScreeningPractitionerDayViewPage(page).select_practitioner_dropdown_option(
-            ["(all)", "(all having slots)"]
-        )
-        ScreeningPractitionerDayViewPage(page).click_calendar_button()
-        CalendarPicker(page).v1_calender_picker(date_from_util)
-
-        logging.info(f"Looking for {name_from_util}")
-        try:
-            ScreeningPractitionerDayViewPage(page).click_patient_link(name_from_util)
-            logging.info(f"Found and clicked {name_from_util}")
-        except Exception as e:
-            pytest.fail(f"Unable to find {name_from_util}: {e}")
-
-        AppointmentDetailPage(page).check_attendance_radio()
-        AppointmentDetailPage(page).check_attended_check_box()
-        AppointmentDetailPage(page).click_calendar_button()
-        CalendarPicker(page).v1_calender_picker(datetime.today() - timedelta(1))
-        AppointmentDetailPage(page).click_save_button()
+        AppointmentAttendance(page).mark_as_attended_yesterday()
         try:
             AppointmentDetailPage(page).verify_text_visible("Record updated")
             logging.info(
