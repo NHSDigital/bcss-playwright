@@ -62,15 +62,13 @@ def test_compartment_1(page: Page, smokescreen_properties: dict) -> None:
     CallAndRecallPage(page).go_to_generate_invitations_page()
     logging.info("Generating invitations based on the invitations plan")
     GenerateInvitationsPage(page).click_generate_invitations_button()
-    GenerateInvitationsPage(
-        page
-    ).wait_for_invitation_generation_complete(
+    GenerateInvitationsPage(page).wait_for_invitation_generation_complete(
         int(smokescreen_properties["c1_daily_invitation_rate"])
     )
 
-    # Print the batch of Pre-Invitation Letters - England
-    logging.info("Compartment 1 - Process S1 Batch")
+    logging.info("Compartment 1 - Check and Process Letter Batches")
 
+    # Check for self referral invitations
     if there_is_letter_batch("S83", "Invitation & Test Kit (Self-referral) (FIT)"):
         logging.info(
             "Compartment 1 - Process S83 Invitation & Test Kit (Self-referral) (FIT)"
@@ -85,14 +83,17 @@ def test_compartment_1(page: Page, smokescreen_properties: dict) -> None:
         logging.warning(
             "Skipping S83 Invitation & Test Kit (Self-referral) (FIT) as no self referral invitations were generated"
         )
+
+    # Print the batch of Pre-Invitation Letters - England
+    logging.info("Compartment 1 - Process S1 Batch")
+
     batch_processing(
         page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent", True
     )
 
+    # Check for digital leaflet invitations
     if there_is_letter_batch("S1", "Pre-invitation (FIT) (digital leaflet)"):
-        logging.info(
-            "Compartment 1 - Process S1 Digital Leaflet Batch"
-        )
+        logging.info("Compartment 1 - Process S1 Digital Leaflet Batch")
         batch_processing(
             page,
             "S1",
