@@ -24,7 +24,7 @@ class GenerateInvitationsPage(BasePage):
         self.display_rs = self.page.locator(DISPLAY_RS_SELECTOR)
         self.refresh_button = self.page.get_by_role("button", name="Refresh")
         self.planned_invitations_total = self.page.locator("#col8_total")
-        self.self_referrals_total = self.page.locator("#col5_total")
+        self.self_referrals_total = self.page.locator('[id^="col"][id$="_total"]').nth(1)
 
     def click_generate_invitations_button(self) -> None:
         """This function is used to click the Generate Invitations button."""
@@ -46,11 +46,13 @@ class GenerateInvitationsPage(BasePage):
 
     def wait_for_invitation_generation_complete(
         self, number_of_invitations: int
-    ) -> bool:
+    ) -> None:
         """
         This function is used to wait for the invitations to be generated.
         Every 5 seconds it refreshes the table and checks to see if the invitations have been generated.
-        It also checks that enough invitations were generated and checks to see if self referrals are present
+        It also checks that enough invitations were generated
+        Args:
+            number_of_invitations (int): The number of invitations expected to be generated
         """
         self.page.wait_for_selector(DISPLAY_RS_SELECTOR, timeout=5000)
 
@@ -100,16 +102,6 @@ class GenerateInvitationsPage(BasePage):
             pytest.fail(
                 f"Expected {number_of_invitations} invitations generated but got {value}"
             )
-
-        self_referrals_total_text = self.self_referrals_total.text_content()
-        if self_referrals_total_text is None:
-            pytest.fail("Failed to retrieve self-referrals total")
-        self_referrals_total = int(self_referrals_total_text.strip())
-        if self_referrals_total >= 1:
-            return True
-        else:
-            logging.warning("No S1 Digital Leaflet batch will be generated")
-            return False
 
     def wait_for_self_referral_invitation_generation_complete(
         self, expected_minimum: int = 1
