@@ -148,7 +148,7 @@ class BasePage:
         """
         self.page.wait_for_load_state("load")
         self.page.wait_for_load_state("domcontentloaded")
-        if self.bowel_cancer_screening_page_title.is_visible():
+        if self.bowel_cancer_screening_page_title.is_visible(timeout=3000):
             expect(self.bowel_cancer_screening_page_title).to_contain_text(text)
         else:
             expect(self.bowel_cancer_screening_ntsh_page_title).to_contain_text(text)
