@@ -11,6 +11,7 @@ from utils.fit_kit import FitKitGeneration
 from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
 from utils.user_tools import UserTools
 from utils.fit_kit import FitKitLogged
+from utils.subject_assertion import subject_assertion
 
 
 @pytest.mark.vpn_required
@@ -59,7 +60,10 @@ def test_compartment_2(page: Page, smokescreen_properties: dict) -> None:
         pytest.fail(f"{spoilt_fit_device_id} Unsuccessfully logged: {str(e)}")
 
     batch_processing(
-        page, "S3", "Retest (Spoilt) (FIT)", "S11 - Retest Kit Sent (Spoilt)"
+        page, "S3", "Retest (Spoilt) (FIT)"
+    )
+    nhs_no = subjectdf["subject_nhs_number"].iloc[-1]
+    subject_assertion(nhs_no, {"latest event status": "S11 Retest Kit Sent (Spoilt)"}
     )
 
     # Log out
