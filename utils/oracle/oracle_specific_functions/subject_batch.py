@@ -26,3 +26,43 @@ def get_nhs_no_from_batch_id(batch_id: str) -> pd.DataFrame:
     params = {"batch_id": batch_id}
     nhs_number_df = OracleDB().execute_query(query, params)
     return nhs_number_df
+
+
+def there_is_letter_batch(
+    letter_batch_code: str,
+    letter_batch_title: str,
+) -> bool:
+    """
+    This function checks if there is a letter batch with the specified code and title in the database.
+    Args:
+        letter_batch_code (str): The code of the letter batch to check.
+        letter_batch_title (str): The title of the letter batch to check.
+    Returns:
+        bool: True if the letter batch exists, False otherwise.
+    """
+    sql_query = """ SELECT lb.batch_id
+        FROM lett_batch_records lbr
+        INNER JOIN lett_batch lb
+        ON lb.batch_id = lbr.batch_id
+        INNER JOIN valid_values ld
+        ON ld.valid_value_id = lb.description_id
+        INNER JOIN valid_values lbs
+        ON lbs.valid_value_id = lb.status_id
+        WHERE lb.batch_state_id = 12018
+        AND lbs.allowed_value = :batch_code
+        AND LOWER(ld.description) = LOWER(:batch_title)
+        AND lbr.non_inclusion_id IS NULL
+        AND lbr.key_id != 11539
+        """
+
+
+    params = {
+        "batch_code": letter_batch_code,
+        "batch_title": letter_batch_title,
+    }
+
+    batch_df = OracleDB().execute_query(sql_query, params)
+    if not batch_df.empty:
+        return True
+    else:
+        return False
