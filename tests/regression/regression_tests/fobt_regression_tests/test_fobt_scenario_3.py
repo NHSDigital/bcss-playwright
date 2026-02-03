@@ -572,5 +572,3 @@ def cancel_appointment_and_processes_batches(page: Page, nhs_no: str) -> None:
             "latest event status": "J8 Patient discharge sent (refused colonoscopy assessment appointment)",
         },
     )
-
-    LogoutPage(page).log_out()
