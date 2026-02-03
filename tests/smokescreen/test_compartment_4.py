@@ -17,12 +17,6 @@ from pages.screening_practitioner_appointments.colonoscopy_assessment_appointmen
 from pages.screening_practitioner_appointments.book_appointment_page import (
     BookAppointmentPage,
 )
-from pages.screening_subject_search.subject_screening_summary_page import (
-    SubjectScreeningSummaryPage,
-)
-from pages.screening_subject_search.episode_events_and_notes_page import (
-    EpisodeEventsAndNotesPage,
-)
 from utils.user_tools import UserTools
 from utils.calendar_picker import CalendarPicker
 from utils.batch_processing import batch_processing
