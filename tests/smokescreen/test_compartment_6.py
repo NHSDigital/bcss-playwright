@@ -1,13 +1,13 @@
 import pytest
 from playwright.sync_api import Page
 from utils.user_tools import UserTools
-from utils.screening_subject_page_searcher import verify_subject_event_status_by_nhs_no
 from utils.batch_processing import batch_processing
 from pages.logout.log_out_page import LogoutPage
 from utils.oracle.oracle_specific_functions.subject_datasets import (
     get_subjects_for_investigation_dataset_updates,
 )
 from utils.subject_demographics import SubjectDemographicUtil
+from utils.subject_assertion import subject_assertion
 from utils.investigation_dataset import (
     InvestigationDatasetCompletion,
     InvestigationDatasetResults,
@@ -42,83 +42,89 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
         smokescreen_properties["c6_eng_org_id"],
     )
     logging.info("Fetched subjects for investigation dataset updates.")
-    nhs_no = subjects_df["subject_nhs_number"].iloc[0]
-    logging.info(f"Selected NHS number for older subject: {nhs_no}")
-    SubjectDemographicUtil(page).update_subject_dob(nhs_no, True, False)
+    nhs_no_high_risk_older = subjects_df["subject_nhs_number"].iloc[0]
+    logging.info(f"Selected NHS number for older subject: {nhs_no_high_risk_older}")
+    SubjectDemographicUtil(page).update_subject_dob(nhs_no_high_risk_older, True, False)
     logging.info(
-        f"Updated date of birth for NHS number {nhs_no} to indicate an older subject."
+        f"Updated date of birth for NHS number {nhs_no_high_risk_older} to indicate an older subject."
     )
     InvestigationDatasetCompletion(page).complete_with_result(
-        nhs_no, InvestigationDatasetResults.HIGH_RISK
+        nhs_no_high_risk_older, InvestigationDatasetResults.HIGH_RISK
     )
     logging.info(
-        f"Completed investigation dataset for NHS number {nhs_no} with result: HIGH_RISK."
+        f"Completed investigation dataset for NHS number {nhs_no_high_risk_older} with result: HIGH_RISK."
     )
     AfterInvestigationDatasetComplete(page).progress_episode_based_on_result(
         InvestigationDatasetResults.HIGH_RISK, False
     )
     logging.info(
-        f"Progressed episode for NHS number {nhs_no} based on result: HIGH_RISK."
+        f"Progressed episode for NHS number {nhs_no_high_risk_older} based on result: HIGH_RISK."
     )
 
     # Younger patient - High Risk Result
     logging.info("High-risk result for a younger subject")
-    nhs_no = subjects_df["subject_nhs_number"].iloc[1]
-    logging.info(f"Selected NHS number for younger subject: {nhs_no}")
-    SubjectDemographicUtil(page).update_subject_dob(nhs_no, True, True)
+    nhs_no_high_risk_younger = subjects_df["subject_nhs_number"].iloc[1]
+    logging.info(f"Selected NHS number for younger subject: {nhs_no_high_risk_younger}")
+    SubjectDemographicUtil(page).update_subject_dob(
+        nhs_no_high_risk_younger, True, True
+    )
     logging.info(
-        f"Updated date of birth for NHS number {nhs_no} to indicate a younger subject."
+        f"Updated date of birth for NHS number {nhs_no_high_risk_younger} to indicate a younger subject."
     )
     InvestigationDatasetCompletion(page).complete_with_result(
-        nhs_no, InvestigationDatasetResults.HIGH_RISK
+        nhs_no_high_risk_younger, InvestigationDatasetResults.HIGH_RISK
     )
     logging.info(
-        f"Completed investigation dataset for NHS number {nhs_no} with result: HIGH_RISK."
+        f"Completed investigation dataset for NHS number {nhs_no_high_risk_younger} with result: HIGH_RISK."
     )
     AfterInvestigationDatasetComplete(page).progress_episode_based_on_result(
         InvestigationDatasetResults.HIGH_RISK, True
     )
     logging.info(
-        f"Progressed episode for NHS number {nhs_no} based on result: HIGH_RISK."
+        f"Progressed episode for NHS number {nhs_no_high_risk_younger} based on result: HIGH_RISK."
     )
 
     # Older patient - LNPCP Result
     logging.info("LNPCP result for an older subject")
-    nhs_no = subjects_df["subject_nhs_number"].iloc[2]
-    logging.info(f"Selected NHS number for older subject: {nhs_no}")
-    SubjectDemographicUtil(page).update_subject_dob(nhs_no, True, False)
+    nhs_no_lnpcp_older = subjects_df["subject_nhs_number"].iloc[2]
+    logging.info(f"Selected NHS number for older subject: {nhs_no_lnpcp_older}")
+    SubjectDemographicUtil(page).update_subject_dob(nhs_no_lnpcp_older, True, False)
     logging.info(
-        f"Updated date of birth for NHS number {nhs_no} to indicate an older subject."
+        f"Updated date of birth for NHS number {nhs_no_lnpcp_older} to indicate an older subject."
     )
     InvestigationDatasetCompletion(page).complete_with_result(
-        nhs_no, InvestigationDatasetResults.LNPCP
+        nhs_no_lnpcp_older, InvestigationDatasetResults.LNPCP
     )
     logging.info(
-        f"Completed investigation dataset for NHS number {nhs_no} with result: LNPCP."
+        f"Completed investigation dataset for NHS number {nhs_no_lnpcp_older} with result: LNPCP."
     )
     AfterInvestigationDatasetComplete(page).progress_episode_based_on_result(
         InvestigationDatasetResults.LNPCP, False
     )
-    logging.info(f"Progressed episode for NHS number {nhs_no} based on result: LNPCP.")
+    logging.info(
+        f"Progressed episode for NHS number {nhs_no_lnpcp_older} based on result: LNPCP."
+    )
 
     # Younger patient - LNPCP Result
     logging.info("LNPCP result for a younger subject")
-    nhs_no = subjects_df["subject_nhs_number"].iloc[3]
-    logging.info(f"Selected NHS number for younger subject: {nhs_no}")
-    SubjectDemographicUtil(page).update_subject_dob(nhs_no, True, True)
+    nhs_no_lnpcp_younger = subjects_df["subject_nhs_number"].iloc[3]
+    logging.info(f"Selected NHS number for younger subject: {nhs_no_lnpcp_younger}")
+    SubjectDemographicUtil(page).update_subject_dob(nhs_no_lnpcp_younger, True, True)
     logging.info(
-        f"Updated date of birth for NHS number {nhs_no} to indicate a younger subject."
+        f"Updated date of birth for NHS number {nhs_no_lnpcp_younger} to indicate a younger subject."
     )
     InvestigationDatasetCompletion(page).complete_with_result(
-        nhs_no, InvestigationDatasetResults.LNPCP
+        nhs_no_lnpcp_younger, InvestigationDatasetResults.LNPCP
     )
     logging.info(
-        f"Completed investigation dataset for NHS number {nhs_no} with result: LNPCP."
+        f"Completed investigation dataset for NHS number {nhs_no_lnpcp_younger} with result: LNPCP."
     )
     AfterInvestigationDatasetComplete(page).progress_episode_based_on_result(
         InvestigationDatasetResults.LNPCP, True
     )
-    logging.info(f"Progressed episode for NHS number {nhs_no} based on result: LNPCP.")
+    logging.info(
+        f"Progressed episode for NHS number {nhs_no_lnpcp_younger} based on result: LNPCP."
+    )
 
     # Any patient -  Normal Result
     logging.info("Normal result for any age subject")
@@ -149,23 +155,72 @@ def test_compartment_6(page: Page, smokescreen_properties: dict) -> None:
         ],
     )
 
-    # This is to check for the status of a normal subject as this NHS Number cannot be retrieved from the DB
-    verify_subject_event_status_by_nhs_no(
-        page, nhs_no_normal, "S61 - Normal (No Abnormalities Found)"
+    logging.info("[DB ASSERTIONS] Asserting younger High-Risk subject status.")
+    subject_assertion(
+        nhs_no_high_risk_younger,
+        {
+            "latest event status": "A158 High-risk findings",
+        },
+    )
+
+    logging.info("[DB ASSERTIONS] Asserting younger LNPCP subject status.")
+    subject_assertion(
+        nhs_no_lnpcp_younger,
+        {
+            "latest event status": "A157 LNPCP",
+        },
+    )
+
+    logging.info("[DB ASSERTIONS] Asserting normal subject status.")
+    subject_assertion(
+        nhs_no_normal,
+        {
+            "latest event status": "S61 Normal (No Abnormalities Found)",
+        },
     )
 
     batch_processing(
         page,
         "A385",
         "Handover into Symptomatic Care Adenoma Surveillance, Age - GP Letter",
-        "A382 - Handover into Symptomatic Care - GP Letter Printed",
+    )
+
+    logging.info("[DB ASSERTIONS] Asserting older High-Risk subject status.")
+    subject_assertion(
+        nhs_no_high_risk_older,
+        {
+            "latest event status": "A382 Handover into Symptomatic Care - GP Letter Printed",
+        },
+    )
+
+    logging.info("[DB ASSERTIONS] Asserting older LNPCP subject status.")
+    subject_assertion(
+        nhs_no_lnpcp_older,
+        {
+            "latest event status": "A382 Handover into Symptomatic Care - GP Letter Printed",
+        },
     )
 
     batch_processing(
         page,
         "A382",
         "Handover into Symptomatic Care Adenoma Surveillance - Patient Letter",
-        "P202 - Waiting Completion of Outstanding Events",
+    )
+
+    logging.info("[DB ASSERTIONS] Asserting older High-Risk subject status.")
+    subject_assertion(
+        nhs_no_high_risk_older,
+        {
+            "latest event status": "P202 Waiting Completion of Outstanding Events",
+        },
+    )
+
+    logging.info("[DB ASSERTIONS] Asserting older LNPCP subject status.")
+    subject_assertion(
+        nhs_no_lnpcp_older,
+        {
+            "latest event status": "P202 Waiting Completion of Outstanding Events",
+        },
     )
 
     LogoutPage(page).log_out()
