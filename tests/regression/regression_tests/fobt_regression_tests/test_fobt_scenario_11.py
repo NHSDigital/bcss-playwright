@@ -160,8 +160,12 @@ def test_fobt_scenario_11(page: Page) -> None:
 
     # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
     # When I process the open "S9" letter batch for my subject
-    batch_processing(
-        page, "S9", "Invitation & Test Kit (FIT)", "S10 - Invitation & Test Kit Sent"
+    batch_processing(page, "S9", "Invitation & Test Kit (FIT)")
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {"latest event status": "S10 Invitation & Test Kit Sent"},
     )
 
     # When I log my subject's latest unlogged FIT kit

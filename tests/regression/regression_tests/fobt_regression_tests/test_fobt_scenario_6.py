@@ -147,26 +147,37 @@ def test_fobt_scenario_6(page: Page) -> None:
 
     # Then there is a "S1" letter batch for my subject with the exact title "Pre-invitation (FIT)"
     # When I process the open "S1" letter batch for my subject
+    batch_processing(page, "S1", "Pre-invitation (FIT)")
+
     # Then my subject has been updated as follows:
-    batch_processing(
-        page,
-        "S1",
-        "Pre-invitation (FIT)",
-        "S9 - Pre-invitation Sent",
-        True,
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S9 Pre-invitation Sent",
+        },
     )
 
     # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
+
     # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
     # When I process the open "S9" letter batch for my subject
-    # # Then my subject has been updated as follows:
     batch_processing(
         page,
         "S9",
         "Invitation & Test Kit (FIT)",
-        "S10 - Invitation & Test Kit Sent",
-        True,
     )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S10 Invitation & Test Kit Sent",
+        },
+    )
+
+    # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
 
     # When I log my subject's latest unlogged FIT kit
     fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
@@ -211,12 +222,16 @@ def test_fobt_scenario_6(page: Page) -> None:
 
     # And there is a "A183" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment"
     # When I process the open "A183 - Practitioner Clinic 1st Appointment" letter batch for my subject
-    # Then my subject has been updated as follows:
     batch_processing(
         page,
         "A183",
         "Practitioner Clinic 1st Appointment",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {"latest event status": "A25 1st Colonoscopy Assessment Appointment Booked"},
     )
 
     # And there is a "A183" letter batch for my subject with the exact title "GP Result (Abnormal)"
@@ -224,7 +239,12 @@ def test_fobt_scenario_6(page: Page) -> None:
         page,
         "A183",
         "GP Result (Abnormal)",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {"latest event status": "A25 1st Colonoscopy Assessment Appointment Booked"},
     )
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
@@ -269,12 +289,18 @@ def test_fobt_scenario_6(page: Page) -> None:
 
     # And there is a "J30" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment Non Attendance (Screening Centre)"
     # When I process the open "J30" letter batch for my subject
-    # Then my subject has been updated as follows:
     batch_processing(
         page,
         "J30",
         "Practitioner Clinic 1st Appointment Non Attendance (Screening Centre)",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent"
+        },
     )
 
     # When I switch users to BCSS "England" as user role "Hub Manager"
@@ -390,7 +416,6 @@ def test_fobt_scenario_6(page: Page) -> None:
         page,
         "A38",
         "Discharge (No Agreement To Proceed With Diagnostic Tests) - Patient letter",
-        "A168 - GP Discharge Sent (No Agreement to Proceed with Diagnostic Tests)",
     )
     criteria = {
         "calculated FOBT due date": "2 years from episode end",
@@ -506,7 +531,6 @@ def test_fobt_scenario_6(page: Page) -> None:
         page,
         "A165",
         "Patient Discharge (No Agreement To Proceed With Diagnostic Tests) - Patient Letter",
-        "A168 - GP Discharge Sent (No Agreement to Proceed with Diagnostic Tests)",
     )
     criteria = {
         "calculated fobt due date": "2 years from episode end",

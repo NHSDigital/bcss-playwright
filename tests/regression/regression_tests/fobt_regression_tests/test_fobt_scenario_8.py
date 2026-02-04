@@ -166,14 +166,22 @@ def test_fobt_scenario_8(page: Page) -> None:
 
     # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
     # When I process the open "S9" letter batch for my subject
-    # Then my subject has been updated as follows:
     batch_processing(
         page=page,
         batch_type="S9",
         batch_description="Invitation & Test Kit (FIT)",
-        latest_event_status="S10 - Invitation & Test Kit Sent",
-        run_timed_events=True,
     )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        criteria={
+            "latest event status": "S10 Invitation & Test Kit Sent",
+        },
+    )
+
+    # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
 
     # When I log my subject's latest unlogged FIT kit
     fit_kit = FitKitGeneration().get_fit_kit_for_subject_sql(nhs_no, False, False)
@@ -327,24 +335,6 @@ def test_fobt_scenario_8(page: Page) -> None:
             "latest event status": "A172 DNA Diagnostic Test",
         },
     )
-
-    # When I switch users to BCSS "England" as user role "Hub Manager"
-    UserTools.switch_user(page, "Hub Manager", "BCS01")
-
-    # And I process the open "A183 - GP Result (Abnormal)" letter batch for my subject
-    # NOTE LEAVE COMMENTED - Subject is already at A172 DNA Diagnostic Test (line 313)
-    # Then my subject has been updated as follows:
-    # batch_processing(
-    #     page,
-    #     "A183",
-    #     "GP Result (Abnormal)",
-    #     "A172 - DNA Diagnostic Test",
-    # )
-    # criteria = {
-    #     "latest episode includes event status": "A167 GP Abnormal FOBT Result Sent",
-    #     "latest episode accumulated result": "No Result",
-    # }
-    # subject_assertion(nhs_no, criteria)
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager" (and remember session)
     user_role = UserTools.switch_user(

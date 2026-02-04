@@ -14,6 +14,7 @@ from pages.screening_subject_search.subject_screening_summary_page import (
 )
 from utils.appointments import book_appointments
 from utils.sspi_change_steps import SSPIChangeSteps
+from utils.oracle.oracle import OracleDB
 from pages.logout.log_out_page import LogoutPage
 from pages.base_page import BasePage
 from pages.screening_subject_search.episode_events_and_notes_page import (
@@ -153,20 +154,33 @@ def test_fobt_scenario_7(page: Page) -> None:
 
     # Then there is a "S1" letter batch for my subject with the exact title "Pre-invitation (FIT)"
     # When I process the open "S1" letter batch for my subject
+    batch_processing(page, "S1", "Pre-invitation (FIT)")
+
     # Then my subject has been updated as follows:
-    # When I run Timed Events for my subject
-    batch_processing(
-        page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent", True
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S9 Pre-invitation Sent",
+        },
     )
+
+    # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
 
     # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
     # When I process the open "S9" letter batch for my subject
-    # Then my subject has been updated as follows:
     batch_processing(
         page,
         "S9",
         "Invitation & Test Kit (FIT)",
-        "S10 - Invitation & Test Kit Sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S10 Invitation & Test Kit Sent",
+        },
     )
 
     # When I log my subject's latest unlogged FIT kit
@@ -213,12 +227,18 @@ def test_fobt_scenario_7(page: Page) -> None:
 
     # And there is a "A183" letter batch for my subject with the exact title "Practitioner Clinic 1st Appointment"
     # When I process the open "A183 - Practitioner Clinic 1st Appointment" letter batch for my subject
-    # Then my subject has been updated as follows:
     batch_processing(
         page,
         "A183",
         "Practitioner Clinic 1st Appointment",
-        "A25 - 1st Colonoscopy Assessment Appointment Booked, letter sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A25 1st Colonoscopy Assessment Appointment Booked",
+        },
     )
 
     # When I switch users to BCSS "England" as user role "Screening Centre Manager"
@@ -390,7 +410,6 @@ def test_fobt_scenario_7(page: Page) -> None:
         page,
         "A183",
         "GP Result (Abnormal)",
-        "J10 - Attended Colonoscopy Assessment Appointment",
     )
 
     # Then my subject has been updated as follows:
@@ -452,7 +471,14 @@ def test_fobt_scenario_7(page: Page) -> None:
         page,
         "J34",
         "Practitioner Clinic 1st Subsequent Appointment",
-        "J35 - Subsequent Appointment Booked, letter sent",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "J35 Subsequent Appointment Booked, letter sent",
+        },
     )
 
     # When I view the event history for the subject's latest episode
@@ -508,7 +534,14 @@ def test_fobt_scenario_7(page: Page) -> None:
         page,
         "J15",
         "Subject Discharge (Unsuitable For Further Diagnostic Tests)",
-        "J16 - Patient Discharge Sent (Unsuitable for Diagnostic Tests)",
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "J16 Patient Discharge Sent (Unsuitable for Diagnostic Tests)"
+        },
     )
 
     # When I switch users to BCSS "England" as user role "Hub Manager"
@@ -523,7 +556,6 @@ def test_fobt_scenario_7(page: Page) -> None:
         page,
         "J16",
         "GP Discharge (Not Suitable For Diagnostic Tests)",
-        "J17 - GP Discharge Sent (Unsuitable for Diagnostic Tests)",
     )
 
     # Then my subject has been updated as follows:
@@ -556,4 +588,5 @@ def test_fobt_scenario_7(page: Page) -> None:
         "surveillance due date": "Null",
     }
     subject_assertion(nhs_no, criteria)
+
     LogoutPage(page).log_out()

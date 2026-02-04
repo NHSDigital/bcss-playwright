@@ -1,6 +1,7 @@
 import pytest
 from playwright.sync_api import Page
 from utils.user_tools import UserTools
+from utils.oracle.oracle import OracleDB
 from utils.oracle.subject_creation_util import CreateSubjectSteps
 from utils.subject_assertion import subject_assertion
 from utils.call_and_recall_utils import CallAndRecallUtils
@@ -98,31 +99,56 @@ def test_fobt_scenario_1(page: Page) -> None:
 
     # Then there is a "S1" letter batch for my subject with the exact title "Pre-invitation (FIT)"
     # When I process the open "S1" letter batch for my subject
+    batch_processing(page, "S1", "Pre-invitation (FIT)")
+
     # Then my subject has been updated as follows:
-    # When I run Timed Events for my subject
-    batch_processing(
-        page, "S1", "Pre-invitation (FIT)", "S9 - Pre-invitation Sent", True
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S9 Pre-invitation Sent",
+        },
     )
+
+    # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
 
     # Then there is a "S9" letter batch for my subject with the exact title "Invitation & Test Kit (FIT)"
     # When I process the open "S9" letter batch for my subject
-    # Then my subject has been updated as follows:
-    # When I run Timed Events for my subject
     batch_processing(
         page,
         "S9",
         "Invitation & Test Kit (FIT)",
-        "S10 - Invitation & Test Kit Sent",
-        True,
     )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S10 Invitation & Test Kit Sent",
+        },
+    )
+
+    # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
 
     # Then there is a "S10" letter batch for my subject with the exact title "Test Kit Reminder"
     # When I process the open "S10" letter batch for my subject
-    # Then my subject has been updated as follows:
-    # When I run Timed Events for my subject
     batch_processing(
-        page, "S10", "Test Kit Reminder", "S19 - Reminder of Initial Test Sent", True
+        page,
+        "S10",
+        "Test Kit Reminder",
     )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S19 Reminder of Initial Test Sent",
+        },
+    )
+
+    # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
 
     # Then there is a "S19" letter batch for my subject with the exact title "GP Discharge (Initial Test)"
     # When I process the open "S19" letter batch for my subject
@@ -130,7 +156,6 @@ def test_fobt_scenario_1(page: Page) -> None:
         page,
         "S19",
         "GP Discharge (Initial Test)",
-        "S44 - GP Discharge for Non-response Sent (Initial Test)",
     )
 
     # Then my subject has been updated as follows:
@@ -194,23 +219,37 @@ def test_fobt_scenario_1(page: Page) -> None:
 
     # And there is a "S3" letter batch for my subject with the exact title "Retest (Spoilt) (FIT)"
     # When I process the open "S3" letter batch for my subject
+    batch_processing(page, "S3", "Retest (Spoilt) (FIT)")
+
     # Then my subject has been updated as follows:
-    # When I run Timed Events for my subject
-    batch_processing(
-        page, "S3", "Retest (Spoilt) (FIT)", "S11 - Retest Kit Sent (Spoilt)", True
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S11 Retest Kit Sent (Spoilt)",
+        },
     )
+
+    # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
 
     # Then there is a "S11" letter batch for my subject with the exact title "Reminder of Retest (Spoilt)"
     # When I process the open "S11" letter batch for my subject
-    # Then my subject has been updated as follows:
-    # When I run Timed Events for my subject
     batch_processing(
         page,
         "S11",
         "Reminder of Retest (Spoilt)",
-        "S20 - Reminder of Retest Kit Sent (Spoilt)",
-        True,
     )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "S20 Reminder of Retest Kit Sent (Spoilt)",
+        },
+    )
+
+    # When I run Timed Events for my subject
+    OracleDB().exec_bcss_timed_events(nhs_number=nhs_no)
 
     # Then there is a "S20" letter batch for my subject with the exact title "GP Discharge Non Response (Spoilt)"
     # When I process the open "S20" letter batch for my subject
@@ -218,7 +257,6 @@ def test_fobt_scenario_1(page: Page) -> None:
         page,
         "S20",
         "GP Discharge Non Response (Spoilt)",
-        "S47 - GP Discharge for Non-response Sent (Spoilt Retest Kit)",
     )
 
     # Then my subject has been updated as follows:
