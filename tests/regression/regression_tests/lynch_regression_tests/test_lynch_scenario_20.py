@@ -54,7 +54,6 @@ from utils import screening_subject_page_searcher
 from utils.appointments import book_appointments, book_post_investigation_appointment
 from utils.batch_processing import batch_processing
 from utils.calendar_picker import CalendarPicker
-from utils.dataset_field_util import DatasetFieldUtil
 from utils.investigation_dataset import InvestigationDatasetCompletion
 from utils.lynch_utils import LynchUtils
 from utils.oracle.oracle import OracleDB
