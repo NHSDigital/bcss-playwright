@@ -74,7 +74,6 @@ from utils.subject_assertion import subject_assertion
 from utils.user_tools import UserTools
 
 
-@pytest.mark.wip
 @pytest.mark.usefixtures("setup_org_and_appointments")
 @pytest.mark.vpn_required
 @pytest.mark.regression
