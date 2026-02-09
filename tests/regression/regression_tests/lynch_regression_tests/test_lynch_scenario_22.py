@@ -30,8 +30,8 @@ from pages.datasets.investigation_dataset_page import (
     PolypInterventionModalityOptions,
     PolypInterventionRetrievedOptions,
     PolypTypeOptions,
-    YesNoUncertainOptions,
     YesNoOptions,
+    YesNoUncertainOptions,
 )
 from pages.datasets.subject_datasets_page import SubjectDatasetsPage
 from pages.logout.log_out_page import LogoutPage
@@ -50,6 +50,7 @@ from pages.screening_subject_search.contact_with_patient_page import (
 from pages.screening_subject_search.diagnostic_test_outcome_page import (
     DiagnosticTestOutcomePage,
     OutcomeOfDiagnosticTest,
+    ReasonForSymptomaticReferral,
 )
 from pages.screening_subject_search.episode_events_and_notes_page import (
     EpisodeEventsAndNotesPage,
@@ -77,13 +78,13 @@ from utils.user_tools import UserTools
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.lynch_regression_tests
-def test_lynch_scenario_21(page: Page) -> None:
+def test_lynch_scenario_22(page: Page) -> None:
     """
-    Scenario: 21 - Cancer result from diagnostic tests
+    Scenario: 22 - Cancer result from symptomatic procedure
 
-    G1-G2-G3-A183-A25-J10-A99-A59-A259-A315-A361-A323-A317-A345-A346-A63-C203-Lynch in age [SSCL18d]
+    G1-G2-G3-A183-A25-J10-A99-A59-A259-A315-A361-A323-A317-A353-A372-A345-A346-A63-C203 [SSCL18d]
 
-    This scenario takes an in-age subject through their Lynch episode to closure on Cancer result from diagnostic tests, returning the subject to Lynch Surveillance.
+    This scenario tests where a subject has a diagnostic test result of LNPCP, but then goes on to have a cancer result from symptomatic procedure.
 
     Scenario summary:
 
@@ -97,11 +98,14 @@ def test_lynch_scenario_21(page: Page) -> None:
     > Suitable for Endoscopic Test > A99 (2.2)
     > Invite for Diagnostic Test > A59 (2.1)
     > Attend test > A259 (2.1)
-    > Cancer Result, Refer MDT > A315 (2.1)
+    > LNPCP, refer symptomatic > A315 (2.1)
     > Other Post-investigation Appointment Required > A361 (2.1)
-    > Post-investigation Appointment Not Required > A345 (2.7)
+    > Post-investigation Appointment Not Required > A317 (2.1)
+    > MDT Referral Not Required > A353 (2.6)
+    > Process A353 letter batch > A372 (2.6)
+    > Cancer Result, Refer MDT > A345 (2.6)
     > Handover into Symptomatic Care > A346 (2.7)
-    > Process A346 letter batch > A63 (3.6)
+    > Process A346 letter batch > A63 > C203(3.6)
     > Check recall [SSCL18d]
     """
     # Given I log in to BCSS "England" as user role "Hub Manager"
@@ -212,7 +216,7 @@ def test_lynch_scenario_21(page: Page) -> None:
     # And I receive an SSPI update to change their date of birth to "65" years old
     SSPIChangeSteps().sspi_update_to_change_dob_received(nhs_no, 65)
 
-    logging.info("Progress the episode through to closure")
+    logging.info("Progress the episode to suitable for colonoscopy")
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -266,8 +270,10 @@ def test_lynch_scenario_21(page: Page) -> None:
     # And I view the latest practitioner appointment in the subject's episode
     EpisodeEventsAndNotesPage(page).click_most_recent_view_appointment_link()
 
-    # And I attend the subject's practitioner appointment "today"
-    AppointmentDetailPage(page).mark_appointment_as_attended(datetime.today())
+    # And I attend the subject's practitioner appointment "3 days ago"
+    AppointmentDetailPage(page).mark_appointment_as_attended(
+        datetime.today() - timedelta(days=3)
+    )
 
     # Then my subject has been updated as follows:
     subject_assertion(
@@ -275,6 +281,10 @@ def test_lynch_scenario_21(page: Page) -> None:
         {
             "latest event status": "J10 Attended Colonoscopy Assessment Appointment",
         },
+    )
+
+    logging.info(
+        "Progress the episode until the subject has attended their first diagnostic test"
     )
 
     # When I view the subject
@@ -319,9 +329,9 @@ def test_lynch_scenario_21(page: Page) -> None:
         "Colonoscopy"
     )
 
-    # And I enter a Diagnostic Test First Offered Appointment Date of "tomorrow"
+    # And I enter a Diagnostic Test First Offered Appointment Date of "today"
     AdvanceLynchSurveillanceEpisodePage(page).click_calendar_button()
-    CalendarPicker(page).v1_calender_picker(datetime.today() + timedelta(days=1))
+    CalendarPicker(page).v1_calender_picker(datetime.today())
 
     # And I advance the subject's episode for "Invite for Diagnostic Test >>"
     AdvanceLynchSurveillanceEpisodePage(page).click_invite_for_diagnostic_test_button()
@@ -330,12 +340,26 @@ def test_lynch_scenario_21(page: Page) -> None:
     subject_assertion(
         nhs_no,
         {
+            "which diagnostic test": "Latest test in latest episode",
+            "diagnostic test proposed type": "Colonoscopy",
+            "diagnostic test confirmed type": "Null",
+            "diagnostic test intended extent": "Null",
             "latest event status": "A59 Invited for Diagnostic Test",
         },
     )
 
     # When I select the advance episode option for "Attend Diagnostic Test"
     AdvanceLynchSurveillanceEpisodePage(page).click_attend_diagnostic_test_button()
+
+    # Then I confirm the value of the diagnostic test attendance field "Proposed Type of Test" is "Colonoscopy"
+    AttendDiagnosticTestPage(page).confirm_proposed_type_of_test(
+        "Proposed Type of Test", "Colonoscopy"
+    )
+
+    # And I confirm the value of the diagnostic test attendance field "Actual Type of Test" is "Colonoscopy"
+    AttendDiagnosticTestPage(page).confirm_proposed_type_of_test(
+        "Actual Type of Test", "Colonoscopy"
+    )
 
     # And I attend the subject's diagnostic test
     AttendDiagnosticTestPage(page).click_calendar_button()
@@ -346,9 +370,15 @@ def test_lynch_scenario_21(page: Page) -> None:
     subject_assertion(
         nhs_no,
         {
+            "which diagnostic test": "Latest test in latest episode",
+            "diagnostic test proposed type": "Colonoscopy",
+            "diagnostic test confirmed type": "Colonoscopy",
+            "diagnostic test intended extent": "Null",
             "latest event status": "A259 Attended Diagnostic Test",
         },
     )
+
+    logging.info("Complete the investigation dataset to give a result of Abnormal")
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -370,27 +400,25 @@ def test_lynch_scenario_21(page: Page) -> None:
     # And I open all minimized sections on the dataset
     InvestigationDatasetsPage(page).open_all_minimized_sections()
 
-    # When I apply the "CancerDetected2" Investigation Dataset Scenario
-    # When I add the following bowel preparation drugs and values within the Investigation Dataset for this subject:
-    InvestigationDatasetCompletion(page).fill_out_drug_information(
-        {
-            "drug_dose1": "10",
-            "drug_type1": DrugTypeOptions.BISACODYL,
-            "drug_dose2": "20",
-            "drug_type2": DrugTypeOptions.CITRAFLEET,
-        }
-    )
-
-    # And I set the following fields and values within the Investigation Dataset for this subject:
+    # And I set the following fields and values within the "Investigation Dataset" section of the investigation dataset:
     InvestigationDatasetCompletion(page).fill_out_general_information(
         {
             "practitioner": 1,
             "site": 1,
             "testing clinician": 1,
-            "aspirant endoscopist": 1,
+            "aspirant endoscopist": None,
         }
     )
 
+    # And I add the following bowel preparation drugs and values within the Investigation Dataset for this subject:
+    InvestigationDatasetCompletion(page).fill_out_drug_information(
+        {
+            "drug_dose1": "3",
+            "drug_type1": DrugTypeOptions.MANNITOL,
+        }
+    )
+
+    # And I set the following fields and values within the "Endoscopy Information" section of the investigation dataset:
     InvestigationDatasetCompletion(page).fill_endoscopy_information(
         {
             "endoscope inserted": "yes",
@@ -398,13 +426,13 @@ def test_lynch_scenario_21(page: Page) -> None:
             "bowel preparation quality": BowelPreparationQualityOptions.GOOD,
             "comfort during recovery": ComfortOptions.NO_DISCOMFORT,
             "comfort during examination": ComfortOptions.NO_DISCOMFORT,
-            "endoscopist defined extent": EndoscopyLocationOptions.ANASTOMOSIS,
+            "endoscopist defined extent": EndoscopyLocationOptions.APPENDIX,
             "scope imager used": YesNoOptions.YES,
             "retroverted view": YesNoOptions.YES,
             "start of intubation time": "09:00",
-            "start of extubation time": "09:15",
-            "end time of procedure": "09:30",
-            "scope id": "A1",
+            "start of extubation time": "09:30",
+            "end time of procedure": "10:00",
+            "scope id": "Autotest",
             "insufflation": InsufflationOptions.AIR,
             "outcome at time of procedure": OutcomeAtTimeOfProcedureOptions.LEAVE_DEPARTMENT,
             "late outcome": LateOutcomeOptions.NO_COMPLICATIONS,
@@ -413,7 +441,7 @@ def test_lynch_scenario_21(page: Page) -> None:
 
     # And I set the following completion proof values within the Investigation Dataset for this subject:
     InvestigationDatasetCompletion(page).fill_out_completion_information(
-        {"completion proof": CompletionProofOptions.VIDEO_ANASTOMOSIS}
+        {"completion proof": CompletionProofOptions.VIDEO_APPENDIX}
     )
 
     # And I set the following failure reasons within the Investigation Dataset for this subject:
@@ -424,40 +452,41 @@ def test_lynch_scenario_21(page: Page) -> None:
     # And I add new polyp 1 with the following fields and values within the Investigation Dataset for this subject:
     InvestigationDatasetCompletion(page).fill_polyp_x_information(
         {
-            "location": EndoscopyLocationOptions.RECTUM,
-            "classification": PolypClassificationOptions.IIA,
-            "estimate of whole polyp size": "10",
+            "location": EndoscopyLocationOptions.APPENDIX,
+            "classification": PolypClassificationOptions.ISP,
+            "estimate of whole polyp size": "19",
             "polyp access": PolypAccessOptions.EASY,
             "left in situ": YesNoOptions.NO,
         },
         1,
     )
 
-    # And I add intervention 1 for polyp 1 with the following fields and values within the Investigation Dataset for this subject:
+    # And I add 1 intervention for polyp 1 with the following fields and values within the Investigation Dataset for this subject:
     InvestigationDatasetCompletion(page).fill_polyp_x_intervention(
         {
-            "modality": PolypInterventionModalityOptions.EMR,
+            "modality": PolypInterventionModalityOptions.ESD,
             "device": PolypInterventionDeviceOptions.HOT_SNARE,
             "excised": YesNoOptions.YES,
             "retrieved": PolypInterventionRetrievedOptions.YES,
-            "excision technique": PolypInterventionExcisionTechniqueOptions.EN_BLOC,
+            "excision technique": PolypInterventionExcisionTechniqueOptions.PIECE_MEAL,
+            "polyp appears fully resected endoscopically": YesNoOptions.YES,
         },
         1,
     )
 
-    # And I update histology details for polyp 1 with the following fields and values within the Investigation Dataset for this subject:
+    # And I add histology for polyp 1 with the following fields and values within the Investigation Dataset for this subject:
     InvestigationDatasetCompletion(page).fill_polyp_x_histology(
         {
             "date of receipt": datetime.today(),
             "date of reporting": datetime.today(),
-            "pathology provider": -1,
-            "pathologist": -1,
+            "pathology provider": 1,
+            "pathologist": 1,
             "polyp type": PolypTypeOptions.ADENOMA,
-            "adenoma sub type": AdenomaSubTypeOptions.NOT_REPORTED,
-            "polyp excision complete": PolypExcisionCompleteOptions.R0,
-            "polyp size": "5",
+            "adenoma sub type": AdenomaSubTypeOptions.VILLOUS_ADENOMA,
+            "polyp excision complete": PolypExcisionCompleteOptions.R1,
+            "polyp size": "20",
             "polyp dysplasia": PolypDysplasiaOptions.NOT_REPORTED,
-            "polyp carcinoma": YesNoUncertainOptions.YES,
+            "polyp carcinoma": YesNoUncertainOptions.NO,
         },
         1,
     )
@@ -465,13 +494,20 @@ def test_lynch_scenario_21(page: Page) -> None:
     # And I mark the Investigation Dataset as completed
     InvestigationDatasetsPage(page).check_dataset_complete_checkbox()
 
-    # Then the Investigation Dataset result message, which I will cancel, is "Cancer Detected"
-    InvestigationDatasetsPage(page).click_save_dataset_button_assert_dialog(
-        "Cancer Detected"
-    )
+    # Then the Investigation Dataset result message, which I will cancel, is "LNPCP"
+    InvestigationDatasetsPage(page).click_save_dataset_button_assert_dialog("LNPCP")
 
     # And I press the save Investigation Dataset button
     InvestigationDatasetsPage(page).click_save_dataset_button()
+
+    # Then I confirm the Polyp Algorithm Size for Polyp 1 is 20
+    InvestigationDatasetsPage(page).assert_polyp_algorithm_size(1, "20")
+
+    # And I confirm the Polyp Category for Polyp 1 is "LNPCP"
+    InvestigationDatasetsPage(page).assert_polyp_category(1, "LNPCP")
+
+    # And I confirm the Episode Result is "LNPCP"
+    EpisodeRepository().confirm_episode_result(nhs_no, "LNPCP")
 
     # When I view the subject
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
@@ -482,9 +518,31 @@ def test_lynch_scenario_21(page: Page) -> None:
         page
     ).click_enter_diagnostic_test_outcome_button()
 
-    # And I select Outcome of Refer MDT
+    # Then I confirm the Outcome Of Diagnostic Test dropdown has the following options:
+    DiagnosticTestOutcomePage(page).test_outcome_dropdown_contains_options(
+        [
+            "Refer Another Diagnostic Test",
+            "Refer Symptomatic",
+            "Investigation Complete",
+        ],
+    )
+
+    # And I select Outcome of Refer Symptomatic
     DiagnosticTestOutcomePage(page).select_test_outcome_option(
-        OutcomeOfDiagnosticTest.REFER_MDT
+        OutcomeOfDiagnosticTest.REFER_SYMPTOMATIC
+    )
+    DiagnosticTestOutcomePage(page).select_reason_for_symptomatic_referral_option(
+        ReasonForSymptomaticReferral.POLYP_EXCISION
+    )
+
+    # Then the text "Diagnostic Test Date resulting in a recall due date" is not visible
+    DiagnosticTestOutcomePage(page).text_is_visible(
+        "Diagnostic Test Date resulting in a recall due date", False
+    )
+
+    # When I select Reason for Symptomatic Referral value "Suspected Cancer Surgery"
+    DiagnosticTestOutcomePage(page).select_reason_for_symptomatic_referral_option(
+        ReasonForSymptomaticReferral.SUSPECTED_CANCER_SURGERY
     )
 
     # And I save the Diagnostic Test Outcome
@@ -498,16 +556,8 @@ def test_lynch_scenario_21(page: Page) -> None:
         },
     )
 
-    # And I confirm the Episode Result is "Cancer Detected"
-    EpisodeRepository().confirm_episode_result(nhs_no, "Cancer Detected")
-
-    # When I select the advance episode option for "Other Post-investigation Contact Required"
-    # Then I confirm OK to an alert message that "contains" "A post-investigation appointment is advised after a cancer diagnosis"
-    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    # When I advance the subject's episode for "Other Post-investigation Contact Required"
     SubjectScreeningSummaryPage(page).click_advance_lynch_surveillance_episode_button()
-    AdvanceLynchSurveillanceEpisodePage(page).assert_dialog_text(
-        "A post-investigation appointment is advised after a cancer diagnosis", True
-    )
     AdvanceLynchSurveillanceEpisodePage(
         page
     ).click_other_post_investigation_contact_required_button()
@@ -546,15 +596,7 @@ def test_lynch_scenario_21(page: Page) -> None:
         nhs_no,
         {
             "latest episode includes event status": "A323 Post-investigation Appointment NOT Required",
-        },
-    )
-
-    # And my subject has been updated as follows:
-    subject_assertion(
-        nhs_no,
-        {
-            "latest episode includes event status": "A317 Post-investigation Contact Made",
-            "latest event status": "A345 Cancer Result, Refer MDT",
+            "latest event status": "A317 Post-investigation Contact Made",
         },
     )
 
@@ -562,7 +604,56 @@ def test_lynch_scenario_21(page: Page) -> None:
     screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
     SubjectScreeningSummaryPage(page).click_advance_lynch_surveillance_episode_button()
 
-    # And I select the advance episode option for "Handover into Symptomatic Care"
+    # And I advance the subject's episode for "MDT Referral Not Required"
+    AdvanceLynchSurveillanceEpisodePage(page).click_mdt_referral_not_required_button()
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A353 MDT Referral Not Required",
+        },
+    )
+
+    # And there is a "A353" letter batch for my subject with the exact title "GP Letter Indicating Referral to Symptomatic (Lynch)"
+    # When I process the open "A353" letter batch for my subject
+    batch_processing(
+        page, "A353", "GP Letter Indicating Referral to Symptomatic (Lynch)"
+    )
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest event status": "A372 Refer Symptomatic, GP Letter Printed",
+        },
+    )
+
+    logging.info("Record a symptomatic result of Cancer")
+
+    # When I view the advance episode options
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+    SubjectScreeningSummaryPage(page).click_advance_lynch_surveillance_episode_button()
+
+    # And I enter a Date of Symptomatic Procedure of "yesterday"
+    AdvanceLynchSurveillanceEpisodePage(page).click_calendar_button()
+    CalendarPicker(page).v1_calender_picker(datetime.today() - timedelta(days=1))
+
+    # And I advance the subject's episode for "Cancer Result, Refer MDT >>"
+    AdvanceLynchSurveillanceEpisodePage(page).click_cancer_result_refer_mdt_button()
+
+    # Then my subject has been updated as follows:
+    subject_assertion(
+        nhs_no,
+        {
+            "latest episode accumulated result": "Cancer Detected",
+            "latest event status": "A345 Cancer Result, Refer MDT",
+        },
+    )
+
+    logging.info("Handover into Symptomatic Care")
+
+    # When I select the advance episode option for "Handover into Symptomatic Care"
     AdvanceLynchSurveillanceEpisodePage(
         page
     ).click_handover_into_symptomatic_care_button()
@@ -570,7 +661,7 @@ def test_lynch_scenario_21(page: Page) -> None:
     # And I fill in Handover into Symptomatic Care with Cancer details
     HandoverIntoSymptomaticCarePage(page).fill_with_cancer_details()
 
-    # And my subject has been updated as follows:
+    # Then my subject has been updated as follows:
     subject_assertion(
         nhs_no, {"latest event status": "A346 Handover into Symptomatic Care"}
     )
@@ -587,6 +678,7 @@ def test_lynch_scenario_21(page: Page) -> None:
     subject_assertion(
         nhs_no,
         {
+            "which diagnostic test": "Latest not-void test in latest episode",
             "calculated fobt due date": "Null",
             "calculated lynch due date": "2 years from episode end",
             "calculated surveillance due date": "Null",
@@ -594,25 +686,26 @@ def test_lynch_scenario_21(page: Page) -> None:
             "ceased confirmation details": "Null",
             "ceased confirmation user id": "Null",
             "clinical reason for cease": "Null",
-            "latest episode accumulated result": "Cancer Detected",
             "latest episode recall calculation method": "Episode end date",
             "latest episode recall episode type": "Lynch Surveillance",
             "latest episode recall surveillance type": "Null",
             "latest episode status reason": "Episode Complete",
             "latest event status": "A63 Cancer",
             "lynch due date": "Calculated Lynch due date",
-            "lynch due date date of change": "Today",
             "lynch due date reason": "Result referred for Cancer Treatment",
-            "lynch incident episode": "Latest episode",
+            "lynch due date date of change": "Today",
             "screening due date": "Null",
             "screening due date date of change": "Unchanged",
             "screening due date reason": "Unchanged",
+            "screening referral type": "Null",
             "screening status": "Lynch Surveillance",
-            "screening status date of change": "Unchanged",
             "screening status reason": "Result referred for Cancer Treatment",
+            "screening status date of change": "Unchanged",
             "surveillance due date": "Null",
-            "surveillance due date date of change": "Unchanged",
             "surveillance due date reason": "Unchanged",
+            "surveillance due date date of change": "Unchanged",
+            "symptomatic procedure date": "Yesterday",
+            "symptomatic procedure result": "Cancer",
         },
     )
 
