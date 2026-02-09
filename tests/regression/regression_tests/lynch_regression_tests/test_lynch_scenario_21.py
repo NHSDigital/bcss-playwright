@@ -50,7 +50,6 @@ from pages.screening_subject_search.contact_with_patient_page import (
 from pages.screening_subject_search.diagnostic_test_outcome_page import (
     DiagnosticTestOutcomePage,
     OutcomeOfDiagnosticTest,
-    ReasonForSymptomaticReferral,
 )
 from pages.screening_subject_search.episode_events_and_notes_page import (
     EpisodeEventsAndNotesPage,
@@ -63,7 +62,7 @@ from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
 from utils import screening_subject_page_searcher
-from utils.appointments import book_appointments, book_post_investigation_appointment
+from utils.appointments import book_appointments
 from utils.batch_processing import batch_processing
 from utils.calendar_picker import CalendarPicker
 from utils.investigation_dataset import InvestigationDatasetCompletion
@@ -78,7 +77,7 @@ from utils.user_tools import UserTools
 @pytest.mark.vpn_required
 @pytest.mark.regression
 @pytest.mark.lynch_regression_tests
-def test_lynch_scenario_20(page: Page) -> None:
+def test_lynch_scenario_21(page: Page) -> None:
     """
     Scenario: 21 - Cancer result from diagnostic tests
 
