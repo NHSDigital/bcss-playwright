@@ -1,6 +1,5 @@
 import logging
 import pytest
-from datetime import datetime
 from playwright.sync_api import Page
 from classes.repositories.general_repository import GeneralRepository
 from classes.repositories.subject_repository import SubjectRepository
@@ -8,11 +7,8 @@ from pages.base_page import BasePage
 from pages.logout.log_out_page import LogoutPage
 from pages.screening_practitioner_appointments.appointment_detail_page import (
     AppointmentDetailPage,
-    ReasonForCancellationOptions,
 )
-from pages.screening_subject_search.advance_lynch_surveillance_episode_page import (
-    AdvanceLynchSurveillanceEpisodePage,
-)
+
 from pages.screening_subject_search.episode_events_and_notes_page import (
     EpisodeEventsAndNotesPage,
 )
@@ -320,4 +316,3 @@ def test_lynch_scenario_2_1(page: Page) -> None:
     )
 
     LogoutPage(page).log_out()
-    
