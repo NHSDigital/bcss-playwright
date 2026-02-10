@@ -16,13 +16,12 @@ from pages.screening_subject_search.subject_screening_summary_page import (
     SubjectScreeningSummaryPage,
 )
 from utils import screening_subject_page_searcher
-from utils.appointments import AppointmentAttendance, book_appointments
+from utils.appointments import  book_appointments
 from utils.batch_processing import batch_processing
 from utils.lynch_utils import LynchUtils
 from utils.oracle.oracle import OracleDB
 from utils.subject_assertion import subject_assertion
 from utils.user_tools import UserTools
-
 
 @pytest.mark.usefixtures("setup_org_and_appointments")
 @pytest.mark.vpn_required
