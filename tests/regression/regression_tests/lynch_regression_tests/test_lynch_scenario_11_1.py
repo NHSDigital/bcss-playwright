@@ -89,10 +89,10 @@ def test_lynch_scenario_11_1(page: Page) -> None:
     if user_role is None:
         raise ValueError("User cannot be assigned to a UserRoleType")
 
-    # When I receive Lynch diagnosis "EPCAM" for a new subject in my hub aged "75" with diagnosis date "3 years ago" and last colonoscopy date "2 years ago"
+    # When I receive Lynch diagnosis "MSH6" for a new subject in my hub aged "75" with diagnosis date "3 years ago" and last colonoscopy date "2 years ago"
     nhs_no = LynchUtils(page).insert_validated_lynch_patient_from_new_subject_with_age(
         age="75",
-        gene="EPCAM",
+        gene="MSH6",
         when_diagnosis_took_place="3 years ago",
         when_last_colonoscopy_took_place="2 years ago",
         user_role=user_role,
@@ -122,7 +122,7 @@ def test_lynch_scenario_11_1(page: Page) -> None:
             "Screening due date reason": "Null",
             "Subject has lynch diagnosis": "Yes",
             "Subject lower FOBT age": "Default",
-            "Subject lower lynch age": "25",
+            "Subject lower lynch age": "35",
             "Screening status": "Lynch Self-referral",
             "Screening status date of change": "Today",
             "Screening status reason": "Self-referral",
@@ -158,7 +158,7 @@ def test_lynch_scenario_11_1(page: Page) -> None:
             "screening due date reason": "Null",
             "subject has lynch diagnosis": "Yes",
             "subject lower fobt age": "Default",
-            "subject lower lynch age": "25",
+            "subject lower lynch age": "35",
             "screening status": "Lynch Self-referral",
             "screening status date of change": "Today",
             "screening status reason": "Self-referral",
