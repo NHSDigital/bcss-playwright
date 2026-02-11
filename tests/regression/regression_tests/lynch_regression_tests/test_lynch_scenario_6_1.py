@@ -659,5 +659,5 @@ def test_lynch_scenario_6_1(page: Page) -> None:
     SubjectScreeningSummaryPage(page).button_with_value_present(
         "Self-refer Lynch Surveillance", True
     )
-    
+
     LogoutPage(page).log_out()
