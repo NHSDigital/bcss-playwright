@@ -652,4 +652,12 @@ def test_lynch_scenario_6_1(page: Page) -> None:
         user_role,
     )
 
+    # When I view the subject
+    screening_subject_page_searcher.navigate_to_subject_summary_page(page, nhs_no)
+
+    # Then I "can" see a button with value of "Self-refer Lynch Surveillance"
+    SubjectScreeningSummaryPage(page).button_with_value_present(
+        "Self-refer Lynch Surveillance", True
+    )
+    
     LogoutPage(page).log_out()
