@@ -52,7 +52,6 @@ from utils.calendar_picker import CalendarPicker
 from utils.investigation_dataset import InvestigationDatasetCompletion
 from utils.lynch_utils import LynchUtils
 from utils.oracle.oracle import OracleDB
-from utils.sspi_change_steps import SSPIChangeSteps
 from utils.subject_assertion import subject_assertion
 from utils.user_tools import UserTools
 
