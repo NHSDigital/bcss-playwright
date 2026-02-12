@@ -573,13 +573,13 @@ def test_lynch_scenario_23_1(page: Page) -> None:
         page
     ).click_handover_into_symptomatic_care_button()
 
-    # And I fill in Handover into Symptomatic Care form for Patient Unfit for Treatment and Cease from programme
+    # And I fill in Handover into Symptomatic Care form for Patient Unfit for Treatment and do not Cease
     HandoverIntoSymptomaticCarePage(page).select_referral_dropdown_option(
         "Referral to Patient's GP Practice"
     )
     HandoverIntoSymptomaticCarePage(page).select_practitioner_from_index(1)
-    HandoverIntoSymptomaticCarePage(page).fill_notes("Handover notes - unfit (cease)")
-    HandoverIntoSymptomaticCarePage(page).select_cease_from_program(True)
+    HandoverIntoSymptomaticCarePage(page).fill_notes("Handover notes - unfit")
+    HandoverIntoSymptomaticCarePage(page).select_cease_from_program(False)
     HandoverIntoSymptomaticCarePage(page).click_save_button()
 
     # Then my subject has been updated as follows:
