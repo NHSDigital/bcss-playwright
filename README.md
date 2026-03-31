@@ -1,6 +1,7 @@
 # BCSS Playwright Test Suite
 
-[![CI/CD Pull Request](https://github.com/nhs-england-tools/playwright-python-blueprint/actions/workflows/cicd-1-pull-request.yaml/badge.svg)](https://github.com/nhs-england-tools/playwright-python-blueprint/actions/workflows/cicd-1-pull-request.yaml)
+> [!WARNING]
+> This repository has now been archived as the tests and additional functionality provided by this repository have been merged into the [bcss](https://github.com/NHSDigital/bcss) project.
 
 This repository contains the automated UI test suite for the BCSS application, built using [Playwright Python](https://playwright.dev/python/). It provides a structured framework and reusable utilities to support consistent, maintainable test development across the project.
 
